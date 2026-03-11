@@ -1,0 +1,1970 @@
+# Changelog
+
+All notable changes to the Agentic AI Data Science Methodology will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.3.37] - 2026-03-10
+
+### Added - Third-Party Asset Due Diligence (BACKLOG-166)
+
+- DSM_6.0 Principle 1.8 (Know What You Own): checklist and guidance for verifying licensing before deploying any third-party asset (AI-generated images, stock photos, fonts, code snippets, API data); covers free-tier vs. paid-tier ownership distinctions, high-risk scenario flags, scope (public-facing vs. internal), timing (at creation, not deployment), and relationship to Principle 1.7 (Own Your Process); evidence from Recraft AI logo incident (dsm-blog-poster S4)
+- DSM_6.0 Section 2.2 Gaps table: new row mapping third-party asset licensing gap to Principle 1.8
+- DSM_0: updated DSM_6.0 description from seven to eight principles, added Know What You Own
+
+### Source
+
+- BL-166 (Session 112); evidence from dsm-blog-poster inbox (Recraft logo licensing incident, S4)
+
+## [1.3.36] - 2026-03-10
+
+### Added - Standard Spoke Pattern + Project Participation Pattern Detection (BACKLOG-169)
+
+- DSM_3 Section 6.9 (Standard Spoke Pattern): unified entry point for the default DSM project type; covers core properties table, git configuration, CLAUDE.md template with Protocol Applicability table, canonical directory structure, bidirectional data flow architecture, communication protocol, and anti-patterns; references existing detailed sections (6.1-6.7) without duplication
+- DSM_3 Section 6 intro: project participation pattern overview table comparing all three patterns (Standard Spoke, External Contribution, Private Project) across git tracking, registry visibility, inbox direction, feedback push, README notifications, cross-repo writes, and CLAUDE.md location; clarifies that the DSM track (Notebook/Application/Hybrid/Documentation) and participation pattern are orthogonal dimensions
+- DSM_0.2 Participation Pattern Detection subsection: extends session-start Project Type Detection to identify both track and participation pattern; agent announces "This is a [track] project ([DSM version]) using the [pattern] pattern"; detection indicators for Standard Spoke, External Contribution, and Private Project; governs inbox behavior, feedback push, README notifications, and cross-repo write scope
+- DSM_0: added Section 6.9 to DSM_3 content description
+
+### Source
+
+- BL-169 (Session 112); gap surfaced after formalizing Private Project Pattern in Section 6.8 (S111)
+
+## [1.3.60] - 2026-03-10
+
+### Added - Private Project Pattern + Enabling File Content Protocol (BACKLOG-162)
+
+- DSM_3 Section 6.8 (Private Project Pattern): canonical template for privacy-sensitive projects using local git only (no remote); covers CLAUDE.md template with Protocol Applicability table, directory structure, data flow architecture, sanitized feedback protocol with minimal "feedback available" inbox notification, local README as project status dashboard, WSL2 path constraint, and initialization checklist override
+- DSM_0.2 Enabling File Content Protocol: meta rule that enabling files (backlog items, checkpoints, decisions, plans, epochs, handoffs) are scope/tracking artifacts and never implementation targets; agent must flag any "document X in this file" pattern and surface it to the user
+- DSM_0 listing: added Section 6.8 to DSM_3 content description
+- BL-162 corrected: git tracking "No" changed to "Local only (no remote)"; implementation section now references DSM_3 Section 6.8 instead of self-documenting in the backlog item
+
+### Source
+
+- BL-162 promotion to DSM body (Session 111); field evidence from AMEX (Sessions 98-100) and Steuern (Session 110) private projects
+
+## [1.3.59] - 2026-03-04
+
+### Added - Fork Governance Isolation ("My Fork, My Rules")
+
+- DSM_6 Principle 1.6 (Match the Room): replaced NOTE placeholder with governance boundary subsection; defines two dimensions of external contribution governance: outward (contribution matches upstream) and inward (contributor maintains governance sovereignty)
+- DSM_3 Section 6.6.10 (Fork Governance Isolation): new operational guidance for maintaining governance sovereignty when upstream projects have AI governance artifacts; covers file handling (rename, not delete), governance layers, conflict resolution, and session-start awareness
+- DSM_3 Section 6.6 Anti-Patterns: 3 new entries for governance isolation violations (following upstream AI governance as active instructions, deleting upstream governance files, letting upstream override contributor process)
+- DSM_6 Section 2.1 Evolution table: new protocol mapping row for Fork Governance Isolation
+- DSM_0: added Section 6.6.10 to the DSM_3 listing
+
+### Source
+
+- Architecture designed in Session 92; evidence from Reclaim Launcher external contribution (Sessions 82-89, all 3 PRs merged upstream)
+
+## [1.3.58] - 2026-03-02
+
+### Added - Lightweight Session Lifecycle (BACKLOG-151) + Per-Session Feedback (BACKLOG-153 Phase 1)
+
+- DSM_0.2 Lightweight Session Lifecycle: new protocol section documenting the lightweight mode, safety gate, deferred-items pattern, and transcript behavior for continuation sessions with known tasks
+- DSM_0.2 Session Transcript Protocol: updated lifecycle paragraph with lightweight mode exception (transcript persists, boundary marker appended instead of overwritten)
+- DSM_0.2 Command File Version Tracking: added `dsm-light-go` and `dsm-light-wrap-up` to user-level command listing
+- `/dsm-go` and `/dsm-light-go`: checkpoint consumption at session start (read, annotate, move to done/) prevents checkpoint accumulation
+- `/dsm-wrap-up` and `/dsm-quick-wrap-up`: parallelism hints for independent startup steps, MEMORY.md context notes, cross-references between variants
+- Moved 22 accumulated historical checkpoints to `docs/checkpoints/done/`
+- DSM_0.2 DSM Feedback Tracking: rewritten for per-session files (`YYYY-MM-DD_sN_{type}.md`) with lifecycle (create -> notify -> process -> done/), feedback directory requirements, new anti-pattern
+- DSM_0.2 Session-End Inbox Push: updated all references from append-only entries to per-session files, done/ convention replaces mark-or-remove
+- DSM_0.2 Technical Progress Reporting: updated intro to distinguish append-only model from per-session, relationship table now includes Lifecycle column
+
+### Source
+
+- BACKLOG-151 (Lightweight Session Lifecycle Mode): implemented across S87-S89, validated with full chain test (S87 light wrap-up -> S88 light go -> S88 light wrap-up -> S89 light go)
+- BACKLOG-153 Phase 1 (Per-Session Feedback Lifecycle): protocol design in DSM_0.2; command updates and spoke migration deferred to Phase 2-3
+
+## [1.3.57] - 2026-03-01
+
+### Added - Spoke Feedback Protocol Improvements
+
+- DSM_0.2 Phase 0.5: ad-hoc research documentation trigger; when the agent conducts incidental research (web searches, reference analysis) during implementation, write findings to `docs/research/` as part of the process, with a threshold (>5 min to reconstruct) to avoid overhead for trivial lookups
+- DSM_0.2 Feedback Tracking: filing completeness cross-reference; explicitly connects feedback filing to the Immediate push rule in Session-End Inbox Push, with new anti-pattern for filing without notification
+- `/dsm-go` step 3.5: checkpoint auto-read at session start; reads latest checkpoint from `docs/checkpoints/` to supplement MEMORY.md with consolidated pending work details
+
+### Source
+
+- Three process gap feedback entries from Reclaim Launcher external contribution (Sessions 2-3): research artifact not auto-generated, feedback inbox notification skipped, checkpoint not read at session start. Common pattern: agent completes primary action but misses automatic follow-through.
+
+## [1.3.56] - 2026-03-01
+
+### Added - Artifact Lifecycle Management (BACKLOG-137)
+
+- DSM_0.2 Artifact Lifecycle Management: new protocol section with transcript retirement rule (>10 sessions without STAA flag moves to done/), checkpoint supersession rule (newer checkpoint covers same scope + prior next steps acted on), and anti-patterns
+- Sprint Boundary Checklist: added "superseded checkpoints moved to done/" step
+- Project CLAUDE.md: backlog done/ yearly archival convention (DSM Central specific)
+- Research document: `docs/research/2026-03-01_information-lifecycle-management.md` with audit metrics (125 done backlog items, 22 checkpoints without done/, 24 pending transcripts) and lifecycle design
+
+## [1.3.55] - 2026-03-01
+
+### Added - AI Collaboration Ethics (BACKLOG-124)
+
+- DSM_6.0 Principle 1.7 "Own Your Process": new attribution/disclosure principle with decision framework (context-dependent disclosure levels for external contributions, published artifacts, internal work, exploratory work); guidance on what to disclose (tool, nature of involvement, human contribution) and what not to (prompts, token counts); relationship to Earn Your Assertions and external frameworks (EU AI Act, arXiv:2512.00867)
+- DSM_6.0 Principle 1.3 accountability corollary: explicit statement that the human who submits work is the author of record regardless of tools used; responsibility for correctness, completeness, style, and impact is not diminished by AI output quality
+- DSM_6.0 Guideline 2.3 "Environmental Awareness": awareness-level note on AI compute costs; practical levers (prefer sufficient over maximal models, avoid unnecessary regeneration, intentional context usage); not prescriptive, acknowledges individual practitioner limitations
+- DSM_6.0 gap table: 3 new ethics rows (attribution/disclosure, accountability, environmental) marked as addressed
+- DSM_0 section listing: updated to reflect seven principles
+- README: updated principle count, DSM_6 description, Recent Changes
+
+### Research
+
+- Based on survey of NIST AI RMF 1.0, EU AI Act, IEEE CertifAIEd, arXiv:2512.00867 (AI Attribution Paradox), WEF/OECD responsible AI frameworks (docs/research/2026-03-01_ai-collaboration-ethics-research.md)
+
+## [1.3.54] - 2026-02-19
+
+### Added - Continuous Learning Protocol (BACKLOG-140)
+
+- DSM_0.2 Continuous Learning Protocol: new section defining a lightweight per-session learning step for tracking external developments in AI collaboration, data science methodology, and agentic AI patterns; includes topic selection, research, digest, store, and optional action steps; opt-in per project via `docs/research/learning-log.md` file existence; flexible cadence (every session aspiration, minimum every 3, skip criteria for constrained sessions)
+- Learning log template: `docs/research/learning-log.md` with topic queue (12 seeded topics spanning AI safety, governance, collaboration, methodology, MLOps, process mining), entry template with citation and relevance fields, append-only dated entries
+
+## [1.3.53] - 2026-02-19
+
+### Added - Agent Security Protocol Phase 2 (BACKLOG-135)
+
+- DSM_0.2 Untrusted Input Protocol: new section defining how the agent handles content from external sources (inbox entries, tool outputs, web fetch results, API responses); classifies sources as trusted vs untrusted, requires explicit user confirmation before executing embedded commands, flags suspicious patterns (shell commands, sensitive paths, protocol-contradicting instructions); maps to OWASP LLM01 (Prompt Injection, indirect variant)
+- Appendix F.1.1 Security Anti-Patterns: new subsection with 4 OWASP-informed code security patterns (SQL injection via f-strings, XSS in generated HTML, path traversal in file operations, command injection via subprocess); each pattern includes notebook vs production context guidance; maps to OWASP LLM05 (Improper Output Handling)
+- Cross-reference: DSM_0.2 Untrusted Input Protocol references Appendix F.1.1 for code-level patterns; F.1.1 references DSM_0.2 for agent-behavior protocol; security protocol summary table links all three security sections (Secret Exposure, Destructive Action, Untrusted Input)
+
+## [1.3.52] - 2026-02-19
+
+### Added - Phase 0.5 Research Hardening (BACKLOG-141)
+
+- Phase 0.5 source verification: new gate after drafting requires every factual claim in research-derived documents to trace to a specific source; anti-pattern added for unsourced claims (from IronCalc OBS-007)
+- Phase 0.5 done/ move checklist: replaced passive "fill in" guidance with explicit 4-step checklist (Status, Date Completed, Outcome Reference, verify artifact) with blocking language (from IronCalc OBS-008)
+- Inbox processing: "read referenced source file before evaluating" added to DSM_0.2 Session-Start Inbox Check and `/dsm-go` Step 2b; ensures agents follow the source pointer rather than evaluating from inbox summaries alone
+
+## [1.3.51] - 2026-02-19
+
+### Added - Technical Progress Reporting (BACKLOG-138)
+
+- DSM_0.2 Technical Progress Reporting: new protocol section defining `docs/feedback/technical.md` as the third feedback file for reporting what was built, how, and why at sprint boundaries; includes entry template (techniques table, data scale, outcomes, profile-relevant flag), inbox routing format, and channel relationship table
+- Sprint Boundary Checklist: "technical progress report updated" added as 7th item
+- DSM_0.1 feedback convention: updated from "exactly two files" to "exactly three files" (backlogs.md, methodology.md, technical.md)
+- `/dsm-wrap-up` step 7c: scans `docs/feedback/technical.md` for unpushed entries alongside backlogs and methodology files
+- Inbox entry type: "Technical Progress Report" added to `_inbox/README.md` type enum
+
+## [1.3.50] - 2026-02-18
+
+### Added - Reasoning Lessons Protocol formalization
+
+- DSM_0.2 Reasoning Lessons Protocol: new optional section formalizing the auto/STAA extraction system from BACKLOG-126 experiment; documents file format, extraction modes, maintenance rules (pruning cadence, promotion criteria, file size target), STAA guidance, and spoke opt-in mechanism
+- Wrap-up STAA recommendation: `/dsm-wrap-up` and `/dsm-quick-wrap-up` Step 0 now outputs a targeted STAA recommendation after auto extraction, replacing the generic session-start reminder
+- Post-experiment cleanup: removed "(BACKLOG-126 experiment)" labels from dsm-go (Steps 1.5, 6.5, 6.7), dsm-wrap-up, and dsm-quick-wrap-up command steps
+- dsm-go Step 6.7: simplified from generic STAA reminder to conditional reminder based on previous session's wrap-up recommendation
+
+## [1.3.49] - 2026-02-18
+
+### Added - Agent Security Protocol Phase 1 (BACKLOG-134)
+
+- DSM_0.2 Secret Exposure Prevention: agent-side pre-commit check against sensitive file patterns (`.env`, `*.key`, `*.pem`, `credentials.*`, etc.); refuses to stage matches without explicit user confirmation
+- DSM_0.2 Destructive Action Protocol: extends destructive command protections to non-bash operations (cross-repo writes, substantive file deletion, methodology structural changes)
+- Project CLAUDE.md: reinforcement of both new protocols; Destructive Command Protocol extended with non-bash operations list
+
+## [1.3.48] - 2026-02-18
+
+### Added - README Change Notification Filter (BACKLOG-132)
+
+- DSM_0.2 README Change Notification: sender-side relevance filter with send/skip criteria; internal-only changes (version bumps for protocol additions, date-only updates, formatting fixes) no longer trigger portfolio notifications
+- `/dsm-wrap-up` step 1: relevance filter evaluation before sending README notifications; logs decision with reason
+
+### Changed - Command Source Consolidation, Phase B (BACKLOG-131)
+
+- Consolidated all 12 DSM command files into `scripts/commands/` as single canonical source; 5 project-level commands moved from `.claude/commands/` (git-tracked) to `scripts/commands/` (git-tracked) with deploy-back via sync script
+- `scripts/sync-commands.sh`: dual-target deploy, user-level to `~/.claude/commands/` and project-level to `.claude/commands/`; deployed project-level commands gitignored as artifacts
+- `/dsm-wrap-up` step 1: relevance filter evaluation before sending README notifications; logs decision with reason
+
+## [1.3.47] - 2026-02-18
+
+### Changed - Contributions-docs Externalization (BACKLOG-129)
+
+- Migrated `contributions-docs/` from DSM Central to external governance storage repo (`~/dsm-collaboration-storage`); instance-specific governance no longer tracked in DSM Central git history
+- All literal `contributions-docs/` references in DSM_0.2 (6 locations), DSM_3 (~15 locations), and DSM_0.1 (1 location) replaced with `{contributions-docs-path}` template variable resolved from Ecosystem Path Registry
+- `.gitignore`: blanket `contributions-docs/` entry replaces specific file entry
+- `/dsm-wrap-up` and `/dsm-quick-wrap-up`: new governance storage commit step auto-commits external governance repo when modified; cross-repo commit note updated
+
+## [1.3.46] - 2026-02-17
+
+### Added - Command File Version Tracking, Phase A (BACKLOG-130)
+
+- `scripts/commands/`: tracked canonical source for 7 user-level DSM command files (dsm-align, dsm-go, dsm-quick-wrap-up, dsm-refresh-all, dsm-refresh-memory, dsm-staa, dsm-wrap-up)
+- `scripts/sync-commands.sh`: sync script with `--check` (drift detection) and `--deploy` (tracked -> runtime) modes
+- DSM_0.2 Command File Version Tracking section: edit flow (edit tracked source, then sync), drift detection, anti-patterns
+- `/dsm-align` step 9: command file drift detection (DSM Central only)
+- Phase A scope: user-level commands only; project-level `.claude/commands/` already tracked
+
+### Changed - README Change Notification detail requirement
+
+- DSM_0.2 README Change Notification: entry format now requires specific "What changed" field with actual text added/modified/removed, replacing vague "Summary of changes" placeholder; receiver must be able to act without reading the full source README
+
+## [1.3.45] - 2026-02-17
+
+### Added - Revert Safeguards Protocol (BACKLOG-127)
+
+- DSM_0.2 Revert Safeguards Protocol section: Pre-Implementation Snapshot, Backlog Item Revert Section, Feature Branch for Experimental Changes
+- `/dsm-backlog` template updated: prompts for untracked files and includes Revert Procedure section
+- BACKLOG-130 retroactive revert procedure added
+- Snapshot format template for `plan/archive/` pre-edit snapshots
+
+## [1.3.44] - 2026-02-17
+
+### Added - Inbox Append Rule
+
+- DSM_0.2 Session-End Inbox Push: new anti-pattern, do not overwrite existing inbox files; always append when unprocessed entries exist
+- DSM_0.2 README Change Notification: explicit append rule with cross-reference to inbox push anti-patterns
+
+## [1.3.43] - 2026-02-17
+
+### Added - Ecosystem Path Registry (BACKLOG-128)
+
+- Ecosystem Path Registry: `.claude/dsm-ecosystem.md` replaces hardcoded cross-repo paths with configurable logical name -> path mappings
+- New DSM_0.2 section: Ecosystem Path Registry (consumption, logical names, fallback behavior, validation)
+- `/dsm-go` Step 2a.5: reads and validates registry at session start; warns on missing paths
+- `/dsm-go` Step 6.7: STAA reminder when session transcript is archived (BL-126 enhancement)
+- `/dsm-wrap-up` Step 1b: uses registry for portfolio inbox path instead of hardcoded path
+- DSM_0.2 README Change Notification: portfolio target uses `{portfolio-path}` from registry
+- DSM_3: hub and governance references use registry instead of hardcoded absolute paths
+- Revert safety: pre-edit snapshots in `plan/archive/BL-128_pre-edit-snapshots.md`
+
+## [1.3.42] - 2026-02-16
+
+### Added - Reasoning Lessons Experiment (BACKLOG-126)
+
+- Reasoning Lessons extraction: `[auto]` tagged entries extracted at CA wrap-up, `[STAA]` tagged entries from dedicated analysis sessions
+- `/dsm-staa` command: Session Transcript Analysis Agent for deep transcript review without creating its own transcript (avoids recursion)
+- `/dsm-go` Step 1.5: reads `.claude/reasoning-lessons.md` at session start to prime with accumulated patterns
+- `/dsm-go` Step 6.5: archives previous session transcript to `.claude/transcripts/{timestamp}-ST.md` before reset
+- `/dsm-wrap-up` and `/dsm-quick-wrap-up` Step 0: scans transcript for notable reasoning patterns before other wrap-up steps
+- 10-session experiment (Sessions 51-61) comparing lightweight automated extraction vs full STAA analysis
+
+## [1.3.41] - 2026-02-15
+
+### Added - Blog Publication Tracking (BACKLOG-071)
+
+- Step 7 (Tracking) added to DSM_1.0 Section 2.5.6 Blog Process: update tracker after publication, move files to done/
+- Sprint Boundary Checklist in DSM_2.0: added "Blog publication tracker updated" item (template and example)
+- Publication Tracker subsection in DSM_0.1 Blog Artifacts: standard table format, status key, scope by project type (spoke, hub, external contribution)
+- IronCalc contributions-docs scaffolding: added missing done/ subfolders to blog/, checkpoints/, handoffs/
+
+## [1.3.40] - 2026-02-15
+
+### Added - Citation Backfill Audit (BACKLOG-113)
+
+- Inline citations added to DSM_0: Semantic Versioning (Preston-Werner, 2013), Architecture Decision Records (Nygard, 2011)
+- Inline citations added to DSM_4.0: ADRs (Nygard, 2011), TDD (Beck, 2003)
+- Hub-and-spoke pattern attribution added to DSM_3 (general distribution/organizational pattern)
+- References sections added to DSM_0 and DSM_4.0
+- Bare URLs in active backlog items (BACKLOG-050, 051, 052) converted to contextual citations
+- Done/ research docs verified against citation standard
+
+## [1.3.39] - 2026-02-15
+
+### Added - IronCalc-Derived Protocols and Breaking Change Notification
+
+- Breaking Change Notification Protocol in DSM_0.2 and DSM_3 Section 6.4.6 (BACKLOG-115): hub sends inbox entries to spokes on breaking changes, spoke updates Protocol Applicability table, agent enforces grace period
+- Research Execution Methodology in DSM_0.2 Phase 0.5 (BACKLOG-117): 4-step pipeline (gather, cluster, synthesize, validate), full citation metadata requirement, external contribution tone calibration
+- Reference File Size Protocol in DSM_0.1 (BACKLOG-119): ~500 line max, split-by-topic guidance, context budget warning for large files
+- Mechanical vs Decision Edits in DSM_0.2 (BACKLOG-120): batch mechanical updates to reduce approval fatigue, never mix with decision edits
+- Context Budget Protocol in DSM_0.2 (BACKLOG-121): large file read options, 40% threshold early warning, session planning estimation
+- DSM_0 listing updated for Section 6.4.6
+- README: contact email added, framework description repositioned (production > research > academic, "continuously refined")
+
+## [1.3.38] - 2026-02-15
+
+### Added - Take a Bite Delivery Principle (BACKLOG-122)
+
+- Session Delivery Budget in DSM_0.2: 5-7 files / ~500 lines per session review capacity heuristic
+- Research Phase Guard in DSM_0.2 Phase 0.5: gather-synthesize-checkpoint-go/no-go cycle to prevent unbounded exploration
+- PR Size Guidance in DSM_3 Section 6.6.7: calibration table based on upstream merge history, anti-patterns
+- DSM_6.0 Table 2.2 gap status: added Status column, 3 gaps marked as addressed, research guard row added
+- BACKLOG-125 proposed: DSM_6.0 Novelty Analysis and Publication Research
+- Research file: `docs/research/2026-02-15_dsm6-chatgpt-citations-and-analysis.md` (18 citations, academic mappings, publishability scores)
+
+### Fixed
+
+- /dsm-wrap-up README notification bug: now uses baseline commit SHA instead of working tree diff (was silently skipping all committed README changes)
+- /dsm-go: now records HEAD commit SHA in session baseline for wrap-up comparison
+- Overdue portfolio notification sent for README changes from Sessions 44-45
+
+## [1.3.37] - 2026-02-15
+
+### Added - Systematic Codebase Analysis
+
+- Systematic Codebase Analysis template in DSM_3 Section 6.6.9 (BACKLOG-118): 7-dimension quantitative analysis template for external contributions (quantitative overview, function patterns, error handling, test patterns, module organization, formatting, dependencies)
+- DSM_0 section listing updated for Section 6.6.9
+
+### Fixed
+
+- DSM_6.0 heading typo: removed stray 'b' character from document title
+
+## [1.3.36] - 2026-02-15
+
+### Added - AI Collaboration Principles, README Scope Update
+
+**DSM_6.0 AI Collaboration Principles v1.0** (new document):
+- Six foundational principles for human-AI collaboration: Take a Bite, The Human Brings the Spark, Earn Your Assertions, Understand/Review/Decide, Know Your Context, Match the Room
+- 32 existing protocol mappings to principles across all DSM documents
+- Inclusive Language guardrail in Match the Room: agent surfaces conflicts with external conventions, human decides
+- Gap analysis identifying 3 areas requiring new protocols (BACKLOG-119, 121, 122)
+- Cross-validated against full DSM documentation (BACKLOG-123)
+
+**TAKE_A_BITE.md** (new document):
+- Short version of the central principle with cookie metaphor
+- Hints at Earn Your Assertions and the broader framework
+
+**DSM_0 START HERE** updated:
+- Added DSM 6.0 section with six principles and key sections
+- Added TAKE_A_BITE.md cross-reference
+
+**README.md** updated:
+- Broadened scope: DSM is a human-AI collaboration framework, not just data science project management
+- Replaced "battle-tested" with neutral language throughout
+- Added DSM_6.0 and TAKE_A_BITE.md to System Components, Repository Structure, and document table
+- Added Documentation Track (DSM 5.0) and Collaboration Principles (DSM 6.0) to System Architecture diagram
+- Heading "Battle-Tested Case Studies" renamed to "Applied Across Projects"
+
+**DSM_0.2** updated:
+- Inclusive Language section: avoid violence, gender, political, religious, superiority-implying language
+- External contribution guardrail: agent must surface inclusive language conflicts, human approves consciously
+
+**Backlog:**
+- BACKLOG-123 implemented (Cross-Validate DSM_6.0 Against DSM Documentation)
+
+---
+
+## [1.3.35] - 2026-02-13
+
+### Added - External Contribution Protocol Hardening, README Notification
+
+**DSM_0.2** updated (BACKLOG-114):
+- External Contribution exception in Session-Start Inbox Check: agents must not create `_inbox/` in external repos
+- Protocol precedence rule in CLAUDE.md Configuration: project-specific CLAUDE.md overrides generic DSM_0.2
+- Validation gate before migration confirmation: verify governance scope before sending confirmation
+- Inbox vs feedback file roles clarified in Immediate push protocol: feedback file is source of truth, inbox is notification
+- README Change Notification: added notification targets table (spoke->portfolio+central, central->portfolio)
+
+**`/dsm-go`** updated (BACKLOG-114):
+- Step 2 rewritten with explicit dependency chain: 2a project type detection (gates 2b/2c) -> 2b inbox check -> 2c version check
+- Step 1 documents fallback behavior when MEMORY.md fails to load
+- Steps 6-7 document external contribution trade-off (Claude Code `.git/info/exclude` safety net)
+
+**`/dsm-wrap-up`** updated:
+- README check added as step 1: detects README changes, sends inbox to portfolio and DSM Central
+
+**IronCalc feedback:**
+- Full incident evidence transferred to `contributions-docs/IronCalc/feedback/methodology.md` (OBS-001, 11 problems, source audit with verbatim quotes)
+- Proposed fixes registered in `contributions-docs/IronCalc/feedback/backlogs.md` (BACKLOG-114, 115)
+
+**Backlog:**
+- BACKLOG-114 implemented (External Contribution Protocol Hardening, 7 fixes)
+- BACKLOG-115 proposed (Breaking Change Notification to Spokes)
+
+---
+
+## [1.3.34] - 2026-02-13
+
+### Added - Operational Monitoring, Root File Policy, Self-Compliance Audit
+
+**DSM_2.0** updated (BACKLOG-087):
+- Operational Monitoring section: metric categories (7 rows), recommended tool stack (4 rows), integration points, reporting format template
+
+**DSM_0.1** updated:
+- Root File Policy: allowed/not-allowed tables for project root files
+- Blog Workflow section: three-document pipeline (journal, blog-materials, blog/linkedin) (BACKLOG-105)
+
+**DSM_3 Section 6.6.7** added (BACKLOG-072):
+- Contribution Scope Planning: scope assessment matrix, risk levels, planning templates
+
+**DSM_3 Section 6.6.8** added (BACKLOG-070):
+- CLAUDE.md template, kickoff prompt, setup checklist for external contributions
+
+**DSM_5.0** updated (BACKLOG-081):
+- Hub exemption note for docs/feedback/ in Section 9.3
+- Self-compliance audit: 38 pre-convention backlog items backfilled with Date Implemented
+
+**DSM_0.2** updated:
+- WARNING added to CLAUDE.md Configuration: `@` reference as discovery mechanism
+- `/dsm-align` step 7: validates CLAUDE.md `@` reference to DSM_0.2
+
+**Tooling:**
+- `/dsm-refresh-memory` global skill created (BACKLOG-110): lightweight MEMORY.md reload
+- `/dsm-refresh-all` global skill created (BACKLOG-110): full context reload without session infrastructure
+- `/dsm-quick-wrap-up` global skill created: autonomous wrap-up without feedback push
+- `/dsm-go` step 3 added: handoff lifecycle (moves consumed handoffs to done/)
+- `/dsm-align` steps 4-6 added: feedback compliance, consumed handoffs, feedback push
+
+**Backlog:**
+- BACKLOG-070, 072, 081, 087, 105, 110 implemented
+
+---
+
+## [1.3.33] - 2026-02-13
+
+### Added - External Contribution Governance, Citation Standards, /dsm-align
+
+**DSM_3 Section 6.5** added (BACKLOG-096):
+- AI Contribution Guidelines Template: reusable 6-section template for OSS projects
+- Policy spectrum (5 positions from full embrace to full ban with real-world URLs)
+- Adaptation process for DSM agents approaching external projects
+- Legal context table by license type
+
+**DSM_3 Section 6.6** added (BACKLOG-069):
+- External Contribution Governance: governance for contributing to repos you don't own
+- Governance artifact location pattern (contributions-docs/{project}/)
+- Key differences from spoke projects (7-row comparison table)
+- Mandatory checks (AI policy step zero, upstream precedence rule)
+- CLAUDE.md pattern for external projects with protocol applicability table
+- Feedback cadence tied to contribution milestones
+
+**DSM_3 Section 6.6.7** added (BACKLOG-094):
+- External Contribution Onboarding Lifecycle: 3-phase pattern (Research, Onboarding, Deepening)
+- Phase transition validation criteria
+
+**DSM_0.1** updated (BACKLOG-112):
+- Citation Standards section: when to cite, format by source type, location by document type
+
+**DSM_0.2** updated:
+- Pre-Generation Brief: citations log reference points to DSM_0.1 Citation Standards
+- References section added (Semantic Versioning, Diataxis), modeling its own recommendation
+- Project Type Detection: External Contribution row added
+
+**DSM_0** updated:
+- Section 6.5 and 6.6 bullets added to DSM_3 listing
+
+**Tooling:**
+- `/dsm-align` global skill created (BACKLOG-109): idempotent structure alignment for spoke projects
+- `/dsm-feedback` absorbed into `/dsm-align` and deleted
+- `/dsm-go` updated to reference `/dsm-align` for structure checks
+
+**Backlog:**
+- BACKLOG-112, BACKLOG-113 created (citation standards and backfill audit)
+- _inbox/ migration from docs/inbox/ to project root
+
+---
+
+## [1.3.32] - 2026-02-11
+
+### Changed - Feedback Push, VRP Clarification, Experiment Types
+
+**DSM_0.2** updated:
+- Visible Reasoning Protocol: added anti-pattern clarifying VRP does not replace the Pre-Generation Brief
+- Session-End Inbox Push: added "Immediate push" option for ripe entries with explicit file routing (methodology.md for observations, backlogs.md for proposals, both + inbox)
+- Read-Only Access: renamed from "Scoped Read-Only Exploration" to unconditional "Read-Only Access Within Repository" (Session 31 change, first release)
+- Version header bumped to v1.3.11
+
+**DSM_4.0** updated:
+- Section 4.4: added "Experiment types" note distinguishing tuning experiments (threshold selection, no learned weights) from model experiments (train/test splits, cross-validation required)
+
+**Inbox** processed:
+- Graph Explorer: 6 entries processed (3 implemented, 3 cleared)
+
+---
+
+## [1.3.31] - 2026-02-10
+
+### Added - Visible Reasoning Protocol
+
+**DSM_0.2** updated:
+- Visible Reasoning Protocol section: agents output substantive reasoning as visible conversation text using delimiters, not hidden thinking blocks (workaround for VS Code extension collapsing thinking, microsoft/vscode#287658)
+- Protocol Reinforcement table: added Visible Reasoning Protocol row (all projects)
+- Version header bumped to v1.3.10
+
+**Global command** `/dsm-go` updated:
+- Inline thinking rule replaced with reference to DSM_0.2 Visible Reasoning Protocol
+
+---
+
+## [1.3.30] - 2026-02-10
+
+### Added - Bidirectional Project Inbox Pattern (BACKLOG-092)
+
+**DSM_3 Section 6.4** added:
+- Inbox architecture: hub inbox (one file per spoke), spoke inbox (from-hub.md)
+- Entry format with Type, Priority, Source fields
+- Lifecycle: write, surface, process, remove (transit point, not archive)
+- Spoke-to-hub flow with ripe criteria and push process
+- Hub-to-spoke flow for action items and notifications
+- Anti-patterns for inbox misuse
+
+**DSM_3 Section 6** updated:
+- Intro paragraph mentions inbox pattern
+- Scaffolding checklist (6.2.2): docs/inbox/ added
+
+**DSM_0.2** updated:
+- Session-Start Inbox Check: spoke agents check docs/inbox/ at session start
+- Inbox README template: spoke agents create README.md with entry template when initializing docs/inbox/
+- Migration confirmation: spoke agents send confirmation entry to DSM Central inbox after migration
+- Session-End Inbox Push: spoke agents push ripe feedback entries to hub inbox, with ripe criteria and anti-patterns
+- Transition note: docs/backlog/ renamed to docs/inbox/, auto-rename on detection
+- Version header bumped to v1.3.9
+
+**DSM Central** `docs/inbox/` created:
+- README.md with entry template, lifecycle explanation, and file conventions
+
+**DSM_4.0** updated:
+- docs/inbox/ added to both project structure trees (DSM 1.0 and DSM 4.0 patterns)
+
+**DSM_0** updated:
+- Implementation Guide listing includes inbox pattern reference
+
+---
+
+## [1.3.29] - 2026-02-10
+
+### Added - Anti-Pattern Requirements and Research Lifecycle (BACKLOG-089, BACKLOG-093)
+
+**DSM_0.2 Anti-Patterns** (BACKLOG-089):
+- Pre-Generation Brief Protocol: anti-patterns for premature artifact generation and batch briefs
+- Notebook Collaboration Protocol: anti-patterns for batch cell generation and skipping output validation
+- DSM Feedback Tracking: anti-patterns for mixing project-local fixes with methodology proposals
+- Sprint Cadence: anti-patterns for monolithic sprints, skipping boundary checklist, deferring feedback
+
+**DSM_0.2 Phase 0.5 Research Lifecycle** (BACKLOG-093):
+- Research file header template: Purpose/Question, Target Outcome, Status, dates, Outcome Reference
+- Validation gate: three-question checklist before processing research into outcomes
+- Archive convention: `docs/research/archive/` for consumed research with traceability fields
+- Research-specific anti-patterns for undirected research, stale files, and skipped validation
+
+---
+
+## [1.3.28] - 2026-02-10
+
+### Added - Blog Workflow Refinements and docs/guides/ Standard (BACKLOG-095, 097, 098, 101)
+
+**DSM_0.1 Blog Artifacts** updated:
+- Materials file role clarified: one per blog post, dual purpose (capture + structure), no separate journal file (BACKLOG-101)
+- Blog post metadata header template: Date, Author, Status, Platform (BACKLOG-095)
+- Mermaid diagram recommendation for architecture and flow diagrams (BACKLOG-098)
+
+**DSM_1.0 Section 2.5.6** updated:
+- Step 1 (Preparation) clarified: materials file is per-post with dual capture/structure role
+- Mermaid reference added to technical details bullet
+- Metadata header reference added to File Naming paragraph
+
+**DSM_4.0 Section 2.2** updated:
+- docs/ subfolder tree expanded from 4 to 8 subfolders (added feedback/, plans/, research/, guides/)
+- Aligns with DSM_0 which already documented 7 subfolders (BACKLOG-097)
+
+**DSM_0** updated:
+- DSM 4.0 pattern tree: added docs/guides/ subfolder
+
+---
+
+## [1.3.27] - 2026-02-10
+
+### Added - Spoke Update Propagation Mechanism (BACKLOG-088)
+
+**DSM_0.2** updated:
+- Version header moved to top of file (was buried at bottom, invisible via `@` reference)
+- New "Session-Start Version Check" section: spoke agents compare DSM version against last handoff
+
+**DSM_1.0 Section 6.1.2** updated:
+- Handoff template now includes `DSM Version` field for version tracking across sessions
+
+**DSM_3 Section 6.3** added:
+- "DSM Version Propagation" section documenting the hybrid detection mechanism
+- Immediate detection via version header + handoff-based version trail
+
+**DSM_0** updated:
+- Implementation Guide listing includes version propagation reference
+
+---
+
+## [1.3.26] - 2026-02-08
+
+### Added - Documentation Project Adaptation (BACKLOG-079, BACKLOG-080)
+
+**DSM_5.0_Documentation_Project_Adaptation_v1.0.md** (new document):
+- Track adaptation for documentation-only projects, parallel to DSM_4.0
+- 11 sections: project structure, file naming, metadata, cross-references, versioning, quality, session management, review cycle, integration with standard DSM
+- Codifies DSM Central's implicit conventions for documentation projects
+
+**DSM_0** updated:
+- Documentation track section alongside DSM_4.0 listing
+- Project Type Detection table includes Documentation row referencing DSM_5.0
+- File listing and Central DSM Repository diagram updated
+
+**DSM_0.2** updated:
+- Documentation row now references DSM_5.0 (was DSM 2.0/Section 2.5)
+- Agent initialization text updated
+
+**Research:** `docs/research/2026-02-08_documentation-project-best-practices.md` mapping DSM conventions to Diataxis, docs-as-code, keepachangelog, and semantic versioning frameworks
+
+---
+
+## [1.3.25] - 2026-02-06
+
+### Added - Hub-to-Spoke Project Kickoff (BACKLOG-068)
+
+**DSM_3 Section 6** restructured to "Project Handover Protocols":
+- Section 6.1: Spoke-to-Hub Feedback Handover (existing, renumbered 6.1.1-6.1.3)
+- Section 6.2: Hub-to-Spoke Project Kickoff (new), with preliminary scope template (6.2.1), scaffolding checklist (6.2.2), and kickoff prompt template (6.2.3)
+
+**DSM_0** workflow diagram updated with Hub Kickoff step before Sprint 1 Day 1
+
+**DSM_1.0 Section 6.5.2**: Hub Kickoff Gate (pre-Gateway 1) note added
+
+### Fixed
+- Removed stale `blog.md` reference from DSM_3 spoke-to-hub handover prompt template (BACKLOG-066 consistency)
+
+---
+
+## [1.3.24] - 2026-02-06
+
+### Added - Workflow Improvements Batch (BACKLOG-061, 062, 063, 064, 065, 067)
+
+**PM Guidelines Template 8 Enhancements** (BACKLOG-061, 063, 064, 065)
+- Execution mode field (`notebook | script | both`) and DSM references in phase definitions
+- Phase Boundary Checklist for intra-sprint documentation at phase transitions
+- Phase planning notes linking evaluation phases to Appendix C.1 experiment templates
+- README update added to Sprint Boundary Checklist
+
+**Custom Instructions Template** (BACKLOG-061, 064, 065)
+- Phase-to-DSM-Section Mapping table connecting phase types to relevant DSM sections
+- Notebook-to-Script Transition rule (when to extract code from notebooks)
+- Sprint boundary checklist now includes README update
+- Design decision documentation rule in Pre-Generation Brief Protocol
+- IDE permission mode note for Claude Code in VS Code
+
+**DSM_1.0 Section 6.4.1** (BACKLOG-063)
+- Intra-sprint checkpoint guidance for multi-phase sprints
+
+**Appendix C.1.3** (BACKLOG-062)
+- Design Decisions template for implementation-level decisions within experiments
+- References template with citation requirements for external tools, benchmarks, APIs
+
+**DSM 4.0 Section 15** (BACKLOG-067)
+- Claude Code permission mode configuration (`initialPermissionMode: default`)
+
+**DSM_0** (BACKLOG-061)
+- Appendix C.1.3 reference added to Advanced Practices listing for evaluation phases
+
+---
+
+## [1.3.23] - 2026-02-06
+
+### Changed - Blog Workflow Refinements (BACKLOG-066)
+
+**Section 6.4.5 - Blog/Feedback Separation**
+- Reduced feedback system from 3 files to 2 (backlogs.md, methodology.md)
+- Blog materials moved from `docs/feedback/blog.md` to `docs/blog/` as project deliverables
+- Updated Gateway 1 and Gateway 3 references
+- Updated `/dsm-feedback` command to reflect 2-file system
+
+**Section 2.5.6 - Blog Naming Convention**
+- Added `YYYY-MM-DD_{type}-{scope}.md` file naming reference to blog process
+
+**Section 2.5.9 - Blog Style Guide (NEW)**
+- Long-form conventions: byline, opening pattern, tone, citations, structure
+- Short-form LinkedIn conventions: plain text only, link-in-comments, hashtags
+- Style consistency step: read most recent post before drafting new one
+
+**Section 2.5.10 - Renumbered**
+- Presentation Preparation Checklist renumbered from 2.5.9 to 2.5.10
+
+**BACKLOG-068 Created**
+- Hub-to-spoke project kickoff handover process (Medium priority)
+- Documents workflow: hub writes preliminary scope, handover, spoke does Phase 0.5 research
+
+---
+
+## [1.3.22] - 2026-02-06
+
+### Added - Feedback Integration and Blog Workflow (BACKLOG-060, 066)
+
+**DSM_3 - Section 6: Feedback Handover Process** (BACKLOG-060)
+- Standardized handover prompt template for spoke-to-hub feedback integration
+- Created `/dsm-review-feedback` slash command for automated triage
+- Added handover process to DSM_1.0 Section 6.4.5
+- Added Project Finalization step to DSM_0 workflow diagram
+
+**DSM_0.1 - Blog Artifact Naming Convention** (BACKLOG-066, partial)
+- Added `YYYY-MM-DD_{type}-{scope}.md` convention for blog files
+- Covers materials, drafts, final posts, and LinkedIn posts
+- Added Blog Artifacts section with pattern table and scope examples
+
+**sql-query-agent Feedback Triage**
+- Processed 14 proposals from first spoke project: 5 rejected (already addressed), 9 accepted
+- Created BACKLOG-061 through BACKLOG-067 from accepted proposals
+
+**First DSM Central Blog Post**
+- "A Methodology That Listens" covering the feedback loop from sql-query-agent
+- Materials, draft, and LinkedIn post in docs/blog/
+
+**dsm-blog-poster Project Scaffolded** (BACKLOG-055)
+- Hugo v0.142.0 extended site at ~/dsm-blog-poster
+- CLAUDE.md with 7-post content migration catalog
+- Renamed ~/nlp-and-llms to ~/dsm-disaster-tweets
+
+---
+
+## [1.3.21] - 2026-02-06
+
+### Changed - DSM_0 Refactoring and Anti-Patterns Guide (BACKLOG-056, 058, 054, 047)
+
+**DSM_0 - Renamed Custom Instructions to DSM_0.2** (BACKLOG-056)
+- Renamed `DSM_Custom_Instructions_v1.1.md` to `DSM_0.2_Custom_Instructions_v1.1.md`
+- Updated all @references across DSM repo and 3 spoke projects
+- Migrated sql-query-agent from Windows to WSL path
+
+**DSM_0 - Refactored to Concise Orientation Map** (BACKLOG-058)
+- Reduced from 1,628 to 980 lines (40% reduction)
+- Replaced duplicated content with cross-references to source documents
+- Fixed 3 broken cross-references in DSM_2.0 and DSM_3
+
+**DSM_1.0 - Section 3.2.6: Coding Anti-Patterns + Appendix F** (BACKLOG-054)
+- Added 33 anti-patterns across 4 categories (Python, Data Science, ML Engineering, Agent Collaboration)
+- Summary table in Section 3.2.6, detailed reference with code examples in Appendix F
+- Each pattern includes Problem, Example, Fix, and DSM Reference
+
+**DSM_0.2 - Protocol Reinforcement Guidance** (BACKLOG-047)
+- Added WARNING about agents deprioritizing inherited protocols
+- Table of critical protocols that must be reinforced in project-specific CLAUDE.md
+- Example reinforcement block for notebook workflow
+
+---
+
+## [1.3.20] - 2026-02-06
+
+### Added - Methodology Improvements and Repository Organization (BACKLOG-049, 053, 056, 057)
+
+**DSM_4.0 - Section 4.4.1: Fixture Validation Principle** (BACKLOG-049)
+- Validate synthetic test fixtures against real data before building test suites
+- Four requirements: inspect real data first, extract don't invent, early capability experiment, format spot-check
+- Sprint 1 timing guidance added to Appendix C.1.3
+
+**DSM_1.0 - Section 6.5.6: DSM as Central Project Hub** (BACKLOG-053)
+- Documents DSM's dual role as methodology framework and project management hub
+- Hub-and-spoke ecosystem model for multi-project governance
+- Backlog classification: developments (external repos) vs improvements (internal DSM)
+
+**DSM_2.0 - Version Update Workflow Enhancement** (BACKLOG-056, partial)
+- Expanded workflow to explicit root file validation chain (DSM_0, DSM_0.1, DSM_0.2, README, CHANGELOG)
+- Added post-push audit step
+- Added version bump cadence policy (batch per session, one bump per session)
+- Backlog workflow now links to Version Update Workflow for implementation
+
+**Repository Organization** (BACKLOG-057)
+- Moved setup scripts to `scripts/` folder (clean root)
+- Updated all references across 9 active documents
+- Backlog reorganized into `developments/` and `improvements/` subfolders
+- Classification documented in PM Guidelines
+
+### Added - Backlog Items
+
+- BACKLOG-050: Research Agent MCP Server (High, development)
+- BACKLOG-051: Model Optimization Guide (Medium, development)
+- BACKLOG-052: DSM Jupyter Book (Medium, development)
+- BACKLOG-054: Coding Anti-Patterns Guide (Medium, improvement)
+- BACKLOG-055: Personal Website with Blog and LinkedIn Automation (Medium, development)
+- BACKLOG-058: Unified DSM Workflow in DSM_0 (High, improvement)
+- BACKLOG-059: Setup Scripts Modernization (Low, improvement)
+
+### Changed
+- **DSM_Custom_Instructions:** Added Punctuation section
+- **README:** Updated Graph Explorer stats (202 tests, 94% coverage)
+- **DSM_0:** Updated section references for 4.4.1 and 6.5.6; script paths updated
+
+---
+
+## [1.3.19] - 2026-02-01
+
+### Added - Cross-Project Governance and Development Protocols (BACKLOG-039 through BACKLOG-046)
+
+**Custom Instructions Template (DSM_Custom_Instructions_v1.1.md):**
+
+- **Pre-Generation Brief Protocol** (BACKLOG-043)
+  - Structured 4-point brief (what, why, key decisions, structure) before every artifact
+  - Formalizes existing "confirm before generating" guidance into actionable protocol
+  - Cross-validated by dsm-graph-explorer project (highest-priority feedback item)
+
+- **Notebook Collaboration Protocol** (BACKLOG-045)
+  - Agent provides cells as code blocks in conversation, never writes .ipynb directly
+  - Cell-by-cell interaction mechanics: provide, execute, validate, next
+  - Cross-validated by sql-query-agent project (lowest scoring DSM section at 2.5/5)
+
+- **Phase 0.5: Research and Grounding** (BACKLOG-039)
+  - Optional research phase before sprint planning for novel techniques/domains
+  - Trigger criteria (when to apply vs skip) and deliverable format
+  - Cross-validated by both projects independently adding research phases
+
+- **Sprint Cadence and Feedback Boundaries** (BACKLOG-040)
+  - Short sprint guidance: prefer 1-3 focused sprints over monolithic sprints
+  - Sprint boundary checklist (checkpoint, feedback, decisions, blog)
+  - Cross-validated by dsm-graph-explorer restructuring into 4 short sprints
+
+- **App Development Protocol** added to template (moved from project-specific CLAUDE.md)
+- **CLAUDE.md Configuration** requirement: all projects must `@` reference Custom Instructions
+
+**DSM_0 Complete Guide:**
+
+- **Project Directory Structure** updated (BACKLOG-042)
+  - Separate patterns for DSM 1.0 (data science) and DSM 4.0 (software engineering)
+  - Complete docs/ subfolder structure: checkpoints/, decisions/, feedback/, handoffs/, plans/, research/, blog/
+  - CLAUDE.md `@` reference requirement documented in setup section
+  - Cross-validated by both projects discovering missing folders during execution
+
+- **DSM Feedback Tracking** updated to reference 3-file system in docs/feedback/
+- **PM Guidelines Template 8** listed in template inventory
+
+**PM Guidelines (Template 8: Sprint Plan with Cadence Guidance)** (BACKLOG-044, BACKLOG-040)
+  - Sprint-level planning template with MUST/SHOULD/COULD deliverables
+  - Sprint phases, open design questions, and "how to resume" sections
+  - Sprint boundary checklist aligned with feedback system
+  - Cadence guidance integrated into template preamble
+
+**Section 6.4.5: Project Feedback Deliverables** (BACKLOG-041)
+  - Consolidated from 2-file to 3-file system: backlogs.md, methodology.md, blog.md
+  - Files now live in docs/feedback/ (standardized location)
+  - Integrated Validation Tracker scoring into methodology.md (per-section scores)
+  - Appendix E.12 updated to note integration into feedback system
+
+**Section 6.5: Gateway Review Protocol** (BACKLOG-046)
+  - Hub-and-Spoke governance model for methodology-to-project feedback
+  - Three gateway levels: Setup Complete, Sprint Boundary, Project Delivery
+  - Gateway review process: checklist, alignment report, feedback, pass
+  - Cross-project learning mechanisms based on SECI model
+  - Anti-patterns to avoid (compliance theater, central bottleneck, over-governance)
+  - Grounded in multi-agent governance research (docs/research/)
+
+**Research:**
+  - `docs/research/2026-02-01_multi-agent-governance-research.md` - Comprehensive survey of 6 domains
+    (multi-agent systems, software engineering governance, quality gates,
+    organizational learning, docs-as-code, AI agent frameworks)
+
+### Changed
+- **BACKLOG-039 through BACKLOG-046:** Status updated to Implemented, moved to done/
+- **Appendix E.12:** Marked as integrated into feedback system (Section 6.4.5)
+- **DSM_0 Section 3:** Project directory structure now has DSM 1.0 and DSM 4.0 patterns
+
+### Purpose
+Formalizes bidirectional feedback between DSM methodology and consuming projects.
+Previously, feedback only flowed from projects to DSM (bottom-up via feedback files).
+This release adds methodology-to-project guidance (top-down via gateway reviews),
+standardized development protocols, and cross-project learning mechanisms. Grounded
+in research across multi-agent systems, organizational learning theory, and software
+engineering governance patterns. All changes cross-validated by two concurrent DSM
+projects (dsm-graph-explorer, sql-query-agent-ollama).
+
+---
+
+## [1.3.18] - 2026-01-30
+
+### Added - DSM 4.0 Project Structure Patterns (BACKLOG-038)
+
+**DSM 4.0 v1.3 - Section 2: Project Structure Patterns**
+- DSM 1.0 pattern (data science projects): Separate `_Project_Knowledge/` repository
+  - Session handoffs, decisions, checkpoints in separate repo
+  - Rationale: Separates analysis artifacts from meta-documentation
+- DSM 4.0 pattern (software engineering projects): In-repo `docs/` folder
+  - Session handoffs, decisions, checkpoints inside main repo
+  - Rationale: Follows software engineering conventions, simpler for contributors
+- When to use each pattern (project type decision table)
+- Claude Projects context guidance for both patterns
+- Migration guidance for existing and new projects
+
+**Section renumbering:**
+- New Section 2 inserted, all subsequent sections renumbered (old Section 2 → Section 3, etc.)
+- TOC updated to reflect new structure (17 sections total)
+
+### Changed
+- **BACKLOG-038:** Status updated to Implemented
+- **DSM 4.0:** Version updated to v1.3
+
+### Purpose
+Formalizes the project structure pattern difference between data science and software engineering projects. This clarifies when to use separate Project_Knowledge repos vs. in-repo docs/, preventing confusion when following DSM 4.0.
+
+---
+
+## [1.3.17] - 2026-01-30
+
+### Added - Analysis Enhancements, Blog Process, PM Checklists (BACKLOG-023 through BACKLOG-035)
+
+**Section 2.4 Analysis enhancements (BACKLOG-028, 029, 030, 031):**
+
+- **Section 2.4.8: Human Performance Baseline** (BACKLOG-028)
+  - When to establish human baseline (criteria by task type)
+  - Methods by effort level (quick estimate, inter-annotator agreement, published benchmarks)
+  - Reporting format for model comparison tables
+
+- **Section 2.4.9: Model Complexity vs Explainability** (BACKLOG-029)
+  - Decision framework table (performance gap, stakeholder needs, regulatory context)
+  - Explainability assessment template for model selection reporting
+  - Guidance on when small gains do not justify complexity
+
+- **Section 2.4.10: Grouped Data Splitting** (BACKLOG-031)
+  - Scenario table (users, patients, sensors, products, sessions)
+  - Decision checklist before splitting data
+  - GroupKFold and GroupShuffleSplit references
+
+**Appendix D.2.7: Embedding Visualization (BACKLOG-030):**
+  - When to visualize embeddings (comparison, debugging, communication)
+  - Technique comparison table (PCA, t-SNE, UMAP)
+  - Interpretation guidelines and comparison layout recommendation
+
+**Section 2.5 Blog/Communication process (BACKLOG-023, 024, 025):**
+
+- **Section 2.5.6: Blog/Communication Deliverable Process** (BACKLOG-023)
+  - 6-step process: preparation, scoping, drafting, review, audit, publication
+  - Materials document template, scoping questions, citation and jargon audit
+
+- **Section 2.5.7: Publication Strategy** (BACKLOG-024)
+  - Three-deliverable format (short post, article, follow-up comment)
+  - Publication sequence and timing rationale
+  - Short post structure, formatting notes for LinkedIn Articles
+
+- **Section 2.5.8: Blog Post as Standard Deliverable** (BACKLOG-025)
+  - Blog as standard Communication phase output
+  - Expectations (length, audience, quality)
+  - Skip conditions documented
+
+- **Section 2.5.9: Presentation Preparation Checklist** (BACKLOG-035)
+  - Common Q&A categories (baselines, alternatives, limitations, explainability)
+  - 5-step preparation process
+
+**PM Guidelines additions (BACKLOG-026, 032, 033):**
+
+- **Visualization Quality Checklist** (BACKLOG-026)
+  - Content, formatting, and output checks for figures
+  - Context-specific notes (presentations, blogs, notebooks)
+
+- **Debugging Log Template** (BACKLOG-032)
+  - Structured template for multi-iteration debugging sequences
+  - Fields: problem, attempts table, root cause, solution, prevention
+
+- **Scope Review Checkpoint** (BACKLOG-033)
+  - Trigger conditions for scope review (COULD items, timeline extension)
+  - Review questions and lightweight documentation format
+
+**Appendix A.10: External API Portability (BACKLOG-027):**
+  - Prefer direct HTTP over CLI wrappers
+  - Auth method documentation practice
+  - Fallback logic for data paths
+  - Common API portability issues table
+
+**Section 6.4.6: Documentation Audit (BACKLOG-034):**
+  - Audit checklist for project closure
+  - When to audit and audit process
+
+### Changed
+
+- **BACKLOG-023 through BACKLOG-035:** Status updated to Implemented
+- **DSM_0:** Core Content updated with new Section 2.4, 2.5 subsections; Appendix A.10, D.2.7
+- **PM Guidelines description:** Updated with new checklists
+
+### Purpose
+
+Comprehensive implementation of NLP project feedback covering instructor feedback (human baselines, explainability, embedding visualization, grouped splitting), blog writing process standardization, and PM quality checklists. All items originated from the NLP & LLMs project Day 6-7 feedback and Final Closure review.
+
+---
+
+## [1.3.16] - 2026-01-30
+
+### Added - Inclusive Language Guidance (BACKLOG-022)
+
+**New section in main methodology:**
+
+- **Section 3.5: Inclusive Language**
+  - Terminology table with preferred alternatives (master/slave, whitelist/blacklist, etc.)
+  - Gender-neutral language guidance
+  - NLP-specific example alternatives (word embedding analogies)
+  - General principle: neutral examples when equally effective
+
+### Changed
+
+- **BACKLOG-022:** Status updated to Implemented
+- **DSM_0:** Core Content updated with Section 3.5
+
+### Purpose
+
+Technical writing should be welcoming to all readers. This brief guidance addresses terminology and examples identified during the NLP project (gendered word embedding analogies, imperial metaphors) without being exhaustive.
+
+---
+
+## [1.3.15] - 2026-01-30
+
+### Added - VS Code IDE Configuration (BACKLOG-011)
+
+**New subsection in DSM 4.0 Section 14 (GitHub Repository Setup):**
+
+- **IDE Configuration (VS Code)** (BACKLOG-011)
+  - `.vscode/settings.json` template with auto interpreter selection
+  - pytest integration configuration
+  - Cross-platform path note (Linux/Mac/Windows)
+  - Optional `.vscode/extensions.json` for team collaboration
+
+### Changed
+
+- **BACKLOG-011:** Status updated to Implemented
+- **DSM_0:** DSM 4.0 key sections updated with IDE Configuration
+
+### Purpose
+
+Eliminates the paper-cut issue of manually selecting Python interpreter in VS Code for every project. Auto-configures the virtual environment and testing framework.
+
+---
+
+## [1.3.14] - 2026-01-30
+
+### Added - Notebook Standards (BACKLOG-015, BACKLOG-020)
+
+**New subsections in PM Guidelines (Communication & Working Style):**
+
+- **Notebook Cell Quality Checklist** (BACKLOG-015)
+  - Before/after code cell checks (markdown descriptions, actual output values)
+  - Section transition checks (summary cells, variables carried forward)
+  - Per-notebook checks (title cell, final summary, Restart & Run All)
+
+- **Notebook Portability Checklist** (BACKLOG-020)
+  - Directory safety (`os.makedirs`, `pathlib.Path`)
+  - Package management for cloud environments (`!pip install`, version pinning)
+  - Data access fallbacks (local vs. API, environment variable authentication)
+  - Runtime documentation (GPU/CPU requirements, expected runtime)
+  - Environment detection pattern (`IN_COLAB`)
+
+### Changed
+
+- **BACKLOG-015, BACKLOG-020:** Status updated to Implemented
+- **DSM_0:** PM Guidelines description updated with notebook checklists
+
+### Purpose
+
+Notebook quality and portability were recurring friction points in the NLP project. The cell checklist reinforces existing standards in a quick-reference format. The portability checklist addresses Colab compatibility issues that consumed an entire project day.
+
+---
+
+## [1.3.13] - 2026-01-30
+
+### Added - Environment Setup Enhancements (BACKLOG-010, BACKLOG-013, BACKLOG-021)
+
+**New subsections in Appendix A (Environment Setup Details):**
+
+- **A.7: Environment Tool Selection Guide** (BACKLOG-010)
+  - Two-phase setup approach (infrastructure first, project libraries after planning)
+  - Tool comparison table (venv, pyenv, Poetry, Conda, uv)
+  - Recommended defaults by project type (DSM 1.0, DSM 4.0, Production)
+
+- **A.8: Model & Data Cache Management** (BACKLOG-013)
+  - Common cache locations table (gensim, HuggingFace, NLTK, spaCy, PyTorch)
+  - Size checking and cleanup commands
+  - Best practices for documenting large downloads
+
+- **A.9: WSL & Cross-Platform Setup** (BACKLOG-021)
+  - WSL path mapping table (Windows to WSL)
+  - Python conflict resolution in WSL
+  - CLAUDE.md path guidance for Windows vs WSL contexts
+  - Common WSL issues table with solutions
+
+### Changed
+
+- **BACKLOG-010, BACKLOG-013, BACKLOG-021:** Status updated to Implemented
+- **DSM_0:** Appendix A description updated with A.7-A.9, version notes added
+
+### Purpose
+
+Environment setup was the most common friction point in the NLP project feedback. These three items address: choosing the right tool (A.7), managing large downloads (A.8), and cross-platform compatibility (A.9).
+
+---
+
+## [1.3.12] - 2026-01-30
+
+### Added - Project Feedback Deliverables Standard
+
+**New subsection in Section 6.4 (Checkpoint and Feedback Protocol):**
+
+- **Section 6.4.5: Project Feedback Deliverables**
+  - Two-file feedback standard for project completion
+  - `dsm-feedback-backlogs.md`: Concrete improvement proposals that become BACKLOG items
+  - `dsm-feedback-methodology.md`: Record of actual pipeline, tools, plan vs reality
+  - Templates for both files with required sections
+  - Relationship diagram showing how each file feeds back into DSM
+  - Distinction: backlogs generate immediate action; methodology builds knowledge base
+
+### Changed
+
+- **Section 6.4.3:** Updated feedback loop diagram to show both deliverable paths
+- **DSM_0:** Core Content updated with Section 6.4.5, version notes added
+
+### Purpose
+
+Formalizes the feedback deliverable pattern validated by the NLP Disaster Tweet Classification project. The two-file separation distinguishes actionable improvement proposals (backlogs) from informational methodology records (what was actually built). Both are global observations -- not limited to a project's domain.
+
+---
+
+## [1.3.11] - 2026-01-30
+
+### Added - Analysis Templates (BACKLOG-018, BACKLOG-019)
+
+**New subsections in Section 2.4 (Analysis):**
+
+- **Section 2.4.6: Model Comparison Documentation** (BACKLOG-018)
+  - Comparison setup template (objective, metrics, dataset)
+  - Results table with baseline and relative improvement
+  - Selection decision format with trade-offs and Decision Log cross-reference
+  - Required Negative Results section for documenting underperformance
+
+- **Section 2.4.7: Error Analysis Framework** (BACKLOG-019)
+  - Error category table with counts, examples, and root causes
+  - Pattern identification format
+  - Actionable insights table (finding, fix, effort, impact)
+  - Known limitations documentation
+  - Domain-specific error categories (NLP, Tabular, Regression, Clustering)
+
+### Changed
+
+- **BACKLOG-018, BACKLOG-019:** Status updated to Implemented
+- **DSM_0:** Core Content updated with Section 2.4.6-2.4.7, version notes added
+
+### Purpose
+
+Structured templates for the two most common analysis documentation needs: comparing multiple models and analyzing errors. Both emerged from the NLP project where 5+ models were compared ad-hoc and error analysis followed no standard format.
+
+---
+
+## [1.3.10] - 2026-01-30
+
+### Added - NLP Domain Enhancement (BACKLOG-014, BACKLOG-016, BACKLOG-017)
+
+**New subsections in Appendix D.2 (NLP Projects):**
+
+- **D.2.4: NLP EDA Checklist** (BACKLOG-016)
+  - Text-specific EDA table (class distribution, text length, vocabulary, special characters)
+  - Classification-specific EDA (top N-grams per class, duplicates, label quality)
+  - Preprocessing impact assessment guidance
+  - Cross-references to Section 2.2 and Appendix B.2.4
+
+- **D.2.5: NLP Preprocessing & Vectorization Guide** (BACKLOG-017)
+  - Text cleaning pipeline with decision points (7-step ordered process)
+  - TF-IDF parameter guide with typical ranges and starting values
+  - Edge case handling table (empty strings, encoding, short texts)
+  - Cross-reference to Section 2.3.7 (Data Leakage Prevention)
+
+- **D.2.6: NLP Performance Expectations** (BACKLOG-014)
+  - Method selection table by task characteristics (TF-IDF vs. Embeddings vs. Transformers)
+  - When each method typically wins (with concrete examples)
+  - Baseline performance expectations by task type (F1 ranges)
+  - Key principle: start simple, add complexity when empirically justified
+
+### Changed
+
+- **BACKLOG-014, BACKLOG-016, BACKLOG-017:** Status updated to Implemented
+- **DSM_0:** Appendix D description updated with D.2.4-D.2.6, version notes added
+
+### Purpose
+
+First grouped NLP domain enhancement from Disaster Tweet Classification project feedback. These three items address the gap between DSM's existing brief NLP guidance (D.2.1-D.2.3) and the practical needs encountered during a real NLP sprint: text-specific EDA patterns, preprocessing parameter guidance, and realistic performance expectations.
+
+---
+
+## [1.3.9] - 2026-01-30
+
+### Added - Data Leakage Prevention Checklist (BACKLOG-012)
+
+**New section in main methodology:**
+
+- **Section 2.3.7: Data Leakage Prevention** (~75 lines)
+  - Pre-modeling checklist (split first, fit on train only)
+  - Common leakage patterns table (scaling, encoding, imputing, feature selection)
+  - Domain-specific leakage risks (NLP, Time Series, Tabular)
+  - Recommended pattern: Scikit-learn Pipeline
+  - Leakage detection symptoms and verification steps
+
+### Changed
+
+- **BACKLOG-012:** Status updated to Implemented
+
+### Purpose
+
+Data leakage was caught during the NLP project when vectorizing before splitting. This checklist prevents the most common leakage patterns across all domains, with domain-specific guidance for NLP, time series, and tabular data.
+
+---
+
+## [1.3.8] - 2026-01-26
+
+### Changed - Simplified CLAUDE.md Template
+
+**Improved Quick Start Guide (Section 4, Step 3):**
+
+- Reduced CLAUDE.md template from ~65 lines to ~10 lines
+- Made `@path` import mechanism the clear focus
+- Removed redundant protocol content (already in DSM_Custom_Instructions)
+- Added "What gets imported automatically" summary
+- Clearer path examples for Windows and Linux/Mac
+
+### Purpose
+
+Users were confused by the long template, not realizing that `@path` imports all protocols automatically. The simplified template makes it clear: import DSM instructions, add only project-specific context.
+
+---
+
+## [1.3.7] - 2026-01-26
+
+### Added - Experiment Artifact Organization Standard (BACKLOG-009)
+
+**New section in Appendix C (Advanced Practices):**
+
+- **C.1.6: Experiment Artifact Organization** (~105 lines)
+  - Folder structure: `data/experiments/s{SS}_d{DD}_exp{NNN}/`
+  - Naming convention with sprint/day/experiment ID pattern
+  - EXPERIMENTS_REGISTRY.md template for central index
+  - Experiment README template for self-contained documentation
+  - Relationship between `data/experiments/` (code) and `docs/experiments/` (documentation)
+  - Cross-references to C.1.3-C.1.5 and DSM 4.0 Section 3.4
+
+### Changed
+
+- **BACKLOG-009:** Status updated to Implemented
+
+### Purpose
+
+Provides systematic organization for experiment artifacts (scripts, results, test data) that accumulated during projects. Sprint/day prefix pattern aligns with DSM file naming standards and shows experiment chronology at a glance.
+
+---
+
+## [1.3.6] - 2026-01-26
+
+### Added - Tests vs Capability Experiments Clarification (BACKLOG-008)
+
+**New section in DSM 4.0 Software Engineering Adaptation:**
+
+- **Section 3.4: Tests vs Capability Experiments** (~40 lines)
+  - Comparison table: purpose, scope, frequency, output, location
+  - Guidelines for when to use each approach
+  - Example showing complementary usage (Cross-Lingual Retrieval)
+  - Key principle: Tests = "Does this function work?" vs Experiments = "Does this feature achieve its goal?"
+
+### Changed
+
+- **Version Update Workflow:** Added step 4 "Update DSM_0 document descriptions if new sections added"
+- **BACKLOG-008:** Status updated to Implemented
+
+### Purpose
+
+Clarifies the distinction between pytest unit tests and capability experiments (C.1.3) to prevent redundancy or gaps in validation coverage. Emerged from practical implementation experience in RAG Document Assistant project.
+
+---
+
+## [1.3.5] - 2026-01-26
+
+### Changed - Quick Start Guide Modernization
+
+**Updated DSM_0_START_HERE_Complete_Guide.md to reflect current workflow:**
+
+- **Section 4 (Quick Start Guide) restructured:**
+  - Added Step 0: Assess Project Type & Requirements (Notebook/Application/Hybrid)
+  - Updated Step 1: Separate environment setup for Data Science vs Application projects
+  - Removed outdated "Create Project Knowledge Folder" step
+  - Updated CLAUDE.md example to point to central DSM repository via `@path`
+  - Projects now reference DSM centrally instead of copying files
+
+- **New Project Checklist (Section 5):**
+  - Updated to reflect 6-step process (Step 0-5)
+  - Data Science projects: Use `setup_base_environment_minimal.py`
+  - Application projects: Create custom `requirements.txt`
+
+- **Document Relationship Map:**
+  - Updated to show central DSM repository reference pattern
+  - Clarified `@path` import syntax for CLAUDE.md
+
+### Purpose
+
+Modernizes onboarding to reflect current best practice: projects point to central DSM repository rather than copying DSM files locally. Adds guidance for Application projects that need custom library setups.
+
+---
+
+## [1.3.4] - 2026-01-26
+
+### Added - AI Agent Project Initialization Protocol
+
+**Enhanced onboarding for AI agents using DSM:**
+
+- **DSM_0_START_HERE_Complete_Guide.md:**
+  - Added "AI Agent Project Initialization" section
+  - Project Type Detection table (Notebook/Application/Hybrid)
+  - DSM Feedback Tracking activation instructions
+  - Hybrid Projects guidance
+
+- **DSM_Custom_Instructions_v1.1.md:**
+  - Added "Project Type Detection" section at top
+  - Added "DSM Feedback Tracking" section
+  - Agent now states project type at session start
+
+### Purpose
+
+Ensures AI agents can:
+1. Automatically identify whether a project uses DSM 1.0 (notebooks) or DSM 4.0 (applications)
+2. Activate feedback tracking for continuous DSM improvement
+3. Handle hybrid projects that combine both tracks
+
+---
+
+## [1.3.3] - 2026-01-26
+
+### Added - Beyond DSM: Production & MLOps References (BACKLOG-007)
+
+**New section in DSM 4.0 Software Engineering Adaptation:**
+
+- **Section 15: Beyond DSM: Production & MLOps** (~35 lines)
+  - MLOps Maturity Models (Google, Microsoft references)
+  - Model & Data Documentation (Model Cards, Data Cards)
+  - Deployment Patterns (Shadow, Canary, Blue/Green, Champion/Challenger)
+  - Data Quality & Monitoring (Great Expectations, dbt, drift detection)
+
+### Changed
+
+- **DSM 4.0:** Version updated to 1.2, Version History renumbered to Section 16
+- **BACKLOG-007:** Status updated to Implemented
+- **BACKLOG-003, 004, 005:** Archived (would cause methodology bloat)
+
+### Purpose
+
+Provides lightweight pointers to established MLOps/production resources without bloating the methodology. Users completing DSM 4.0 projects now have clear next steps for production operations.
+
+---
+
+## [1.3.2] - 2026-01-26
+
+### Added - Checkpoint, Feedback & Change Tracking Protocol (BACKLOG-006)
+
+**New methodology sections for project tracking and continuous improvement:**
+
+- **Section 6.4: Checkpoint and Feedback Protocol** (~70 lines)
+  - 6.4.1: Milestone Checkpoints (triggers, documentation)
+  - 6.4.2: Methodology Feedback Collection (Validation Tracker)
+  - 6.4.3: Feedback Loop (continuous DSM improvement)
+  - 6.4.4: Daily Checkpoint Template Addition
+
+- **Appendix E.12: DSM Validation Tracker Template** (~130 lines)
+  - Complete template for tracking DSM effectiveness
+  - Sections Used table with scoring
+  - Feedback Log format with evaluation criteria
+  - Summary metrics by section and feedback type
+  - Scoring guidelines (1-5 scale)
+
+- **PM Guidelines: Project Change Tracking** (~100 lines)
+  - Backlog System (structure, template, workflow)
+  - Archive Pattern (completed/obsolete docs)
+  - Changelog Maintenance (Keep a Changelog format)
+  - Git Tagging Convention (release vs checkpoint)
+  - Version Update Workflow (6 steps)
+  - Backlog Priorities table
+
+### Changed
+
+- **BACKLOG-006:** Status updated to Implemented
+
+### Purpose
+
+Projects using DSM can now:
+1. Track methodology effectiveness with quantifiable metrics
+2. Provide structured feedback for DSM improvement
+3. Manage project evolution with standardized backlog/changelog
+4. Create clear version history with git tags
+
+---
+
+## [1.3.1] - 2026-01-26
+
+### Added - Capability Experiment Template (BACKLOG-001)
+
+**New sections in Appendix C for software/RAG project evaluation:**
+
+- **C.1.3: Capability Experiment Template** (~185 lines)
+  - Combined quantitative + qualitative evaluation framework
+  - Internal evaluation: Retrieval, Generation, Capability metrics
+  - External evaluation: Safety, Efficiency metrics
+  - Complete example: RAG conflict detection experiment
+  - Findings section template with limitation tracking
+
+- **C.1.4: RAG Evaluation Metrics Reference** (~95 lines)
+  - Framework overview: RAGAS, RAGBench, SafeRAG, FreshLLMs
+  - Internal metrics: Traditional (Precision@K, ROUGE) + LLM-based (faithfulness)
+  - External metrics: Robustness, Factuality, Adversarial, Privacy, Fairness, Efficiency
+  - RAGAS quick reference code example
+  - RAGBench TRACe metrics documentation
+  - Best practice: Combined evaluation strategy
+
+- **C.1.5: Limitation Discovery Protocol** (~110 lines)
+  - Step-by-step limitation documentation
+  - Disposition decision matrix (Fix Now / Accept MVP / Defer)
+  - Severity-based decision guidance
+  - README Known Limitations template
+  - Future Improvements template with quantitative targets
+  - Limitation tracking summary table
+
+### Changed
+
+- **DSM_4.0:** Added reference to C.1.3-C.1.5 for software/RAG projects
+- **BACKLOG-001:** Status updated to Implemented, moved to `plan/backlog/done/`
+
+### Added - Plan Folder Organization
+
+- **Backlog system:** `plan/backlog/` for proposed enhancements, `plan/backlog/done/` for implemented items
+- **BACKLOG-003:** Deployment Planning & MLOps (Priority: High)
+- **BACKLOG-004:** Documentation Templates - Model Cards, Data Cards (Priority: Medium)
+- **BACKLOG-005:** DataOps & Production Patterns (Priority: Medium)
+- **Archive:** Moved obsolete planning documents to `plan/archive/`
+
+### Archived (Historical Documents)
+
+Moved to `plan/archive/`:
+- `20251119_CONTENT_MAPPING_PLAN.md` - v1.1 reorganization (completed)
+- `20251119_SESSION_CHECKPOINT_Methodology_Reorganization.md` - v1.1 session (completed)
+- `20251119_CHECKPOINT_File_Consolidation_Discussion.md` - consolidation (completed)
+- `EDA_Deepening_Analysis.md` - implemented in v1.3.0
+
+### Retained (Active Reference)
+
+Kept in `plan/` for future roadmap:
+- `DSM_vs_CRISP-DM_Comparison_Analysis.md` - gap analysis for future enhancements
+- `Data_Science_Frameworks_Standards_Overview.md` - framework survey for roadmap
+
+### References
+
+- Chen et al. (2025). "Retrieval Augmented Generation Evaluation in the Era of Large Language Models: A Comprehensive Survey." arXiv:2504.14891
+- RAGAS Documentation: https://docs.ragas.io/en/stable/concepts/metrics/overview/
+
+---
+
+## [1.3.0] - 2026-01-22
+
+### Added - Business Understanding & EDA Enhancement
+
+**Major enhancement: DSM's differentiator for Phase 1 (Exploration)**
+
+This release deepens DSM's approach to data exploration, making Business Understanding and EDA an iterative dialogue rather than sequential steps. This is DSM's original contribution to data science methodology.
+
+**New in Main Methodology (DSM_1.0):**
+
+- **Section 2.1.9: Business Understanding Foundation** (~70 lines)
+  - Business Understanding ↔ EDA feedback loop concept
+  - The Five Business Questions framework
+  - Business Understanding Template (Decision, Success, Constraints, Domain Knowledge)
+  - Business Understanding Checkpoint (pre-EDA gate)
+
+- **Section 2.2.2: Three-Layer EDA Framework** (~70 lines)
+  - Layer 1: Facts (Data Inventory) with question matrix
+  - Layer 2: Patterns (Statistical Understanding) with technique mapping
+  - Layer 3: Implications (Analysis Direction) with decision framework
+  - Domain Validation During EDA protocol
+
+- **Section 2.2.3: Enhanced Deliverables** (~55 lines)
+  - Layer 1/2/3 Summary Templates
+  - Updated Business Understanding (Post-EDA) template
+  - Assumptions vs. Reality documentation
+
+- **Section 2.2.4: EDA Exit Criteria** (~45 lines)
+  - Layer-specific completion checklists
+  - EDA Anti-Patterns table (Analysis Paralysis, Plot Overload, Perfectionism, Scope Creep)
+
+**New in Appendices (DSM_1.0_Methodology_Appendices):**
+
+- **Appendix B.2.4: EDA Techniques by Data Type** (~40 lines)
+  - Numeric data techniques (5-number summary, histograms, Q-Q plots)
+  - Categorical data techniques (value counts, crosstab, chi-square)
+  - Temporal data techniques (rolling stats, seasonal decomposition, ACF/PACF)
+  - Text data techniques (length distribution, word frequency, language detection)
+
+- **Appendix B.2.5: Business Understanding Integration** (~30 lines)
+  - Domain Briefing Template (Before EDA)
+  - EDA Validation Checklist (After EDA)
+
+- **Appendix B.2.6: References** (~15 lines)
+  - Attribution to foundational frameworks (CRISP-DM, Tukey, DIKW)
+  - Documentation of DSM-specific adaptations
+
+### Changed - Line Count Updates
+
+| Document | Before | After | Change |
+|----------|--------|-------|--------|
+| Main methodology | ~3,130 | ~3,400 | +270 lines |
+| Appendices | ~3,920 | ~4,010 | +90 lines |
+| **Total system** | **~8,100** | **~8,460** | **+360 lines** |
+
+### References & Attributions
+
+This release includes proper attribution for concepts adapted from established frameworks:
+
+- **CRISP-DM (Chapman et al., 1999):** Business Understanding and Data Understanding phases - adapted as iterative dialogue
+- **John Tukey (1977):** Exploratory Data Analysis philosophy - systematic questioning approach
+- **DIKW Hierarchy (Ackoff, 1989):** Facts → Patterns → Implications framework inspiration
+- **TDSP (Microsoft, 2016):** Structured templates concept
+- **Toyota Production System:** Five Whys adapted as Five Business Questions
+
+**Original DSM Contributions:**
+- Business Understanding ↔ EDA Feedback Loop
+- Three-Layer Summary Templates
+- EDA Exit Criteria Checklist
+- Updated Business Understanding (Post-EDA) Template
+- Integration with AI Agent Collaboration workflow
+
+---
+
+## [1.2.0] - 2026-01-20
+
+### Added - Software Engineering Adaptation & App Development Protocol
+
+**Major new capability: DSM 4.0 Software Engineering Adaptation**
+
+This release introduces a complete methodology track for ML application development, extending the framework beyond data science notebooks to production-ready software.
+
+**New Documents:**
+
+- **DSM_4.0_Software_Engineering_Adaptation_v1.0.md** (~625 lines)
+  - Adapted phase structure (Data Pipeline → Core Modules → Integration → Application)
+  - Module development protocol (replaces notebook protocol for SW projects)
+  - Architectural decision log templates
+  - Portfolio project checklist
+  - Streamlit Cloud deployment checklist
+  - Session state patterns for multi-tab apps
+  - A/B testing UX guidelines
+  - LLM cost tracking patterns
+  - Sprint planning templates for SW projects
+  - GitHub repository setup checklist
+
+- **DSM_2.1_PM_ProdGuidelines_extension.md** (~415 lines)
+  - Project governance and RACI matrix templates
+  - Data versioning requirements (dataset naming, metadata templates)
+  - Environment versioning guidelines
+  - QA checklists and peer review process
+  - Risk management framework (risk register, prioritization matrix)
+  - Stakeholder communication matrix
+  - Post-project review template
+
+**App Development Protocol added to CLAUDE.md and DSM_Custom_Instructions:**
+
+```
+When building application code (packages, modules, scripts):
+1. Guide step by step through the development process
+2. Explain **why** before each action
+3. Provide code segments for user to copy/paste
+4. Wait for user confirmation before proceeding to next step
+5. Generate no files directly - user creates all artifacts
+6. Build modules incrementally: imports → constants → one function → test → next function
+7. Use Test-Driven Development (TDD): write tests in `tests/` alongside code
+```
+
+**Project Knowledge Repository Pattern:**
+- Session handoffs now stored in separate repository: `../{project-name}_Project_Knowledge/`
+- Keeps framework documentation separate from project implementation code
+- Updated Section 6.1 (Session Management) with new location guidance
+
+### Changed - Cross-Reference Updates
+
+**Files updated with DSM 4.0 references:**
+- `DSM_0_START_HERE_Complete_Guide.md` - Added "Project Type Decision" section
+- `DSM_1.0_Data_Science_Collaboration_Methodology_v1.1.md` - Added DSM 4.0 callouts in Sections 1.2 and 2
+- `DSM_1.0_Methodology_Appendices.md` - Added DSM 4.0 reference in Appendix D header
+- `DSM_3_Methodology_Implementation_Guide_v1.1.md` - Added Example 3 (DevFlow Analyzer - SW Engineering project)
+- `.claude/CLAUDE.md` - Added Key Paths for new documents
+- `README.md` - Updated System Components and When to Use tables
+
+### Summary
+
+| Change Type | Count |
+|-------------|-------|
+| New documents | 2 |
+| Updated documents | 8 |
+| New lines added | ~1,040 |
+| Total system size | ~8,100 lines |
+
+---
+
+## [1.1.3] - 2025-12-14
+
+### Added - Favorita Project Methodology Enhancements
+
+**4 methodology modifications implemented from Favorita Demand Forecasting lessons learned:**
+
+**HIGH Priority:**
+- **MOD-20: Scale-Dependent Validation Protocol** - Added to Appendix B.4.3
+  - Critical finding: Model selection at sample scale may not hold at production scale
+  - 3-stage protocol (sample development, scale validation, comparison)
+  - Decision log template for scale-dependent findings
+  - Source: LSTM won on 300K sample, XGBoost won at 4.8M production scale
+
+- **MOD-21: Hypothesis Testing with Rejection Protocol** - Added to Section 4.1.5
+  - Pre-registration template for testable hypotheses
+  - Explicit rejection criteria defined BEFORE testing
+  - Negative result documentation as valuable findings
+  - Example: DEC-015 rejection (106% worse RMSE) led to temporal consistency principle
+
+**MEDIUM Priority:**
+- **MOD-22: Decision Invalidation Arc Documentation** - Added to Appendix E.6.1
+  - Track how decisions evolve over time
+  - Template for documenting when earlier decisions are invalidated
+  - Example: DEC-012 (include oil) -> DEC-014 (remove oil) arc
+  - Decision status lifecycle (Proposed -> Active -> Superseded/Rejected/Completed)
+
+**LOW Priority:**
+- **MOD-23: Environment Transition Checklist** - Added to Appendix A.6
+  - Guide for Windows to WSL2/Linux transitions
+  - Cross-platform path handling with pathlib
+  - GPU environment setup (WSL2 + CUDA)
+  - Transition validation script
+  - Best practices and documentation templates
+
+### Changed - Line Count Updates
+
+**Files updated to reflect MOD-20 through MOD-23:**
+- Main methodology: ~3,000 -> ~3,130 lines (+130 lines)
+- Appendices: ~3,565 -> ~3,920 lines (+355 lines)
+- Total system: ~6,565 -> ~7,050 lines (+7% increase)
+
+---
+
+## [1.1.2] - 2025-12-13
+
+### Added - Methodology Enhancements (MOD Implementations)
+
+**16 methodology modifications implemented from TravelTide lessons learned:**
+
+**CRITICAL Priority:**
+- **MOD-15: Sprint-Based Structure** - Replaced all "Week 1/2/3/4" terminology with "Sprint 1/2/3/4"
+  - File naming: `wYY_dXX` → `sYY_dXX`
+  - Project plans: `Week1_Plan.md` → `Sprint1_Plan.md`
+  - Added flexible sprint duration configuration (DSM_0 Section 1.5)
+
+**HIGH Priority:**
+- **MOD-18: Temporal Consistency Principle** - Added to Appendix D.1.4
+  - Seasonal training period selection for time series forecasting
+  - Complete examples and validation approaches
+- **MOD-19: Feature Ablation Methodology** - Added to Appendix B.3.3
+  - 3-stage validation process (Permutation Importance → Ablation Study → SHAP)
+  - Code examples and interpretation guidelines
+
+**MEDIUM Priority:**
+- **MOD-01: Cell-by-Cell Execution Protocol** - Added to Section 6.2.5
+  - Progressive execution standard for Jupyter notebooks
+- **MOD-03: Factual Accuracy Requirement** - Added to Section 1.3.5
+  - No guessing policy for data science precision
+- **MOD-04: Daily Checkpoint Template** - Enhanced PM Guidelines Template 6
+  - Added Appendix: Outputs Created section
+- **MOD-05: Feature Dictionary Standard** - Added to Section 3.4.5
+  - Standardized feature documentation format
+- **MOD-06: Enhanced Decision Log Format** - Updated Appendix E.6
+  - Full template with DEC-XXX identifiers
+- **MOD-11: Verification Script Template** - Added to Appendix E.10.4
+  - Sprint transition verification Python template
+- **MOD-16: Correlation Aggregation Warning** - Added to Appendix D.1.5
+  - Simpson's Paradox warning for aggregated correlations
+- **MOD-17: NaN Strategy Documentation** - Added to Section 2.3.6
+  - Missing value strategy for engineered features
+
+**LOW Priority:**
+- **MOD-02: Print Statement Standards** - Added to Section 3.2.5
+  - Informative vs generic confirmation guidelines
+- **MOD-09: Visualization Naming** - Verified in E.11 (already covered)
+- **MOD-10: Visualization Quality Checklist** - Verified in E.10 (already covered)
+- **MOD-12: Q&A Preparation Document** - Added PM Guidelines Template 11
+- **MOD-13: Scope Limitations Log** - Added PM Guidelines Template 12
+
+### Changed - Line Count Updates
+
+**Files updated to reflect MOD implementations:**
+- Main methodology: 2,576 → ~3,000 lines (+424 lines)
+- Appendices: 2,464 → ~3,565 lines (+1,101 lines)
+- PM Guidelines: 450 → ~1,220 lines (+770 lines)
+- Total system: 5,040 → ~6,565 lines (+30% increase)
+
+**Version references updated across:**
+- DSM_0_START_HERE_Complete_Guide.md
+- DSM_1.0_Data_Science_Collaboration_Methodology_v1.1.md (Section 8.4)
+- DSM_Custom_Instructions_v1.1.md
+
+### Added - Consistency Audit
+
+**New documentation:**
+- `docs/Methodology_Consistency_Audit.md` - Comprehensive consistency report
+  - Terminology validation (Week vs Sprint)
+  - Cross-reference accuracy checks
+  - File naming convention verification
+  - Future consistency checklist
+
+---
+
+## [1.1.1] - 2025-11-19
+
+### Changed - File Consolidation
+
+**Repository Optimization:**
+- Reduced file count from 20 to 13 methodology files (-35% reduction)
+- Improved maintainability while preserving all content
+
+**Getting Started Consolidation (3→1):**
+- Merged into `0_START_HERE_Complete_Guide.md` (comprehensive single guide):
+  - `0_Integrated_System_Guide-START-HERE_v1.1.md`
+  - `00_Final_System_Summary_v1.1.md`
+  - `00_New_Project_Checklist_Quick-Start-Template_v1.1.md`
+- New structure: Quick Start → System Overview → Document Map → File Inventory → New Project Checklist → Common Patterns → Tips → Troubleshooting
+- All content preserved with improved organization
+
+**Appendices Consolidation (5→1):**
+- Merged into `1.0_Methodology_Appendices.md` (2,464 lines):
+  - Appendix A: Environment Setup Details (583 lines)
+  - Appendix B: Phase Deep Dives (643 lines)
+  - Appendix C: Advanced Practices Detailed (500 lines)
+  - Appendix D: Domain Adaptations (374 lines)
+  - Appendix E: Quick Reference (327 lines)
+- Section numbering unchanged (backward compatible)
+- All cross-references preserved
+
+**Updated Files:**
+- `1.0_Data_Science_Collaboration_Methodology_v1.1.md` - Updated Section 8.4 (Appendix References) and version history
+- `IMPROVED_Custom_Instructions_v1.1.md` - Updated to reference consolidated files
+- `CHANGELOG.md` - Added v1.1.1 release notes
+
+**Benefits:**
+- Easier maintenance (fewer files to update)
+- Better navigation (comprehensive guides vs. scattered files)
+- Same content, better packaging
+- Reduced context switching for users
+
+### Added - File Naming Standards
+
+**New Documentation:**
+- **Appendix E.11:** File Naming Standards (~212 lines)
+  - Core naming pattern: `wYY_dXX_PHASE_description.extension`
+  - Phase codes (SETUP, EDA, FE, MODEL, REPORT)
+  - File type conventions (notebooks, datasets, visualizations, documentation)
+  - Directory structure recommendations
+  - Week 4 consolidation process
+  - Git integration patterns
+  - Common mistakes and best practices
+  - Quick examples by week
+
+**Quick Reference Card:**
+- `1.4_File_Naming_Quick_Reference.md` (118 lines)
+  - Printable one-page reference card
+  - Designed for daily use while coding
+  - Quick rules checklist
+  - Examples by file type and week
+  - Directory structure overview
+
+**Updated Files:**
+- `1.0_Methodology_Appendices.md` - Added E.11 section (2,464 → 2,676 lines)
+- `0_START_HERE_Complete_Guide.md` - Updated file inventory and totals
+
+**Benefits:**
+- Consistent file organization across all projects
+- Scannable working files (week and day visible)
+- Clear consolidation path (working → final)
+- Professional repository structure
+- Reduced naming confusion
+
+**Repository Status:**
+- File count: 13 → 14 (+1 practical reference)
+- Total system: ~8,320 lines
+
+## [1.1.0] - 2025-11-19
+
+### Added - Initial Release
+
+**Core Methodology Documents:**
+- `1.0_Data_Science_Collaboration_Methodology.md` - Academic Edition v1.0 (2,206 lines)
+  - 4-phase workflow (Exploration Ã¢â€ â€™ Features Ã¢â€ â€™ Analysis Ã¢â€ â€™ Communication)
+  - Tier 1 practices integrated (Decision Log, Pivot Criteria, Stakeholder Communication)
+  - Advanced Complexity section with 10 optional practices
+  - Notebook standards (~400 lines, 5-6 sections)
+  - Text conventions (WARNING/OK/ERROR)
+
+**Project Management Guidelines:**
+- `2.0_ProjectManagement_Guidelines_v2.md` - Standard Edition (400 lines)
+  - 7 required sections for project plans
+  - 5 plan structure templates
+  - File naming standards
+  - Quality assurance checklist
+- `2.1_PM_ProdGuidelines_extension.md` - Production Extension (477 lines)
+  - Governance and RACI matrix
+  - Risk management framework
+  - Quality assurance and peer review
+  - Post-project review process
+
+**System Integration:**
+- `0_Integrated_System_Guide-START-HERE.md` - Master integration guide
+  - System overview with 4-document relationship
+  - Hybrid setup step-by-step
+  - Decision table for document usage
+  - Quality checklist
+  - Troubleshooting guide
+- `00_New_Project_Checklist_Quick-Start-Template.md` - 5-step initialization
+- `00_Final_System_Summary.md` - Complete system summary
+
+**Implementation & Support:**
+- `3_Methodology_Implementation_Guide.md` - Setup instructions
+  - Custom Instructions template
+  - Domain-specific examples (Time Series, NLP)
+  - Advanced practices selection guide
+- `1.1_Domain_Specific_Package_Reference.md` - Package recommendations by domain
+- `1.2_File_Naming_Standards_Comprehensive.md` - Detailed naming conventions
+- `1.3_File_Naming_Quick_Reference.md` - Quick naming reference
+
+**Environment Setup:**
+- `setup_base_environment.py` - Full environment setup script
+- `setup_base_environment_minimal.py` - Minimal setup for academic work
+
+**Documentation:**
+- `README.md` - Comprehensive repository overview
+- `LICENSE` - MIT License
+- `CONTRIBUTING.md` - Contribution guidelines
+- `CHANGELOG.md` - This file
+
+### Battle-Tested Foundation
+- Methodology validated through TravelTide Customer Segmentation Project
+- 5,765 customer cohort analysis
+- 89+ engineered features
+- K=3 clustering optimization
+- Consolidation from 15 to 6 notebooks (60% reduction)
+- Complete stakeholder presentations and reporting
+
+### Key Features
+- AI agent optimized (Project Knowledge, Custom Instructions, progressive execution)
+- Academic-focused with production extensions
+- Integrated decision logging and pivot criteria
+- Quality assurance standards throughout
+- Text conventions (no emojis): WARNING/OK/ERROR
+- Progressive cell-by-cell development approach
+
+## [1.1.0] - 2025-11-19
+
+### Changed - Methodology Reorganization
+
+**Major Restructure:**
+- `1.0_Data_Science_Collaboration_Methodology.md` reorganized to v1.1
+  - Reduced from 3,324 to 2,576 lines (22.5% reduction)
+  - Implemented 4-level hierarchical numbering (# ## ### ####)
+  - 8 main sections with clear topic-based grouping
+  - Removed Table of Contents (self-documenting via numbering)
+  - Enhanced navigation: easy section referencing (e.g., "See Section 4.1.2")
+
+### Added - Detailed Appendices
+
+**Five New Appendix Documents (1,552 additional lines):**
+
+1. **`1.0_Appendix_A_Environment_Setup_Details.md`** (453 lines)
+   - Package rationale and installation procedures
+   - Platform-specific troubleshooting (Windows, Mac, Linux)
+   - Domain-specific package extensions (Time Series, NLP, Deep Learning, Computer Vision)
+   - Environment maintenance and verification
+
+2. **`1.0_Appendix_B_Phase_Deep_Dives.md`** (584 lines)
+   - Detailed implementation guidance for each phase
+   - Phase 0: Setup script walkthrough, VS Code configuration
+   - Phase 1: Data quality assessment techniques, cohort strategies
+   - Phase 2: Feature generation patterns, propensity modeling
+   - Phase 3: Algorithm selection, validation techniques
+   - Phase 4: Notebook consolidation, report writing, presentation design
+
+3. **`1.0_Appendix_C_Advanced_Practices_Detailed.md`** (573 lines)
+   - Complete implementation for Tiers 2-4 practices
+   - Experiment tracking (manual CSV, MLflow)
+   - Hypothesis management and statistical testing
+   - Ethics & bias auditing with fairness metrics
+   - Testing strategies (data validation, unit tests)
+   - Data versioning and lineage tracking
+   - Technical debt register templates
+   - Scalability planning and resource estimation
+   - Literature review extraction templates
+   - Risk management frameworks
+
+4. **`1.0_Appendix_D_Domain_Adaptations.md`** (369 lines)
+   - Time Series: Stationarity testing, seasonal decomposition
+   - NLP: Text preprocessing, TF-IDF vectorization
+   - Computer Vision: Image augmentation, transfer learning
+   - Clustering: Optimal K selection, cluster profiling (TravelTide example)
+   - Regression/Classification: Metrics and evaluation patterns
+   - Domain-specific challenges and solutions
+
+5. **`1.0_Appendix_E_Quick_Reference.md`** (321 lines)
+   - Phase completion checklists
+   - Command cheat sheets (environment, packages, git)
+   - Text convention reference tables
+   - File naming patterns quick lookup
+   - Validation metrics summary
+   - Troubleshooting quick guide
+   - Quality checklists
+
+### Improved
+
+**Organization & Navigation:**
+- Topic-based section grouping (Introduction â†’ Workflow â†’ Standards â†’ Practices)
+- Progressive complexity flow (Essential â†’ Advanced)
+- Clear separation of concerns (core vs. detailed content)
+- Comprehensive cross-referencing system (main doc â†” appendices)
+- Self-documenting structure (no TOC maintenance needed)
+
+**Maintainability:**
+- Easier section location via hierarchical numbering
+- Modular appendices for targeted updates
+- Clear boundaries between topics
+- Better suited for team collaboration and reviews
+
+**Content Enhancements:**
+- TravelTide decision log example in main doc (Section 4.1.4)
+- 32+ code examples across appendices
+- Domain-specific techniques and patterns
+- Platform-specific troubleshooting guidance
+- Comprehensive quick reference tables
+
+### Technical Details
+
+**Total Content:**
+- Main document: 2,576 lines
+- Appendices: 2,300 lines (5 files)
+- Combined: 4,876 lines (46% increase from v1.0)
+- Original v1.0: 3,324 lines
+
+**Structure Changes:**
+- Main doc retains: Core workflow, essential practices, advanced practices overview
+- Appendices contain: Detailed implementations, examples, domain adaptations, quick references
+- All v1.0 content preserved and enhanced
+
+**Standards Maintained:**
+- Text conventions (WARNING/OK/ERROR) throughout
+- No emojis in documentation
+- Professional tone
+- 4-level hierarchical numbering consistently applied
+
+## [Unreleased]
+
+### Planned
+- Templates directory with project starter templates
+- Examples directory with domain-specific case studies
+- TravelTide complete case study
+- Troubleshooting guide expansion
+- FAQ document
+- Video tutorials (consideration)
+
+### Under Consideration
+- Tool integration guides (MLflow, DVC, Weights & Biases)
+- Additional domain templates (computer vision, reinforcement learning)
+- Multi-language support (German, Spanish)
+- AI agent comparison guide
+- Jupyter notebook templates
+
+---
+
+## Version Numbering
+
+This project follows [Semantic Versioning](https://semver.org/):
+- **MAJOR** version: Incompatible methodology changes
+- **MINOR** version: New features, backward-compatible
+- **PATCH** version: Bug fixes, documentation updates
+
+## Types of Changes
+
+- **Added** - New features or documents
+- **Changed** - Changes to existing functionality
+- **Deprecated** - Soon-to-be removed features
+- **Removed** - Removed features
+- **Fixed** - Bug fixes
+- **Security** - Vulnerability fixes
+
+## How to Contribute
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing to this project.
+
+## Contact
+
+For questions or suggestions, please open an issue on GitHub.

@@ -27,4 +27,4 @@ cookie? Ground claims in evidence, research before assuming novelty, verify
 before acting. Context is the foundation.
 
 For the full framework of principles and guidelines, see
-`DSM_AI_COLLABORATION_PRINCIPLES.md`.
+`DSM_6.0_AI_Collaboration_Principles_v1.0.md`.

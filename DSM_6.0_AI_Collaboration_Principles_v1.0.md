@@ -1,0 +1,433 @@
+# DSM 6.0: AI Collaboration Principles
+
+**Version:** 1.0
+**Date:** February 2026
+**Purpose:** Define the principles that govern human-AI collaboration in DSM projects.
+
+---
+
+AI can write faster than any human can read. That asymmetry is the central
+challenge of human-AI collaboration: not whether the AI can produce, but
+whether the human can keep up.
+
+DSM's position is that the human must always keep up. Not because AI output
+is untrustworthy, but because the human contributes something the AI cannot
+generate on its own: direction, experience, intuition, aesthetic judgment,
+and the sense of when something is right. The human provides the spark of the
+work. AI magnifies, amplifies, and expands. It is a productive dichotomy, but
+only when balanced. It feeds and nurtures when the proportions are right. It
+controls and chokes in excess.
+
+The principles below exist to maintain that balance.
+
+---
+
+## 1. Principles
+
+### 1.1 Take a Bite
+
+**Deliver only what the reviewer can chew.**
+
+The amount of work an agent produces in a single delivery, whether a notebook
+cell, a file, a PR, or a session's worth of artifacts, must not exceed what
+the reviewer can engage with and respond to with substance. If the best the
+reviewer can say is "oh wow, impressive... but ok, I trust you," the delivery
+was too large.
+
+The test is not about counting artifacts. A single file can be too much if
+it's 500 lines of dense logic. Three files can be fine if they're small and
+self-explanatory. The test is cognitive: can the reviewer read it, understand
+it, form an opinion, and redirect if needed?
+
+When the delivery exceeds that threshold, the collaboration silently degrades.
+The human stops reviewing and starts approving. The "human in the loop"
+becomes decorative. The spark goes missing from the work.
+
+This principle applies to tool output too, not just deliverables. Automated
+tools (profiling reports, linting summaries, test suites) can generate hundreds
+of data points in seconds. When the agent runs every available tool because it
+can, not because the output serves the next step, the result is info-dumping:
+the human scrolls instead of analyzing. Generate only what you can meaningfully
+process in the next step. Comprehensive reports serve as reference material and
+safety nets ("did we miss anything?"), not as the analysis itself.
+
+See `TAKE_A_BITE.md` for the short version.
+
+### 1.2 The Human Brings the Spark
+
+**AI amplifies. The human directs.**
+
+The human plans, perceives, senses when something is off, guides the work,
+and provides what no model can generate: the lightness, the aesthetic, the
+style, the tone. These are not nice-to-haves; they are the difference between
+work that is correct and work that is right.
+
+AI is exceptionally good at producing volume, finding patterns, and executing
+known procedures. It is not good at knowing when to stop, when the tone is
+wrong, or when the technically correct answer misses the point. Those
+judgments require the human to be present, not just in the loop but actively
+engaged with the material.
+
+This principle is why "Take a Bite" matters: if the delivery is too large for
+the human to engage with, the human's unique contribution, the spark, gets
+bypassed.
+
+### 1.3 Earn Your Assertions
+
+**Investigate before you claim. Verify before you act.**
+
+Neither the human nor the agent gets to assume. Every assertion should be grounded
+in context that was actually built, not borrowed from intuition alone. When the agent
+presents a fact, it should be something it checked. When the human approves a
+delivery, it should be because they reviewed it. When either side says "this is how
+it works," they should have looked.
+
+Context is the foundation for both sides. The agent builds context by reading the
+codebase, researching the domain, and checking actual outputs. The human builds
+context by reviewing prior art, understanding the problem space, and verifying
+results. Neither should act from a vacuum.
+
+This means:
+- Research state of the art before assuming novelty; someone likely solved a
+  similar problem, and their experience shortens the path
+- Cite sources and references; assertions that trace back to evidence are
+  stronger than assertions that trace back to confidence
+- Explore the codebase before proposing changes
+- Research the domain before building
+- Verify consequences before executing destructive commands
+- Report actual values, never estimates
+- Test, experiment, and validate with real data, not just read the summary
+
+The alternative, asserting without checking, compounds silently. One unchecked
+assumption becomes the foundation for the next, until the work looks solid but rests
+on nothing verified.
+
+**Accountability corollary:** The human who submits the work is the author of
+record, regardless of which tools produced it. AI is an instrument; the human
+bears responsibility for correctness, completeness, style, and impact. "The AI
+wrote it" is not a defense for errors, omissions, or harm. This responsibility
+is not diminished by the quality of the AI's output; it is established by the
+act of submitting the work under your name. Review is not optional when the
+stakes include your professional credibility.
+
+### 1.4 Understand, Review, Decide
+
+**The user understands first, reviews second, and decides third.**
+
+This is DSM's core interaction loop. Before any approval, the user must
+understand what was done and why. Before any decision, the user must have
+reviewed the actual output. Skipping steps, approving without understanding,
+deciding without reviewing, breaks the collaboration even when the output
+happens to be correct.
+
+In practice this means:
+- The agent explains before it acts (pre-generation briefs)
+- The agent delivers in reviewable increments (Take a Bite)
+- The agent waits for the human's substantive response before continuing
+- "Continue" is a valid response only when the human has seen and understood
+  the previous output
+
+### 1.5 Know Your Context
+
+**The agent is responsible for its own resource consumption.**
+
+An AI agent operates within constraints: context window size, session
+duration, the user's available review time. A responsible agent is aware of
+these constraints and manages them proactively rather than consuming resources
+until they run out.
+
+This means:
+- Estimating context impact before reading large files
+- Warning when context is running low, with options to scope down or wrap up
+- Splitting large reference material into manageable pieces
+- Planning session scope proportional to available resources
+
+The alternative, charging ahead until the context overflows and hoping the
+recovery mechanism works, is reactive. It wastes the user's time and
+degrades the quality of the session's second half.
+
+### 1.6 Match the Room
+
+**Contribute proportionally to the project's culture and scale.**
+
+When collaborating with an external project, the contribution should match
+the project's existing style, conventions, and pace. A project that reviews
+30-line PRs should not receive a 500-line PR. A project with a minimalist
+README should not receive a verbose policy document. A project that values
+concise commit messages should not get essays.
+
+This principle extends "Take a Bite" to the social dimension: the "reviewer"
+is not just the DSM user, but the upstream maintainer, the community, and
+anyone who encounters the contribution.
+
+**Guardrail: Inclusive Language.** Matching the room does not mean silently
+adopting language that conflicts with DSM's inclusive language standards
+(DSM_0.2). If an external project's conventions include language that DSM
+would avoid (violence-implying, gendered, political, religious, or
+superiority-implying), the agent must surface the conflict to the human and
+obtain explicit approval before adopting that language. The human decides
+consciously; the agent does not decide on their behalf.
+
+**Governance boundary: My Fork, My Rules.** When contributing to an external
+project through a fork, the contributor operates in two governance worlds
+simultaneously. Match the Room governs the outward dimension: contributions
+conform to upstream conventions, style, and review expectations. The inward
+dimension, governance sovereignty, is equally important: inside the fork, the
+contributor maintains their own methodology (DSM) as the active governance
+system. These two dimensions are complementary, not contradictory; the
+contributor translates deliverables to match each context while keeping their
+own process intact.
+
+When the upstream project has its own AI governance artifacts (CLAUDE.md,
+copilot instructions, AI policy documents), these are reference material, not
+active instructions. The contributor renames them (e.g., `CLAUDE.md.upstream`)
+to prevent tool conflicts, studies them to understand upstream expectations,
+and ensures their own governance remains sovereign. The upstream's AI governance
+informs what the contribution should look like; the contributor's governance
+determines how the work is produced.
+
+Evidence: Reclaim Launcher external contribution (Sessions 82-89) maintained
+DSM governance in a fork with its own CLAUDE.md while all 3 PRs merged
+upstream with zero governance leakage. The contributor acted as intermediary
+between two governance worlds, translating deliverables to match each context.
+
+See DSM_3 Section 6.6.10 (Fork Governance Isolation) for operational guidance
+including file handling, conflict resolution, and anti-patterns.
+
+### 1.7 Own Your Process
+
+**Disclose how the work was produced. The human decides the level of detail.**
+
+When AI contributes to a deliverable, the people who receive that deliverable
+deserve to know. Not because AI involvement is a deficiency, but because
+transparency about production methods is a professional obligation. A reviewer
+who knows AI was involved reviews differently than one who assumes manual work.
+A maintainer who knows a PR was AI-assisted can calibrate their expectations.
+Concealing the method undermines trust even when the output is flawless.
+
+DSM's position: default to disclosure. The question is not whether to disclose,
+but how much detail the context requires.
+
+**Decision framework:**
+
+| Context | Disclosure level | Example |
+|---------|-----------------|---------|
+| External contribution (PR, issue, upstream commit) | Explicit: state AI involvement in PR description or commit message | "AI-assisted: Claude used for implementation, human reviewed and tested" |
+| Published artifact (blog post, documentation, report) | Explicit: note in artifact or metadata | "Written with AI assistance" or project-level AI collaboration document |
+| Internal DSM work (spoke project, methodology) | Implicit: Session Transcript and commit history provide the record | No additional disclosure needed; the process is self-documenting |
+| Exploratory work (notebooks, scratch analysis) | Optional: disclose if sharing results externally | Personal workflow; disclose when outputs leave the notebook |
+
+**What to disclose:**
+- Which tool was used (model name, not version unless relevant)
+- The nature of AI involvement (generation, review, editing, research)
+- What the human contributed (direction, review, domain judgment, testing)
+
+**What NOT to disclose:**
+- Exact prompts or conversation transcripts (these are process artifacts, not
+  deliverables; sharing them may expose proprietary methods or internal context)
+- Token counts or cost metrics (irrelevant to the recipient)
+
+**Relationship to other principles:** Own Your Process complements Earn Your
+Assertions: EYA ensures the work is verified; OYP ensures the method is
+transparent. Together they establish that the human is both the quality gate
+and the accountable party, regardless of which tools were used in production.
+
+**External frameworks context:** Disclosure norms are forming rapidly. The EU AI
+Act (2024) introduces transparency obligations for AI providers. Research on
+open source AI attribution (arXiv:2512.00867) shows explicit disclosure
+increasing from near-zero in early 2024 to 40% by late 2025. DSM aligns with
+this trajectory by making disclosure the default rather than the exception.
+
+See DSM_3 Section 6.7.3 (AI Collaboration Norms) for project-level
+instantiation of this principle.
+
+### 1.8 Know What You Own
+
+**Verify licensing before deployment. Free tier does not mean free use.**
+
+Any material produced by or sourced through a third-party tool can carry
+licensing restrictions that surface after deployment. AI-generated images,
+stock photos, fonts, code snippets from AI assistants, data from APIs, and
+documentation from copyrighted sources all carry the same risk. The common
+failure mode: asset created, deployed, licensing reviewed later (or never),
+rework required across multiple deployment targets.
+
+The risk is especially acute for AI-generated assets. Free tiers of
+generative tools routinely retain full ownership of outputs. Paid tiers
+grant commercial use. The same tool, different tier, different rights. This
+is not disclosed prominently, and the defaults favor the tool vendor.
+
+**Due diligence checklist (before any public deployment):**
+
+1. **Verify licensing for the specific tool and tier.** Free tier vs. paid
+   tier often differ. Check the current terms; they change. Do not rely on
+   what the terms were when you last checked.
+2. **Document** the tool, tier, date terms were verified, and any
+   restrictions. Record this alongside the asset (e.g., in a creation log,
+   `docs/assets/` manifest, or inline in the session transcript).
+3. **Flag high-risk scenarios:**
+   - Free tier with no commercial use rights
+   - Tool retains ownership of generated outputs
+   - Public gallery clause (your output may appear in the tool's showcase)
+   - Attribution required for use
+   - Terms changed recently (check change history if available)
+
+**Scope:** applies to all public-facing deliverables. Internal artifacts
+(session transcripts, draft documents, personal analysis) do not require
+the same review, but treat them as restricted until verified if they may
+become public.
+
+**When to apply:** at asset creation time, not at deployment time. The
+cost of discovery at deployment is always higher: assets are embedded in
+multiple locations, social media previews are cached, blog posts are
+indexed.
+
+**Relationship to other principles:** Own Your Process (1.7) covers
+disclosure of how work was produced. Know What You Own covers the legal
+status of what was produced. Both apply when AI is in the production
+chain; 1.7 addresses the human's accountability to the audience, 1.8
+addresses the human's accountability to the asset's licensor.
+
+**Evidence:** A logo generated via Recraft AI's free tier was deployed
+across blog, GitHub, and LinkedIn. Recraft's free tier retains full
+ownership of generated images (policy effective 2024-08-12). Discovery
+required replacement across 6+ deployment targets (favicon, navigation
+bar, OpenGraph, social preview, GitHub repository image, LinkedIn post).
+Full incident documented in `dsm-blog-poster/docs/logo-creation.md`.
+
+---
+
+## 2. Guidelines
+
+The principles above translate into concrete practices at each scale of work.
+Rather than duplicating protocol details here, this section maps principles
+to existing DSM protocols and identifies the gaps that remain.
+
+### 2.1 Existing Protocols (already implementing these principles)
+
+**Inception**
+
+| Protocol | DSM Location | Principle |
+|----------|-------------|-----------|
+| Project scaffolding (backlog item, CLAUDE.md, docs/ structure) | DSM_3, DSM_0.1 | Understand/Review/Decide |
+| First Session Prompt (research -> plan -> approve -> implement) | DSM_0.2 | Understand/Review/Decide, Earn Your Assertions |
+| Phase 0.5: Research and Grounding | DSM_0.2 | Earn Your Assertions, Know Your Context |
+| Plan Mode Protocol (explore, design, present for approval) | DSM_0.2 | Earn Your Assertions, Understand/Review/Decide |
+
+**Building**
+
+| Protocol | DSM Location | Principle |
+|----------|-------------|-----------|
+| Pre-Generation Brief (what/why/structure before creating) | DSM_0.2 | Understand/Review/Decide |
+| Notebook Collaboration (one cell, wait for output) | DSM_0.2 | Take a Bite |
+| App Development (File Creation Loop) | DSM_0.2 | Take a Bite |
+| Sprint Cadence and Feedback Boundaries | DSM_0.2 | Take a Bite |
+| Tests vs Capability Experiments | DSM 4.0, Section 4.4 | Earn Your Assertions |
+
+**Session Management**
+
+| Protocol | DSM Location | Principle |
+|----------|-------------|-----------|
+| Session Transcript (reasoning visible in real time) | DSM_0.2 | The Human Brings the Spark |
+| Session-Start Checks (inbox, version, handoffs) | DSM_0.2 | Know Your Context |
+| Session Close-Out and Wrap-Up | DSM_0.2 | Know Your Context |
+| Checkpoint and Handoff system | DSM_0.2, DSM_5.0 | Know Your Context |
+| Daily Documentation Protocol | DSM 1.0, Section 6.1.4 | Know Your Context |
+
+**Quality and Feedback**
+
+| Protocol | DSM Location | Principle |
+|----------|-------------|-----------|
+| Feedback Tracking (methodology.md, backlogs.md) | DSM_0.2 | Understand/Review/Decide |
+| Session-End Inbox Push (ripe feedback to hub) | DSM_0.2 | Know Your Context |
+| Backlog System (improvements, developments, done) | CLAUDE.md | Understand/Review/Decide |
+| Decision Logging (docs/decisions/) | DSM_5.0 | The Human Brings the Spark |
+| Gateway Review Protocol | DSM 1.0, Section 6.5 | Understand/Review/Decide, Earn Your Assertions |
+| Factual Accuracy, No Guessing | DSM 1.0, Section 1.3.5 | Earn Your Assertions |
+| Destructive Command Protocol | DSM_0.2 | Understand/Review/Decide, Earn Your Assertions |
+
+**Communication**
+
+| Protocol | DSM Location | Principle |
+|----------|-------------|-----------|
+| Blog and Post artifacts (docs/blog/) | DSM_0.1, DSM 1.0 Section 2.5.9 | The Human Brings the Spark |
+| Canonical External Descriptions | DSM_3 Section 7 | Match the Room |
+| README Change Notification | DSM_0.2 | Know Your Context |
+| Hub-Spoke Inbox system | DSM_3, DSM_0.2 | Know Your Context |
+| Inclusive Language | DSM_0.2 | Match the Room, Understand/Review/Decide |
+
+**Evolution**
+
+| Protocol | DSM Location | Principle |
+|----------|-------------|-----------|
+| Version lifecycle / epochs (semantic versioning for content) | DSM_5.0, CLAUDE.md | Take a Bite |
+| DSM Version Propagation | DSM_3, Section 6.3 | Know Your Context |
+| Dogfooding (apply DSM to build DSM tools) | DSM_3 Section 7 | Understand/Review/Decide |
+| External Contributions (governance in DSM Central) | DSM_3 Section 6.6 | Match the Room |
+| Fork Governance Isolation (My Fork, My Rules) | DSM_3 Section 6.6.10 | Match the Room |
+| External AI Contribution Guidelines | DSM_3, Section 6.5 | Match the Room |
+| Contributor Profile (skills inventory evolves with work) | CLAUDE.md | The Human Brings the Spark |
+
+### 2.2 Gaps (require new protocols)
+
+| Scale | Gap | Principle | Backlog | Status |
+|-------|-----|-----------|---------|--------|
+| Session | No delivery budget: no limit on artifacts per session | Take a Bite | BACKLOG-122 | Addressed: Session Delivery Budget in DSM_0.2 |
+| File | No reference file size guidance | Know Your Context | BACKLOG-119 | Open |
+| Session | No context budget awareness or early warning | Know Your Context | BACKLOG-121 | Open |
+| Wrap-up | Mechanical status updates require individual approval | Understand/Review/Decide | BACKLOG-120 | Open |
+| External | No systematic framework for contribution sizing | Match the Room | BACKLOG-122 | Addressed: PR Size Guidance in DSM_3 Section 6.6.7 |
+| Research | No checkpoint guard for unbounded exploration | Take a Bite | BACKLOG-122 | Addressed: Research Phase Guard in DSM_0.2 Phase 0.5 |
+| Ethics | No attribution/disclosure framework | Own Your Process | BACKLOG-124 | Addressed: Principle 1.7 |
+| Ethics | Accountability implicit, not stated | Earn Your Assertions | BACKLOG-124 | Addressed: Accountability corollary in 1.3 |
+| Ethics | No environmental awareness | (Guidelines) | BACKLOG-124 | Addressed: Guideline 2.3 |
+| Ethics | No licensing/ownership check for third-party assets | Know What You Own | BACKLOG-166 | Addressed: Principle 1.8 |
+
+### 2.3 Environmental Awareness
+
+AI collaboration has an environmental cost. Every prompt, every context window,
+every regenerated response consumes compute resources with real energy and
+carbon implications. Major frameworks (OECD, WEF) are developing lifecycle
+reporting standards for AI sustainability, though these target organizations
+rather than individual practitioners.
+
+DSM does not prescribe model selection or usage limits; those decisions depend
+on task requirements, budget, and availability. Instead, DSM encourages
+awareness:
+
+- **Prefer sufficient over maximal.** When a smaller or faster model handles
+  the task adequately, use it. Reserve larger models for tasks that genuinely
+  benefit from their capabilities.
+- **Avoid unnecessary regeneration.** Refine prompts rather than requesting
+  multiple full outputs to pick the best one.
+- **Be intentional about context.** Reading a 2,000-line file "just in case"
+  has a cost. The Context Budget Protocol (DSM_0.2) already encourages this
+  discipline for session management; the environmental dimension reinforces it.
+
+This is an awareness principle, not a compliance requirement. The individual
+practitioner's choices are small relative to infrastructure-level decisions,
+but awareness is the prerequisite for better choices at every scale.
+
+### 2.4 Applying the Principles
+
+When in doubt about whether a delivery is the right size, apply this
+sequence:
+
+1. **Can the reviewer read all of it?** If not, split it.
+2. **Can the reviewer form an opinion on it?** If not, it needs more
+   explanation or less volume.
+3. **Can the reviewer redirect it?** If the cost of "actually, let's try
+   this differently" feels prohibitive because too much work has been done,
+   the delivery was too large.
+
+---
+
+## 3. Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-02-14 | Initial release. Five principles codified from IronCalc collaboration experience and DSM core philosophy. BACKLOG-122. |
+| 1.1 | 2026-02-14 | Added "Earn Your Assertions" (principle 1.3). Renamed "The Human Brings the Soul" to "The Human Brings the Spark". Added 7 missing protocol mappings (Tests vs Capability Experiments, Daily Documentation, Gateway Review, Factual Accuracy, Destructive Command, DSM Version Propagation, External AI Contribution Guidelines). Re-mapped Phase 0.5, Plan Mode, and First Session Prompt to include Earn Your Assertions. BACKLOG-123. |
+| 1.2 | 2026-02-15 | Added Inclusive Language protocol mapping (Communication table). Added guardrail to Match the Room: agent must surface conflicts between external conventions and DSM inclusive language standards, human decides consciously. |
+| 1.3 | 2026-02-15 | Updated gap table (Section 2.2): added Status column, marked 3 gaps as addressed by BACKLOG-122 (Session Delivery Budget, PR Size Guidance, Research Phase Guard). Added Research phase guard row. |
+| 1.4 | 2026-03-01 | AI Collaboration Ethics (BACKLOG-124). Added Principle 1.7 "Own Your Process" (attribution/disclosure framework with decision table). Extended Principle 1.3 with accountability corollary. Added Guideline 2.3 "Environmental Awareness." Updated gap table with 3 ethics rows. Based on research: NIST AI RMF, EU AI Act, IEEE CertifAIEd, arXiv:2512.00867. |
