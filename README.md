@@ -1,6 +1,6 @@
 # Take AI Bite
 
-**Deliberate Systematic Methodology (DSM):** a practitioner-oriented framework for human-AI collaboration.
+**A framework for human-AI collaboration where the human stays in control, grows through the work, and retains every lesson learned.**
 
 <p align="center">
   <img src="assets/logo.png" alt="Take AI Bite logo" width="200">
@@ -12,9 +12,11 @@ AI tools generate faster than humans can review. When the output exceeds what a 
 
 Take AI Bite is a set of principles for keeping the human genuinely present in AI-assisted work. Not by slowing the AI down, but by structuring collaboration so that every delivery is sized for real engagement.
 
+But it goes further than review sizing. Take AI Bite builds an agent ecosystem that retains your memory, experience, and decisions across sessions and projects. The ecosystem becomes your avatar: an extension of your professional self that grows with you, remembers what you learned, and carries your accumulated expertise into every new collaboration.
+
 ## The Principles
 
-DSM is built on seven principles that govern how humans and AI agents work together. Each principle addresses a specific failure mode in human-AI collaboration.
+Seven principles govern how humans and AI agents work together. Each addresses a specific failure mode in human-AI collaboration.
 
 | Principle | Core idea |
 |-----------|-----------|
@@ -28,17 +30,38 @@ DSM is built on seven principles that govern how humans and AI agents work toget
 
 For the full framework, see [`DSM_AI_COLLABORATION_PRINCIPLES.md`](DSM_AI_COLLABORATION_PRINCIPLES.md).
 
+## The Engine: Deliberate Systematic Methodology (DSM)
+
+These principles are operationalized by DSM, a living, versioned methodology that governs the full lifecycle of human-AI collaboration: research, implementation, governance, and disclosure.
+
+DSM is not a static document. It evolves through a hub-spoke feedback loop where every session, every project, and every practitioner's experience feeds back into the methodology. Protocols are tested, refined, and propagated across the ecosystem. What one project discovers improves every future project.
+
+This is what makes the avatar possible. Session transcripts capture reasoning. Checkpoints preserve milestones. Memory files retain context across sessions. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that accumulates your expertise, not just your files.
+
 ## Start Here
 
-Read [`TAKE-AI-BITE.md`](TAKE-AI-BITE.md) for the short version of the founding principle. It takes two minutes and captures the core idea: someone offers you a bite of a cookie, you take what fits. AI collaboration works the same way.
+Read [`TAKE-AI-BITE.md`](TAKE-AI-BITE.md) for the short version of the founding principle. It takes two minutes and captures the core idea: someone offers you a bite of a cookie, you take a bite the size you will enjoy; too small and you won't taste the cookie, too much and it will cause a lot of issues.
 
 ## Field-Tested
 
-These principles were developed and validated across real projects spanning data science, software engineering, and open source contribution. They are not theoretical; they emerged from daily practice with AI agents across multiple domains.
+These principles were developed and validated across real projects spanning:
+
+- **Data science:** exploratory analysis, feature engineering, modeling pipelines
+- **Software engineering:** ML applications, production code, test-driven development
+- **Open source contribution:** external projects in unfamiliar technology domains (Android/Kotlin), with all contributions merged upstream
+- **Structured documentation:** complex, interconnected methodology systems with thousands of cross-referenced lines
+- **Research synthesis:** multi-source analysis, competitive landscape mapping, literature review
+- **Administrative processes:** financial documentation, regulatory compliance
+
+They are not theoretical; they emerged from daily practice with AI agents across these domains. Practitioners working on complex multi-session tasks independently recreate DSM patterns (checkpoint directories, session handoffs, decision logs) before encountering the framework. DSM formalizes behavior that emerges naturally from deliberate work.
 
 ## What's Coming
 
-This repository currently contains the philosophical foundation. The full DSM framework includes methodology tracks for data science, software engineering, and project management, with templates, case studies, and setup scripts. These will be published incrementally as they are curated for external use.
+This repository currently contains the philosophical foundation. The full framework is being curated for external publication:
+
+- **Methodology tracks** for data science, software engineering, documentation, and project management, with templates, case studies, and setup scripts
+- **A queryable knowledge graph** that compiles human-authored methodology into a navigable, interconnected structure, making the ecosystem's accumulated knowledge searchable across projects and sessions
+- **Competitive positioning research** mapping the landscape of human-AI collaboration approaches across three dimensions: human control (posture), knowledge provenance, and experience accumulation. No other framework occupies DSM's position as a living, domain-transferable, practitioner-oriented methodology
 
 ## Links
 
