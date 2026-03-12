@@ -23,7 +23,7 @@ Seven principles govern how humans and AI agents work together. Each addresses a
 | **Take a Bite** | Deliver only what the reviewer can chew. If they can't redirect it, it was too much. |
 | **The Human Brings the Spark** | AI amplifies. The human provides direction, intuition, and aesthetic judgment. |
 | **Earn Your Assertions** | Investigate before you claim. Verify before you act. Neither side gets to assume. |
-| **Understand, Review, Decide** | The user understands first, reviews second, decides third. No skipping steps. |
+| **Critical Thinking** | Understand first, review second, decide third. Then challenge your own reasoning: what did I miss? What am I assuming? |
 | **Know Your Context** | The agent manages its own resource consumption. Don't charge ahead until overflow. |
 | **Match the Room** | Contribute proportionally to the project's culture and scale. |
 | **Own Your Process** | Disclose how the work was produced. Transparency about method is a professional obligation. |

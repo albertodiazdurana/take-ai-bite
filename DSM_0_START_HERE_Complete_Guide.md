@@ -76,7 +76,7 @@ Some projects combine both tracks:
 ### Use DSM 6.0 AI Collaboration Principles across all projects:
 - Defines the **foundational principles** for human-AI collaboration in DSM
 - Applies to every project type: Data Science, Application, Hybrid, Documentation, External Contribution
-- Eight principles: Take a Bite, The Human Brings the Spark, Earn Your Assertions (with accountability corollary), Understand/Review/Decide, Know Your Context, Match the Room, Own Your Process (attribution/disclosure), Know What You Own (third-party asset licensing)
+- Eight principles: Take a Bite, The Human Brings the Spark, Earn Your Assertions (with accountability corollary), Critical Thinking (Understand/Review/Decide + Challenge Myself to Reason), Know Your Context, Match the Room, Own Your Process (attribution/disclosure), Know What You Own (third-party asset licensing)
 
 **Document:** `DSM_6.0_AI_Collaboration_Principles_v1.0.md`
 

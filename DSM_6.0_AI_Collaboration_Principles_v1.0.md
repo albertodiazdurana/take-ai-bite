@@ -110,22 +110,71 @@ is not diminished by the quality of the AI's output; it is established by the
 act of submitting the work under your name. Review is not optional when the
 stakes include your professional credibility.
 
-### 1.4 Understand, Review, Decide
+### 1.4 Critical Thinking
 
-**The user understands first, reviews second, and decides third.**
+**Question your own reasoning before asking others to trust it.**
 
-This is DSM's core interaction loop. Before any approval, the user must
-understand what was done and why. Before any decision, the user must have
+Self-regulation, thinking about your own thinking, is what distinguishes critical
+engagement from passive processing. It is the deliberate act of questioning,
+confirming, validating, or correcting one's own reasoning before acting on it
+(Facione, 1990). It is the meta-skill that makes all other skills trustworthy.
+
+Critical thinking in collaboration is bidirectional. The human understands first:
+the vision, the plan, the direction. The agent follows that plan and examines its
+own choices before presenting them. The human examines what is presented before
+approving it. Both sides exercise purposeful, self-regulatory judgment, but the
+human sets the course.
+
+When either side skips this step, the collaboration degrades silently. The agent
+that presents without self-challenging produces work that looks complete but
+has not been stress-tested. The human who approves without scrutinizing
+creates a loop where oversight exists in form but not in substance.
+
+#### 1.4.1 Understand, Review, Decide
+
+**The human understands first, reviews second, and decides third.**
+
+This is DSM's core interaction loop. Before any approval, the human must
+understand what was done and why. Before any decision, the human must have
 reviewed the actual output. Skipping steps, approving without understanding,
 deciding without reviewing, breaks the collaboration even when the output
 happens to be correct.
 
 In practice this means:
-- The agent explains before it acts (pre-generation briefs)
+- The agent follows a plan that the human has reviewed and approved
+- The agent explains before it acts (pre-generation briefs) and waits for
+  agreement
 - The agent delivers in reviewable increments (Take a Bite)
 - The agent waits for the human's substantive response before continuing
 - "Continue" is a valid response only when the human has seen and understood
   the previous output
+
+#### 1.4.2 Challenge Myself to Reason
+
+**Before presenting a choice, challenge why you made it.**
+
+This principle applies symmetrically. For the agent: before presenting a design,
+a collection of items, or a sequence of edits, ask yourself why this composition
+and not another. What requirement does each piece trace to? What did you consider
+and exclude? What are you assuming? The goal is not to produce a defense, but to
+surface the reasoning so the human can evaluate it alongside the output.
+
+For the human: before approving, ask what would need to be different for you to
+reject this. If you cannot articulate a reason to say no, you may not have
+examined the work closely enough. The question "why not something else?" is as
+valuable as "why this?"
+
+- **Agent self-regulation:** "I proposed six tests. Why six? Each traces to a
+  specific requirement. I considered a seventh for edge cases but excluded it
+  because the edge case is already covered by test three." Present this reasoning
+  proactively, not only when challenged.
+- **Human self-regulation:** "I am about to approve this. Do I understand what
+  each piece does? Could I explain to someone else why this is the right
+  approach? If not, I need to ask before approving."
+
+The operational protocols that implement this principle, Composition Challenge
+for multi-item artifacts and Edit Explanation Stop for intra-file edits, live in
+DSM_0.2.
 
 ### 1.5 Know Your Context
 
@@ -309,16 +358,18 @@ to existing DSM protocols and identifies the gaps that remain.
 
 | Protocol | DSM Location | Principle |
 |----------|-------------|-----------|
-| Project scaffolding (backlog item, CLAUDE.md, docs/ structure) | DSM_3, DSM_0.1 | Understand/Review/Decide |
-| First Session Prompt (research -> plan -> approve -> implement) | DSM_0.2 | Understand/Review/Decide, Earn Your Assertions |
+| Project scaffolding (backlog item, CLAUDE.md, docs/ structure) | DSM_3, DSM_0.1 | Critical Thinking |
+| First Session Prompt (research -> plan -> approve -> implement) | DSM_0.2 | Critical Thinking, Earn Your Assertions |
 | Phase 0.5: Research and Grounding | DSM_0.2 | Earn Your Assertions, Know Your Context |
-| Plan Mode Protocol (explore, design, present for approval) | DSM_0.2 | Earn Your Assertions, Understand/Review/Decide |
+| Plan Mode Protocol (explore, design, present for approval) | DSM_0.2 | Earn Your Assertions, Critical Thinking |
 
 **Building**
 
 | Protocol | DSM Location | Principle |
 |----------|-------------|-----------|
-| Pre-Generation Brief (what/why/structure before creating) | DSM_0.2 | Understand/Review/Decide |
+| Pre-Generation Brief (what/why/structure before creating) | DSM_0.2 | Critical Thinking |
+| Composition Challenge (justify multi-item collections) | DSM_0.2 | Challenge Myself to Reason |
+| Edit Explanation Stop (review each edit before execution) | DSM_0.2 | Challenge Myself to Reason |
 | Notebook Collaboration (one cell, wait for output) | DSM_0.2 | Take a Bite |
 | App Development (File Creation Loop) | DSM_0.2 | Take a Bite |
 | Sprint Cadence and Feedback Boundaries | DSM_0.2 | Take a Bite |
@@ -338,9 +389,9 @@ to existing DSM protocols and identifies the gaps that remain.
 
 | Protocol | DSM Location | Principle |
 |----------|-------------|-----------|
-| Feedback Tracking (methodology.md, backlogs.md) | DSM_0.2 | Understand/Review/Decide |
+| Feedback Tracking (methodology.md, backlogs.md) | DSM_0.2 | Critical Thinking |
 | Session-End Inbox Push (ripe feedback to hub) | DSM_0.2 | Know Your Context |
-| Backlog System (improvements, developments, done) | CLAUDE.md | Understand/Review/Decide |
+| Backlog System (improvements, developments, done) | CLAUDE.md | Critical Thinking |
 | Decision Logging (docs/decisions/) | DSM_5.0 | The Human Brings the Spark |
 | Gateway Review Protocol | DSM 1.0, Section 6.5 | Understand/Review/Decide, Earn Your Assertions |
 | Factual Accuracy, No Guessing | DSM 1.0, Section 1.3.5 | Earn Your Assertions |
@@ -362,7 +413,7 @@ to existing DSM protocols and identifies the gaps that remain.
 |----------|-------------|-----------|
 | Version lifecycle / epochs (semantic versioning for content) | DSM_5.0, CLAUDE.md | Take a Bite |
 | DSM Version Propagation | DSM_3, Section 6.3 | Know Your Context |
-| Dogfooding (apply DSM to build DSM tools) | DSM_3 Section 7 | Understand/Review/Decide |
+| Dogfooding (apply DSM to build DSM tools) | DSM_3 Section 7 | Critical Thinking |
 | External Contributions (governance in DSM Central) | DSM_3 Section 6.6 | Match the Room |
 | Fork Governance Isolation (My Fork, My Rules) | DSM_3 Section 6.6.10 | Match the Room |
 | External AI Contribution Guidelines | DSM_3, Section 6.5 | Match the Room |
@@ -375,7 +426,7 @@ to existing DSM protocols and identifies the gaps that remain.
 | Session | No delivery budget: no limit on artifacts per session | Take a Bite | BACKLOG-122 | Addressed: Session Delivery Budget in DSM_0.2 |
 | File | No reference file size guidance | Know Your Context | BACKLOG-119 | Open |
 | Session | No context budget awareness or early warning | Know Your Context | BACKLOG-121 | Open |
-| Wrap-up | Mechanical status updates require individual approval | Understand/Review/Decide | BACKLOG-120 | Open |
+| Wrap-up | Mechanical status updates require individual approval | Critical Thinking | BACKLOG-120 | Open |
 | External | No systematic framework for contribution sizing | Match the Room | BACKLOG-122 | Addressed: PR Size Guidance in DSM_3 Section 6.6.7 |
 | Research | No checkpoint guard for unbounded exploration | Take a Bite | BACKLOG-122 | Addressed: Research Phase Guard in DSM_0.2 Phase 0.5 |
 | Ethics | No attribution/disclosure framework | Own Your Process | BACKLOG-124 | Addressed: Principle 1.7 |
@@ -422,6 +473,10 @@ sequence:
 
 ---
 
+## References
+
+- Facione, P.A. (1990). *Critical Thinking: A Statement of Expert Consensus for Purposes of Educational Assessment and Instruction (The Delphi Report)*. California Academic Press. [ERIC ED315423](https://files.eric.ed.gov/fulltext/ED315423.pdf)
+
 ## 3. Version History
 
 | Version | Date | Changes |
@@ -431,3 +486,4 @@ sequence:
 | 1.2 | 2026-02-15 | Added Inclusive Language protocol mapping (Communication table). Added guardrail to Match the Room: agent must surface conflicts between external conventions and DSM inclusive language standards, human decides consciously. |
 | 1.3 | 2026-02-15 | Updated gap table (Section 2.2): added Status column, marked 3 gaps as addressed by BACKLOG-122 (Session Delivery Budget, PR Size Guidance, Research Phase Guard). Added Research phase guard row. |
 | 1.4 | 2026-03-01 | AI Collaboration Ethics (BACKLOG-124). Added Principle 1.7 "Own Your Process" (attribution/disclosure framework with decision table). Extended Principle 1.3 with accountability corollary. Added Guideline 2.3 "Environmental Awareness." Updated gap table with 3 ethics rows. Based on research: NIST AI RMF, EU AI Act, IEEE CertifAIEd, arXiv:2512.00867. |
+| 1.5 | 2026-03-12 | Critical Thinking restructure (BACKLOG-175). Renamed Section 1.4 "Understand, Review, Decide" to "Critical Thinking" with two subsections: 1.4.1 Understand, Review, Decide (preserved), 1.4.2 Challenge Myself to Reason (new). Grounded in Facione (1990) self-regulation concept. Added Composition Challenge and Edit Explanation Stop to protocol mapping. Updated protocol references from "Understand/Review/Decide" to "Critical Thinking." |

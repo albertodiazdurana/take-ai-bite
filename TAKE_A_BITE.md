@@ -27,5 +27,10 @@ Both sides must also earn their assertions, how much do you know about the
 cookie? Ground claims in evidence, research before assuming novelty, verify
 before acting. Context is the foundation.
 
+Before presenting, challenge your own reasoning. Before approving, challenge
+what is presented. Self-regulation, thinking about your own thinking, is what
+keeps both sides honest. The human sets the direction; the agent follows the
+plan and questions its own choices before asking the human to trust them.
+
 For the full framework of principles and guidelines, see
 `DSM_6.0_AI_Collaboration_Principles_v1.0.md`.
