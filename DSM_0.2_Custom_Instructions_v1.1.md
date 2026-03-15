@@ -550,6 +550,25 @@ a testing step.
 
 ---
 
+## Branch Push Policy
+
+Feature branches stay local by default. Push to remote when:
+
+1. **Session continuity:** The session extends via lightweight wrap-up while on
+   an unpushed feature branch. The branch must be pushed to remote before the
+   session gap to ensure remote backup.
+2. **Large or risky changes:** The change benefits from PR-based review before
+   merge (judgment call by human or agent).
+
+**Rationale:** Most BL implementations complete in a single session, making
+remote branches unnecessary overhead. But when work spans sessions, a local-only
+branch has no recovery path if the local environment fails between sessions.
+
+**Cleanup:** When a branch was pushed to remote, delete it after merge:
+`git push origin --delete bl-NNN/short-description`.
+
+---
+
 ## References
 
 - Preston-Werner, T. (2013). [Semantic Versioning 2.0.0](https://semver.org/)
