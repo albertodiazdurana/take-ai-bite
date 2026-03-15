@@ -575,6 +575,24 @@ branch has no recovery path if the local environment fails between sessions.
 
 ---
 
+## Backlog Scope Rule
+
+A backlog item must address a single, independently completable topic. When
+creating or reviewing a BL, check for split indicators:
+
+- **Different execution contexts:** parts that belong in different repos or sessions
+- **Independent success criteria:** one part can be "done" while another is pending
+- **Different complexity levels or timelines:** parts with mismatched effort
+
+If any indicator is present, split into separate BLs. A BL that cannot be fully
+marked "done" because an unrelated part is pending is too broad.
+
+**Agent behavior:** When the agent encounters a multi-topic BL during
+implementation, flag it to the user: "This BL addresses [N] independent topics.
+Split before implementing?"
+
+---
+
 ## References
 
 - Preston-Werner, T. (2013). [Semantic Versioning 2.0.0](https://semver.org/)
