@@ -521,8 +521,13 @@ notifications, create `.claude/dsm-ecosystem.md` with a `portfolio` entry."
 path exists on the filesystem. If a path does not exist, warn the user but
 continue the session. Do not fail silently and do not halt.
 
-**File format:** Markdown table with Name, Path, and Description columns.
+**File format:** Markdown table with Name, Path, Description, and optional Mirror columns.
 See the template in the DSM_0.2 source or create with `/dsm-align`.
+
+**Mirror repos:** Entries with `mirror: true` receive automatic file sync after
+Central methodology changes. When the Version Update Workflow completes (step 9),
+the agent copies changed methodology files to each mirror repo, commits, and pushes.
+This ensures public distribution repos stay current without manual intervention.
 
 ---
 
