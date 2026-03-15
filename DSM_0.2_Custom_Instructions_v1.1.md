@@ -1,5 +1,5 @@
 ---
-**DSM Custom Instructions: v1.3.67**
+**DSM Custom Instructions: v1.3.68**
 **Last Breaking Change:** 2026-03-15 (DSM_0.2 Modularization, BACKLOG-090)
 **Status:** Active, Cross-Project Governance
 **Architecture:** Slim core + 4 on-demand modules (see Module Dispatch Table)
