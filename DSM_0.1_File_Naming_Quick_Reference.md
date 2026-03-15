@@ -381,4 +381,4 @@ Before creating any file, ask:
 
 **For detailed guidance, see:** Appendix E.11 in `1.0_Methodology_Appendices.md`
 
-**Part of:** Agentic AI Data Science Methodology v1.3.0
+**Part of:** Deliberate Systematic Methodology (DSM)

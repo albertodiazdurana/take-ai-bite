@@ -480,7 +480,7 @@ The transcript feeds the lessons; the lessons feed the agent's priming at sessio
 
 DSM evolves through internal experience (session observations, spoke feedback,
 reasoning lessons) but does not systematically track external developments in AI
-collaboration, data science methodology, or agentic AI patterns. This protocol
+collaboration, AI methodology, or agentic AI patterns. This protocol
 adds a lightweight per-session learning step that brings external knowledge into
 the ecosystem.
 

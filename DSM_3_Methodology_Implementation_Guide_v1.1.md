@@ -2383,27 +2383,25 @@ materials, reference this section directly rather than re-deriving the framing e
 
 ### Short Version (1-2 sentences)
 
-> The Data Science Methodology (DSM) is a personal framework for managing data science
-> and ML projects with AI agents. It covers the full lifecycle from exploration through
-> production, validated across 10+ projects.
+> The Deliberate Systematic Methodology (DSM) is a framework for human-AI collaboration
+> across data science, software engineering, and documentation projects. It covers the
+> full lifecycle from exploration through production, validated across 10+ projects.
 
 ### Medium Version (1 paragraph)
 
-> The Data Science Methodology (DSM) is a comprehensive framework I independently
-> developed for managing data science and ML projects with AI agents. Started in August
-> 2025, it provides a structured 4-phase workflow, project management templates, software
-> engineering adaptations, and documentation standards. The methodology has been
-> stress-tested through real-world case studies, including customer analytics (TravelTide)
-> and demand forecasting (Favorita) projects completed during my Masterschool AI Data
-> Science specialization, as well as through a growing ecosystem of dog-fooding tools
-> that validate DSM by building with DSM.
+> The Deliberate Systematic Methodology (DSM) is a comprehensive framework for
+> human-AI collaboration across multiple domains. Started in August 2025, it provides
+> a structured workflow, project management templates, software engineering adaptations,
+> and documentation standards. The methodology has been validated through real-world
+> projects spanning data science, Android/Kotlin development, and open-source
+> contributions, as well as through a growing ecosystem of tools that validate DSM
+> by building with DSM.
 
 ### Full Version (3-4 paragraphs)
 
-> The Data Science Methodology (DSM) is a comprehensive, open-source framework I
-> independently developed for managing data science and ML projects with AI coding
-> agents. Started in August 2025, the methodology addresses a gap I identified in
-> how data scientists collaborate with AI tools: most workflows lack the structure
+> The Deliberate Systematic Methodology (DSM) is a comprehensive, open-source framework
+> for human-AI collaboration. Started in August 2025, the methodology addresses a gap
+> in how professionals collaborate with AI tools: most workflows lack the structure
 > needed for reproducibility, quality assurance, and systematic decision tracking.
 >
 > The framework provides an integrated system of five core documents covering

@@ -1,5 +1,5 @@
-# Agentic AI Data Science Methodology - Complete Getting Started Guide
-**Your complete guide to setting up and executing data science projects with an AI agent**
+# Deliberate Systematic Methodology (DSM) - Complete Getting Started Guide
+**Your complete guide to setting up and executing projects with an AI agent**
 
 **Version:** 1.3.37
 **Last Updated:** 2026-03-10
@@ -42,7 +42,7 @@
 
 **Document:** `DSM_4.0_Software_Engineering_Adaptation_v1.0.md`
 
-**Key sections:** Section 2: Project Structure Patterns (NEW in v1.3.18), Adapted phases for ML apps, App Development Protocol, Section 4.4: Tests vs Capability Experiments (v1.3.6), Section 4.4.1: Fixture Validation Principle (BACKLOG-049), IDE Configuration for VS Code (v1.3.15), Architectural Decision templates, Section 16: Beyond DSM (MLOps/production references)
+**Key sections:** Section 2: Project Structure Patterns (NEW in v1.3.18), Adapted phases for ML apps, App Development Protocol, Section 4.4: Tests vs Capability Experiments (v1.3.6), Section 4.4.1: Fixture Validation Principle (BACKLOG-049), Section 4.6: Bug Disambiguation (v1.3.42), Section 4.7: PR Description Maintenance (v1.3.42), IDE Configuration for VS Code (v1.3.15), Architectural Decision templates, Section 16: Beyond DSM (MLOps/production references)
 
 ### Integration Note
 DSM 4.0 **extends** the standard methodology, it does not replace it. Continue using:
@@ -80,7 +80,7 @@ Some projects combine both tracks:
 
 **Document:** `DSM_6.0_AI_Collaboration_Principles_v1.0.md`
 
-**Key sections:** Section 1: Principles (the reasoning behind DSM's interaction patterns, including ethics of AI attribution and human accountability), Section 2: Guidelines (maps principles to existing protocols, identifies gaps, environmental awareness)
+**Key sections:** Section 1: Principles (the reasoning behind DSM's interaction patterns, including ethics of AI attribution and human accountability), Section 2: Guidelines (maps principles to existing protocols, identifies gaps, environmental awareness), Section 2.5: The DSM Vocabulary (coined terms as collaboration infrastructure, canonical registry reference)
 
 **See also:** `TAKE_A_BITE.md` for the short version of the central principle.
 
@@ -93,6 +93,31 @@ DSM 5.0 **extends** the standard methodology for documentation contexts. Continu
 Does NOT apply:
 - Section 2.1-2.4: Environment setup, EDA, feature engineering, modeling
 - Appendices A-D: Phase-specific technical guidance
+
+---
+
+### Tool Dependencies
+
+DSM has been designed and validated with Claude Code + VS Code on Linux/WSL2. The
+methodology aspires to be tool-agnostic, but not all layers transfer equally to
+other environments.
+
+| Level | Dependency | Examples | Transferability |
+|-------|-----------|----------|----------------|
+| **1. Fundamental** | Capable AI agent with multi-turn context, file access, instruction following, session isolation | Any sufficiently capable agent | High: core to DSM's design, not vendor-specific |
+| **2. Claude Code-specific** | CLAUDE.md config, slash commands, auto-memory, permission window, tool types (Read, Edit, Bash, Agent) | Claude Code CLI/extension | Medium: other agents need equivalent config and tool access |
+| **3. VS Code-specific** | Session transcript real-time view, IDE file links, permission mode setting | VS Code extension | Low impact: UX conveniences, not methodology requirements |
+| **4. Platform-specific** | File paths (`~/dsm-*`), shell (bash), git behavior, line endings | Linux/WSL2 | Low impact: path conventions need OS-specific documentation |
+
+**What transfers to any environment:** Core methodology (session lifecycle,
+documentation standards, governance principles, feedback loops, sprint cadence),
+all DSM documents (DSM_0 through DSM_6), project structure conventions.
+
+**What needs adaptation:** Session start/end commands, configuration file format
+and location, real-time reasoning display mechanism, approval workflow UX.
+
+If you adapt DSM to a different tool or platform, contributions documenting the
+experience are welcome.
 
 ---
 
@@ -562,7 +587,11 @@ This ensures consistent human-agent interaction patterns (pre-generation briefs,
 ├── README.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, CHANGELOG.md, SECURITY.md
 ├── DSM_0_START_HERE_Complete_Guide.md                      # This document (Priority 0)
 ├── DSM_0.1_File_Naming_Quick_Reference.md                  # Printable file naming card
-├── DSM_0.2_Custom_Instructions_v1.1.md                     # Custom Instructions template
+├── DSM_0.2_Custom_Instructions_v1.1.md                     # Custom Instructions (slim core, ~580 lines)
+├── DSM_0.2.A_Session_Lifecycle.md                          # Module A: session lifecycle protocols
+├── DSM_0.2.B_Artifact_Creation.md                          # Module B: artifact creation protocols
+├── DSM_0.2.C_Security_Safety.md                            # Module C: security and safety protocols
+├── DSM_0.2.D_Research_Onboarding.md                        # Module D: research and onboarding protocols
 ├── DSM_1.0_Data_Science_Collaboration_Methodology_v1.1.md  # Main methodology (~4,450 lines)
 ├── DSM_1.0_Methodology_Appendices.md                       # Appendices A-F (~5,820 lines)
 ├── DSM_2.0_ProjectManagement_Guidelines_v2_v1.1.md         # PM Guidelines (Priority 2)
@@ -575,7 +604,7 @@ This ensures consistent human-agent interaction patterns (pre-generation briefs,
 ├── scripts/                                                # Environment setup scripts
 │   ├── setup_base_environment_minimal.py                   # Academic/exploratory
 │   └── setup_base_environment_prod.py                      # Production (+ code quality)
-└── case-studies/traveltide/                                 # Example project application
+└── plan/                                                    # Planning, backlog, and roadmap
 ```
 
 ### Total System Size
@@ -588,9 +617,9 @@ This ensures consistent human-agent interaction patterns (pre-generation briefs,
 | SW Engineering (4.0)  | 1      | ~625        | ML application track     |
 | Implementation        | 1      | ~500        | Setup instructions       |
 | Quick Reference Cards | 1      | ~120        | Printable file naming    |
-| Custom Instructions   | 1      | ~1,650      | Example configuration    |
+| Custom Instructions   | 5      | ~2,390      | Core (580) + 4 modules   |
 | Environment Scripts   | 2      | ~400        | Automated setup          |
-| **Total Core System** | **11** | **~16,200** | **Complete framework**   |
+| **Total Core System** | **15** | **~16,940** | **Complete framework**   |
 
 ---
 
