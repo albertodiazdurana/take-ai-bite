@@ -1,5 +1,5 @@
 # Data Science Project Collaboration Methodology
-## Working Framework for Alberto Diaz Durana & AI Agent
+## Working Framework for Human-AI Collaboration
 ### Academic Edition v1.1
 
 **Version:** 1.3.0 (Academic Edition)
@@ -2406,7 +2406,7 @@ Links to other decisions that informed or were informed by this one.
 
 **Date:** 2025-11-12  
 **Phase:** 3 (Analysis)  
-**Decision Maker:** Alberto (analyst), Elena (stakeholder approval)  
+**Decision Maker:** The analyst, with stakeholder approval
 **Status:** Approved & Implemented
 
 ### Context
@@ -2433,7 +2433,7 @@ Proceed with K=3 clustering, implement fuzzy perk assignment strategy.
 - Statistical validity: K=3 shows clear separation (silhouette = 0.38)
 - Business alignment: Can assign multiple perks per segment based on propensities
 - Data-driven: Let data guide segmentation, not predetermined expectations
-- Stakeholder buy-in: Elena agreed after seeing statistical evidence
+- Stakeholder buy-in: the stakeholder agreed after seeing statistical evidence
 
 ### Implementation
 - K-Means with K=3 applied to 89 features
@@ -2819,7 +2819,7 @@ Temporal consistency principle: Seasonally-aligned training data outperforms vol
 
 **Different Audiences, Different Needs:**
 
-**Executive Leadership (e.g., Elena - Head of Marketing):**
+**Executive Leadership (e.g., Head of Marketing):**
 - **Focus:** Business impact, ROI, strategic decisions
 - **Format:** 1-2 page executive summary, 5-slide deck
 - **Language:** Business terms, minimal technical jargon
@@ -2844,7 +2844,7 @@ Temporal consistency principle: Seasonally-aligned training data outperforms vol
 - **Close:** Clear next steps and ownership
 
 **Example Multi-Level Communication:**
-- **Email to Elena:** "3 customer segments identified with distinct behaviors. Recommend exclusive perks for high-value travelers, free cancellation for budget travelers."
+- **Email to stakeholder:** "3 customer segments identified with distinct behaviors. Recommend exclusive perks for high-value travelers, free cancellation for budget travelers."
 - **Tech Doc:** Complete clustering methodology, validation metrics, code repository link
 - **Operational Guide:** "Segment 1: High-value frequent travelers. Behaviors: Books luxury stays, travels monthly. Recommended perks: Exclusive lounge access, priority booking."
 

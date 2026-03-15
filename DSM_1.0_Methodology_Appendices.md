@@ -2406,6 +2406,45 @@ with mlflow.start_run(run_name="kmeans_k3"):
 
 ### C.1.3. Capability Experiment Template
 
+#### General 7-Element Framework
+
+A domain-agnostic experiment template grounded in established frameworks
+(Sculley et al., 2015; Google Rules of ML; MLflow; Weights & Biases;
+Neptune.ai; Papers with Code). Use this for any experiment; the detailed
+templates below extend it for RAG and software-specific evaluations.
+
+```markdown
+# EXP-###: [Experiment Title]
+
+## 1. Hypothesis
+[Testable claim with measurable prediction]
+
+## 2. Baseline
+[Current state with quantified metrics; what "before" looks like]
+
+## 3. Method
+[Steps to test the hypothesis; reproducible procedure]
+
+## 4. Variables
+- **Independent:** [What you change]
+- **Dependent:** [What you measure]
+- **Controlled:** [What you hold constant]
+
+## 5. Success Criteria
+[Threshold for accepting/rejecting; defined BEFORE running]
+
+## 6. Results
+[Actual outcomes with comparison to baseline]
+
+## 7. Decision
+[Accept / Reject / Iterate — with rationale]
+```
+
+**Key discipline:** Define success criteria (element 5) before running the
+experiment. Post-hoc criteria invite confirmation bias.
+
+#### RAG and Software Capability Experiments
+
 **When to Use:** Testing system behaviors, edge cases, or capabilities where results include both numeric metrics and behavioral observations. Run a minimal capability experiment against real data in Sprint 1 to validate format assumptions before finalizing parser/extractor design (see DSM 4.0 Section 4.4.1: Fixture Validation Principle).
 
 **Gap Addressed:** Standard experiment tracking (C.1.1, C.1.2) focuses on ML metrics. Software and RAG projects require structured documentation for both quantitative scores and qualitative capability assessments.
@@ -3328,7 +3367,7 @@ Marketing stakeholder may change segment requirements mid-project based on busin
 - Document pivot criteria upfront
 
 ### Owner
-Alberto (Data Scientist)
+The data scientist
 
 ### Status
 - [x] Identified

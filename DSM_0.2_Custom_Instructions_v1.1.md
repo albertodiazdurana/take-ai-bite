@@ -398,6 +398,11 @@ Language that excludes, alienates, or assumes shared cultural context reduces
 accessibility. Neutral, professional language ensures the methodology is welcoming
 to everyone.
 
+**Personal names:** Do not use personal names in methodology documentation (DSM_0
+through DSM_6, guides, research files). Use role-neutral references instead ("the
+analyst", "the stakeholder", "the contributor"). Author attribution is acceptable
+in backlog items, blog posts, README author sections, and contributor profiles.
+
 **Scope:** This applies to all DSM documents, spoke project artifacts generated
 under DSM guidance, commit messages, PR descriptions, and blog posts.
 
