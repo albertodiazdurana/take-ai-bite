@@ -511,11 +511,17 @@ them from the registry using logical names.
 | `portfolio` | README change notification | Warn and skip notification |
 | `contributions-docs` | External contribution governance | Warn and skip governance operations |
 
-**When the registry does not exist:** The agent uses fallback resolution where
-available (dsm-central from `@` reference). For paths with no fallback
-(portfolio, contributions-docs), the agent warns:
-"Ecosystem path 'portfolio' is not configured. To enable README change
-notifications, create `.claude/dsm-ecosystem.md` with a `portfolio` entry."
+**Required for all project types.** Every DSM project (hub, spoke, external
+contribution) must have `.claude/dsm-ecosystem.md` with at least `dsm-central`
+and `portfolio` entries. Without these, inbox routing, feedback push, and
+portfolio notifications fail silently or waste context searching the filesystem.
+Run `/dsm-align` to create the file with a standard template.
+
+**When the registry does not exist:** The agent warns at session start:
+"Missing `.claude/dsm-ecosystem.md`. Run `/dsm-align` to create it with
+required ecosystem pointers (`dsm-central`, `portfolio`)." The agent uses
+fallback resolution where available (dsm-central from `@` reference) but
+flags the missing registry as an action item, not a silent skip.
 
 **Path validation:** At session start, for each registry entry, check that the
 path exists on the filesystem. If a path does not exist, warn the user but
