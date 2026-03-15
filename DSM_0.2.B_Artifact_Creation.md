@@ -125,6 +125,7 @@ DSM_6, DSM_0.1, DSM_0.2) or in project deliverables.
 | Plan | Structures phases, deliverables, timelines | `docs/plans/` |
 | Epoch/sprint log | Tracks sprint progress and boundaries | `docs/plans/` or project-specific |
 | Handoff | Enables session continuity | `docs/handoffs/` |
+| Blog artifact | Drafts, seeds, publication materials | `docs/blog/` |
 
 **Detection rule:** When the agent encounters any of these patterns in an
 enabling file, it must flag the issue and surface it to the user before

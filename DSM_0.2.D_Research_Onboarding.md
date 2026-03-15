@@ -196,7 +196,7 @@ build a concrete plan with actionable items (requirements, breakdown, tasks)?"
 - **Citation scope restriction:** Upstream-facing documents cite public URLs only, never
   DSM internal file paths. Internal research files may cite DSM paths freely.
 
-**Deliverable:** `docs/research/{topic}_research.md` with findings, citations, and
+**Deliverable:** `docs/research/{YYYY-MM-DD}_{topic}_research.md` with findings, citations, and
 implications for project design. Research should directly inform the sprint plan.
 
 **Research file header:** All research files should include:
