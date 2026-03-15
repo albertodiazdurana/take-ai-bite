@@ -461,6 +461,88 @@ outputs a STAA recommendation after each auto extraction.
 Reasoning lessons are the curated extract (persistent, accumulating across sessions).
 The transcript feeds the lessons; the lessons feed the agent's priming at session start.
 
+### Scope Classification
+
+Every reasoning lesson entry carries a scope label that determines whether it
+propagates beyond the originating project.
+
+| Scope | Meaning | Redistribution |
+|-------|---------|----------------|
+| `ecosystem` | Applies to any DSM project | Redistributed to all spokes via DSM Central |
+| `pattern` | Applies to projects with same participation pattern or type | Redistributed selectively |
+| `project` | Specific to this project's domain | Stays local; reported for pattern detection |
+
+**Entry format with scope:** `- [{tag}] S{N} [{scope}]: {lesson text}`
+
+Example: `- [auto] S12 [ecosystem]: When placing DSM infrastructure, confirm project root before creating files.`
+
+**Management rules:**
+- Only `ecosystem` and `pattern` scope lessons get redistributed
+- `project` scope lessons are reported in the push notification but not
+  redistributed to other spokes
+- A `project` lesson recurring independently in 3+ spokes escalates to
+  `ecosystem` scope
+- Deduplication: if a lesson already exists in DSM Central's aggregation file
+  or in a DSM_0.2 protocol, acknowledge in the push notification but do not
+  re-add
+
+**When to classify:**
+- `[auto]` extraction at wrap-up: the agent assigns a scope based on
+  whether the lesson is domain-specific or generalizable
+- `[STAA]` analysis: the STAA agent prompts for scope classification
+  when writing each lesson (Step 6)
+
+### Cross-Project Propagation
+
+Reasoning lessons generated in spoke projects must propagate to DSM Central.
+Without propagation, valuable patterns stay siloed in individual projects.
+
+**Mandatory push rule:** At session wrap-up, after extracting reasoning lessons,
+the agent checks whether any new lessons were added during this session. If new
+lessons exist, push a notification to DSM Central's inbox listing the new
+entries with their scope classification.
+
+**Push mechanism:** Uses the Session-End Inbox Push protocol. The notification
+goes to `{dsm-central-path}/_inbox/{this-project-name}.md`.
+
+**Inbox entry format:**
+
+```markdown
+### [YYYY-MM-DD] Reasoning lessons from {project name} (Session N)
+
+**Type:** Notification
+**Priority:** Medium
+**Source:** {project name}
+
+New reasoning lessons added via {[auto]/[STAA]} (Session N):
+
+| # | Category | Scope | Lesson |
+|---|----------|-------|--------|
+| 1 | {category} | {scope} | {lesson text} |
+
+Source file: {project}/.claude/reasoning-lessons.md
+```
+
+**Central aggregation file:** `docs/reasoning-lessons-ecosystem.md` collects
+`ecosystem` and `pattern` scope lessons from all spokes, with attribution to
+the originating project and session. The agent processes incoming lesson
+notifications during DSM Central session-start inbox processing: ecosystem
+lessons are added to the aggregation file; pattern lessons are added with a
+scope note; project lessons are acknowledged but not added.
+
+**Wrap-up variants:**
+- `/dsm-wrap-up`: extract + classify + push (full cycle)
+- `/dsm-quick-wrap-up`: extract + classify, defer push (no cross-repo writes)
+- `/dsm-light-wrap-up`: defer everything (extraction, classification, push)
+
+**DSM Central sessions:** When processing a lesson notification in the inbox,
+the agent:
+1. Reads the notification and checks each lesson against the aggregation file
+   for duplicates
+2. Adds non-duplicate `ecosystem` and `pattern` lessons to
+   `docs/reasoning-lessons-ecosystem.md` with attribution
+3. Moves the inbox entry to `_inbox/done/`
+
 **Anti-Patterns:**
 
 **DO NOT:**
