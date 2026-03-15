@@ -441,12 +441,19 @@ outputs a STAA recommendation after each auto extraction.
 - **File size target:** ~50 entry lines (excluding headers and comments); if
   exceeded, trigger a prune pass regardless of cadence
 - **Prune actions:**
-  1. **Promote:** entries reinforced across 3+ sessions graduate to MEMORY.md
-     (as Key Patterns or Common Pitfalls) or CLAUDE.md (as protocol rules);
-     remove the original after promotion
-  2. **Archive:** session-specific entries for permanently resolved contexts;
+  1. **Promote to memory:** entries reinforced across 3+ sessions graduate to
+     MEMORY.md (as Key Patterns or Common Pitfalls) or CLAUDE.md (as protocol
+     rules); remove the original after promotion
+  2. **Promote to protocol:** entries that represent ecosystem-wide patterns
+     (validated across 3+ sessions, applicable beyond the originating project)
+     graduate to a formal DSM protocol section (DSM_0.2 module), a DSM 6.0
+     principle, or a DSM Vocabulary entry. This is a higher level of promotion
+     than memory; it codifies the pattern into the framework itself. Create a
+     backlog item for the protocol addition, implement via feature branch, and
+     remove the original lesson after the protocol is merged.
+  3. **Archive:** session-specific entries for permanently resolved contexts;
      remove
-  3. **Consolidate:** entries expressing the same insight from different sessions
+  4. **Consolidate:** entries expressing the same insight from different sessions
      merge into one with session cross-references (e.g., `[+S55]`)
 
 **Relationship to Session Transcript Protocol:** The transcript is the raw data
