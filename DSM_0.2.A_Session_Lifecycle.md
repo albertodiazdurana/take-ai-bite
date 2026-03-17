@@ -24,7 +24,8 @@ its content is actionable:
 
 **Pushing process:**
 1. For each ripe per-session file, write a notification to DSM Central's inbox:
-   `{dsm-central-path}/_inbox/{this-project-name}.md`
+   `{dsm-central-path}/_inbox/{date}_{this-project-name}_{content}.md`
+   (e.g., `2026-03-17_dsm-graph-explorer_feedback-entries-46-47.md`)
 2. **Path validation:** Before writing, verify the resolved target path is DSM
    Central's inbox, not the project's own governance inbox. If the resolved path
    contains the current project name as a subdirectory (e.g.,
@@ -231,7 +232,7 @@ record; no empty files.
 1. Note which DSM section was referenced (e.g., "Section 2.2", "Appendix B.2")
 2. If guidance was particularly helpful or lacking, note for feedback
 3. Log gaps or unclear areas encountered
-4. Reference: DSM_1.0 Section 6.4 (Checkpoint Protocol), Appendix E.12 (Validation Tracker)
+4. Reference: DSM_1.0 Section 6.4 (Checkpoint Protocol)
 
 **Filing completeness:** Writing a feedback file to `docs/feedback/` is only
 half the action. The file must also be pushed to DSM Central's inbox per the
@@ -247,6 +248,69 @@ Every project that produces feedback must have:
 - `docs/feedback/technical.md` (append-only, sprint-boundary cadence; see
   Technical Progress Reporting below)
 
+**Per-session file templates:**
+
+Backlog proposal file (`YYYY-MM-DD_sN_backlogs.md`):
+
+```markdown
+# DSM Feedback: Backlog Proposals
+**Project:** [project name]
+**Session:** [N]
+**Date:** [YYYY-MM-DD]
+
+### [Proposal title]
+- **DSM Section:** [which section this proposes to change]
+- **Problem:** [what gap or issue was encountered]
+- **Proposed Solution:** [concrete change proposed]
+- **Evidence:** [what happened that motivated this, with session/sprint context]
+```
+
+Methodology feedback file (`YYYY-MM-DD_sN_methodology.md`):
+
+```markdown
+# DSM Feedback: Methodology Observations
+**Project:** [project name]
+**Session:** [N]
+**Date:** [YYYY-MM-DD]
+
+### Entry: [DSM section name]
+- **Date:** [YYYY-MM-DD] | **Sprint:** [N] | **Type:** Success | Gap | Recurrence
+- **Context:** [what was being done when the observation occurred]
+- **Finding:** [what worked well or what gap was identified]
+- **Scores:** Clarity [1-5], Applicability [1-5], Completeness [1-5], Efficiency [1-5] (Avg: [X.XX])
+- **Recommendation:** [what should change, if anything]
+```
+
+Multiple entries per file are acceptable when they occur in the same session.
+
+**Processing confirmation ("Done" handshake):**
+
+When DSM Central processes a spoke's feedback file:
+1. Central creates BL items or integrates observations as needed
+2. Central sends an inbox notification to the spoke confirming processing:
+   `{spoke-path}/_inbox/{date}_dsm-central_feedback-processed.md`
+3. The spoke moves its local feedback file to `docs/feedback/done/` after
+   receiving the confirmation
+
+The spoke never moves files to `done/` without confirmation from Central.
+This keeps cross-repo writes limited to inbox entries only.
+
+**Migration from legacy monolithic files:**
+
+Projects with existing append-only feedback files (`methodology.md`,
+`backlogs.md`) must migrate before adopting per-session files:
+
+1. **Audit:** DSM Central reads the monolithic files and identifies which
+   entries have been processed (mapped to existing BLs) vs unprocessed
+2. **Extract:** Unprocessed entries are converted to DSM Central BLs or
+   per-session files for processing
+3. **Archive:** Move the monolithic files to `docs/feedback/done/` with a
+   `legacy-` prefix (e.g., `legacy-backlogs.md`, `legacy-methodology.md`)
+4. **Start fresh:** New sessions create per-session files only
+
+Do not delete the legacy files; they contain historical scoring data and
+evidence that may be referenced by existing BLs.
+
 **Anti-Patterns:**
 
 **DO NOT:**
@@ -254,6 +318,7 @@ Every project that produces feedback must have:
 - Defer logging a gap or observation; capture it when encountered or it will be forgotten
 - File feedback locally without sending an inbox notification to DSM Central; the inbox is what triggers Central to read and act on the feedback
 - Use append-only files for backlogs or methodology feedback; use per-session files with the lifecycle above
+- Move feedback files to `done/` without confirmation from DSM Central; unconfirmed moves lose unprocessed entries
 
 ---
 
