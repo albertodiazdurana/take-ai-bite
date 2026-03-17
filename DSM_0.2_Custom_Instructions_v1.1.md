@@ -35,10 +35,10 @@ isolation rules:
 
 | Indicator | Participation Pattern | Reference |
 |-----------|----------------------|-----------|
-| Git remote configured + DSM_3 Section 7 entry | Standard Spoke | Section 6.9 |
-| `contributions-docs/{project}/` exists or CLAUDE.md declares "External Contribution" | External Contribution | Section 6.6 |
-| CLAUDE.md declares "Private" or "DSM private project pattern" | Private Project | Section 6.8 |
-| No indicator found | Assume Standard Spoke | Section 6.9 |
+| Git remote configured + DSM_3 Section 7 entry | Standard Spoke | DSM_3 Section 6.9 |
+| `contributions-docs/{project}/` exists or CLAUDE.md declares "External Contribution" | External Contribution | DSM_3 Section 6.6 |
+| CLAUDE.md declares "Private" or "DSM private project pattern" | Private Project | DSM_3 Section 6.8 |
+| No indicator found | Assume Standard Spoke | DSM_3 Section 6.9 |
 
 **State both dimensions at session start:**
 "This is a [track] project ([DSM version]) using the [pattern] pattern."
@@ -570,13 +570,23 @@ Feature branches stay local by default. Push to remote when:
    session gap to ensure remote backup.
 2. **Large or risky changes:** The change benefits from PR-based review before
    merge (judgment call by human or agent).
+3. **Consolidation branch retention:** Branches that implement backlog
+   consolidations (merging, superseding, or absorbing BLs) must be pushed to
+   remote before or immediately after merge. The remote branch is **not deleted**
+   until the last BL referenced by the consolidation is resolved (implemented,
+   superseded, or closed). This preserves the pre-consolidation state as a
+   reconstruction point if a downstream BL reveals the consolidation was incorrect.
 
 **Rationale:** Most BL implementations complete in a single session, making
 remote branches unnecessary overhead. But when work spans sessions, a local-only
 branch has no recovery path if the local environment fails between sessions.
+Consolidation branches carry additional risk: they restructure the backlog itself,
+and errors may only surface when a referenced BL is later implemented.
 
 **Cleanup:** When a branch was pushed to remote, delete it after merge:
 `git push origin --delete bl-NNN/short-description`.
+**Exception:** Consolidation branches (case 3) are deleted only when all
+referenced BLs are resolved, not at merge time.
 
 ---
 
@@ -595,6 +605,20 @@ marked "done" because an unrelated part is pending is too broad.
 **Agent behavior:** When the agent encounters a multi-topic BL during
 implementation, flag it to the user: "This BL addresses [N] independent topics.
 Split before implementing?"
+
+### Backlog Naming Rule
+
+Backlog item titles must be self-explanatory. A user scanning the backlog README
+should understand each item's purpose without opening the file. The title is the
+primary interface to the backlog; jargon, abbreviations, or internal codenames
+that require context to parse belong in the description, not the title.
+
+**Test:** If the title requires reading the BL file to understand what it does,
+rename it.
+
+**Agent behavior:** When creating a BL, propose a title and verify it passes the
+test above. When reviewing existing BLs (e.g., during consolidation or triage),
+flag titles that fail the test and propose renames.
 
 ---
 

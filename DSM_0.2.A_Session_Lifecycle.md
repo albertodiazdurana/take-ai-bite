@@ -231,7 +231,7 @@ record; no empty files.
 1. Note which DSM section was referenced (e.g., "Section 2.2", "Appendix B.2")
 2. If guidance was particularly helpful or lacking, note for feedback
 3. Log gaps or unclear areas encountered
-4. Reference: Section 6.4 (Checkpoint Protocol), Appendix E.12 (Validation Tracker)
+4. Reference: DSM_1.0 Section 6.4 (Checkpoint Protocol), Appendix E.12 (Validation Tracker)
 
 **Filing completeness:** Writing a feedback file to `docs/feedback/` is only
 half the action. The file must also be pushed to DSM Central's inbox per the
