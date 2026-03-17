@@ -344,6 +344,78 @@ required replacement across 6+ deployment targets (favicon, navigation
 bar, OpenGraph, social preview, GitHub repository image, LinkedIn post).
 Full incident documented in `dsm-blog-poster/docs/logo-creation.md`.
 
+### 1.9 Think Ahead
+
+**Build the map before you walk the territory. Strategy emerges from operational
+maturity, not before it.**
+
+A collaboration framework that grows organically will eventually outpace its own
+ability to prioritize. Features accumulate, backlog items self-generate (each
+implementation surfaces observations that become new items), and the question
+shifts from "what can we build?" to "what should we build next, and why?" This
+is the signal that strategic planning is no longer optional; it is an emergent
+requirement of the system's own complexity.
+
+The instinct is to plan early. Resist it. Strategic planning requires material
+to plan with: operational foundations that work (so you know what "done" looks
+like), governance infrastructure that scales (so you can track what exists),
+philosophical clarity about what you value (so you can weigh trade-offs), and
+learning mechanisms that feed back into decisions (so plans stay connected to
+reality). Without these layers, a roadmap is speculation with formatting.
+
+The progression is not arbitrary:
+
+1. **Operational:** build the guidelines, templates, and conventions that make
+   work repeatable
+2. **Infrastructure:** build the governance systems (backlogs, versioning,
+   hub-spoke routing) that track what exists
+3. **Philosophical:** articulate the principles that explain why you work this
+   way, not just how
+4. **Learning:** build the mechanisms (experiments, feedback loops, reasoning
+   extraction) that make the collaboration improve over time
+5. **Strategic:** build the roadmap that directs which operational work to
+   prioritize, informed by everything above
+
+Each layer enables the next. Strategic thinking closes the loop: vision informs
+which operational work to prioritize, and operational results feed back through
+the learning layer to refine the vision.
+
+**Maturity indicators** (signals that strategic planning is warranted):
+
+| Signal | What it means |
+|--------|---------------|
+| Backlog self-generation | Implementations produce more items than they consume; the system creates work faster than it can finish |
+| Dependency clusters | Items block each other; sequencing matters and is no longer obvious |
+| Phase ambiguity | New items cannot be prioritized without knowing the project's strategic direction |
+| Audience expansion | External stakeholders appear; communication priorities must be weighed against internal priorities |
+| Ecosystem growth | Multiple repos, projects, or contribution streams compete for attention |
+
+**What this means in practice:**
+- Do not create a roadmap in the first week. Build, learn, reflect, then plan.
+- When the backlog starts self-generating, treat it as a maturity signal, not a
+  problem. The system is producing more work because it has enough operational
+  depth to see what is missing.
+- Strategic planning is a living activity, not a one-time document. Review the
+  roadmap at regular intervals (sprint boundaries) and let operational experience
+  update the plan.
+- The roadmap's value is not prediction; it is alignment. It answers "why this
+  item next?" so that individual sessions connect to a larger arc.
+
+**Relationship to other principles:** Think Ahead complements Take a Bite (1.1):
+where Take a Bite governs the size of individual deliveries, Think Ahead governs
+the sequence and direction of deliveries over time. It also depends on the
+learning layer: without Earn Your Assertions (1.3) and Critical Thinking (1.4),
+strategic plans lack the epistemic discipline to distinguish aspiration from
+evidence.
+
+**Evidence:** DSM's own evolution from a single methodology document (November
+2025) to a 14-repo ecosystem with 83 documented features, 796 commits, and a
+38-item strategic roadmap (March 2026). The roadmap system (BL-211) was not
+planned at the start; it emerged when the backlog reached ~30 active items and
+the acceleration curve (0.7 → 10.1 commits/day) made ad-hoc prioritization
+unsustainable. Full analysis: `docs/research/2026-03-16_dsm-evolution-git-history-analysis.md`
+and `docs/research/2026-03-16_dsm-feature-inventory.md`.
+
 ---
 
 ## 2. Guidelines
@@ -418,6 +490,10 @@ to existing DSM protocols and identifies the gaps that remain.
 | Fork Governance Isolation (My Fork, My Rules) | DSM_3 Section 6.6.10 | Match the Room |
 | External AI Contribution Guidelines | DSM_3, Section 6.5 | Match the Room |
 | Contributor Profile (skills inventory evolves with work) | CLAUDE.md | The Human Brings the Spark |
+| Roadmap System (phases, clusters, dependencies) | CLAUDE.md, plan/roadmap.md | Think Ahead |
+| Phase-Gated Work (backlog items assigned to strategic phases) | plan/roadmap.md | Think Ahead |
+| Backlog Scope Rule (single topic per item, split indicators) | DSM_0.2, CLAUDE.md | Think Ahead, Critical Thinking |
+| Feature Branch Rule (test before merge, branch retention) | DSM_0.2, CLAUDE.md | Think Ahead, Earn Your Assertions |
 
 ### 2.2 Gaps (require new protocols)
 
@@ -471,6 +547,29 @@ sequence:
    this differently" feels prohibitive because too much work has been done,
    the delivery was too large.
 
+### 2.5 The DSM Vocabulary
+
+DSM's principles are not just rules; they are a coined vocabulary. Each term
+names a pattern that standard language does not capture precisely. Naming makes
+patterns transferable across domains, testable against new situations, and
+communicable to practitioners outside the ecosystem.
+
+The vocabulary represents three layers of collaboration infrastructure, each
+addressing a different dimension of "how does an ecosystem define its way of
+working":
+
+| Layer | Artifact | Dimension |
+|-------|----------|-----------|
+| Operational | Document structure conventions (DSM_0.1) | How things are organized |
+| Philosophical | Principles (this document) | What we value |
+| Linguistic | Vocabulary (`docs/guides/dsm-vocabulary.md`) | How we name what we do |
+
+The vocabulary grows as the methodology encounters new situations, extending
+from single-session collaboration (formal principles) to ecosystem-level
+patterns (emergent concepts like Ripple Effect and My Fork, My Rules).
+
+**Canonical registry:** `docs/guides/dsm-vocabulary.md` in DSM Central.
+
 ---
 
 ## References
@@ -487,3 +586,4 @@ sequence:
 | 1.3 | 2026-02-15 | Updated gap table (Section 2.2): added Status column, marked 3 gaps as addressed by BACKLOG-122 (Session Delivery Budget, PR Size Guidance, Research Phase Guard). Added Research phase guard row. |
 | 1.4 | 2026-03-01 | AI Collaboration Ethics (BACKLOG-124). Added Principle 1.7 "Own Your Process" (attribution/disclosure framework with decision table). Extended Principle 1.3 with accountability corollary. Added Guideline 2.3 "Environmental Awareness." Updated gap table with 3 ethics rows. Based on research: NIST AI RMF, EU AI Act, IEEE CertifAIEd, arXiv:2512.00867. |
 | 1.5 | 2026-03-12 | Critical Thinking restructure (BACKLOG-175). Renamed Section 1.4 "Understand, Review, Decide" to "Critical Thinking" with two subsections: 1.4.1 Understand, Review, Decide (preserved), 1.4.2 Challenge Myself to Reason (new). Grounded in Facione (1990) self-regulation concept. Added Composition Challenge and Edit Explanation Stop to protocol mapping. Updated protocol references from "Understand/Review/Decide" to "Critical Thinking." |
+| 1.6 | 2026-03-16 | Strategic Thinking Layer (BACKLOG-212). Added Principle 1.9 "Think Ahead" documenting the four-layer maturity progression (operational → philosophical → learning → strategic). Added 4 Evolution protocol mappings (Roadmap System, Phase-Gated Work, Backlog Scope Rule, Feature Branch Rule). Evidence: 83 features across 14 repos, 796 commits, backlog self-generation as maturity signal. |
