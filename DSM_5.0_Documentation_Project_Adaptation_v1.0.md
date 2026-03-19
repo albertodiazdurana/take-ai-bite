@@ -47,7 +47,7 @@ project-root/
     checkpoints/                # Milestone snapshots (historical)
     handoffs/                   # Session-end resumption documents
     research/                   # Research findings (Phase 0.5)
-    feedback/                   # Methodology effectiveness tracking
+    feedback-to-dsm/            # Methodology effectiveness tracking
   plan/                         # Planning artifacts
     backlog/                    # Backlog items
       improvements/             # Internal enhancements

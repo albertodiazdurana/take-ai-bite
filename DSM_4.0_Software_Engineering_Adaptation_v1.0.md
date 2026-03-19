@@ -42,7 +42,7 @@ my-analysis/
 ├── docs/
 │   ├── handoffs/                   # Session continuity documents
 │   ├── checkpoints/                # Progress checkpoints
-│   ├── feedback/                   # Methodology feedback (optional)
+│   ├── feedback-to-dsm/            # Methodology feedback (optional)
 │   └── research/                   # Research artifacts (if Phase 0.5)
 ├── outputs/
 └── .claude/CLAUDE.md               # Points to central DSM via @ reference

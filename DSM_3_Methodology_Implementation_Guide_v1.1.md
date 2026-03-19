@@ -1110,7 +1110,7 @@ Ecosystem Path Registry), not in the external repository:
   blog/            # Blog journal entries and materials
   checkpoints/     # Milestone snapshots
   decisions/       # Design decisions log
-  feedback/        # methodology.md, backlogs.md (DSM feedback)
+  feedback-to-dsm/ # methodology.md, backlogs.md (DSM feedback)
   handoffs/        # Session handoff documents
   plan/            # Contribution plans and scope documents
   research/        # Phase 0.5 research (upstream analysis, gap studies)
@@ -1181,7 +1181,7 @@ Contribution milestones replace sprint boundaries as feedback triggers:
 | Review cycle complete | Push ripe entries to DSM Central inbox |
 
 Feedback files use the same structure as spoke projects (methodology.md, backlogs.md)
-but are located in `{contributions-docs-path}/{project}/feedback/`.
+but are located in `{contributions-docs-path}/{project}/feedback-to-dsm/`.
 
 #### 6.6.7. Onboarding Lifecycle
 
@@ -1458,7 +1458,7 @@ Governance artifacts live in DSM Central, not in this repo:
 
 | Folder | Purpose |
 |--------|---------|
-| `{contributions-docs-path}/{project}/feedback/` | Methodology and backlog feedback |
+| `{contributions-docs-path}/{project}/feedback-to-dsm/` | Methodology and backlog feedback |
 | `{contributions-docs-path}/{project}/blog/` | Blog materials about contributions |
 | `{contributions-docs-path}/{project}/decisions/` | Decision log entries |
 | `{contributions-docs-path}/{project}/checkpoints/` | Milestone snapshots |
@@ -1572,7 +1572,7 @@ priority mechanism. Options:
   docs/
     checkpoints/
     decisions/
-    feedback/
+    feedback-to-dsm/
     guides/
     handoffs/
       done/
@@ -1825,7 +1825,7 @@ upstream-specific concerns.
 | 14 | Initial commit | Project root | |
 
 The canonical `docs/` structure (Step 7) contains 9 subdirectories per DSM_0.1:
-`blog/`, `checkpoints/`, `decisions/`, `feedback/`, `guides/`, `handoffs/` (with
+`blog/`, `checkpoints/`, `decisions/`, `feedback-to-dsm/`, `guides/`, `handoffs/` (with
 `done/`), `inbox/`, `plans/`, `research/`.
 
 #### 6.7.1. First-Session Prompt
@@ -2103,7 +2103,7 @@ Extend the Agent Constraints with project-specific sensitive data types
       done/
   docs/
     decisions/
-    feedback/              (per-session: YYYY-MM-DD_sN_{type}.md)
+    feedback-to-dsm/       (per-session: YYYY-MM-DD_sN_{type}.md)
       done/
     checkpoints/
       done/
@@ -2319,7 +2319,7 @@ Standard spoke pattern (see DSM_3 Section 6.9).
     checkpoints/
       done/
     decisions/
-    feedback/
+    feedback-to-dsm/
       done/
     guides/
     handoffs/

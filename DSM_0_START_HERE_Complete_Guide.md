@@ -527,7 +527,7 @@ project/
 │   ├── blog/                             # Blog materials and journal
 │   ├── checkpoints/                      # Sprint/milestone checkpoints
 │   ├── decisions/                        # Decision records (permanent)
-│   ├── feedback/                         # DSM feedback files (append-only)
+│   ├── feedback-to-dsm/                  # DSM feedback files (append-only)
 │   ├── handoffs/                         # Session continuity documents
 │   ├── plans/                            # Sprint plans, roadmaps
 │   ├── reports/                          # Analysis reports
@@ -552,7 +552,7 @@ project/
 │   ├── blog/                             # Blog materials
 │   ├── checkpoints/                      # Sprint/milestone checkpoints
 │   ├── decisions/                        # Architecture Decision Records (Nygard, 2011) (permanent)
-│   ├── feedback/                         # DSM feedback files (append-only)
+│   ├── feedback-to-dsm/                  # DSM feedback files (append-only)
 │   ├── guides/                           # User-facing documentation (if applicable)
 │   ├── handoffs/                         # Session continuity documents
 │   ├── plans/                            # Sprint plans, roadmaps
