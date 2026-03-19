@@ -57,7 +57,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 3.6. **Sprint boundary gate:** If MEMORY.md or the checkpoint references a recently completed sprint (e.g., "Sprint N complete"), verify that boundary artifacts exist before suggesting new sprint work:
    - Checkpoint for the completed sprint in `docs/checkpoints/done/` (or just consumed in 3.5)
    - Blog journal entry in `docs/blog/journal.md` with a matching date
-   - Feedback files updated (per-session file in `docs/feedback/` or entry in `technical.md`)
+   - Feedback files updated (per-session file in `docs/feedback-to-dsm/` or entry in `technical.md`)
    If any are missing, flag them: "Sprint N boundary incomplete: missing [items]. Complete these before starting Sprint N+1, or defer with confirmation."
    **Skip when:** First sprint in a project (no prior boundary to check), or when no sprint identifier is found in MEMORY.md/checkpoint.
 4. **Bandwidth report:** Run `vnstat -h` and note usage since last session

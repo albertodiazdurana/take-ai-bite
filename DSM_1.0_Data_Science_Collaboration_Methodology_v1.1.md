@@ -3454,7 +3454,7 @@ In addition to the universal checklist:
 In addition to the universal checklist:
 
 4. **Update feedback files** (if methodology observations were made)
-   - `docs/feedback/methodology.md` and `docs/feedback/backlogs.md`
+   - `docs/feedback-to-dsm/methodology.md` and `docs/feedback-to-dsm/backlogs.md`
 
 5. **Sprint boundary deliverables** (if at sprint end)
    - Checkpoint document, feedback files, decision log, blog entry, README update
@@ -3830,7 +3830,7 @@ See **Appendix E.12** for the complete Validation Tracker Template.
 
 ### 6.4.5. Project Feedback Deliverables
 
-At project start, create two feedback files in `docs/feedback/`. These files
+At project start, create two feedback files in `docs/feedback-to-dsm/`. These files
 are maintained throughout execution and finalized at project completion. The
 methodology file integrates section-level scoring (previously in the standalone
 Validation Tracker, Appendix E.12) directly into the feedback system.
@@ -3839,11 +3839,11 @@ Validation Tracker, Appendix E.12) directly into the feedback system.
 
 | File | Purpose | When Created |
 |------|---------|-------------|
-| `docs/feedback/backlogs.md` | Concrete improvement proposals for DSM | Collected during execution, finalized at project end |
-| `docs/feedback/methodology.md` | DSM usage log with per-section scores and project record | Updated at sprint boundaries, finalized at project end |
+| `docs/feedback-to-dsm/backlogs.md` | Concrete improvement proposals for DSM | Collected during execution, finalized at project end |
+| `docs/feedback-to-dsm/methodology.md` | DSM usage log with per-section scores and project record | Updated at sprint boundaries, finalized at project end |
 
 **Blog deliverables** (materials, drafts, publication notes) live in `docs/blog/`,
-not in `docs/feedback/`. Blog output is a project deliverable, not DSM methodology
+not in `docs/feedback-to-dsm/`. Blog output is a project deliverable, not DSM methodology
 feedback. See Section 2.5.6 for the blog process and DSM_0.1 for file naming.
 
 #### File 1: backlogs.md
@@ -3994,7 +3994,7 @@ Gap/issue found      -->  backlogs.md        -->  BACKLOG items created
                            (proposals)
 ```
 
-Both files live in `docs/feedback/` and are updated at sprint boundaries
+Both files live in `docs/feedback-to-dsm/` and are updated at sprint boundaries
 (per the Sprint Boundary Checklist in PM Guidelines Template 8).
 
 The backlogs file generates immediate action. The methodology file (with
@@ -4085,7 +4085,7 @@ Gateway 1 failures from missing scaffolding.
 | Project type | Identified (Notebook/Application/Hybrid) |
 | Directory structure | Follows DSM pattern for project type (see DSM_0 Section 3) |
 | Environment | Virtual environment with dependencies documented |
-| Feedback files | Two files initialized in `docs/feedback/` (backlogs.md, methodology.md) |
+| Feedback files | Two files initialized in `docs/feedback-to-dsm/` (backlogs.md, methodology.md) |
 | Decision log | Initialized |
 | Sprint plan | Created (with Phase 0.5 research if applicable) |
 

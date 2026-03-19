@@ -66,7 +66,7 @@ exist, surface them to the user before starting other work. When an entry
 references a source file (Full evidence, Full report), read the referenced file
 before evaluating the entry; the inbox is a notification, the source file
 contains the full evidence needed for decision-making. Process each entry per
-DSM_3 Section 6.4.3 (implement, defer, or reject; then remove from inbox).
+DSM_3 Section 6.4.3 (implement via BL workflow for substantive changes, defer, or reject; then move to `_inbox/done/`).
 
 **WARNING:** After processing, **move** the entry to `_inbox/done/`. Do not mark entries as "Status: Processed" or add completion markers while keeping the entry in place. Processed entries in `done/` preserve communication history and traceability; entries left in the inbox root cause stale re-processing in future sessions (observed: dsm-blog-poster S3-S4).
 
@@ -134,6 +134,24 @@ Inbox system initialized. _inbox/ created at project root (or migrated from
 docs/inbox/). README.md with entry template installed. Ready to receive and
 send inbox entries per DSM_3 Section 6.4.
 ```
+
+## Session-Start GitHub Issue Check
+
+At session start, check for unprocessed GitHub issues using:
+
+```
+gh issue list --label external --state open
+```
+
+If open `external`-labeled issues exist, surface them to the user before starting
+other work. For each issue, read the body and comments, then triage:
+
+- **New BL needed:** Follow the GitHub Issue Intake Protocol (Module A, Section 16)
+- **Absorbed by existing BL:** Close the issue with a reference to the existing BL
+- **Not actionable:** Close with explanation
+
+This check applies to repos with the `external` label configured. If the label
+does not exist or `gh` is not available, skip silently.
 
 ---
 
@@ -256,6 +274,7 @@ tool calls or file edits.
 - Output summary appended AFTER completing work
 - File is ephemeral: content cleared at session end, not committed
 - Transcript is append-only; never modify or backfill past entries
+- Always append at the end of the file; use the last line as the Edit anchor. Never use `old_string` matching earlier content as an insertion point, as this causes out-of-order timestamps
 - If a past entry was missed, note the gap in the next entry rather than editing history
 
 **Anti-Patterns:**
@@ -266,6 +285,7 @@ tool calls or file edits.
 - Skip the transcript append on turns with non-trivial reasoning
 - Commit the transcript file; it is a session-scoped working artifact
 - Edit or rewrite past transcript entries; each entry reflects reasoning at the time it was written
+- Use Edit with `old_string` matching earlier content to insert entries mid-file; this causes out-of-order timestamps (observed: portfolio S44). Always target the last line for appends
 - Use reasoning delimiters in conversation text; VS Code collapses them after streaming
 
 ---
@@ -324,7 +344,7 @@ Gate 3 does not apply to artifacts that are only created, not executed
 - Concept approval (Gate 1) does NOT grant implementation approval (Gate 2);
   implementation approval does NOT grant run approval (Gate 3)
 
-**Design decision documentation:** When implementing code that involves design choices (alternative approaches, external concepts, trade-offs), document the decision rationale before or alongside the implementation. For experiments, use the Design Decisions template in Appendix C.1.3. Maintain a citations log for external benchmarks, APIs, or research referenced in the code. See DSM_0.1 Citation Standards for format and placement.
+**Design decision documentation:** When implementing code that involves design choices (alternative approaches, external concepts, trade-offs), document the decision rationale before or alongside the implementation. For experiments, follow the Experiment Execution Protocol below. Maintain a citations log for external benchmarks, APIs, or research referenced in the code. See DSM_0.1 Citation Standards for format and placement.
 
 **Anti-Patterns:**
 
@@ -336,6 +356,42 @@ Gate 3 does not apply to artifacts that are only created, not executed
 - Execute scripts or tests without Gate 3 approval; the user must know what will run before it runs
 - Skip Gate 2 for "small" changes; the user reviews all implementation via the diff window
 - Treat prior discussion of findings or decisions as a substitute for Gate 1; a brief about *what to do* (decisions from EDA) is not a brief about *how to do it* (implementation approach for the next artifact). Gate 1 requires an explicit explanation of the specific artifact about to be generated, even when high-level decisions have already been agreed on
+
+---
+
+## Experiment Execution Protocol
+
+When a task involves running an experiment (capability validation, tuning,
+model evaluation, or any EXP-XXX from the sprint plan), follow this protocol.
+Reproducibility is mandatory, not optional.
+
+**Before running the experiment:**
+
+1. Read Appendix C.1.3 for the 7-element capability experiment template
+2. Create experiment folder: `data/experiments/EXP-{NNN}-{short-name}/`
+   (see Appendix C.1.6 for naming conventions and folder structure)
+3. Write an executable script that reproduces the experiment. The script is
+   the experiment; ad-hoc notebook runs without a script are not experiments
+4. Define success criteria BEFORE running. Pre-registered criteria prevent
+   post-hoc rationalization of ambiguous results
+5. Present the experiment design to the user (Gate 1 from Pre-Generation
+   Brief Protocol applies)
+
+**After running the experiment:**
+
+6. Capture output to results files in the experiment folder
+7. Write results using the 7-element structure from C.1.3
+8. Apply Limitation Discovery Protocol (C.1.5) if limitations are found
+9. Update `data/experiments/EXPERIMENTS_REGISTRY.md` with the new entry
+   (see C.1.6 for registry template)
+
+**Post-experiment assessment:** After documenting results, assess whether the
+experiment reveals a contribution opportunity (DSM 4.0 Section 4.4.2).
+
+This protocol is a behavioral trigger: when the agent recognizes that work
+constitutes an experiment, it activates this checklist automatically. The
+passive reference to C.1.3 in design decision documentation is not sufficient;
+this protocol ensures the framework is followed.
 
 ---
 
@@ -415,6 +471,49 @@ conscious decision that the human acknowledges and accepts.
 
 ---
 
+## Heading Parsability Convention for DSM Documents
+
+Since DSM is self-authored, heading conventions can eliminate cross-reference
+detection noise at the source rather than building complex NLP filters. This is
+the "Take a Bite" philosophy applied to documentation format: fix the input,
+not the parser.
+
+### Minimum Token Count (MUST)
+
+Any referenceable heading MUST have at least 4 non-stopword tokens.
+
+- Bad: `## Overview` (1 token)
+- Bad: `## Test Plan` (2 tokens)
+- Good: `## Experiment Gate Test Plan` (4 tokens)
+- Good: `## Sprint Planning Experiment Gate` (4 tokens)
+
+### Cross-Document Uniqueness (SHOULD)
+
+Cross-referenceable headings SHOULD be unique across the DSM document set.
+This eliminates ambiguity when tools or agents resolve references.
+
+### Protocol Naming (SHOULD)
+
+Protocol-level headings SHOULD include the protocol or concept name.
+
+- Bad: `## Enforcement`
+- Good: `## Session Transcript Append-Only Enforcement`
+
+### Format Conversion Applicability
+
+When creating markdown files from other formats (PDF, DOCX, HTML, PPTX),
+short headings from the source document should be expanded or flagged for
+manual review. This convention serves as a quality criterion for converted
+output and directly improves the effectiveness of structural scanning
+strategies (see BL-222).
+
+### Enforcement
+
+Enforceable via Graph Explorer linter rule W004 (warning, not error). Projects
+using GE can validate heading compliance automatically.
+
+---
+
 ## AI Collaboration Principles
 
 The interaction protocols in this document (Notebook Collaboration, App Development,
@@ -425,6 +524,27 @@ foundational reasoning; this document provides the operational protocols.
 When evaluating whether a delivery is the right size, apply the core test from
 DSM 6.0: can the reviewer engage with it and respond with substance? See
 `TAKE_A_BITE.md` for the short version.
+
+---
+
+## Active Suggestion Protocol
+
+When the human explicitly invites input (phrases like "Any questions or
+suggestions?", "Thoughts?", "What do you think?", "Suggestions?", or
+equivalent), the agent MUST offer at least one substantive suggestion or
+question before proceeding. This is not optional politeness; it is a
+collaboration protocol requirement implementing DSM_6.0's bidirectional
+input principle.
+
+A substantive suggestion or question:
+- Draws on the agent's analysis of the current context
+- Proposes a concrete improvement, alternative, or consideration
+- Is not a restatement of what the human just said
+
+If the agent genuinely has no suggestions (rare), it must state this
+explicitly ("I have no additional suggestions at this point") rather than
+proceeding silently. Silence after an invitation is indistinguishable from
+passive compliance and degrades the collaboration.
 
 ---
 
@@ -544,49 +664,108 @@ This ensures public distribution repos stay current without manual intervention.
 
 ## Branch Testing Requirement
 
-Feature branches must be tested before merging to main. No exceptions.
+Task branches (Level 3) must be tested before merging to their parent branch.
+No exceptions.
 
-Merging untested changes to main propagates broken protocols, missing references,
+Merging untested changes propagates broken protocols, missing references,
 or structural issues to all spoke projects via the `@` reference chain. The cost
-of testing is low; the cost of a broken main is high.
+of testing is low; the cost of a broken merge is high.
 
 **Minimum verification before merge:**
 - Structural integrity: files exist, expected line counts, no truncation
 - Cross-references: all internal references resolve (dispatch table entries match module headers, section references point to existing sections)
 - Spoke compatibility: `@` reference still resolves, no new dependencies on features spokes cannot access
 
+**BL-specific test plan:** Each backlog item that requires a feature branch must
+include a Test Plan section with specific, verifiable conditions. These conditions
+are defined at BL creation time and checked off on the branch before merge. The
+test plan adds BL-specific verification on top of the minimum categories above.
+
 **Agent behavior:** After completing implementation on a feature branch, run
-verification before proposing merge. Never suggest "ready to merge" without
-a testing step.
+both the minimum verification above and the BL's Test Plan conditions before
+proposing merge. Never suggest "ready to merge" without a testing step.
 
 ---
 
-## Branch Push Policy
+## Three-Level Branching Strategy
 
-Feature branches stay local by default. Push to remote when:
+A universal branching model for all DSM projects, regardless of whether they
+use BLs, sprints, or neither.
 
-1. **Session continuity:** The session extends via lightweight wrap-up while on
-   an unpushed feature branch. The branch must be pushed to remote before the
-   session gap to ensure remote backup.
-2. **Large or risky changes:** The change benefits from PR-based review before
-   merge (judgment call by human or agent).
-3. **Consolidation branch retention:** Branches that implement backlog
-   consolidations (merging, superseding, or absorbing BLs) must be pushed to
-   remote before or immediately after merge. The remote branch is **not deleted**
-   until the last BL referenced by the consolidation is resolved (implemented,
-   superseded, or closed). This preserves the pre-consolidation state as a
-   reconstruction point if a downstream BL reveals the consolidation was incorrect.
+### Level 1: Main Branch (`main` / `master`)
 
-**Rationale:** Most BL implementations complete in a single session, making
-remote branches unnecessary overhead. But when work spans sessions, a local-only
-branch has no recovery path if the local environment fails between sessions.
-Consolidation branches carry additional risk: they restructure the backlog itself,
-and errors may only surface when a referenced BL is later implemented.
+The production line. Only receives merges from Level 2 session branches.
 
-**Cleanup:** When a branch was pushed to remote, delete it after merge:
-`git push origin --delete bl-NNN/short-description`.
-**Exception:** Consolidation branches (case 3) are deleted only when all
-referenced BLs are resolved, not at merge time.
+### Level 2: Session Branch
+
+Created at every session start (`/dsm-go`, `/dsm-light-go`). This is the
+universal working branch for all project types, including portfolio, notebook,
+and projects without BLs or sprints.
+
+**Naming:** `session-N/YYYY-MM-DD` (or project-specific convention).
+
+**Merge to Level 1:** At session wrap-up (`/dsm-wrap-up`) or light wrap-up
+(`/dsm-light-wrap-up`), only if all Level 3 branches have been formally
+merged back. If Level 3 branches remain open, the session branch stays open
+and is pushed to remote for cross-session continuity.
+
+### Level 3: Task Branches
+
+Created during a session for specific work items. Three types:
+
+| Type | Trigger | Naming | Merge condition |
+|------|---------|--------|-----------------|
+| BL branch | BL implementation starts | `bl-NNN/short-description` | BL moved to `done/` |
+| Sprint branch | Sprint work begins | `sprint-N/short-description` | All sprint plan items checked off |
+| Parallel-session branch | `/dsm-parallel-session-go` | `parallel/short-description` | `/dsm-parallel-session-wrap-up` |
+
+**Merge to Level 2:** Only when formal exit criteria are met. Level 3 branches
+merge to the session branch, not directly to main.
+
+**Exceptions (commit directly to session branch):** Mechanical status updates
+(BL moved to done/), trivial fixes (typos, dates), session artifacts (handoffs,
+checkpoints, feedback).
+
+### Branch Push Policy
+
+**Default: local only.** Branches are not pushed to GitHub unless needed.
+
+**Push triggers:**
+1. **Session ends with open Level 3 branch:** The open Level 3 branch is pushed
+   to remote so the next session can resume work
+2. **Explicit review request:** The user requests a push for review or evaluation
+   before committing to merge
+3. **Consolidation branch retention:** Branches implementing backlog consolidations
+   must be pushed to remote. The remote branch is not deleted until the last BL
+   referenced by the consolidation is resolved
+
+**Cleanup:** Branches are deleted (locally and remotely if pushed) immediately
+after merging to their parent branch. Exception: consolidation branches are
+deleted only when all referenced BLs are resolved.
+
+### Session-Start Branch Resumption Protocol
+
+At session start (`/dsm-go`, `/dsm-light-go`), the agent checks for open
+branches from previous sessions:
+
+1. Check for pushed Level 2 or Level 3 branches that were not merged
+2. If found, inform the user: "There is an open [session/BL/sprint/parallel]
+   branch `[branch-name]` from a previous session. The logical next step is
+   to finalize this work before starting new work."
+3. Resume on the open branch rather than creating a new session branch
+
+### Why Session Branches
+
+Some projects (portfolio, notebook-based, spoke projects) do not work with BLs
+or sprints. A session branch provides isolation and reversibility for every
+session regardless of workflow type. If a session produces no formal task
+branches, all commits land on the session branch and merge to main at wrap-up.
+
+### Relationship to Branch Testing Requirement
+
+The Branch Testing Requirement (above) applies to Level 3 → Level 2 merges.
+Before merging a task branch to the session branch, run the minimum verification
+and any BL-specific test plan conditions.
 
 ---
 
@@ -645,6 +824,7 @@ All module files are in the same directory as this core file.
 | DSM Feedback Tracking | Capturing methodology feedback or backlog proposals | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Technical Progress Reporting | Sprint boundary, engineering work to report | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Lightweight Session Lifecycle | Continuation session with known task, tight context | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Parallel Session Protocol | Concurrent isolated tasks, independent branch work | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Reasoning Lessons Protocol | Session wrap-up (extraction), session start (reading) | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Continuous Learning Protocol | Session start/end, external knowledge integration | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Artifact Lifecycle Management | Transcript retirement, checkpoint supersession | [A](DSM_0.2.A_Session_Lifecycle.md) |
@@ -652,6 +832,8 @@ All module files are in the same directory as this core file.
 | Session Delivery Budget | Estimating session work volume, mid-session check | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Mechanical vs Decision Edits | Multiple edits to stage, distinguishing edit types | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Session Configuration Recommendation | Session start, mid-session task shift | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Responsible Collaboration Timer | Session start, cumulative time exceeds threshold | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| GitHub Issue Intake Protocol | Session-start issue check, external issue triage | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Composition Challenge Protocol | Producing a collection of 2+ discrete items | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Edit Explanation Stop Protocol | Multiple distinct edits to a single file | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Enabling File Content Protocol | Working with backlog items, checkpoints, plans | [B](DSM_0.2.B_Artifact_Creation.md) |

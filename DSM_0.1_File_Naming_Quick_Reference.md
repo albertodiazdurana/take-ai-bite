@@ -288,7 +288,7 @@ Every DSM spoke project uses these exact folder names under `docs/`:
 | `docs/blog/` | Blog materials, drafts, posts | Yes |
 | `docs/checkpoints/` | Milestone snapshots | Yes |
 | `docs/decisions/` | Decision log entries (DEC-NNN) | No (permanent) |
-| `docs/feedback/` | Methodology, backlog, and technical feedback | No (append-only) |
+| `docs/feedback-to-dsm/` | Methodology, backlog, and technical feedback | No (append-only) |
 | `docs/guides/` | Reference guides, user docs | No (permanent) |
 | `docs/handoffs/` | Session continuity documents | Yes |
 | `_inbox/` | Hub-spoke communication transit (project root) | No (entries deleted) |
@@ -312,14 +312,14 @@ move it to `done/` within that folder and update its header:
 | `blog/` | Post published (URL confirmed) |
 | `plans/` | Plan completed or superseded |
 
-**Feedback files:** `docs/feedback/` contains exactly three files: `backlogs.md`,
+**Feedback files:** `docs/feedback-to-dsm/` contains exactly three files: `backlogs.md`,
 `methodology.md`, and `technical.md`. All session observations are appended as
 dated entries within these files, not created as separate per-session files. Mark
 individual entries with `**Pushed:** YYYY-MM-DD` when sent to DSM Central's inbox.
 See DSM_0.2 Technical Progress Reporting for the `technical.md` template and
 routing protocol.
 
-**Anti-pattern:** Do not create `docs/feedback/YYYY-MM-DD_backlogs.md` or
+**Anti-pattern:** Do not create `docs/feedback-to-dsm/YYYY-MM-DD_backlogs.md` or
 similar dated files. The canonical files are the single source of truth;
 per-session files fragment the record and leave the canonical files empty.
 
@@ -363,6 +363,32 @@ Only ecosystem-required files belong in the project root. All project content
 **Principle:** The root should contain only files that tools or platforms expect to
 find there (pip, Streamlit, Docker, GitHub). Everything else goes in a subdirectory.
 If a file does not serve a tool or platform at root level, it belongs elsewhere.
+
+---
+
+## Document Structure: Section Numbering
+
+All DSM methodology documents (DSM_0 through DSM_6, including modular files like
+DSM_0.2.A-D) use hierarchical decimal numbering with trailing period at every
+heading level:
+
+```
+## 6. Project Handover Protocols
+### 6.7. Spoke Project Initialization Checklist
+#### 6.7.2. CLAUDE.md Essentials
+```
+
+**Rules:**
+1. Every structural heading (`##`, `###`, `####`) gets a number
+2. Numbers are hierarchical: parent.child.grandchild
+3. Trailing period after each number: `6.7.2.` not `6.7.2`
+4. Title follows the number with a space: `## 6. Title`
+5. Template headings inside code blocks are not numbered
+6. The document title (`#`) is not numbered
+
+**Why:** Numbered sections enable unambiguous cross-references ("DSM_0.2.A
+Section 7" vs "the parallel session section"), stable citations (heading text
+can change, numbers stay), and ordered structure within documents.
 
 ---
 

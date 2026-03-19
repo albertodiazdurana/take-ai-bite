@@ -42,7 +42,7 @@
 
 **Document:** `DSM_4.0_Software_Engineering_Adaptation_v1.0.md`
 
-**Key sections:** Section 2: Project Structure Patterns (NEW in v1.3.18), Adapted phases for ML apps, App Development Protocol, Section 4.4: Tests vs Capability Experiments (v1.3.6), Section 4.4.1: Fixture Validation Principle (BACKLOG-049), Section 4.6: Bug Disambiguation (v1.3.42), Section 4.7: PR Description Maintenance (v1.3.42), IDE Configuration for VS Code (v1.3.15), Architectural Decision templates, Section 16: Beyond DSM (MLOps/production references)
+**Key sections:** Section 2: Project Structure Patterns (NEW in v1.3.18), Adapted phases for ML apps, App Development Protocol, Section 4.4: Tests vs Capability Experiments (v1.3.6), Section 4.4.1: Fixture Validation Principle (BACKLOG-049), Section 4.4.2: Post-Experiment Contribution Assessment (BACKLOG-217), Section 4.6: Bug Disambiguation (v1.3.42), Section 4.7: PR Description Maintenance (v1.3.42), IDE Configuration for VS Code (v1.3.15), Architectural Decision templates, Section 16: Beyond DSM (MLOps/production references)
 
 ### Integration Note
 DSM 4.0 **extends** the standard methodology, it does not replace it. Continue using:
@@ -134,7 +134,7 @@ At session start, the agent examines the project structure to determine which tr
 
 The agent states the identified type and confirms which track it will follow. See **DSM_0.2_Custom_Instructions** for the full Project Type Detection protocol.
 
-**Optional: DSM Feedback Tracking** - Create two feedback files in `docs/feedback/` (backlogs.md, methodology.md) to contribute improvements back to DSM. Blog materials live in `docs/blog/` as project deliverables. See **Section 6.4** (Checkpoint and Feedback Protocol).
+**Optional: DSM Feedback Tracking** - Create two feedback files in `docs/feedback-to-dsm/` (backlogs.md, methodology.md) to contribute improvements back to DSM. Blog materials live in `docs/blog/` as project deliverables. See **Section 6.4** (Checkpoint and Feedback Protocol).
 
 ---
 

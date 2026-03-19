@@ -11,9 +11,9 @@ when a protocol listed in the dispatch table is needed.
 
 ---
 
-## Session-End Inbox Push
+## 1. Session-End Inbox Push
 
-At session end (or at sprint boundaries), review `docs/feedback/` for per-session
+At session end (or at sprint boundaries), review `docs/feedback-to-dsm/` for per-session
 feedback files that are ripe enough to send to DSM Central. A file is ripe when
 its content is actionable:
 
@@ -31,9 +31,9 @@ its content is actionable:
    contains the current project name as a subdirectory (e.g.,
    `contributions-docs/{project}/_inbox/`), the path is wrong; resolve
    `dsm-central` from the Ecosystem Path Registry or the `@` reference.
-3. Files that are not yet ripe stay in `docs/feedback/` for further drafting
+3. Files that are not yet ripe stay in `docs/feedback-to-dsm/` for further drafting
 4. After DSM Central processes the feedback, the source file moves to
-   `docs/feedback/done/`
+   `docs/feedback-to-dsm/done/`
 
 The DSM Central repo path is the parent directory of the
 `DSM_0.2_Custom_Instructions_v1.1.md` file referenced by the `@` import in this
@@ -43,16 +43,16 @@ project's CLAUDE.md.
 (structured, actionable, meets ripe criteria), write it to both the local
 per-session file and DSM Central's inbox simultaneously:
 
-- Methodology observations: `docs/feedback/YYYY-MM-DD_sN_methodology.md` + inbox
-- Backlog proposals: `docs/feedback/YYYY-MM-DD_sN_backlogs.md` + inbox
+- Methodology observations: `docs/feedback-to-dsm/YYYY-MM-DD_sN_methodology.md` + inbox
+- Backlog proposals: `docs/feedback-to-dsm/YYYY-MM-DD_sN_backlogs.md` + inbox
 
 Reserve the session-end review for rough notes that need structuring before
 they are ripe.
 
 **External Contribution exception:** For External Contribution projects, the
-agent works in the fork, which does not have `docs/feedback/`. Feedback files
-live in the governance folder: `{contributions-docs-path}/{project}/docs/feedback/`.
-All references to `docs/feedback/` in this section resolve to that governance
+agent works in the fork, which does not have `docs/feedback-to-dsm/`. Feedback files
+live in the governance folder: `{contributions-docs-path}/{project}/docs/feedback-to-dsm/`.
+All references to `docs/feedback-to-dsm/` in this section resolve to that governance
 path, not the fork's root. The pushing process, immediate push, and ripe criteria
 apply identically; only the file location changes.
 
@@ -74,7 +74,7 @@ deleted after processing.
 
 ---
 
-## README Change Notification
+## 2. README Change Notification
 
 When a project's `README.md` is updated (content changes, not just formatting),
 send inbox entries to notify downstream consumers. The `/dsm-wrap-up` skill
@@ -148,7 +148,7 @@ accuracy. DSM Central tracks spoke README changes for cross-project awareness.
 
 ---
 
-## External Contribution Milestone Notification
+## 3. External Contribution Milestone Notification
 
 External contribution projects do not own their upstream README, so README Change
 Notifications never fire. Yet the portfolio needs to know about external contribution
@@ -208,14 +208,14 @@ use README Change Notifications for portfolio updates.
 
 ---
 
-## DSM Feedback Tracking
+## 4. DSM Feedback Tracking
 
 Methodology feedback and backlog proposals use **per-session files** with a
 lifecycle. Each session creates its own feedback file(s); processed files move
 to `done/`. This prevents accumulation of processed entries in long-lived
 append-only files.
 
-**File naming:** `docs/feedback/YYYY-MM-DD_sN_{type}.md` where type is
+**File naming:** `docs/feedback-to-dsm/YYYY-MM-DD_sN_{type}.md` where type is
 `backlogs` or `methodology`. Only create a file when there is feedback to
 record; no empty files.
 
@@ -226,7 +226,7 @@ record; no empty files.
 | **Create** | Agent writes feedback to a session-scoped file during the session | Agent (spoke) |
 | **Notify** | At wrap-up, inbox notification to DSM Central references the file | Agent (spoke) |
 | **Process** | DSM Central reads the file, creates BL items or updates scores | Agent (hub) |
-| **Done** | Processed file moves to `docs/feedback/done/` | Agent (hub or spoke) |
+| **Done** | Processed file moves to `docs/feedback-to-dsm/done/` | Agent (hub or spoke) |
 
 **When to capture feedback:**
 1. Note which DSM section was referenced (e.g., "Section 2.2", "Appendix B.2")
@@ -234,7 +234,18 @@ record; no empty files.
 3. Log gaps or unclear areas encountered
 4. Reference: DSM_1.0 Section 6.4 (Checkpoint Protocol)
 
-**Filing completeness:** Writing a feedback file to `docs/feedback/` is only
+**Dual-write requirement:** When the agent identifies methodology-relevant
+feedback during a session (whether from its own reasoning or from user input),
+it must write to `docs/feedback-to-dsm/` using the per-session file template below,
+not only to auto-memory. Auto-memory and `docs/feedback-to-dsm/` serve different
+purposes: auto-memory provides session-local context for the agent;
+`docs/feedback-to-dsm/` feeds the DSM Central governance pipeline via inbox push.
+Saving to one but not the other leaves the feedback invisible to either the
+agent (if only in `docs/feedback-to-dsm/`) or the hub (if only in auto-memory).
+Both writes are required. (Observed gap: portfolio S44, where feedback was
+saved to auto-memory but not to `docs/feedback-to-dsm/`, skipping the Central pipeline.)
+
+**Filing completeness:** Writing a feedback file to `docs/feedback-to-dsm/` is only
 half the action. The file must also be pushed to DSM Central's inbox per the
 **Immediate push** rule in Session-End Inbox Push. Filing without notifying is
 incomplete; the feedback exists locally but is invisible to the hub. This applies
@@ -243,9 +254,9 @@ whether the file is written at session end or mid-session.
 **Feedback directory requirements:**
 
 Every project that produces feedback must have:
-- `docs/feedback/README.md` (describes the feedback protocol and file types)
-- `docs/feedback/done/` subdirectory for processed files
-- `docs/feedback/technical.md` (append-only, sprint-boundary cadence; see
+- `docs/feedback-to-dsm/README.md` (describes the feedback protocol and file types)
+- `docs/feedback-to-dsm/done/` subdirectory for processed files
+- `docs/feedback-to-dsm/technical.md` (append-only, sprint-boundary cadence; see
   Technical Progress Reporting below)
 
 **Per-session file templates:**
@@ -289,7 +300,7 @@ When DSM Central processes a spoke's feedback file:
 1. Central creates BL items or integrates observations as needed
 2. Central sends an inbox notification to the spoke confirming processing:
    `{spoke-path}/_inbox/{date}_dsm-central_feedback-processed.md`
-3. The spoke moves its local feedback file to `docs/feedback/done/` after
+3. The spoke moves its local feedback file to `docs/feedback-to-dsm/done/` after
    receiving the confirmation
 
 The spoke never moves files to `done/` without confirmation from Central.
@@ -304,7 +315,7 @@ Projects with existing append-only feedback files (`methodology.md`,
    entries have been processed (mapped to existing BLs) vs unprocessed
 2. **Extract:** Unprocessed entries are converted to DSM Central BLs or
    per-session files for processing
-3. **Archive:** Move the monolithic files to `docs/feedback/done/` with a
+3. **Archive:** Move the monolithic files to `docs/feedback-to-dsm/done/` with a
    `legacy-` prefix (e.g., `legacy-backlogs.md`, `legacy-methodology.md`)
 4. **Start fresh:** New sessions create per-session files only
 
@@ -322,7 +333,7 @@ evidence that may be referenced by existing BLs.
 
 ---
 
-## Technical Progress Reporting
+## 5. Technical Progress Reporting
 
 Technical progress reports capture **what was built, how, and why** at sprint
 boundaries. They are distinct from methodology feedback (which evaluates DSM
@@ -330,9 +341,9 @@ effectiveness) and from handoffs (which ensure session continuity). Technical
 reports create a structured record of the actual engineering work across the
 ecosystem.
 
-**File:** `docs/feedback/technical.md` (append-only, dated entries)
+**File:** `docs/feedback-to-dsm/technical.md` (append-only, dated entries)
 
-This is the third file type in the `docs/feedback/` directory, alongside
+This is the third file type in the `docs/feedback-to-dsm/` directory, alongside
 per-session backlog and methodology files. Unlike those per-session files,
 `technical.md` is append-only: entries form a chronological engineering record
 that retains reference value after pushing. See DSM Feedback Tracking above
@@ -366,7 +377,7 @@ progress report updated" as a standard item.
 **Profile-relevant:** {new skills exercised, proficiency changes, or "None"}
 ```
 
-**Routing:** The wrap-up command scans `docs/feedback/technical.md` for entries
+**Routing:** The wrap-up command scans `docs/feedback-to-dsm/technical.md` for entries
 without a `**Pushed:**` date. For each unpushed entry, it appends an inbox
 notification to DSM Central and marks the source with `**Pushed:** YYYY-MM-DD`.
 
@@ -386,7 +397,7 @@ Sprint N: {brief title}
 **Scale:** {data scale}
 **Outcomes:** {metrics summary}
 
-**Full report:** `~/{project-path}/docs/feedback/technical.md`
+**Full report:** `~/{project-path}/docs/feedback-to-dsm/technical.md`
 ```
 
 **Why Priority: Low?** Technical progress reports are informational, not action
@@ -414,13 +425,19 @@ items. They accumulate until a portfolio update cycle or the Context Library
 
 ---
 
-## Lightweight Session Lifecycle
+## 6. Lightweight Session Lifecycle
 
 When a session's task is already known (continuation from a previous session) and
 context budget is tight, the lightweight lifecycle reduces start and end overhead
 by deferring non-essential checks.
 
 **Commands:** `/dsm-light-go` (start) and `/dsm-light-wrap-up` (end).
+
+**Branch behavior:** Lightweight sessions continue on the existing session
+branch (Level 2) from the previous session. `/dsm-light-go` does not create a
+new session branch; it resumes the current one. If a Level 3 branch was pushed
+at the end of the previous session, `/dsm-light-go` checks out that branch
+per the Session-Start Branch Resumption Protocol (DSM_0.2 core).
 
 **Lifecycle chain:** The lightweight mode is a closed chain anchored by full
 sessions at both ends:
@@ -459,7 +476,86 @@ Reference: BACKLOG-151
 
 ---
 
-## Reasoning Lessons Protocol
+## 7. Parallel Session Protocol
+
+When a human needs to orchestrate multiple concurrent AI sessions on independent
+tasks within the same repository, parallel sessions provide isolation. Each
+parallel session operates on its own Level 3 git branch (type: parallel-session,
+see DSM_0.2 Three-Level Branching Strategy) with all output confined to a
+dedicated staging folder. The main session retains exclusive control over shared
+files, memory, inbox, and session transcripts.
+
+**Commands:** `/dsm-parallel-session-go` (start) and `/dsm-parallel-session-wrap-up` (end).
+
+**When to use:** Short, isolated evaluation tasks: research collection, document
+assessment, artifact generation, BL drafting. Parallel sessions are not full
+sprints; they produce artifacts that the main session reviews and distributes.
+
+**Lifecycle:**
+
+```
+main session running -> user opens new Claude Code instance
+  -> /dsm-parallel-session-go {task} -> creates parallel/{descriptor} branch
+  -> work (all output to BL staging folder)
+  -> /dsm-parallel-session-wrap-up -> merge to session branch (Level 2), delete branch
+main session picks up merged artifacts
+```
+
+**Isolation rules:**
+
+| Allowed (parallel session) | Prohibited (main session only) |
+|---------------------------|-------------------------------|
+| Create files in BL staging folder | Modify MEMORY.md |
+| Read MEMORY.md, CLAUDE.md | Modify session transcript |
+| Read any repo file | Process inbox entries |
+| Create new files in isolated subfolders | Edit shared/central files |
+| Commit on parallel branch | Push feedback to DSM Central |
+
+**Shared file identification:** At session start, the parallel session reads
+`.claude/CLAUDE.md` to identify files that serve as project-wide references
+(READMEs, config files, trackers, profile documents, source-of-truth files).
+These are off-limits. If the work scope expands to require shared file edits,
+the parallel session stops and defers to the main session.
+
+**Safety checks (before creating branch):**
+1. No uncommitted changes overlapping with planned work scope
+2. No existing `parallel/*` branch targeting the same folder or topic
+3. Planned work does not require shared file modifications
+
+**BL staging folder:** `docs/plans/BL-{NNN}-{descriptor}/` contains all generated
+artifacts. The folder includes a README.md tracking task description, status, and
+artifact list. The main session reviews this folder after merge and distributes
+artifacts to their proper locations.
+
+**Merge strategy:** Wrap-up attempts fast-forward merge to main. If conflicts
+arise, the merge is aborted, the branch is preserved, and the main session
+resolves conflicts manually.
+
+**What parallel sessions skip:**
+
+| Skipped | Reason |
+|---------|--------|
+| Session transcript | Avoids concurrent writes to shared file |
+| MEMORY.md writes | Main session owns memory lifecycle |
+| Inbox processing | Avoids duplicate processing |
+| Reasoning lessons | Main session handles extraction |
+| Feedback push | Main session handles DSM Central communication |
+| Ecosystem path validation | Unnecessary for isolated tasks |
+
+**Anti-Patterns:**
+
+**DO NOT:**
+- Use parallel sessions for full sprint work; they are for short, isolated tasks
+- Modify files outside the BL staging folder (except new files in isolated subfolders)
+- Process inbox entries or push feedback from a parallel session
+- Run multiple parallel sessions targeting the same topic or folder
+- Treat parallel session output as final; the main session must review and distribute
+
+Reference: BACKLOG-220
+
+---
+
+## 8. Reasoning Lessons Protocol
 
 Session transcripts contain valuable reasoning traces, decision heuristics, and
 course corrections that are lost when the transcript is overwritten at the next
@@ -526,7 +622,7 @@ outputs a STAA recommendation after each auto extraction.
 Reasoning lessons are the curated extract (persistent, accumulating across sessions).
 The transcript feeds the lessons; the lessons feed the agent's priming at session start.
 
-### Scope Classification
+### 8.1. Scope Classification
 
 Every reasoning lesson entry carries a scope label that determines whether it
 propagates beyond the originating project.
@@ -557,7 +653,7 @@ Example: `- [auto] S12 [ecosystem]: When placing DSM infrastructure, confirm pro
 - `[STAA]` analysis: the STAA agent prompts for scope classification
   when writing each lesson (Step 6)
 
-### Cross-Project Propagation
+### 8.2. Cross-Project Propagation
 
 Reasoning lessons generated in spoke projects must propagate to DSM Central.
 Without propagation, valuable patterns stay siloed in individual projects.
@@ -623,7 +719,7 @@ the agent:
 
 ---
 
-## Continuous Learning Protocol
+## 9. Continuous Learning Protocol
 
 DSM evolves through internal experience (session observations, spoke feedback,
 reasoning lessons) but does not systematically track external developments in AI
@@ -680,7 +776,7 @@ awareness.
 
 ---
 
-## Artifact Lifecycle Management
+## 10. Artifact Lifecycle Management
 
 DSM projects accumulate artifacts across sessions: transcripts, checkpoints,
 backlog items, research files. Without lifecycle rules, directories grow
@@ -691,7 +787,7 @@ archived, and when they can be retired.
 Project-specific artifacts (e.g., DSM Central's backlog done/) are managed in
 the project CLAUDE.md, not here.
 
-### Transcript Retirement
+### 10.1. Transcript Retirement
 
 Session transcripts archive at session start (/dsm-go Step 6.5) and accumulate
 in `.claude/transcripts/`. STAA analysis is the intended next step, but it is
@@ -711,7 +807,7 @@ may adjust this threshold in their project CLAUDE.md.
 
 **Cadence:** Per-session, integrated into /dsm-go after Step 6.5.
 
-### Checkpoint Supersession
+### 10.2. Checkpoint Supersession
 
 Checkpoints capture milestone state. Once a newer checkpoint covers the same
 project scope, the older one is superseded.
@@ -727,7 +823,7 @@ Move superseded checkpoints to `docs/checkpoints/done/`. Add
 
 **Cadence:** Per-sprint, integrated into the Sprint Boundary Checklist.
 
-### Anti-Patterns
+### 10.3. Anti-Patterns
 
 **DO NOT:**
 - Delete artifacts instead of moving to done/; done/ preserves traceability
@@ -740,12 +836,17 @@ Move superseded checkpoints to `docs/checkpoints/done/`. Add
 
 ---
 
-## Sprint Cadence and Feedback Boundaries
+## 11. Sprint Cadence and Feedback Boundaries
 
 Prefer shorter sprints with feedback at each boundary over long monolithic sprints:
 
 - Each sprint should deliver a testable, demonstrable increment
-- **Sprint boundary checklist:** checkpoint document, feedback files updated, decision log updated, blog journal entry, README updated, technical progress report updated, superseded checkpoints moved to done/ (see Artifact Lifecycle Management), hub/portfolio notified (see below), alignment review, next steps summary (3-5 sentences connecting to next sprint)
+- **Sprint boundary checklist:** checkpoint document, feedback files updated, decision log updated, blog journal entry, README updated, technical progress report updated, superseded checkpoints moved to done/ (see Artifact Lifecycle Management), hub/portfolio notified (see below), alignment review, epoch plan check (see below), next steps summary (3-5 sentences connecting to next sprint)
+- **Epoch plan check:** If this sprint completes an epoch (or is the last sprint
+  before an epoch boundary), verify: (1) the epoch plan reflects actual outcomes,
+  (2) remaining epoch goals are flagged as carried over or dropped, (3) the next
+  epoch plan exists or is drafted. If no epoch structure exists in the project,
+  skip this step silently.
 - **Alignment review (before starting next sprint):** The agent presents a
   summary for user confirmation:
   1. What was completed vs what was planned
@@ -772,6 +873,45 @@ Prefer shorter sprints with feedback at each boundary over long monolithic sprin
   `{portfolio-path}/_inbox/{project-name}.md`. This is a status signal, not a
   duplicate of the technical progress report.
 - Split sprints when: original scope has >2 distinct deliverable types, would exceed 3 sessions without feedback, natural delivery boundaries exist
+- **Ecosystem alignment request (epoch boundaries):** Before drafting an epoch
+  plan, send an alignment request to DSM Central's `_inbox/` with: (1) current
+  project state (epoch completed, metrics, capabilities), (2) candidate items for
+  next epoch, (3) questions about DSM version changes, proposal adoption, or
+  portfolio priorities. This is not a blocking gate; the spoke can begin planning
+  immediately but should incorporate hub feedback before the first sprint completes.
+  Skip for projects without epoch structure or for the first epoch.
+  ```
+  ### [YYYY-MM-DD] Ecosystem alignment request: {project-name} Epoch N+1
+
+  **Type:** Alignment Request
+  **Priority:** Medium
+  **Source:** {project-name}
+
+  **Completed:** Epoch N — {summary}
+  **Proposed scope:** {bullet list of candidate items}
+  **Questions:** {DSM changes, priority conflicts, resource considerations}
+  ```
+  Target: `{dsm-central-path}/_inbox/{project-name}.md`
+- **Plan notification (after drafting):** After drafting any plan (epoch or
+  sprint), send a notification to hub and portfolio `_inbox/` with: plan summary,
+  scope table, and pointer to the full plan document. This completes the
+  notification loop: alignment request (inbound) → plan draft → plan notification
+  (outbound) → execution → sprint completion notification (outbound).
+  ```
+  ### [YYYY-MM-DD] Plan drafted: {project-name} Epoch N / Sprint N
+
+  **Type:** Plan Notification
+  **Priority:** Low
+  **Source:** {project-name}
+
+  **Scope:** {2-3 bullet summary with MoSCoW priorities}
+  **Full plan:** `docs/plans/{plan-filename}`
+  **Requested action:** Review and flag conflicts before execution starts
+  ```
+  Targets: `{dsm-central-path}/_inbox/{project-name}.md` and
+  `{portfolio-path}/_inbox/{project-name}.md`. Trigger scales with project size:
+  epoch plans always notify; sprint plans notify for medium+ projects; micro
+  projects skip.
 
 **Anti-Patterns:**
 
@@ -784,7 +924,7 @@ Reference: PM Guidelines Template 8 (Sprint Plan)
 
 ---
 
-## Session Delivery Budget
+## 12. Session Delivery Budget
 
 Each session has a finite review budget. When the agent produces more artifacts than the
 human can meaningfully review, oversight degrades into passive approval (see DSM_6.0
@@ -816,7 +956,7 @@ Reference: DSM_6.0 Principle 1 (Take a Bite), PM Guidelines Template 8 (Sprint P
 
 ---
 
-## Mechanical vs Decision Edits
+## 13. Mechanical vs Decision Edits
 
 User approval via the permission window should be reserved for edits where the user's
 judgment matters. Mechanical status updates are not decisions.
@@ -849,7 +989,7 @@ judgment matters. Mechanical status updates are not decisions.
 
 ---
 
-## Session Configuration Recommendation
+## 14. Session Configuration Recommendation
 
 Claude Code exposes configurable parameters (Model, Effort, Thinking, Fast mode)
 that affect reasoning depth, speed, and usage budget consumption. This protocol
@@ -864,7 +1004,7 @@ resolution needed.
 does not exist, ask the user for their Claude plan type (Max, Pro, API) and
 create the file. Do not proceed with recommendations until the file exists.
 
-### Configuration Profiles
+### 14.1. Configuration Profiles
 
 | Profile | Model | Effort | Thinking | Fast | Use when |
 |---------|-------|--------|----------|------|----------|
@@ -888,7 +1028,7 @@ downgraded if the user interacts with the `/model` UI during a session
 (claude-code#30726). For reliable configuration, use CLI flags or environment
 variables instead of `settings.json` when max effort is critical.
 
-### When to Display
+### 14.2. When to Display
 
 The recommendation requires knowing the session's scope:
 
@@ -899,7 +1039,7 @@ The recommendation requires knowing the session's scope:
 | `/dsm-light-go` with known pending work | As part of the lightweight report |
 | Mid-session task shift | When the new task type differs from the current profile |
 
-### Display Format
+### 14.3. Display Format
 
 **Session start:**
 
@@ -914,7 +1054,7 @@ Reason: [1 sentence based on planned work scope]
 Consider switching to [Profile]: [1 sentence explaining why the new task warrants different settings]
 ```
 
-### Anti-Patterns
+### 14.4. Anti-Patterns
 
 **DO NOT:**
 - Recommend a configuration before the session scope is known (exception:
@@ -923,3 +1063,132 @@ Consider switching to [Profile]: [1 sentence explaining why the new task warrant
   (e.g., from inbox processing to architecture design)
 - Hardcode subscription details in project files; always read from the
   user-level file
+
+---
+
+## 15. Responsible Collaboration Timer
+
+DSM_6 Section 1.5 establishes that the agent is responsible for its own resource
+consumption. This protocol extends that principle to the human side: long
+collaboration sessions degrade human judgment, review rigor, and decision
+quality. A responsible collaboration is aware of both participants' limits.
+
+The timer is **advisory, not enforcing**. The user always has final say.
+
+### 15.1. Timer Mechanics
+
+**Start:** The timer begins when `/dsm-go` or `/dsm-light-go` writes the
+session-baseline timestamp.
+
+**Cumulative tracking across lightweight chains:** When `/dsm-light-go` starts a
+continuation session, calculate cumulative active time from the previous
+session-baseline timestamp. Lightweight session chains share a single cumulative
+counter.
+
+**Reset condition:** If the gap between the previous session's last activity and
+the current session start exceeds 8 hours, reset the cumulative counter to zero.
+The previous session's last activity is approximated by the timestamp of its
+session-baseline file.
+
+**Threshold and interval:**
+- After **10 hours** of cumulative active time, generate a break reminder
+- Repeat the reminder every **30 minutes** of continued work
+- Track the last reminder time to avoid duplicate reminders within the interval
+
+### 15.2. Reminder Format
+
+Reminders appear in conversation text as a brief, non-blocking note. They do not
+require acknowledgment and do not interrupt tool calls or workflow.
+
+```
+[Session timer: ~Xh cumulative active time. Consider taking a break.]
+```
+
+The reminder is a single line, visually distinct but unobtrusive. It does not
+appear in the session transcript (the transcript is for reasoning, not
+notifications).
+
+### 15.3. Anti-Patterns
+
+**DO NOT:**
+- Block workflow or require acknowledgment before continuing
+- Generate reminders more frequently than the configured interval
+- Reset the cumulative counter on lightweight session boundaries (only reset
+  after the configured gap)
+- Treat the timer as a hard limit; the user decides when to stop
+- Add the reminder to the session transcript; it belongs in conversation text
+  only
+
+---
+
+## 16. GitHub Issue Intake Protocol
+
+GitHub issues filed by external users, community members, or the project owner
+have no defined path into the BL system without this protocol. This section
+defines the inbound pipeline: how an incoming issue becomes a properly scoped
+backlog item with DSM context.
+
+The outbound pipeline (BL -> GitHub issue) is already established in the Change
+Tracking Workflow and is not modified here.
+
+### 16.1. Inbound Pipeline (Issue to BL)
+
+When the session-start check (DSM_0.2 core) finds open issues with the
+`external` label, process each one:
+
+1. **Read:** Review the issue body and comments for context
+2. **Triage:** Determine if the issue is relevant to current DSM scope and
+   whether it overlaps with an existing BL
+3. **Create BL:** If a new BL is needed, create a BL file with proper DSM
+   context (problem, proposal, scope, test plan). Set the Origin field to
+   reference the original issue: `Origin: GitHub issue #N by @username`
+4. **Create tracking issue:** Create a new GitHub issue from the BL with a
+   structured description (BL#, phase, cluster). The new issue references the
+   original: "Originated from #N"
+5. **Close original:** Close the incoming issue with an attribution comment:
+   "Thank you @username. This has been processed into BL-XXX and is tracked
+   in #M."
+6. **Add to Project:** Add the new tracking issue to the GitHub Project with
+   phase and cluster fields
+
+If the issue is absorbed into an existing BL, close the original with a
+reference to that BL instead of creating a new one.
+
+### 16.2. Attribution
+
+Issue authors are credited without granting repository access:
+
+| Location | Attribution |
+|----------|-------------|
+| BL Origin field | `Origin: GitHub issue #N by @username` |
+| Closing comment on original issue | Thank you + reference to BL and new issue |
+| New tracking issue body | "Originally proposed by @username in #N" |
+
+GitHub's @mention system notifies the author at each step, allowing them to
+follow progress without collaborator access.
+
+### 16.3. Label Setup
+
+The `external` label must exist on each repo that uses this protocol. Create it
+once per repo:
+
+```
+gh label create external --description "Incoming issue for intake triage" --color 0E8A16
+```
+
+The label serves as:
+- **Triage filter:** `gh issue list --label external --state open` shows
+  unprocessed intake
+- **Status marker:** open + external = unprocessed; closed + external = processed
+- **Traceability:** Label persists after closing, linking back to the intake origin
+
+### 16.4. Anti-Patterns
+
+**DO NOT:**
+- Process external issues without creating a BL; the BL provides DSM context
+  that raw issues lack
+- Skip the attribution comment; issue authors should know their input was
+  received and processed
+- Remove the `external` label after processing; it preserves traceability
+- Create the `external` label on repos that do not use this protocol; the
+  session-start check skips repos without the label

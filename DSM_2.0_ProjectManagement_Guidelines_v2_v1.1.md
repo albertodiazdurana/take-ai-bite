@@ -620,6 +620,38 @@ After completing Phase 1, you will have:
 **Goal:** [One-sentence sprint objective]
 **Prerequisites:** [What must be complete before starting]
 
+## Research Assessment (before detailing deliverables)
+
+After initial research and any decisions, evaluate:
+- Can I describe the scope in enough detail for a concrete task breakdown?
+- Are there unresolved unknowns that would make task estimates speculative?
+
+If unknowns remain, conduct targeted deep-dive research (see DSM_0.2 Phase 0.5,
+tiered research pattern) before proceeding to deliverables. This prevents plans
+built on speculative assumptions.
+
+## Experiment Gate (before implementation begins)
+
+If the sprint introduces a new user-facing capability, an experiment must be
+defined before implementation starts:
+
+- [ ] **Capability sprint:** EXP-XXX defined in epoch/project plan with success
+  criteria, realistic test data, and expected output (see DSM 4.0 Section 4.4,
+  Appendix C.1.3)
+- [ ] **Performance-only sprint** (no new capability): experiment skip justified
+  in sprint notes
+
+When work emerges between sprints (e.g., findings from a prior experiment reveal
+a new capability need), update the epoch/project plan with an experiment
+definition before the capability is considered complete.
+
+## Branch Strategy
+
+For multi-sprint projects, each sprint creates a Level 3 sprint branch
+(`sprint-N/short-description`) off the session branch (Level 2). The sprint
+branch merges back to the session branch when all sprint plan items are
+checked off. See DSM_0.2 Three-Level Branching Strategy for the full model.
+
 ---
 
 ## Deliverables
@@ -737,7 +769,7 @@ After completing Phase 1, you will have:
 
 ## Sprint Boundary Checklist
 - [ ] Checkpoint: docs/checkpoints/sprint1-complete.md
-- [ ] Feedback: docs/feedback/ updated with DSM observations
+- [ ] Feedback: docs/feedback-to-dsm/ updated with DSM observations
 - [ ] Decisions: DEC-001 recorded
 - [ ] Tests: pytest passing, 80%+ coverage
 - [ ] Blog: Sprint 1 journal entry written
@@ -1279,7 +1311,7 @@ the same issue.
 or dependency issues that block progress. Include in checkpoint documents or as a
 standalone entry in the project docs folder.
 
-Cross-reference: Section 6.4 (Checkpoint Protocol), Section 6.1 (Session Management)
+Cross-reference: DSM_1.0 Section 6.4 (Checkpoint Protocol), DSM_1.0 Section 6.1 (Session Management)
 
 ### Scope Review Checkpoint
 

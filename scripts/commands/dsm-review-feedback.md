@@ -6,9 +6,9 @@ The user provides the project path (e.g., `~/sql-query-agent-ollama`).
 
 ## Steps
 
-1. Read `{project-path}/docs/feedback/backlogs.md`
-2. Read `{project-path}/docs/feedback/methodology.md`
-3. Read `{project-path}/docs/feedback/blog.md` (if it exists)
+1. Read `{project-path}/docs/feedback-to-dsm/backlogs.md`
+2. Read `{project-path}/docs/feedback-to-dsm/methodology.md`
+3. Read `{project-path}/docs/feedback-to-dsm/blog.md` (if it exists)
 
 ## Triage Backlog Proposals
 

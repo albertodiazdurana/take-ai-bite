@@ -203,11 +203,27 @@ project/
 ├── notebooks/
 │   └── 01_demo.ipynb      # Demo/exploration only
 ├── data/
-│   └── sample/            # Sample datasets
+│   ├── sample/            # Sample datasets
+│   └── experiments/       # Capability experiments (C.1.3)
 ├── app.py                 # Streamlit application
 ├── requirements.txt
 └── README.md
 ```
+
+#### 4.3.1 Branching Strategy for Development Workflow
+
+All DSM software projects follow the Three-Level Branching Strategy defined in
+DSM_0.2:
+
+- **Level 1 (main):** production line, receives only session branch merges
+- **Level 2 (session branch):** created at session start, merges to main at wrap-up
+- **Level 3 (task branches):** BL branches, sprint branches, or parallel-session
+  branches, each with specific merge conditions
+
+For sprint-based projects, each sprint creates a Level 3 sprint branch off the
+session branch. BL implementations create Level 3 BL branches. See DSM_0.2
+Three-Level Branching Strategy for naming conventions, push policy, and
+resumption protocol.
 
 ### 4.4 Tests vs Capability Experiments
 
@@ -244,6 +260,17 @@ Software projects use two distinct validation approaches. Understanding when to 
 
 **Key principle:** Tests answer "Does this function work?" while experiments answer "Does this feature achieve its goal?"
 
+**Experiment gate:** Every sprint that introduces a new user-facing capability
+must have a defined experiment (EXP-XXX) before implementation begins. See
+DSM 2.0 Template 8 (Experiment Gate section) for the sprint planning checklist.
+Performance-only sprints may skip the experiment with a justified note.
+
+**Experiment execution:** Once an experiment is defined, follow the Experiment
+Execution Protocol in DSM_0.2 for the 9-step checklist (folder creation,
+reproducible script, pre-registered criteria, results documentation, registry
+update). See Appendix C.1.3 for the 7-element template and C.1.6 for artifact
+organization.
+
 **Experiment types:** Not all experiments require the same rigor:
 
 - **Tuning experiments** select cutoff parameters for rule-based tools (thresholds,
@@ -273,6 +300,41 @@ Before writing tests against synthetic fixtures, verify the fixture format match
 **Why this matters:** Catching format mismatches early (Sprint 1) costs minutes; catching them late (Sprint 3) costs hours of rework. This principle is simple: look at real data before creating fake data.
 
 **Origin:** Discovered during DSM Graph Explorer development where 145 tests passed against a wrong fixture format, causing 448 false errors on first real-world run.
+
+#### 4.4.2. Post-Experiment Contribution Assessment
+
+Capability experiments that validate external libraries routinely discover gaps:
+undocumented APIs, missing testing guidance, incomplete examples. These findings
+are documented internally (research files, experiment scripts, blog journal) but
+represent upstream contribution opportunities if acted on systematically.
+
+**Trigger:** After completing a capability experiment that validates an external
+library or tool, assess whether the findings warrant upstream contribution.
+
+**Assessment criteria:**
+
+1. Would other users encounter the same gap?
+2. Is the evidence sufficient (reproducible steps, clear description)?
+3. Does the contribution align with project goals (visibility, community engagement)?
+
+If all three are met, proceed through the pipeline:
+
+**Pipeline:**
+
+1. **Issue:** Open a GitHub issue on the upstream repo documenting the gap. Include
+   experiment context (what was tested, how the gap was discovered). Gauge
+   maintainer responsiveness before investing further.
+2. **Blog post:** Write a post narrating the discovery process, showing how
+   structured experiments surface gaps that ad-hoc usage misses. Follow the blog
+   pipeline in DSM_0.1.
+3. **PR:** If maintainers are responsive, contribute the fix. Follow the External
+   Contribution governance in DSM_3 Section 6.6.
+
+**Scaling:** This applies across all spoke projects. Any experiment validating an
+external library is a potential pipeline trigger.
+
+**Origin:** DSM Graph Explorer Sessions 33-34, EXP-005 (FalkorDBLite validation)
+discovered 5 documentation gaps and led to FalkorDB/falkordblite#85.
 
 ### 4.5 Package Verification
 
@@ -316,6 +378,26 @@ risk (OWASP LLM03).
   the needed functionality
 - Install packages with broad system-level permissions when a virtual environment
   is available
+
+### 4.6 Bug Disambiguation
+
+When a user reports "bug persists" or "still broken," re-verify that the current
+symptoms match the previously identified bug before assuming the same root cause.
+Symptoms that sound similar may stem from different issues, and conflating them
+wastes debugging effort on the wrong path.
+
+**Before resuming a fix:** Ask whether the symptoms are identical or whether the
+behavior has changed. If the behavior has changed, treat it as a new issue and
+investigate from scratch.
+
+### 4.7 PR Description Maintenance
+
+When a PR's scope expands during development (additional bugs found, scope creep,
+new files added), update the PR title and body before the next commit push, not
+at review time. Stale PR metadata misleads reviewers and makes the contribution
+history harder to follow.
+
+**Trigger:** Any commit that adds work outside the original PR description.
 
 ---
 

@@ -2867,6 +2867,10 @@ For software/RAG projects using these templates, see also:
 
 **When to Use:** Any project conducting capability experiments (C.1.3) that needs systematic organization of experiment scripts, results, and test data.
 
+**Operational protocol:** The Experiment Execution Protocol in DSM_0.2 core
+provides the behavioral trigger that activates this framework. This appendix
+defines the templates and conventions; DSM_0.2 ensures they are followed.
+
 #### Folder Structure
 
 ```
@@ -5458,12 +5462,12 @@ feedback for DSM improvement.
 
 **NOTE (v1.3.19):** The standalone Validation Tracker has been integrated into
 the project feedback system (Section 6.4.5). Section-level scoring is now part
-of `docs/feedback/methodology.md` rather than a separate file. The template
+of `docs/feedback-to-dsm/methodology.md` rather than a separate file. The template
 below is retained as reference for the scoring format.
 
 ### E.12.2. Template Structure (Reference)
 
-**File Location:** `docs/feedback/methodology.md` (integrated with project methodology record)
+**File Location:** `docs/feedback-to-dsm/methodology.md` (integrated with project methodology record)
 
 ```markdown
 # DSM Validation Tracker

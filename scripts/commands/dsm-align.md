@@ -43,16 +43,16 @@ Before starting alignment, check if git is initialized:
    | `docs/blog/` | Yes | journal.md |
    | `docs/checkpoints/` | Yes | README.md |
    | `docs/decisions/` | No | None |
-   | `docs/feedback/` | Yes | README.md |
+   | `docs/feedback-to-dsm/` | Yes | README.md |
    | `docs/guides/` | No | None |
    | `docs/handoffs/` | Yes | README.md |
    | `docs/plans/` | Yes | README.md |
    | `docs/research/` | Yes | README.md |
 
 4. **Check feedback file compliance:**
-   - `docs/feedback/` should contain per-session files (`YYYY-MM-DD_sN_backlogs.md`, `YYYY-MM-DD_sN_methodology.md`), `technical.md`, `README.md`, and `done/`
+   - `docs/feedback-to-dsm/` should contain per-session files (`YYYY-MM-DD_sN_backlogs.md`, `YYYY-MM-DD_sN_methodology.md`), `technical.md`, `README.md`, and `done/`
    - If legacy `backlogs.md` or `methodology.md` exist (append-only format), **report as warning**: "Legacy feedback files found (`backlogs.md` / `methodology.md`). Consider migrating to per-session format: split entries into `YYYY-MM-DD_sN_{type}.md` files and move originals to `done/`."
-   - If `docs/feedback/README.md` does not exist, create from Feedback README Template below
+   - If `docs/feedback-to-dsm/README.md` does not exist, create from Feedback README Template below
    - Do NOT auto-delete or auto-migrate legacy files; report for user action.
 
 5. **Check for consumed handoffs:**
@@ -62,9 +62,9 @@ Before starting alignment, check if git is initialized:
 
 6. **Push unpushed feedback to DSM Central:**
    The DSM Central repo path is the parent directory of the `DSM_0.2_Custom_Instructions_v1.1.md` file referenced by the `@` import in this project's CLAUDE.md. Target: `{dsm-central-path}/_inbox/{this-project-name}.md`.
-   a. **Per-session files:** Scan `docs/feedback/` for files matching `YYYY-MM-DD_sN_backlogs.md` or `YYYY-MM-DD_sN_methodology.md` that are NOT in `done/`. For each ripe file (see DSM_0.2 Session-End Inbox Push ripe criteria), append its content to the inbox file and move the source to `docs/feedback/done/`.
-   b. **Legacy files:** If `docs/feedback/backlogs.md` or `docs/feedback/methodology.md` exist with unpushed entries, push using the old `**Pushed:**` marker model.
-   c. **Technical progress:** Scan `docs/feedback/technical.md` for entries without a `**Pushed:**` date. Push using the `**Pushed:**` marker model.
+   a. **Per-session files:** Scan `docs/feedback-to-dsm/` for files matching `YYYY-MM-DD_sN_backlogs.md` or `YYYY-MM-DD_sN_methodology.md` that are NOT in `done/`. For each ripe file (see DSM_0.2 Session-End Inbox Push ripe criteria), append its content to the inbox file and move the source to `docs/feedback-to-dsm/done/`.
+   b. **Legacy files:** If `docs/feedback-to-dsm/backlogs.md` or `docs/feedback-to-dsm/methodology.md` exist with unpushed entries, push using the old `**Pushed:**` marker model.
+   c. **Technical progress:** Scan `docs/feedback-to-dsm/technical.md` for entries without a `**Pushed:**` date. Push using the `**Pushed:**` marker model.
    d. Group all entries under a single inbox entry header:
       ```
       ### [YYYY-MM-DD] Feedback from {project-name}
@@ -190,7 +190,7 @@ Reference: DSM_0.1 Blog Artifacts (three-document pipeline).
 {Observation, story, pattern, or insight}
 ```
 
-### Feedback README Template (`docs/feedback/README.md`)
+### Feedback README Template (`docs/feedback-to-dsm/README.md`)
 
 ```markdown
 # DSM Feedback

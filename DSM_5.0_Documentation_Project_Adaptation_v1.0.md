@@ -299,11 +299,11 @@ For projects with extensive cross-references:
 ### 9.3 Feedback Integration
 
 Documentation projects in the DSM ecosystem should track methodology effectiveness:
-- `docs/feedback/methodology.md`: Per-section scores for DSM guidance used
-- `docs/feedback/backlogs.md`: Feedback-derived backlog items for DSM Central
+- `docs/feedback-to-dsm/methodology.md`: Per-section scores for DSM guidance used
+- `docs/feedback-to-dsm/backlogs.md`: Feedback-derived backlog items for DSM Central
 
 **Hub exemption:** Hub projects (DSM Central) route improvements directly to
-`plan/backlog/`; the `docs/feedback/` directory pattern applies to spoke projects
+`plan/backlog/`; the `docs/feedback-to-dsm/` directory pattern applies to spoke projects
 that propose changes upstream. The hub processes incoming feedback via `_inbox/`
 and creates backlog items directly.
 
