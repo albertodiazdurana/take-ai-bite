@@ -1581,13 +1581,13 @@ or sprint). The materials file serves as both capture space and draft structure:
 **Step 6: Publication** -- Format for target platform and publish
 (see Section 2.5.7 for LinkedIn-specific strategy).
 
-**Step 7: Tracking** -- After publication, update `docs/blog/README.md` with the
+**Step 7: Tracking** -- After publication, update `dsm-docs/blog/README.md` with the
 publication date and platform status. Move all related files for the published post
-to `docs/blog/done/`. See DSM_0.1 Blog Artifacts for the tracker table format and
+to `dsm-docs/blog/done/`. See DSM_0.1 Blog Artifacts for the tracker table format and
 the done/ convention.
 
 **File Naming:** All blog artifacts use `YYYY-MM-DD_{type}-{scope}.md` and live
-in `docs/blog/`. Types: `blog-materials-` (materials), `blog-` (draft),
+in `dsm-docs/blog/`. Types: `blog-materials-` (materials), `blog-` (draft),
 `post-` (final), `linkedin-` (LinkedIn post). See DSM_0.1 Blog Artifacts
 section for full convention and examples. Include the metadata header (Date,
 Author, Status, Platform) from DSM_0.1 Blog Artifacts in each file.
@@ -2119,7 +2119,7 @@ project_root/
 â”‚   â”œâ”€â”€ figures/                # Visualizations
 â”‚   â”œâ”€â”€ models/                 # Trained models
 â”‚   â””â”€â”€ reports/                # Written deliverables
-â”œâ”€â”€ docs/
+â”œâ”€â”€ dsm-docs/
 â”‚   â”œâ”€â”€ project_plan.md
 â”‚   â”œâ”€â”€ decision_log.md
 â”‚   â””â”€â”€ feature_dictionary.md
@@ -2169,7 +2169,7 @@ project_root/
 
 ### 3.4.4. Documentation Folders
 
-**docs/**: Project documentation
+**dsm-docs/**: Project documentation
 - Project plan and timeline
 - Decision log
 - Feature dictionary
@@ -2193,7 +2193,7 @@ project_root/
 
 **Filename:** `feature_dictionary.txt` or `feature_dictionary_v[N].txt`
 
-**Location:** `docs/`
+**Location:** `dsm-docs/`
 
 **Format:**
 
@@ -2380,8 +2380,8 @@ Links to other decisions that informed or were informed by this one.
 ### 4.1.3. Implementation Guidelines
 
 **File Location:**
-- `docs/decision_log.md` in project root
-- Or separate file: `docs/DEC-[ID]_[title].md` for complex decisions
+- `dsm-docs/decision_log.md` in project root
+- Or separate file: `dsm-docs/DEC-[ID]_[title].md` for complex decisions
 
 **Decision Numbering:**
 - Sequential: DEC-001, DEC-002, DEC-003...
@@ -3257,7 +3257,7 @@ Track `users_v2.0.csv` â†’ `users_v2.1.csv` changes, document why cohort de
 ## Next Session Prompt
 [Exact prompt to start next session efficiently]
 "I'm continuing work on [project]. Last session we completed [X]. 
-Next step is [Y]. Please review the handoff document in docs/handoffs/."
+Next step is [Y]. Please review the handoff document in dsm-docs/handoffs/."
 ```
 
 **Example Handoff Prompt:**
@@ -3265,16 +3265,16 @@ Next step is [Y]. Please review the handoff document in docs/handoffs/."
 I'm continuing the TravelTide customer segmentation project.
 Last session we completed Phase 2 (feature engineering) and created 89 features.
 Next step is Phase 3: clustering analysis to identify customer segments.
-Please review the session handoff in docs/handoffs/.
+Please review the session handoff in dsm-docs/handoffs/.
 ```
 
-**Note:** Store handoffs in `docs/handoffs/` within the project repository. For same-date
+**Note:** Store handoffs in `dsm-docs/handoffs/` within the project repository. For same-date
 sessions, append to the existing handoff file rather than creating a new one.
 
 ### 6.1.3. Continuity Best Practices
 
 **Before Starting New Session:**
-- Review previous session handoff in `docs/handoffs/`
+- Review previous session handoff in `dsm-docs/handoffs/`
 - Review decision log for context
 - Check what files were created
 - Understand where we left off
@@ -3287,7 +3287,7 @@ sessions, append to the existing handoff file rather than creating a new one.
 
 **Ending Session:**
 - Follow Section 6.1.5 Session Close-Out Protocol
-- Create or update handoff document in `docs/handoffs/`
+- Create or update handoff document in `dsm-docs/handoffs/`
 - Summarize key accomplishments
 - Document any pending questions
 - Provide clear next steps
@@ -3352,7 +3352,7 @@ Maintain project continuity and progress visibility through consistent documenta
 
 #### Daily Checkpoint Template
 
-**File:** `docs/checkpoints/sYY_dXX_checkpoint.md`
+**File:** `dsm-docs/checkpoints/sYY_dXX_checkpoint.md`
 
 ```markdown
 # Daily Checkpoint - Sprint [Y] Day [X]
@@ -3395,7 +3395,7 @@ Maintain project continuity and progress visibility through consistent documenta
    - Commit to git if applicable
 
 2. **Update checkpoint file**
-   - Create/update `docs/checkpoints/sYY_dXX_checkpoint.md`
+   - Create/update `dsm-docs/checkpoints/sYY_dXX_checkpoint.md`
    - Mark completed items
    - Note any blockers
 
@@ -3434,7 +3434,7 @@ spoke (project) session.
 3. **Create or update handoff document**
    - If session has complex pending work or spans multiple sessions on the same day,
      append to the existing date's handoff
-   - Location: `docs/handoffs/` within the project repository
+   - Location: `dsm-docs/handoffs/` within the project repository
    - Use Section 6.1.2 handoff template
 
 **Hub-Specific Close-Out (DSM Central):**
@@ -3454,7 +3454,7 @@ In addition to the universal checklist:
 In addition to the universal checklist:
 
 4. **Update feedback files** (if methodology observations were made)
-   - `docs/feedback-to-dsm/methodology.md` and `docs/feedback-to-dsm/backlogs.md`
+   - `dsm-docs/feedback-to-dsm/methodology.md` and `dsm-docs/feedback-to-dsm/backlogs.md`
 
 5. **Sprint boundary deliverables** (if at sprint end)
    - Checkpoint document, feedback files, decision log, blog entry, README update
@@ -3830,7 +3830,7 @@ See **Appendix E.12** for the complete Validation Tracker Template.
 
 ### 6.4.5. Project Feedback Deliverables
 
-At project start, create two feedback files in `docs/feedback-to-dsm/`. These files
+At project start, create two feedback files in `dsm-docs/feedback-to-dsm/`. These files
 are maintained throughout execution and finalized at project completion. The
 methodology file integrates section-level scoring (previously in the standalone
 Validation Tracker, Appendix E.12) directly into the feedback system.
@@ -3839,11 +3839,11 @@ Validation Tracker, Appendix E.12) directly into the feedback system.
 
 | File | Purpose | When Created |
 |------|---------|-------------|
-| `docs/feedback-to-dsm/backlogs.md` | Concrete improvement proposals for DSM | Collected during execution, finalized at project end |
-| `docs/feedback-to-dsm/methodology.md` | DSM usage log with per-section scores and project record | Updated at sprint boundaries, finalized at project end |
+| `dsm-docs/feedback-to-dsm/backlogs.md` | Concrete improvement proposals for DSM | Collected during execution, finalized at project end |
+| `dsm-docs/feedback-to-dsm/methodology.md` | DSM usage log with per-section scores and project record | Updated at sprint boundaries, finalized at project end |
 
-**Blog deliverables** (materials, drafts, publication notes) live in `docs/blog/`,
-not in `docs/feedback-to-dsm/`. Blog output is a project deliverable, not DSM methodology
+**Blog deliverables** (materials, drafts, publication notes) live in `dsm-docs/blog/`,
+not in `dsm-docs/feedback-to-dsm/`. Blog output is a project deliverable, not DSM methodology
 feedback. See Section 2.5.6 for the blog process and DSM_0.1 for file naming.
 
 #### File 1: backlogs.md
@@ -3994,13 +3994,13 @@ Gap/issue found      -->  backlogs.md        -->  BACKLOG items created
                            (proposals)
 ```
 
-Both files live in `docs/feedback-to-dsm/` and are updated at sprint boundaries
+Both files live in `dsm-docs/feedback-to-dsm/` and are updated at sprint boundaries
 (per the Sprint Boundary Checklist in PM Guidelines Template 8).
 
 The backlogs file generates immediate action. The methodology file (with
 integrated section scoring) tracks DSM effectiveness and builds a knowledge base.
 
-Blog materials and drafts are tracked separately in `docs/blog/` as project
+Blog materials and drafts are tracked separately in `dsm-docs/blog/` as project
 deliverables (see Section 2.5.6).
 
 **Note:** The standalone Validation Tracker (Appendix E.12) has been integrated
@@ -4065,7 +4065,7 @@ state against DSM standards and providing alignment recommendations.
 **Architecture:** Hub-and-Spoke model where DSM is the hub (methodology authority)
 and projects are spokes. Gateway reviews are the connections.
 
-See `docs/research/2026-02-01_multi-agent-governance-research.md` for the full research
+See `dsm-docs/research/2026-02-01_multi-agent-governance-research.md` for the full research
 grounding (multi-agent coordination, organizational learning theory, stage-gate
 processes).
 
@@ -4085,7 +4085,7 @@ Gateway 1 failures from missing scaffolding.
 | Project type | Identified (Notebook/Application/Hybrid) |
 | Directory structure | Follows DSM pattern for project type (see DSM_0 Section 3) |
 | Environment | Virtual environment with dependencies documented |
-| Feedback files | Two files initialized in `docs/feedback-to-dsm/` (backlogs.md, methodology.md) |
+| Feedback files | Two files initialized in `dsm-docs/feedback-to-dsm/` (backlogs.md, methodology.md) |
 | Decision log | Initialized |
 | Sprint plan | Created (with Phase 0.5 research if applicable) |
 
@@ -4096,7 +4096,7 @@ Gateway 1 failures from missing scaffolding.
 | Deliverables | Phase deliverables meet Definition of Done |
 | Decision log | Updated with sprint decisions |
 | Feedback files | Updated with observations and section scores |
-| Checkpoint | Document created in `docs/checkpoints/` |
+| Checkpoint | Document created in `dsm-docs/checkpoints/` |
 | Deviations | No methodology deviations without documented rationale |
 | Tests | Passing (DSM 4.0 projects) |
 | Blog | Journal entry written for sprint |

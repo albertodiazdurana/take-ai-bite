@@ -64,7 +64,7 @@ Some projects combine both tracks:
 
 ### Use DSM 5.0 Documentation Project Adaptation when:
 - Primary deliverable is **written documentation**, not code or analysis
-- Project contains `docs/`, markdown files, and configuration, but no `notebooks/` or `src/`
+- Project contains `dsm-docs/`, markdown files, and configuration, but no `notebooks/` or `src/`
 - Version control tracks **content changes**, not code changes
 
 **Examples:** Methodology repositories (DSM Central), professional portfolios, blog sites, knowledge bases, technical writing projects
@@ -130,11 +130,11 @@ At session start, the agent examines the project structure to determine which tr
 | `notebooks/` only, no `src/` | Data Science    | DSM 1.0 (Sections 2.1-2.5)                |
 | `src/`, `tests/`, `app.py`   | Application     | DSM 4.0                                   |
 | Both `notebooks/` and `src/` | Hybrid          | DSM 1.0 for analysis, DSM 4.0 for modules |
-| `docs/`, markdown-only, no `notebooks/` or `src/` | Documentation | DSM 5.0              |
+| `dsm-docs/`, markdown-only, no `notebooks/` or `src/` | Documentation | DSM 5.0              |
 
 The agent states the identified type and confirms which track it will follow. See **DSM_0.2_Custom_Instructions** for the full Project Type Detection protocol.
 
-**Optional: DSM Feedback Tracking** - Create two feedback files in `docs/feedback-to-dsm/` (backlogs.md, methodology.md) to contribute improvements back to DSM. Blog materials live in `docs/blog/` as project deliverables. See **Section 6.4** (Checkpoint and Feedback Protocol).
+**Optional: DSM Feedback Tracking** - Create two feedback files in `dsm-docs/feedback-to-dsm/` (backlogs.md, methodology.md) to contribute improvements back to DSM. Blog materials live in `dsm-docs/blog/` as project deliverables. See **Section 6.4** (Checkpoint and Feedback Protocol).
 
 ---
 
@@ -230,7 +230,7 @@ Sprint 1 Day 1: Create Project Plan
     ↓
 [PM Guidelines] ← Reference for STRUCTURE
     ↓
-    Create: docs/plan/ProjectName_Sprint1_Plan.md
+    Create: dsm-docs/plan/ProjectName_Sprint1_Plan.md
     ↓
 Sprint 1-4: Execute Work
     ↓
@@ -523,7 +523,7 @@ project/
 │   └── results/
 ├── notebooks/
 ├── _inbox/                               # Hub-spoke communication transit (DSM_3 Section 6.4)
-├── docs/                                 # See DSM_0.1 for canonical names + done/ convention
+├── dsm-docs/                                 # See DSM_0.1 for canonical names + done/ convention
 │   ├── blog/                             # Blog materials and journal
 │   ├── checkpoints/                      # Sprint/milestone checkpoints
 │   ├── decisions/                        # Decision records (permanent)
@@ -548,7 +548,7 @@ project/
 ├── tests/                                # Test suite
 │   └── fixtures/                         # Test data
 ├── _inbox/                               # Hub-spoke communication transit (DSM_3 Section 6.4)
-├── docs/                                 # See DSM_0.1 for canonical names + done/ convention
+├── dsm-docs/                                 # See DSM_0.1 for canonical names + done/ convention
 │   ├── blog/                             # Blog materials
 │   ├── checkpoints/                      # Sprint/milestone checkpoints
 │   ├── decisions/                        # Architecture Decision Records (Nygard, 2011) (permanent)
@@ -563,7 +563,7 @@ project/
 └── pyproject.toml (or requirements_*.txt)
 ```
 
-**Both DSM 1.0 and 4.0** keep documentation in-repo under `docs/`. Session handoffs, checkpoints, and research artifacts live alongside the project code. The CLAUDE.md `@` reference imports methodology content from DSM Central.
+**Both DSM 1.0 and 4.0** keep documentation in-repo under `dsm-docs/`. Session handoffs, checkpoints, and research artifacts live alongside the project code. The CLAUDE.md `@` reference imports methodology content from DSM Central.
 
 #### CLAUDE.md Setup Requirement
 
@@ -652,7 +652,7 @@ For **domain-specific package lists**, see **Appendix A.3** in DSM_1.0_Methodolo
 ```
 Morning:
 1. Check project plan (PM Guidelines structure)
-2. Review previous day's checkpoint (docs/checkpoints/sYY_dXX_checkpoint.md)
+2. Review previous day's checkpoint (dsm-docs/checkpoints/sYY_dXX_checkpoint.md)
 3. Identify today's deliverable
 4. Reference methodology for execution approach
 
@@ -661,7 +661,7 @@ During Work:
 6. Add Notebook Summary Cell after completing each notebook (Section 6.1.4)
 
 End of Day (5 min):
-7. Create daily checkpoint file (docs/checkpoints/sYY_dXX_checkpoint.md)
+7. Create daily checkpoint file (dsm-docs/checkpoints/sYY_dXX_checkpoint.md)
 8. Update decision log if major choices made (DEC-XXX format)
 9. Commit to git and push to remote
 10. Note tomorrow's first priority
@@ -797,7 +797,7 @@ BAD: [Copy-pasting entire Phase 2 section into CLAUDE.md]
 
 ### Tip 6: Maintain Decision Log
 
-**Create:** `docs/decision_log.md` at project start
+**Create:** `dsm-docs/decision_log.md` at project start
 
 **Update when:**
 - Choosing between multiple approaches

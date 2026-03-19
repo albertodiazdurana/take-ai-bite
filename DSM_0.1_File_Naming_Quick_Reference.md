@@ -76,7 +76,7 @@ outputs/
     features/        # sYY_dXX_FE_*.png
     models/          # sYY_dXX_MODEL_*.png
     final/           # figXX_*.png (Sprint 4)
-docs/
+dsm-docs/
   decisions/         # DEC-XXX_*.md
   plans/             # sYY_dXX_checkpoint.md
   reports/           # sYY_PHASE_report.md
@@ -107,7 +107,7 @@ docs/
 ## Blog Artifacts
 
 Blog content follows a three-document pipeline. Each phase has its own file type;
-files progress through the pipeline and move to `docs/blog/done/` when published.
+files progress through the pipeline and move to `dsm-docs/blog/done/` when published.
 
 ```
 Session work → journal.md (append observations)
@@ -116,7 +116,7 @@ Session work → journal.md (append observations)
                   ↓ (refinement)
               blog-{scope}.md + linkedin-{scope}.md (publish)
                   ↓ (URL confirmed)
-              docs/blog/done/ (all related files)
+              dsm-docs/blog/done/ (all related files)
 ```
 
 ### Phase 1: Journal (capture)
@@ -125,7 +125,7 @@ Session work → journal.md (append observations)
 |------|---------|-------------|
 | Journal | `journal.md` | Yes (no date prefix, single file per project) |
 
-- Append-only file in `docs/blog/` for blog-worthy observations
+- Append-only file in `dsm-docs/blog/` for blog-worthy observations
 - Capture triggers: explicit user request ("add this to the journal"), or agent
   noting something interesting during session work
 - Entries accumulate across sessions; not consumed at session end
@@ -157,7 +157,7 @@ Session work → journal.md (append observations)
 | LinkedIn | `YYYY-MM-DD_linkedin-{scope}.md` | `2026-02-06_linkedin-feedback-loop.md` |
 
 - Refined from materials into publishable form
-- When published (URL confirmed), move all related files for that post to `docs/blog/done/`
+- When published (URL confirmed), move all related files for that post to `dsm-docs/blog/done/`
 
 **Date:** Publication or creation date (YYYY-MM-DD). Enables chronological sorting
 and static site generator compatibility.
@@ -166,7 +166,7 @@ and static site generator compatibility.
 - Topic-based: `feedback-loop`, `anti-patterns`, `hub-and-spoke`
 - Sprint-based (spoke projects): `s01`, `s01-evaluation`, `s02-deployment`
 
-**Location:** `docs/blog/`
+**Location:** `dsm-docs/blog/`
 
 **Metadata header:** All blog files (except journal.md) should include:
 
@@ -179,7 +179,7 @@ and static site generator compatibility.
 
 **Diagrams:** Use Mermaid syntax for architecture and flow diagrams.
 - Render at mermaid.live for PNG/SVG export
-- Store `.mmd` source files in `docs/blog/` alongside posts
+- Store `.mmd` source files in `dsm-docs/blog/` alongside posts
 - Vertical layouts (`flowchart TB`) work better for LinkedIn feed
 - Mermaid renders natively in GitHub markdown
 
@@ -190,7 +190,7 @@ exists precisely to decouple capture from structuring.
 ### Publication Tracker
 
 Every project with blog artifacts maintains a publication tracker at
-`docs/blog/README.md`. This file serves as the index for all blog content and
+`dsm-docs/blog/README.md`. This file serves as the index for all blog content and
 tracks publication status across platforms.
 
 **Standard table format:**
@@ -214,10 +214,10 @@ Track creation and publication status of blog materials.
 **When to update:**
 - At sprint boundaries (per Sprint Boundary Checklist in DSM_2.0)
 - After publication (Step 7 of Section 2.5.6 Blog Process)
-- When moving published files to `docs/blog/done/`
+- When moving published files to `dsm-docs/blog/done/`
 
 **Scope by project type:**
-- **Spoke projects and DSM Central:** `docs/blog/README.md` in the project repo
+- **Spoke projects and DSM Central:** `dsm-docs/blog/README.md` in the project repo
 - **External contributions:** Blog artifacts about contributions live in DSM
   `{contributions-docs-path}/{project}/blog/`, not in the external repo.
   The tracker follows the blog content to that location.
@@ -259,7 +259,7 @@ Track creation and publication status of blog materials.
 
 ## Reference File Size Protocol
 
-Reference files (`_references/`, `docs/research/`, collected documentation) should
+Reference files (`_references/`, `dsm-docs/research/`, collected documentation) should
 remain small enough for both the agent and the human to review in a single pass.
 
 **Guidelines:**
@@ -281,19 +281,19 @@ materials should be digestible, not overwhelming.
 
 ## Canonical Spoke Folder Names
 
-Every DSM spoke project uses these exact folder names under `docs/`:
+Every DSM spoke project uses these exact folder names under `dsm-docs/`:
 
 | Canonical Name | Content Type | Has done/? |
 |---------------|-------------|------------|
-| `docs/blog/` | Blog materials, drafts, posts | Yes |
-| `docs/checkpoints/` | Milestone snapshots | Yes |
-| `docs/decisions/` | Decision log entries (DEC-NNN) | No (permanent) |
-| `docs/feedback-to-dsm/` | Methodology, backlog, and technical feedback | No (append-only) |
-| `docs/guides/` | Reference guides, user docs | No (permanent) |
-| `docs/handoffs/` | Session continuity documents | Yes |
+| `dsm-docs/blog/` | Blog materials, drafts, posts | Yes |
+| `dsm-docs/checkpoints/` | Milestone snapshots | Yes |
+| `dsm-docs/decisions/` | Decision log entries (DEC-NNN) | No (permanent) |
+| `dsm-docs/feedback-to-dsm/` | Methodology, backlog, and technical feedback | No (append-only) |
+| `dsm-docs/guides/` | Reference guides, user docs | No (permanent) |
+| `dsm-docs/handoffs/` | Session continuity documents | Yes |
 | `_inbox/` | Hub-spoke communication transit (project root) | No (entries deleted) |
-| `docs/plans/` | Sprint and project planning | Yes |
-| `docs/research/` | Research documents and findings | Yes |
+| `dsm-docs/plans/` | Sprint and project planning | Yes |
+| `dsm-docs/research/` | Research documents and findings | Yes |
 
 **done/ subfolder convention:** Folders marked "Has done/" contain artifacts with
 a consumption lifecycle. Once an artifact is consumed, superseded, or published,
@@ -312,14 +312,14 @@ move it to `done/` within that folder and update its header:
 | `blog/` | Post published (URL confirmed) |
 | `plans/` | Plan completed or superseded |
 
-**Feedback files:** `docs/feedback-to-dsm/` contains exactly three files: `backlogs.md`,
+**Feedback files:** `dsm-docs/feedback-to-dsm/` contains exactly three files: `backlogs.md`,
 `methodology.md`, and `technical.md`. All session observations are appended as
 dated entries within these files, not created as separate per-session files. Mark
 individual entries with `**Pushed:** YYYY-MM-DD` when sent to DSM Central's inbox.
 See DSM_0.2 Technical Progress Reporting for the `technical.md` template and
 routing protocol.
 
-**Anti-pattern:** Do not create `docs/feedback-to-dsm/YYYY-MM-DD_backlogs.md` or
+**Anti-pattern:** Do not create `dsm-docs/feedback-to-dsm/YYYY-MM-DD_backlogs.md` or
 similar dated files. The canonical files are the single source of truth;
 per-session files fragment the record and leave the canonical files empty.
 
@@ -328,7 +328,7 @@ per-session files fragment the record and leave the canonical files empty.
 ## Root File Policy
 
 Only ecosystem-required files belong in the project root. All project content
-(plans, documentation, research) goes in the appropriate `docs/` subdirectory.
+(plans, documentation, research) goes in the appropriate `dsm-docs/` subdirectory.
 
 **Allowed in root:**
 
@@ -345,7 +345,7 @@ Only ecosystem-required files belong in the project root. All project content
 | `app.py`, `main.py` | Application entry point (Streamlit, FastAPI) |
 | `Dockerfile`, `docker-compose.yml` | Container convention |
 | `_inbox/` | DSM hub-spoke communication |
-| `docs/`, `src/`, `tests/`, `notebooks/`, `data/` | Standard project directories |
+| `dsm-docs/`, `src/`, `tests/`, `notebooks/`, `data/` | Standard project directories |
 | `.claude/`, `.venv/`, `.github/` | Tooling directories |
 | `plan/`, `templates/`, `scripts/` | DSM project directories (as needed) |
 
@@ -353,12 +353,12 @@ Only ecosystem-required files belong in the project root. All project content
 
 | Anti-pattern | Correct location |
 |-------------|-----------------|
-| `PROJECT_PLAN.md`, `PLAN.md` | `docs/plans/` |
-| `DECISIONS.md`, `ADR-*.md` | `docs/decisions/` |
-| `RESEARCH.md`, `STATE_OF_ART.md` | `docs/research/` |
-| `HANDOFF.md`, `SESSION_NOTES.md` | `docs/handoffs/` |
+| `PROJECT_PLAN.md`, `PLAN.md` | `dsm-docs/plans/` |
+| `DECISIONS.md`, `ADR-*.md` | `dsm-docs/decisions/` |
+| `RESEARCH.md`, `STATE_OF_ART.md` | `dsm-docs/research/` |
+| `HANDOFF.md`, `SESSION_NOTES.md` | `dsm-docs/handoffs/` |
 | `prompts/` (non-standard directory) | `src/prompts/` or `data/prompts/` |
-| Loose markdown files (notes, drafts) | Appropriate `docs/` subdirectory |
+| Loose markdown files (notes, drafts) | Appropriate `dsm-docs/` subdirectory |
 
 **Principle:** The root should contain only files that tools or platforms expect to
 find there (pip, Streamlit, Docker, GitHub). Everything else goes in a subdirectory.

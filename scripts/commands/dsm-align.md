@@ -20,51 +20,51 @@ Before starting alignment, check if git is initialized:
    - `notebooks/` only, no `src/` → Data Science (DSM 1.0)
    - `src/`, `tests/`, `app.py` → Application (DSM 4.0)
    - Both `notebooks/` and `src/` → Hybrid
-   - `docs/`, markdown-only, no `notebooks/` or `src/` → Documentation (DSM 5.0)
+   - `dsm-docs/`, markdown-only, no `notebooks/` or `src/` → Documentation (DSM 5.0)
    - `contributions-docs/{project}/` in DSM Central → External Contribution (DSM_3 Section 6.6)
    State the detected type.
 
 2. **Check and fix `_inbox/` at project root:**
-   - If `docs/backlog/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox (`~/dsm-agentic-ai-data-science-methodology/_inbox/{project-name}.md`).
-   - If `docs/inbox/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox.
+   - If `dsm-docs/backlog/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox (`~/dsm-agentic-ai-data-science-methodology/_inbox/{project-name}.md`).
+   - If `dsm-docs/inbox/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox.
    - If `_inbox/` does not exist: create it.
    - If `_inbox/done/` does not exist: create it.
    - If `_inbox/README.md` does not exist: create it from the Inbox Template below.
 
-3. **Check and fix each canonical docs/ folder.** For each folder in the table below:
+3. **Check and fix each canonical dsm-docs/ folder.** For each folder in the table below:
    a. Check if it exists. If missing, create it.
-   b. Check for name collisions (e.g., `plan/` when canonical is `docs/plans/`, or `docs/checkpoint/` when canonical is `docs/checkpoints/`). If collision found, **report to user** but do NOT auto-rename.
+   b. Check for name collisions (e.g., `plan/` when canonical is `dsm-docs/plans/`, or `docs/checkpoint/` when canonical is `dsm-docs/checkpoints/`). If collision found, **report to user** but do NOT auto-rename.
    c. If the folder should have `done/`: check `done/` exists inside it. Create if missing.
    d. If the folder should have a template file: check if it exists. Create from templates below if missing.
 
    | Folder | Has done/? | Template file(s) |
    |--------|-----------|-------------------|
    | `plan/backlog/` | Yes | README.md |
-   | `docs/blog/` | Yes | journal.md |
-   | `docs/checkpoints/` | Yes | README.md |
-   | `docs/decisions/` | No | None |
-   | `docs/feedback-to-dsm/` | Yes | README.md |
-   | `docs/guides/` | No | None |
-   | `docs/handoffs/` | Yes | README.md |
-   | `docs/plans/` | Yes | README.md |
-   | `docs/research/` | Yes | README.md |
+   | `dsm-docs/blog/` | Yes | journal.md |
+   | `dsm-docs/checkpoints/` | Yes | README.md |
+   | `dsm-docs/decisions/` | No | None |
+   | `dsm-docs/feedback-to-dsm/` | Yes | README.md |
+   | `dsm-docs/guides/` | No | None |
+   | `dsm-docs/handoffs/` | Yes | README.md |
+   | `dsm-docs/plans/` | Yes | README.md |
+   | `dsm-docs/research/` | Yes | README.md |
 
 4. **Check feedback file compliance:**
-   - `docs/feedback-to-dsm/` should contain per-session files (`YYYY-MM-DD_sN_backlogs.md`, `YYYY-MM-DD_sN_methodology.md`), `technical.md`, `README.md`, and `done/`
+   - `dsm-docs/feedback-to-dsm/` should contain per-session files (`YYYY-MM-DD_sN_backlogs.md`, `YYYY-MM-DD_sN_methodology.md`), `technical.md`, `README.md`, and `done/`
    - If legacy `backlogs.md` or `methodology.md` exist (append-only format), **report as warning**: "Legacy feedback files found (`backlogs.md` / `methodology.md`). Consider migrating to per-session format: split entries into `YYYY-MM-DD_sN_{type}.md` files and move originals to `done/`."
-   - If `docs/feedback-to-dsm/README.md` does not exist, create from Feedback README Template below
+   - If `dsm-docs/feedback-to-dsm/README.md` does not exist, create from Feedback README Template below
    - Do NOT auto-delete or auto-migrate legacy files; report for user action.
 
 5. **Check for consumed handoffs:**
-   - List files in `docs/handoffs/` (excluding `done/` and `.gitkeep`)
+   - List files in `dsm-docs/handoffs/` (excluding `done/` and `.gitkeep`)
    - If any handoff files exist that are NOT from the current session, **report as warning**: "Consumed handoff(s) found outside done/. Run `/dsm-go` to move them, or move manually."
    - Do NOT auto-move; report for user action.
 
 6. **Push unpushed feedback to DSM Central:**
    The DSM Central repo path is the parent directory of the `DSM_0.2_Custom_Instructions_v1.1.md` file referenced by the `@` import in this project's CLAUDE.md. Target: `{dsm-central-path}/_inbox/{this-project-name}.md`.
-   a. **Per-session files:** Scan `docs/feedback-to-dsm/` for files matching `YYYY-MM-DD_sN_backlogs.md` or `YYYY-MM-DD_sN_methodology.md` that are NOT in `done/`. For each ripe file (see DSM_0.2 Session-End Inbox Push ripe criteria), append its content to the inbox file and move the source to `docs/feedback-to-dsm/done/`.
-   b. **Legacy files:** If `docs/feedback-to-dsm/backlogs.md` or `docs/feedback-to-dsm/methodology.md` exist with unpushed entries, push using the old `**Pushed:**` marker model.
-   c. **Technical progress:** Scan `docs/feedback-to-dsm/technical.md` for entries without a `**Pushed:**` date. Push using the `**Pushed:**` marker model.
+   a. **Per-session files:** Scan `dsm-docs/feedback-to-dsm/` for files matching `YYYY-MM-DD_sN_backlogs.md` or `YYYY-MM-DD_sN_methodology.md` that are NOT in `done/`. For each ripe file (see DSM_0.2 Session-End Inbox Push ripe criteria), append its content to the inbox file and move the source to `dsm-docs/feedback-to-dsm/done/`.
+   b. **Legacy files:** If `dsm-docs/feedback-to-dsm/backlogs.md` or `dsm-docs/feedback-to-dsm/methodology.md` exist with unpushed entries, push using the old `**Pushed:**` marker model.
+   c. **Technical progress:** Scan `dsm-docs/feedback-to-dsm/technical.md` for entries without a `**Pushed:**` date. Push using the `**Pushed:**` marker model.
    d. Group all entries under a single inbox entry header:
       ```
       ### [YYYY-MM-DD] Feedback from {project-name}
@@ -120,7 +120,7 @@ Before starting alignment, check if git is initialized:
    - Feedback pushed: [count of entries pushed to DSM Central, or "none pending"]
    ```
 
-12. **Persist report:** Write the alignment report to `docs/decisions/YYYY-MM-DD_sN_align-report.md`
+12. **Persist report:** Write the alignment report to `dsm-docs/decisions/YYYY-MM-DD_sN_align-report.md`
    so it survives session end. The file uses this header:
    ```markdown
    # Alignment Report — Session N
@@ -175,7 +175,7 @@ Completed items move to `done/`.
 |-----|-------|----------|
 ```
 
-### Blog Journal Template (`docs/blog/journal.md`)
+### Blog Journal Template (`dsm-docs/blog/journal.md`)
 
 ```markdown
 # Blog Journal
@@ -190,7 +190,7 @@ Reference: DSM_0.1 Blog Artifacts (three-document pipeline).
 {Observation, story, pattern, or insight}
 ```
 
-### Feedback README Template (`docs/feedback-to-dsm/README.md`)
+### Feedback README Template (`dsm-docs/feedback-to-dsm/README.md`)
 
 ```markdown
 # DSM Feedback
@@ -217,7 +217,7 @@ Only create a file when there is feedback to record. No empty files.
 Reference: DSM_0.2 DSM Feedback Tracking.
 ```
 
-### Checkpoints README Template (`docs/checkpoints/README.md`)
+### Checkpoints README Template (`dsm-docs/checkpoints/README.md`)
 
 ```markdown
 # Checkpoints
@@ -231,7 +231,7 @@ Reference: DSM_0.2 (via /dsm-go Step 3.5).
 `YYYY-MM-DD_vX.Y.Z_release_checkpoint.md` or `YYYY-MM-DD_sN_{description}.md`
 ```
 
-### Handoffs README Template (`docs/handoffs/README.md`)
+### Handoffs README Template (`dsm-docs/handoffs/README.md`)
 
 ```markdown
 # Handoffs
@@ -246,7 +246,7 @@ Reference: DSM_0.2 (via /dsm-go Step 3).
 `YYYY-MM-DD_{description}.md` or `YYYY-MM-DD_sN_{description}.md`
 ```
 
-### Plans README Template (`docs/plans/README.md`)
+### Plans README Template (`dsm-docs/plans/README.md`)
 
 ```markdown
 # Plans
@@ -259,7 +259,7 @@ Reference: DSM_2.0 (PM Guidelines).
 `YYYY-MM-DD_{plan-type}.md` or descriptive name (e.g., `sprint-3-plan.md`)
 ```
 
-### Research README Template (`docs/research/README.md`)
+### Research README Template (`dsm-docs/research/README.md`)
 
 ```markdown
 # Research

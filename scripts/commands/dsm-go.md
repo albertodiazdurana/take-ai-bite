@@ -34,30 +34,30 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
      - If the path exists: note as validated
      - If the path does not exist: warn "Ecosystem path '{name}' points to '{path}' which does not exist. Cross-repo operations using this path will be skipped."
      If the file does not exist, present as an **action item** for all project types: "Missing `.claude/dsm-ecosystem.md`. Run `/dsm-align` to create it with required ecosystem pointers (`dsm-central`, `portfolio`)." Use fallback resolution (dsm-central from `@` reference) for the current session but flag the gap. Continue to 2b.
-   - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). For spoke projects, if `_inbox/` is missing or docs/ structure is incomplete, suggest running `/dsm-align`. **Inbox location by project type:**
+   - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). For spoke projects, if `_inbox/` is missing or dsm-docs/ structure is incomplete, suggest running `/dsm-align`. **Inbox location by project type:**
      - **DSM hub (DSM Central):** `_inbox/` at repo root
      - **DSM spoke:** `_inbox/` at repo root
      - **External contribution:** `contributions-docs/{project}/_inbox/` in DSM Central (NOT in the external repo)
      **How to check:** Use `ls` on the inbox directory (not Glob with literal paths, which silently fails for `_inbox/` directories). Exclude `README.md` from results. If `ls` shows no entries besides `README.md`, confirm with a second method (`ls -la`) before concluding the inbox is empty.
      Process any pending inbox entries: when an entry references a source file (Full evidence, Full report), read the referenced file before evaluating; the inbox is a notification, the source file contains the full evidence. Then evaluate impact, propose action (implement, defer, or reject per DSM_3 Section 6.4.3), and ask the user how to proceed. Do not merely list entry titles.
-   - **2b.5. Canonical folder check:** Quickly verify that all 8 canonical docs/ folders exist (`blog`, `checkpoints`, `decisions`, `feedback`, `guides`, `handoffs`, `plans`, `research`). If any are missing, suggest: "Missing canonical folders: [list]. Run `/dsm-align` to fix." Do not create folders here; dsm-align handles creation with proper templates.
+   - **2b.5. Governance folder check:** First, check if the project uses `docs/` instead of `dsm-docs/`. If `docs/` exists but `dsm-docs/` does not, inform the user: "This project uses `docs/` instead of `dsm-docs/`. Rename to match the current DSM convention? Run `/dsm-align` to migrate." Then verify that all 9 canonical `dsm-docs/` subfolders exist (`blog`, `checkpoints`, `decisions`, `feedback-to-dsm`, `guides`, `handoffs`, `plans`, `research`, `inbox`). If any are missing, suggest: "Missing canonical folders: [list]. Run `/dsm-align` to fix." Do not create folders here; dsm-align handles creation with proper templates.
    - **2c. Version check:** Compare DSM version against last handoff, note changes.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
-3. **Handoff lifecycle:** Check `docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:
-   - Move the file to `docs/handoffs/done/`
+3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:
+   - Move the file to `dsm-docs/handoffs/done/`
    - Add `**Date Completed:** YYYY-MM-DD` and `**Outcome Reference:** Consumed at session N start` to the file header
    - Report each moved file in the session report
-3.5. **Checkpoint check:** List `docs/checkpoints/` (excluding `done/`). If a checkpoint exists from the most recent session (matching the session number or date in MEMORY.md), read it in full; it contains consolidated state that supplements MEMORY.md (pending work details, branch state, decision context). Extract pending items and next steps from the checkpoint; these become **suggested work items** in the session report (Step 9). If no recent checkpoint exists, skip silently.
+3.5. **Checkpoint check:** List `dsm-docs/checkpoints/` (excluding `done/`). If a checkpoint exists from the most recent session (matching the session number or date in MEMORY.md), read it in full; it contains consolidated state that supplements MEMORY.md (pending work details, branch state, decision context). Extract pending items and next steps from the checkpoint; these become **suggested work items** in the session report (Step 9). If no recent checkpoint exists, skip silently.
    **After reading, move the checkpoint to `done/`:**
-   1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' docs/checkpoints/{filename}`
-   2. `git mv docs/checkpoints/{filename} docs/checkpoints/done/{filename}`
+   1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' dsm-docs/checkpoints/{filename}`
+   2. `git mv dsm-docs/checkpoints/{filename} dsm-docs/checkpoints/done/{filename}`
    3. Report: "Checkpoint {filename} moved to done/"
-   If multiple checkpoints exist in `docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation.
+   If multiple checkpoints exist in `dsm-docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation.
 3.6. **Sprint boundary gate:** If MEMORY.md or the checkpoint references a recently completed sprint (e.g., "Sprint N complete"), verify that boundary artifacts exist before suggesting new sprint work:
-   - Checkpoint for the completed sprint in `docs/checkpoints/done/` (or just consumed in 3.5)
-   - Blog journal entry in `docs/blog/journal.md` with a matching date
-   - Feedback files updated (per-session file in `docs/feedback-to-dsm/` or entry in `technical.md`)
+   - Checkpoint for the completed sprint in `dsm-docs/checkpoints/done/` (or just consumed in 3.5)
+   - Blog journal entry in `dsm-docs/blog/journal.md` with a matching date
+   - Feedback files updated (per-session file in `dsm-docs/feedback-to-dsm/` or entry in `technical.md`)
    If any are missing, flag them: "Sprint N boundary incomplete: missing [items]. Complete these before starting Sprint N+1, or defer with confirmation."
    **Skip when:** First sprint in a project (no prior boundary to check), or when no sprint identifier is found in MEMORY.md/checkpoint.
 4. **Bandwidth report:** Run `vnstat -h` and note usage since last session

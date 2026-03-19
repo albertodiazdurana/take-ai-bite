@@ -7,7 +7,7 @@ Before proceeding, check `.claude/session-baseline.txt` for `mode: light`.
 **If the marker is present:** proceed normally.
 
 **If the marker is absent or the file does not exist**, check for a fallback:
-1. Run `ls -t docs/checkpoints/*lightweight*.md 2>/dev/null | head -1`
+1. Run `ls -t dsm-docs/checkpoints/*lightweight*.md 2>/dev/null | head -1`
 2. If a lightweight checkpoint exists from the expected previous session number:
    - Warn: "mode: light marker missing, but lightweight checkpoint found. Proceeding with lightweight start."
    - Proceed with the lightweight flow (the checkpoint provides the context).
@@ -26,12 +26,12 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 ## Steps (only if safety gate passes)
 
 1. **MEMORY.md:** Already loaded via auto memory context. Do NOT re-read; use the version in context.
-2. **Read latest checkpoint:** Run `ls -t docs/checkpoints/*.md 2>/dev/null | head -1` to find the most recent checkpoint. Read it in full. This provides the task context.
+2. **Read latest checkpoint:** Run `ls -t dsm-docs/checkpoints/*.md 2>/dev/null | head -1` to find the most recent checkpoint. Read it in full. This provides the task context.
    **After reading, move the checkpoint to `done/`:**
-   1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' docs/checkpoints/{filename}`
-   2. `git mv docs/checkpoints/{filename} docs/checkpoints/done/{filename}`
+   1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' dsm-docs/checkpoints/{filename}`
+   2. `git mv dsm-docs/checkpoints/{filename} dsm-docs/checkpoints/done/{filename}`
    3. Report: "Checkpoint {filename} moved to done/"
-   If multiple checkpoints exist in `docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation. If no checkpoint exists, skip silently.
+   If multiple checkpoints exist in `dsm-docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation. If no checkpoint exists, skip silently.
 3. **Git status:** Run `git status` to check for uncommitted changes.
 4. **Save session baseline:** Save a new baseline snapshot (same as full `/dsm-go` step 6), then append `mode: light` to preserve the chain for the next lightweight wrap-up.
 5. **Transcript boundary marker:** Append a session boundary marker to the existing `.claude/session-transcript.md` (do NOT archive or overwrite):

@@ -464,7 +464,7 @@ After completing Phase 1, you will have:
 
 **Filename Convention:** `sXX_dXX_checkpoint.md` (e.g., s01_d03_checkpoint.md)
 
-**Location:** `docs/checkpoints/` or `docs/plans/`
+**Location:** `dsm-docs/checkpoints/` or `dsm-docs/plans/`
 
 **Benefits of Daily Checkpoints:**
 - Enables recovery if session interrupted
@@ -697,7 +697,7 @@ checked off. See DSM_0.2 Three-Level Branching Strategy for the full model.
 ## Phase Boundary Checklist (intra-sprint)
 - [ ] Update methodology.md with phase observations and scores
 - [ ] Create checkpoint if significant milestone reached
-- [ ] Log decisions made during phase (docs/decisions/)
+- [ ] Log decisions made during phase (dsm-docs/decisions/)
 - [ ] Update blog materials if insights worth sharing
 
 ---
@@ -710,18 +710,18 @@ checked off. See DSM_0.2 Three-Level Branching Strategy for the full model.
 
 ## How to Resume
 1. Read this sprint plan
-2. Read the most recent checkpoint in docs/checkpoints/
+2. Read the most recent checkpoint in dsm-docs/checkpoints/
 3. [Project-specific resume steps]
 
 ---
 
 ## Sprint Boundary Checklist
-- [ ] Checkpoint document created (docs/checkpoints/)
+- [ ] Checkpoint document created (dsm-docs/checkpoints/)
 - [ ] Feedback files updated (backlogs, methodology)
 - [ ] Decision log updated with sprint decisions
 - [ ] Tests passing (DSM 4.0 projects)
 - [ ] Blog journal entry written
-- [ ] Blog publication tracker updated (`docs/blog/README.md`)
+- [ ] Blog publication tracker updated (`dsm-docs/blog/README.md`)
 - [ ] Repository README updated (status, results, structure)
 - [ ] Next steps summary (3-5 sentences: next sprint goal, key deliverables, relevant plan reference)
 ```
@@ -768,12 +768,12 @@ checked off. See DSM_0.2 Three-Level Branching Strategy for the full model.
 ---
 
 ## Sprint Boundary Checklist
-- [ ] Checkpoint: docs/checkpoints/sprint1-complete.md
-- [ ] Feedback: docs/feedback-to-dsm/ updated with DSM observations
+- [ ] Checkpoint: dsm-docs/checkpoints/sprint1-complete.md
+- [ ] Feedback: dsm-docs/feedback-to-dsm/ updated with DSM observations
 - [ ] Decisions: DEC-001 recorded
 - [ ] Tests: pytest passing, 80%+ coverage
 - [ ] Blog: Sprint 1 journal entry written
-- [ ] Blog: Publication tracker updated (`docs/blog/README.md`)
+- [ ] Blog: Publication tracker updated (`dsm-docs/blog/README.md`)
 - [ ] Next steps: Sprint 2 goal, deliverables, and epoch plan reference
 ```
 
@@ -859,7 +859,7 @@ checked off. See DSM_0.2 Three-Level Branching Strategy for the full model.
 
 **Filename:** `Sprint[N]_QA_Presentation_Prep.md`
 
-**Location:** `docs/`
+**Location:** `dsm-docs/`
 
 **Structure:**
 
@@ -957,7 +957,7 @@ checked off. See DSM_0.2 Three-Level Branching Strategy for the full model.
 
 **Filename:** `scope_limitations.md`
 
-**Location:** `docs/`
+**Location:** `dsm-docs/`
 
 **Template:**
 
@@ -1402,7 +1402,7 @@ across projects and sessions.
 ### Integration Points
 
 - **Session close-out (Section 6.1.5):** Optional `vnstat -h` snapshot in handoff metadata. See DSM_0.2 Session Management for the bandwidth reporting convention.
-- **Checkpoints (docs/checkpoints/):** Resource summary alongside milestone context.
+- **Checkpoints (dsm-docs/checkpoints/):** Resource summary alongside milestone context.
 - **Sprint boundaries:** Cumulative resource report for the sprint, comparing planned vs actual.
 - **Project retrospectives:** Cost analysis across sessions, identifying resource-intensive phases.
 

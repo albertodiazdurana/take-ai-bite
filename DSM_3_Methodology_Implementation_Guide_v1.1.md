@@ -163,7 +163,7 @@ This project uses:
 - Alert at 80% capacity (~160K tokens)
 - Provide session summary as Handoff for the following chat if nearing limit
 - Reference Methodology Section 6.1 for session handoff templates
-- Store handoffs in `docs/handoffs/` within the project repository for continuity
+- Store handoffs in `dsm-docs/handoffs/` within the project repository for continuity
   - **Why**: Keeps session handoffs alongside the project code, accessible via git history
 
 ### Language & Formatting
@@ -448,7 +448,7 @@ This project uses:
 - [ ] Tests: `tests/` with pytest
 - [ ] Demo: Streamlit application
 - [ ] Documentation: README, architecture diagram
-- [ ] Decision log: Architectural decisions in `docs/decisions/`
+- [ ] Decision log: Architectural decisions in `dsm-docs/decisions/`
 
 ## Domain Adaptations (DSM 4.0)
 
@@ -567,7 +567,7 @@ methodology standards]."
 **Solution:** Remove methodology content, keep only project-specific details
 
 **Issue:** Lost context between sessions
-**Solution:** Create session handoff document (Section 6.1 template), store in `docs/handoffs/` within the project repository
+**Solution:** Create session handoff document (Section 6.1 template), store in `dsm-docs/handoffs/` within the project repository
 
 **Issue:** Unsure which advanced practices to activate  
 **Solution:** Start with 0-2 practices, add as complexity increases. See Appendix C for guidance.
@@ -623,7 +623,7 @@ Copy this prompt and customize the bracketed sections. Use it in a DSM Central
 session to trigger feedback review:
 
 ```
-Review project feedback at ~/[project-name]/docs/feedback-to-dsm/:
+Review project feedback at ~/[project-name]/dsm-docs/feedback-to-dsm/:
 - methodology.md ([N] scored entries, avg [X.X]/5, [M] gaps identified)
 - backlogs.md ([N] backlog proposals, [M] medium / [L] low priority)
 
@@ -645,11 +645,11 @@ Before handing off feedback, verify in the spoke project:
 
 | Check | Description |
 |-------|-------------|
-| Files exist | `docs/feedback-to-dsm/methodology.md` and `backlogs.md` present |
+| Files exist | `dsm-docs/feedback-to-dsm/methodology.md` and `backlogs.md` present |
 | Scores complete | All used DSM sections scored (1-5 scale) |
 | Proposals structured | Each backlog proposal has Problem, Proposed Solution, Evidence |
 | Summary metrics | Entry count, average score, gap count included |
-| Blog separated | Blog materials in `docs/blog/`, not in `docs/feedback-to-dsm/` |
+| Blog separated | Blog materials in `dsm-docs/blog/`, not in `dsm-docs/feedback-to-dsm/` |
 
 #### 6.1.3. DSM Review Process
 
@@ -702,7 +702,7 @@ Create this in the DSM Central session before handing off to the spoke:
 
 ## Phase 0.5 Research (if applicable)
 - Research questions: [what needs investigation before sprint planning]
-- Expected deliverable: docs/research/{topic}_research.md
+- Expected deliverable: dsm-docs/research/{topic}_research.md
 - Skip criteria: [why research may not be needed]
 
 ## Protocols to Reinforce in CLAUDE.md
@@ -719,14 +719,14 @@ The hub creates these artifacts before the spoke session begins:
 | Artifact | Location | Notes |
 |----------|----------|-------|
 | CLAUDE.md | `.claude/CLAUDE.md` | With `@` reference to DSM_0.2 and protocol reinforcement |
-| Feedback files | `docs/feedback-to-dsm/` | `methodology.md` and `backlogs.md` (2 files) |
-| Decision log | `docs/decisions/` | Initialized with DEC-000 template |
-| Blog directory | `docs/blog/` | Empty directory for sprint journal entries |
-| Research directory | `docs/research/` | If Phase 0.5 applies |
-| Sprint plan location | `docs/plans/` | Directory ready for spoke to create sprint plan |
+| Feedback files | `dsm-docs/feedback-to-dsm/` | `methodology.md` and `backlogs.md` (2 files) |
+| Decision log | `dsm-docs/decisions/` | Initialized with DEC-000 template |
+| Blog directory | `dsm-docs/blog/` | Empty directory for sprint journal entries |
+| Research directory | `dsm-docs/research/` | If Phase 0.5 applies |
+| Sprint plan location | `dsm-docs/plans/` | Directory ready for spoke to create sprint plan |
 | Inbox directory | `_inbox/` | For hub-to-spoke action items (see Section 6.4) |
-| Handoffs directory | `docs/handoffs/` | Session continuity documents |
-| Checkpoints directory | `docs/checkpoints/` | Milestone snapshots |
+| Handoffs directory | `dsm-docs/handoffs/` | Session continuity documents |
+| Checkpoints directory | `dsm-docs/checkpoints/` | Milestone snapshots |
 
 Use canonical folder names from DSM_0.1. Before creating any folder, check if a
 similar folder already exists (e.g., `plan/` when creating `plans/`) to avoid
@@ -753,9 +753,9 @@ Phase 0.5 research questions (if applicable):
 First task: [Phase 0.5 research | Sprint 1 planning | specific starting point]
 
 Governance notes:
-- Feedback files initialized in docs/feedback-to-dsm/ (methodology.md, backlogs.md)
-- Blog materials go in docs/blog/ (not docs/feedback-to-dsm/)
-- Decision log initialized in docs/decisions/
+- Feedback files initialized in dsm-docs/feedback-to-dsm/ (methodology.md, backlogs.md)
+- Blog materials go in dsm-docs/blog/ (not dsm-docs/feedback-to-dsm/)
+- Decision log initialized in dsm-docs/decisions/
 - Sprint boundary checklist: checkpoint, feedback, decision log, blog entry, README
 ```
 
@@ -798,7 +798,7 @@ during active work, with a defined lifecycle: write, process, remove.
 - Contains action items, notifications, or guidance from DSM Central
 - Spoke processes entries at session start, then removes them
 
-**Relationship to feedback files:** Spoke `docs/feedback-to-dsm/` files (backlogs.md,
+**Relationship to feedback files:** Spoke `dsm-docs/feedback-to-dsm/` files (backlogs.md,
 methodology.md) remain as a drafting space where observations accumulate over
 multiple sessions. The inbox handles entries that are ripe and need attention.
 Feedback files are for collecting; the inbox is for transmitting.
@@ -847,13 +847,13 @@ and decision logs, not in the inbox.
 - Cross-project observation: pattern or issue that affects multiple projects
 
 **Pushing process:**
-1. At session end, review `docs/feedback-to-dsm/` for ripe entries
+1. At session end, review `dsm-docs/feedback-to-dsm/` for ripe entries
 2. Copy ripe entries to DSM Central's `_inbox/{project-name}.md`
-3. Remove or mark the source entry in `docs/feedback-to-dsm/` as "Pushed to hub"
+3. Remove or mark the source entry in `dsm-docs/feedback-to-dsm/` as "Pushed to hub"
 
 **Hub processing:**
 1. At session start, check `_inbox/` for unprocessed files
-2. For each entry, read the source spoke's `docs/feedback-to-dsm/` files (methodology.md,
+2. For each entry, read the source spoke's `dsm-docs/feedback-to-dsm/` files (methodology.md,
    backlogs.md) to extract full context; the inbox entry is a summary, the feedback
    file has the detailed rationale and evidence
 3. Process each entry per Section 6.4.3 using the full context
@@ -878,7 +878,7 @@ and decision logs, not in the inbox.
 #### Anti-Patterns
 
 **DO NOT:**
-- Use the inbox as a drafting space; draft in `docs/feedback-to-dsm/`, push when ripe
+- Use the inbox as a drafting space; draft in `dsm-docs/feedback-to-dsm/`, push when ripe
 - Leave processed entries in the inbox; the inbox is a transit point, not an archive
 - Push entries without the required structure (type, priority, description); unstructured entries cannot be triaged
 - Skip surfacing inbox entries at session start; unseen entries defeat the purpose
@@ -1073,7 +1073,7 @@ Cross-reference: BACKLOG-094 (External Contribution Onboarding Pattern), BACKLOG
 (External Contribution Governance Structure), DSM_0.2 (Session-Start Inbox Check for
 AI policy detection)
 
-Research basis: `docs/research/done/2026-02-13_backlog-096-ai-contribution-guidelines-research.md`
+Research basis: `dsm-docs/research/done/2026-02-13_backlog-096-ai-contribution-guidelines-research.md`
 (7 policies mapped, legal analysis, ecosystem data, full source list)
 
 ### 6.6. External Contribution Governance
@@ -1117,7 +1117,7 @@ Ecosystem Path Registry), not in the external repository:
   README.md        # Project overview, status, and contribution roadmap
 ```
 
-This structure mirrors the spoke project `docs/` layout (DSM_0.1) but is stored
+This structure mirrors the spoke project `dsm-docs/` layout (DSM_0.1) but is stored
 externally because the external repo is not ours to modify. The path is resolved
 from the Ecosystem Path Registry (`contributions-docs` logical name).
 
@@ -1126,8 +1126,8 @@ from the Ecosystem Path Registry (`contributions-docs` logical name).
 | Aspect | Spoke Project | External Contribution |
 |--------|--------------|----------------------|
 | Repo ownership | Contributor owns | Upstream maintainer owns |
-| Governance artifacts | In project `docs/` | In `{contributions-docs-path}/` |
-| Scaffolding | Hub creates `docs/` structure | Project already exists; no scaffolding |
+| Governance artifacts | In project `dsm-docs/` | In `{contributions-docs-path}/` |
+| Scaffolding | Hub creates `dsm-docs/` structure | Project already exists; no scaffolding |
 | Sprint cadence | Contributor-defined | Upstream review cycles dictate pace |
 | Feedback cadence | Sprint boundaries | Contribution milestones (PR merged, issue resolved) |
 | Commit authorship | Per project CLAUDE.md policy | Must follow upstream conventions |
@@ -1558,7 +1558,7 @@ priority mechanism. Options:
 | 11 | Create governance folder | `{contributions-docs-path}/{project}/` | Section 6.6.2 |
 | 12 | Scaffold governance directory structure | Governance folder | See directory list below |
 | 13 | Add project to ecosystem path registry | `.claude/dsm-ecosystem.md` | DSM_0.2 Ecosystem Path Registry; **required entries:** `dsm-central`, `portfolio`, `contributions-docs` |
-| 14 | Initialize feedback files | `{governance}/docs/feedback-to-dsm/` | methodology.md, backlogs.md |
+| 14 | Initialize feedback files | `{governance}/dsm-docs/feedback-to-dsm/` | methodology.md, backlogs.md |
 | 15 | Run contributor profile assessment | DSM Central | Map skills to project stack |
 | 16 | Send welcome inbox entry | `{governance}/_inbox/` | Include AI collaboration norms action item |
 | 17 | Fill in kickoff prompt from template above | DSM Central session | Section 6.6.7 Phase 2 |
@@ -1569,7 +1569,7 @@ priority mechanism. Options:
 {contributions-docs-path}/{project}/
   _inbox/
     README.md          # Entry template (Section 6.4)
-  docs/
+  dsm-docs/
     checkpoints/
     decisions/
     feedback-to-dsm/
@@ -1584,7 +1584,7 @@ priority mechanism. Options:
 - Setup summary (what was created, where governance artifacts live)
 - Suggested first actions (environment discovery, upstream reconnaissance)
 - Action item: assess upstream AI collaboration norms and document in
-  `{governance}/docs/guides/ai-collaboration.md`, capturing which DSM
+  `{governance}/dsm-docs/guides/ai-collaboration.md`, capturing which DSM
   protocols apply, how the human-agent split works for this project,
   and any upstream-specific conventions
 
@@ -1815,16 +1815,16 @@ upstream-specific concerns.
 | 4 | Create `.claude/dsm-ecosystem.md` | `.claude/` | DSM_0.2 Ecosystem Path Registry |
 | 5 | Create `_inbox/` with README.md | Project root | Section 6.4 entry template |
 | 6 | Create `plan/backlog/` with `done/` and README.md | `plan/backlog/` | Spoke Backlog Template below |
-| 7 | Create canonical `docs/` structure | `docs/` | DSM_0.1 (9 subdirectories) |
-| 8 | Move preliminary plan to `docs/research/` | `docs/research/` | If exists from hub kickoff |
+| 7 | Create canonical `dsm-docs/` structure | `dsm-docs/` | DSM_0.1 (9 subdirectories) |
+| 8 | Move preliminary plan to `dsm-docs/research/` | `dsm-docs/research/` | If exists from hub kickoff |
 | 9 | Send first-session prompt to spoke's `_inbox/` | `_inbox/` | See template below |
 | 10 | Send inbox confirmation to DSM Central's `_inbox/` | Hub `_inbox/` | DSM_0.2 migration confirmation |
-| 11 | Create AI collaboration norms | `docs/guides/` | See Section 6.7.3 below |
+| 11 | Create AI collaboration norms | `dsm-docs/guides/` | See Section 6.7.3 below |
 | 12 | Create README.md | Project root | Project name, purpose, setup, structure |
 | 13 | Check `~/.claude/CLAUDE.md` for user conventions | `.claude/CLAUDE.md` | Inherit punctuation, formatting, tone preferences |
 | 14 | Initial commit | Project root | |
 
-The canonical `docs/` structure (Step 7) contains 9 subdirectories per DSM_0.1:
+The canonical `dsm-docs/` structure (Step 7) contains 9 subdirectories per DSM_0.1:
 `blog/`, `checkpoints/`, `decisions/`, `feedback-to-dsm/`, `guides/`, `handoffs/` (with
 `done/`), `inbox/`, `plans/`, `research/`.
 
@@ -1844,16 +1844,16 @@ and gets deleted.
 This is a DSM ecosystem project. Read `.claude/CLAUDE.md` for methodology
 and interaction protocols.
 
-Read the preliminary plan in `docs/research/` to understand the project
+Read the preliminary plan in `dsm-docs/research/` to understand the project
 goals and initial design direction.
 
 Based on the preliminary plan:
 1. Do extensive research to validate and expand on the plan. Document
-   findings with citations in `docs/research/`.
-2. Create a project plan in `docs/plans/` covering scope, phases,
+   findings with citations in `dsm-docs/research/`.
+2. Create a project plan in `dsm-docs/plans/` covering scope, phases,
    deliverables, and success criteria.
 3. Present the plan for review and approval before starting implementation.
-4. Create AI collaboration norms in `docs/guides/ai-collaboration.md`
+4. Create AI collaboration norms in `dsm-docs/guides/ai-collaboration.md`
    (see DSM_3 Section 6.7.3).
 ```
 
@@ -1882,7 +1882,7 @@ explicitly restate.
 
 #### 6.7.3. AI Collaboration Norms
 
-As part of project initialization, create `docs/guides/ai-collaboration.md`
+As part of project initialization, create `dsm-docs/guides/ai-collaboration.md`
 capturing how human-AI collaboration works for this specific project:
 
 - **Protocol applicability:** Which inherited DSM protocols apply, which are
@@ -1900,14 +1900,14 @@ for what to expect from the agent's behavior.
 
 For external contributions, the equivalent step is assessing the upstream AI
 policy (Section 6.6.4) and documenting collaboration approach in the governance
-folder (`{contributions-docs-path}/{project}/docs/guides/ai-collaboration.md`).
+folder (`{contributions-docs-path}/{project}/dsm-docs/guides/ai-collaboration.md`).
 
 #### Anti-Patterns
 
 **DO NOT:**
 - Skip the ecosystem path registry (Step 4); without it, cross-repo operations
   (inbox push, feedback handover) silently fail
-- Place the first-session prompt in `docs/handoffs/`; it is a transient action
+- Place the first-session prompt in `dsm-docs/handoffs/`; it is a transient action
   item, not a session continuity document
 - Copy the full DSM_0.2 protocol list into the AI collaboration norms; reference
   the Protocol Applicability table pattern from Section 6.6.5 and customize for
@@ -1927,9 +1927,9 @@ adoption checklist before the standard initialization (Section 6.7 checklist).
 1. Discover: list all non-DSM session artifacts (`context/`, handoffs,
    checkpoints, memory files at project root)
 2. Classify and migrate:
-   - `context/*.md` or loose handoff files → `docs/handoffs/done/` with
+   - `context/*.md` or loose handoff files → `dsm-docs/handoffs/done/` with
      `**Consumed at:** DSM adoption (YYYY-MM-DD)` annotation
-   - Checkpoint files at root → `docs/checkpoints/done/` with consumed annotation
+   - Checkpoint files at root → `dsm-docs/checkpoints/done/` with consumed annotation
    - Agent-created memory files (e.g., `memody.md`) → extract key user
      preferences into CLAUDE.md, then archive the source file in place
 3. Preserve all originals; they are the user's pre-DSM work record
@@ -2071,7 +2071,7 @@ Project type: Private Documentation. DSM private project pattern
 
 DSM Central --writes--> _inbox/               (methodology updates only)
 {project}   --writes--> DSM Central/_inbox/    (minimal: "feedback available")
-DSM Central <--reads--- docs/feedback-to-dsm/         (sanitized by user, read-only)
+DSM Central <--reads--- dsm-docs/feedback-to-dsm/         (sanitized by user, read-only)
 
 ### Session Transcript Protocol (reinforces inherited protocol)
 
@@ -2101,7 +2101,7 @@ Extend the Agent Constraints with project-specific sensitive data types
   plan/
     backlog/               (project-specific enhancements, tech debt)
       done/
-  docs/
+  dsm-docs/
     decisions/
     feedback-to-dsm/       (per-session: YYYY-MM-DD_sN_{type}.md)
       done/
@@ -2122,7 +2122,7 @@ domain content.
 ```
 DSM Central --writes--> {project}/_inbox/         (methodology updates only)
 {project}   --writes--> DSM Central/_inbox/       (minimal: "feedback available")
-DSM Central <--reads--- {project}/docs/feedback-to-dsm/  (sanitized by user)
+DSM Central <--reads--- {project}/dsm-docs/feedback-to-dsm/  (sanitized by user)
 ```
 
 No other cross-boundary data flow. The user is the sanitization gate.
@@ -2135,7 +2135,7 @@ to `{project}/_inbox/` using the standard inbox entry format (Section 6.4).
 The agent processes these at session start per DSM_0.2 Inbox Check.
 
 **Outbound (project to DSM Central):**
-The agent writes per-session feedback files to `{project}/docs/feedback-to-dsm/`
+The agent writes per-session feedback files to `{project}/dsm-docs/feedback-to-dsm/`
 during the session. At wrap-up:
 1. Agent lists feedback files that are ripe
 2. User reviews content for personal data and confirms sanitization
@@ -2151,14 +2151,14 @@ during the session. At wrap-up:
 
 Sanitized feedback is available for review.
 
-**Feedback file:** `{project-path}/docs/feedback-to-dsm/{filename}`
+**Feedback file:** `{project-path}/dsm-docs/feedback-to-dsm/{filename}`
 ```
 
 The notification contains only the file path, never project content.
 DSM Central reads the feedback file directly when processing the inbox entry.
 
 4. After DSM Central processes the feedback, the source file moves to
-   `docs/feedback-to-dsm/done/`
+   `dsm-docs/feedback-to-dsm/done/`
 
 **Receiver-side validation (DSM Central):**
 When DSM Central reads a feedback file from a private project, it must scan
@@ -2313,7 +2313,7 @@ Standard spoke pattern (see DSM_3 Section 6.9).
   plan/
     backlog/               (project-specific enhancements, tech debt)
       done/
-  docs/
+  dsm-docs/
     blog/
       done/
     checkpoints/
@@ -2337,7 +2337,7 @@ See DSM_0.1 for the full nine-subdirectory canonical structure.
 DSM Central  --writes--> {project}/_inbox/          (methodology updates, backlog proposals)
 {project}    --writes--> DSM Central/_inbox/        (feedback, README notifications)
 {project}    --writes--> portfolio/_inbox/          (README notifications)
-DSM Central  <--reads--- {project}/docs/feedback-to-dsm/   (methodology observations, backlogs)
+DSM Central  <--reads--- {project}/dsm-docs/feedback-to-dsm/   (methodology observations, backlogs)
 ```
 
 Full bidirectional communication. The agent executes inbox and feedback
@@ -2465,7 +2465,7 @@ referencing DSM externally, select projects relevant to the context.
 - Residential Heating DS Guide: 6K-line domain knowledge base, German standards documentation
 - Residential Energy Apps: Heating curve simulator, Streamlit app, RANSAC regression
 
-**DSM Tooling (dog-fooding):** See also `docs/core-tools.md` for the authoritative
+**DSM Tooling (dog-fooding):** See also `dsm-docs/core-tools.md` for the authoritative
 Core Tools registry (branding, ecosystem-wide updates).
 - DSM Graph Explorer: Cross-reference validation, 471 tests, 95% coverage
 - Take AI Bite: Public-facing framework distribution, curated DSM subset for external adoption

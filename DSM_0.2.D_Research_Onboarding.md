@@ -12,7 +12,7 @@ protocol listed in the dispatch table is needed.
 
 ---
 
-## Breaking Change Notification Protocol
+## 1. Breaking Change Notification Protocol
 
 When DSM_0.2 introduces a breaking change, DSM Central must notify all spoke projects
 and external contributions so they can update their Protocol Applicability tables.
@@ -66,7 +66,7 @@ decision. See DSM_3 Section 6.4.6 for the spoke-side handling process.
 
 ---
 
-## External DSM Descriptions
+## 2. External DSM Descriptions
 
 When describing DSM in external-facing documents (job applications, portfolio,
 blog posts, LinkedIn), use the canonical descriptions in **DSM_3 Section 7**
@@ -75,7 +75,7 @@ full versions with critical framing rules that prevent misattribution.
 
 ---
 
-## Step 0: Situational Assessment
+## 3. Step 0: Situational Assessment
 
 Before research or implementation, understand the situation: governance,
 dynamics, contribution model, and codebase structure. This is the most
@@ -109,7 +109,7 @@ completes before Phase 0.5 begins.
 
 ---
 
-## Phase 0.5: Research and Grounding (Optional)
+## 4. Phase 0.5: Research and Grounding (Optional)
 
 Before sprint planning, consider whether a research phase would strengthen the project:
 
@@ -131,7 +131,7 @@ at any scale and suggests research when unresolved uncertainty exists:
 | Planning unit | Research depth | Output |
 |--------------|---------------|--------|
 | Feature | ~10 minutes, inline in session | Decision noted in transcript |
-| Sprint | Targeted research doc in `docs/research/` | Findings inform sprint plan |
+| Sprint | Targeted research doc in `dsm-docs/research/` | Findings inform sprint plan |
 | Epoch/project | Full Phase 0.5 with checkpoints | Research file + validation gate |
 
 **Proactive suggestion:** When the agent detects uncertainty in a planning
@@ -171,8 +171,8 @@ build a concrete plan with actionable items (requirements, breakdown, tasks)?"
    for systematic codebase analysis). Cast a wide net before filtering.
 2. **Consume and cluster:** Read all sources and cluster findings by **topic**, not by
    source. This prevents siloed summaries and surfaces cross-source patterns. Move
-   consumed reference files to `docs/research/done/` as they are processed.
-3. **Synthesize:** Write a consolidated synthesis document in `docs/research/` organized
+   consumed reference files to `dsm-docs/research/done/` as they are processed.
+3. **Synthesize:** Write a consolidated synthesis document in `dsm-docs/research/` organized
    by topic cluster. Each cluster should have findings, evidence, and implications for
    the target outcome. Cite all sources with full metadata per DSM_0.1 Citation
    Standards: author, title, institution/publisher, date, and URL where available.
@@ -196,7 +196,7 @@ build a concrete plan with actionable items (requirements, breakdown, tasks)?"
 - **Citation scope restriction:** Upstream-facing documents cite public URLs only, never
   DSM internal file paths. Internal research files may cite DSM paths freely.
 
-**Deliverable:** `docs/research/{YYYY-MM-DD}_{topic}_research.md` with findings, citations, and
+**Deliverable:** `dsm-docs/research/{YYYY-MM-DD}_{topic}_research.md` with findings, citations, and
 implications for project design. Research should directly inform the sprint plan.
 
 **Research file header:** All research files should include:
@@ -226,7 +226,7 @@ claim. This gate is especially critical for upstream-facing documents where
 inaccurate claims damage contributor credibility.
 
 **done/ convention:** When research has been processed into its target outcome,
-complete this checklist before moving the file to `docs/research/done/`:
+complete this checklist before moving the file to `dsm-docs/research/done/`:
 
 1. Set `Status:` to `Done`
 2. Fill in `Date Completed:` with today's date
@@ -235,7 +235,7 @@ complete this checklist before moving the file to `docs/research/done/`:
 
 Do not move files to done/ without completing this checklist. This keeps the
 active research directory clean and provides traceability from research to
-outcome. See DSM_0.1 for the full done/ convention across all docs/ folders.
+outcome. See DSM_0.1 for the full done/ convention across all dsm-dsm-docs/ folders.
 
 **Research phase guard:** Research can expand without bound. To prevent unbounded
 exploration, checkpoint after each distinct cluster of findings:
@@ -268,7 +268,7 @@ session transcript.
 
 **Trigger:** When the agent conducts research involving web searches, external
 source analysis, or multi-source comparison to inform a task, write a structured
-document to `docs/research/` as part of the research process, not after. Use the
+document to `dsm-docs/research/` as part of the research process, not after. Use the
 standard research file header (Purpose, Target Outcome, Status, dates). The
 session transcript captures reasoning; the research artifact captures conclusions
 for future sessions.
@@ -280,11 +280,11 @@ config value) do not need a research artifact.
 **Relationship to Phase 0.5:** Phase 0.5 is a planned phase with checkpoints and
 validation gates. Ad-hoc research documentation is a lightweight trigger with no
 gate; the agent writes the artifact and continues. Both use the same file
-conventions (`docs/research/`, standard header, done/ convention).
+conventions (`dsm-docs/research/`, standard header, done/ convention).
 
 ---
 
-## Environment Preflight Protocol (Optional)
+## 5. Environment Preflight Protocol (Optional)
 
 Projects with native toolchains (Android/Kotlin, C/C++, Rust with system deps,
 embedded development) have system-level dependencies that surface one at a time
@@ -325,10 +325,10 @@ dependencies upfront.
 
 ---
 
-## First Session Prompt for New Projects
+## 6. First Session Prompt for New Projects
 
 When a new DSM spoke project is scaffolded, it starts with a preliminary plan in
-`docs/research/`. The first session in the project should follow a research-to-plan
+`dsm-docs/research/`. The first session in the project should follow a research-to-plan
 pipeline before any implementation begins. Send this prompt as an inbox entry to the
 spoke project's `_inbox/`. It is a hub-to-spoke action item (arrives, gets processed,
 gets deleted), not a session continuity document.
@@ -341,16 +341,16 @@ The prompt content:
 This is a DSM ecosystem project. Read `.claude/CLAUDE.md` for methodology
 and interaction protocols.
 
-Read the preliminary plan in `docs/research/` to understand the project
+Read the preliminary plan in `dsm-docs/research/` to understand the project
 goals and initial design direction.
 
 Based on the preliminary plan:
 1. Do extensive research to validate and expand on the plan. Document
-   findings with citations in `docs/research/`.
-2. Create a project plan in `docs/plans/` covering scope, phases,
+   findings with citations in `dsm-docs/research/`.
+2. Create a project plan in `dsm-docs/plans/` covering scope, phases,
    deliverables, and success criteria.
 3. Present the plan for review and approval before starting implementation.
-4. Create AI collaboration norms in `docs/guides/ai-collaboration.md`
+4. Create AI collaboration norms in `dsm-docs/guides/ai-collaboration.md`
    (see DSM_3 Section 6.7.3).
 ```
 
@@ -367,7 +367,7 @@ exploration leads to plan revisions that waste context.
 
 ---
 
-## Phase-to-DSM-Section Mapping
+## 7. Phase-to-DSM-Section Mapping
 
 When planning sprint phases, reference the appropriate DSM sections:
 
@@ -384,7 +384,7 @@ For evaluation phases, check Appendix C.1 for experiment templates before buildi
 custom evaluation harnesses.
 
 **Blog pipeline quick reference:** The blog content pipeline uses three document
-types in `docs/blog/`:
+types in `dsm-docs/blog/`:
 
 | Stage | File | Purpose |
 |-------|------|---------|
@@ -398,7 +398,7 @@ should reinforce the full template in their project CLAUDE.md.
 
 ---
 
-## Command File Version Tracking
+## 8. Command File Version Tracking
 
 All DSM command files (user-level and project-level) have their canonical source
 in `scripts/commands/` within DSM Central. The sync script deploys them to their

@@ -20,7 +20,7 @@ This command is only valid when the session will continue with `/dsm-light-go` n
 2. **Feature branch safety push:** Before committing, check if the current branch is a feature branch (not main/master) with unpushed commits. If so, push the branch to remote (`git push -u origin {branch}`) to ensure remote backup before the session gap. Report: "Pushed feature branch {branch} to remote for safety."
 3. **Git commit + push:** Stage all session changes, commit, and push. Commit message format: "Session N (light): [brief description]"
    This runs BEFORE the checkpoint so that the checkpoint reflects the actual committed state (commit hash, clean working tree).
-4. **Checkpoint:** Create a minimal checkpoint in `docs/checkpoints/` with:
+4. **Checkpoint:** Create a minimal checkpoint in `dsm-docs/checkpoints/` with:
    - Current task state (what was done, what remains)
    - Branch and commit state (from the commit in step 3)
    - Deferred items list:

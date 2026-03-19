@@ -313,7 +313,7 @@ is not disclosed prominently, and the defaults favor the tool vendor.
    what the terms were when you last checked.
 2. **Document** the tool, tier, date terms were verified, and any
    restrictions. Record this alongside the asset (e.g., in a creation log,
-   `docs/assets/` manifest, or inline in the session transcript).
+   `dsm-docs/assets/` manifest, or inline in the session transcript).
 3. **Flag high-risk scenarios:**
    - Free tier with no commercial use rights
    - Tool retains ownership of generated outputs
@@ -342,7 +342,7 @@ across blog, GitHub, and LinkedIn. Recraft's free tier retains full
 ownership of generated images (policy effective 2024-08-12). Discovery
 required replacement across 6+ deployment targets (favicon, navigation
 bar, OpenGraph, social preview, GitHub repository image, LinkedIn post).
-Full incident documented in `dsm-blog-poster/docs/logo-creation.md`.
+Full incident documented in `dsm-blog-poster/dsm-docs/logo-creation.md`.
 
 ### 1.9 Think Ahead
 
@@ -413,8 +413,8 @@ evidence.
 38-item strategic roadmap (March 2026). The roadmap system (BL-211) was not
 planned at the start; it emerged when the backlog reached ~30 active items and
 the acceleration curve (0.7 → 10.1 commits/day) made ad-hoc prioritization
-unsustainable. Full analysis: `docs/research/2026-03-16_dsm-evolution-git-history-analysis.md`
-and `docs/research/2026-03-16_dsm-feature-inventory.md`.
+unsustainable. Full analysis: `dsm-docs/research/2026-03-16_dsm-evolution-git-history-analysis.md`
+and `dsm-docs/research/2026-03-16_dsm-feature-inventory.md`.
 
 ---
 
@@ -430,7 +430,7 @@ to existing DSM protocols and identifies the gaps that remain.
 
 | Protocol | DSM Location | Principle |
 |----------|-------------|-----------|
-| Project scaffolding (backlog item, CLAUDE.md, docs/ structure) | DSM_3, DSM_0.1 | Critical Thinking |
+| Project scaffolding (backlog item, CLAUDE.md, dsm-docs/ structure) | DSM_3, DSM_0.1 | Critical Thinking |
 | First Session Prompt (research -> plan -> approve -> implement) | DSM_0.2 | Critical Thinking, Earn Your Assertions |
 | Phase 0.5: Research and Grounding | DSM_0.2 | Earn Your Assertions, Know Your Context |
 | Plan Mode Protocol (explore, design, present for approval) | DSM_0.2 | Earn Your Assertions, Critical Thinking |
@@ -464,7 +464,7 @@ to existing DSM protocols and identifies the gaps that remain.
 | Feedback Tracking (methodology.md, backlogs.md) | DSM_0.2 | Critical Thinking |
 | Session-End Inbox Push (ripe feedback to hub) | DSM_0.2 | Know Your Context |
 | Backlog System (improvements, developments, done) | CLAUDE.md | Critical Thinking |
-| Decision Logging (docs/decisions/) | DSM_5.0 | The Human Brings the Spark |
+| Decision Logging (dsm-docs/decisions/) | DSM_5.0 | The Human Brings the Spark |
 | Gateway Review Protocol | DSM 1.0, Section 6.5 | Understand/Review/Decide, Earn Your Assertions |
 | Factual Accuracy, No Guessing | DSM 1.0, Section 1.3.5 | Earn Your Assertions |
 | Destructive Command Protocol | DSM_0.2 | Understand/Review/Decide, Earn Your Assertions |
@@ -473,7 +473,7 @@ to existing DSM protocols and identifies the gaps that remain.
 
 | Protocol | DSM Location | Principle |
 |----------|-------------|-----------|
-| Blog and Post artifacts (docs/blog/) | DSM_0.1, DSM 1.0 Section 2.5.9 | The Human Brings the Spark |
+| Blog and Post artifacts (dsm-docs/blog/) | DSM_0.1, DSM 1.0 Section 2.5.9 | The Human Brings the Spark |
 | Canonical External Descriptions | DSM_3 Section 7 | Match the Room |
 | README Change Notification | DSM_0.2 | Know Your Context |
 | Hub-Spoke Inbox system | DSM_3, DSM_0.2 | Know Your Context |
@@ -562,13 +562,13 @@ working":
 |-------|----------|-----------|
 | Operational | Document structure conventions (DSM_0.1) | How things are organized |
 | Philosophical | Principles (this document) | What we value |
-| Linguistic | Vocabulary (`docs/guides/dsm-vocabulary.md`) | How we name what we do |
+| Linguistic | Vocabulary (`dsm-docs/guides/dsm-vocabulary.md`) | How we name what we do |
 
 The vocabulary grows as the methodology encounters new situations, extending
 from single-session collaboration (formal principles) to ecosystem-level
 patterns (emergent concepts like Ripple Effect and My Fork, My Rules).
 
-**Canonical registry:** `docs/guides/dsm-vocabulary.md` in DSM Central.
+**Canonical registry:** `dsm-docs/guides/dsm-vocabulary.md` in DSM Central.
 
 ---
 

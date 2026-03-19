@@ -16,7 +16,7 @@ At session start, identify the project type by examining the directory structure
 | `notebooks/` only, no `src/` | Data Science | DSM 1.0 (Sections 2.1-2.5) |
 | `src/`, `tests/`, `app.py` | Application | DSM 4.0 |
 | Both `notebooks/` and `src/` | Hybrid | DSM 1.0 for analysis, DSM 4.0 for modules |
-| `docs/`, markdown-only, no `notebooks/` or `src/` | Documentation | DSM 5.0 |
+| `dsm-docs/`, markdown-only, no `notebooks/` or `src/` | Documentation | DSM 5.0 |
 | `{contributions-docs-path}/{project}/` exists | External Contribution | DSM_3 Section 6.6 |
 
 **State the identified type at session start:**
@@ -52,7 +52,7 @@ explicitly override every inherited DSM_0.2 protocol.
 
 ## Session-Start Version Check
 
-At session start in spoke projects, compare the DSM version in the header above against the version recorded in the most recent handoff (`docs/handoffs/`). If the versions differ:
+At session start in spoke projects, compare the DSM version in the header above against the version recorded in the most recent handoff (`dsm-docs/handoffs/`). If the versions differ:
 1. Note the update: "DSM updated from vX.Y.Z to vA.B.C since last session"
 2. Check the DSM CHANGELOG for changes between those versions
 3. Apply any updated protocols for this session
@@ -103,7 +103,7 @@ copy full feedback files, methodology documents, or backlog lists into the inbox
 When creating `_inbox/`, also create the `_inbox/done/` subdirectory for
 processed entries.
 
-**Migration:** If `docs/backlog/` or `docs/inbox/` exists (legacy conventions),
+**Migration:** If `dsm-docs/backlog/` or `dsm-docs/inbox/` exists (legacy conventions),
 move contents to `_inbox/` at project root, create the README.md, and remove the
 old directory.
 
@@ -131,7 +131,7 @@ import in this project's CLAUDE.md. Write the confirmation to
 **Source:** [this project name]
 
 Inbox system initialized. _inbox/ created at project root (or migrated from
-docs/inbox/). README.md with entry template installed. Ready to receive and
+dsm-docs/inbox/). README.md with entry template installed. Ready to receive and
 send inbox entries per DSM_3 Section 6.4.
 ```
 

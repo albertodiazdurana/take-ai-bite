@@ -29,7 +29,7 @@
 
 ## 2. Project Structure Patterns
 
-Both DSM 1.0 and 4.0 projects keep documentation in-repo under `docs/`. The CLAUDE.md `@` reference imports methodology content from DSM Central.
+Both DSM 1.0 and 4.0 projects keep documentation in-repo under `dsm-docs/`. The CLAUDE.md `@` reference imports methodology content from DSM Central.
 
 ### 2.1 DSM 1.0 Pattern (Data Science Projects)
 
@@ -39,7 +39,7 @@ my-analysis/
 ├── _inbox/                         # Hub-spoke communication (DSM_3 Section 6.4)
 ├── notebooks/
 ├── data/
-├── docs/
+├── dsm-docs/
 │   ├── handoffs/                   # Session continuity documents
 │   ├── checkpoints/                # Progress checkpoints
 │   ├── feedback-to-dsm/            # Methodology feedback (optional)
@@ -97,10 +97,10 @@ D:\data-science\
 
 | Project Type | Deliverables | Pattern | Examples |
 |--------------|--------------|---------|----------|
-| **Data Science** | Notebooks, analysis, insights | In-repo `docs/` | TravelTide segmentation, Favorita forecasting, NLP classification |
-| **ML Application** | Python packages, APIs, services | In-repo `docs/` | RAG system, prediction API, recommendation engine |
-| **Documentation Tool** | CLI tools, parsers, validators | In-repo `docs/` | DSM Graph Explorer, markdown processors |
-| **Hybrid** | Notebooks + production code | In-repo `docs/` | Research → production pipeline |
+| **Data Science** | Notebooks, analysis, insights | In-repo `dsm-docs/` | TravelTide segmentation, Favorita forecasting, NLP classification |
+| **ML Application** | Python packages, APIs, services | In-repo `dsm-docs/` | RAG system, prediction API, recommendation engine |
+| **Documentation Tool** | CLI tools, parsers, validators | In-repo `dsm-docs/` | DSM Graph Explorer, markdown processors |
+| **Hybrid** | Notebooks + production code | In-repo `dsm-docs/` | Research → production pipeline |
 
 ### 2.4 Agent Context
 
@@ -108,14 +108,14 @@ D:\data-science\
 - Create `.claude/CLAUDE.md` with `@/path/to/DSM_0.2_Custom_Instructions_v1.1.md`
 - The `@` reference imports methodology content automatically
 - Project-specific instructions follow after the `@` reference
-- Session handoffs in `docs/handoffs/` provide continuity between sessions
+- Session handoffs in `dsm-docs/handoffs/` provide continuity between sessions
 
 ### 2.5 Migration Guidance
 
-**Projects with separate `_Project_Knowledge/` repos:** Migrate session artifacts into the main project's `docs/` folder:
-- `session_handoffs/` → `docs/handoffs/`
-- `decisions/` → tracked via backlog items or `docs/decisions/`
-- `checkpoints/` → `docs/checkpoints/`
+**Projects with separate `_Project_Knowledge/` repos:** Migrate session artifacts into the main project's `dsm-docs/` folder:
+- `session_handoffs/` → `dsm-docs/handoffs/`
+- `decisions/` → tracked via backlog items or `dsm-docs/decisions/`
+- `checkpoints/` → `dsm-docs/checkpoints/`
 
 ---
 
@@ -966,7 +966,7 @@ These topics are outside DSM scope but are important for production ML systems. 
 
 **v1.3 (January 2026):**
 - Added Section 2: Project Structure Patterns (BACKLOG-038)
-  - Unified in-repo `docs/` pattern for both DSM 1.0 and 4.0
+  - Unified in-repo `dsm-docs/` pattern for both DSM 1.0 and 4.0
   - CLAUDE.md `@` reference for methodology context
   - Migration guidance for legacy `_Project_Knowledge/` repos
   - Renumbered all subsequent sections (old Section 2 → Section 3, etc.)

@@ -11,7 +11,7 @@
 Use DSM 5.0 when the project's primary output is written documentation: methodology guides, knowledge bases, portfolios, blog sites, or technical writing.
 
 **Indicators:**
-- Directory contains `docs/`, markdown files, and configuration, but no `notebooks/` or `src/`
+- Directory contains `dsm-docs/`, markdown files, and configuration, but no `notebooks/` or `src/`
 - Deliverables are documents, not code artifacts or analytical results
 - Version control tracks content changes, not code changes
 
@@ -42,7 +42,7 @@ project-root/
   CHANGELOG.md                  # Version history (keepachangelog format)
   LICENSE                       # License file
   .gitignore                    # Git ignore rules
-  docs/                         # Project outputs
+  dsm-docs/                     # Project outputs
     blog/                       # Blog materials and posts
     checkpoints/                # Milestone snapshots (historical)
     handoffs/                   # Session-end resumption documents
@@ -65,7 +65,7 @@ project-root/
 
 **Hub projects** (methodology repositories): Include `plan/backlog/`, `contributions-docs/`, `case-studies/`, core methodology files in root.
 
-**Spoke projects** (documentation that follows DSM): Simpler layout. May only need `docs/`, `README.md`, `.claude/`. Add `plan/` and `templates/` as complexity grows.
+**Spoke projects** (documentation that follows DSM): Simpler layout. May only need `dsm-docs/`, `README.md`, `.claude/`. Add `plan/` and `templates/` as complexity grows.
 
 ---
 
@@ -264,9 +264,9 @@ A documentation sprint is complete when:
 
 ### 8.2 Checkpoints vs Handoffs
 
-**Checkpoints** (`docs/checkpoints/`): Historical milestone snapshots. Created at significant milestones (releases, major feature completions). Kept permanently as recovery points.
+**Checkpoints** (`dsm-docs/checkpoints/`): Historical milestone snapshots. Created at significant milestones (releases, major feature completions). Kept permanently as recovery points.
 
-**Handoffs** (`docs/handoffs/`): Session-end resumption documents. Created every session that has pending work. Consumed and replaced by the next session.
+**Handoffs** (`dsm-docs/handoffs/`): Session-end resumption documents. Created every session that has pending work. Consumed and replaced by the next session.
 
 ### 8.3 Session Close-Out
 
@@ -299,11 +299,11 @@ For projects with extensive cross-references:
 ### 9.3 Feedback Integration
 
 Documentation projects in the DSM ecosystem should track methodology effectiveness:
-- `docs/feedback-to-dsm/methodology.md`: Per-section scores for DSM guidance used
-- `docs/feedback-to-dsm/backlogs.md`: Feedback-derived backlog items for DSM Central
+- `dsm-docs/feedback-to-dsm/methodology.md`: Per-section scores for DSM guidance used
+- `dsm-docs/feedback-to-dsm/backlogs.md`: Feedback-derived backlog items for DSM Central
 
 **Hub exemption:** Hub projects (DSM Central) route improvements directly to
-`plan/backlog/`; the `docs/feedback-to-dsm/` directory pattern applies to spoke projects
+`plan/backlog/`; the `dsm-docs/feedback-to-dsm/` directory pattern applies to spoke projects
 that propose changes upstream. The hub processes incoming feedback via `_inbox/`
 and creates backlog items directly.
 

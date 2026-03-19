@@ -37,14 +37,14 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop: "Parallel
      - Uncommitted changes on the current branch overlap with the planned work scope
    - If stopped, explain the conflict and ask the user to reframe the work scope to avoid overlap. Do NOT proceed until the conflict is resolved.
 
-5. **Determine BL number:** Read `docs/plans/README.md` (or equivalent backlog tracker) to find the highest existing BL number. The new BL number is highest + 1.
+5. **Determine BL number:** Read `dsm-docs/plans/README.md` (or equivalent backlog tracker) to find the highest existing BL number. The new BL number is highest + 1.
 
 6. **Create branch and BL folder:**
    ```bash
    git checkout -b parallel/{descriptor}
-   mkdir -p docs/plans/BL-{NNN}-{descriptor}/
+   mkdir -p dsm-docs/plans/BL-{NNN}-{descriptor}/
    ```
-   Create a brief `docs/plans/BL-{NNN}-{descriptor}/README.md` with:
+   Create a brief `dsm-docs/plans/BL-{NNN}-{descriptor}/README.md` with:
    ```markdown
    # BL-{NNN}: {Task title}
 
@@ -62,7 +62,7 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop: "Parallel
 7. **Report and begin:**
    ```
    Branch: parallel/{descriptor}
-   BL folder: docs/plans/BL-{NNN}-{descriptor}/
+   BL folder: dsm-docs/plans/BL-{NNN}-{descriptor}/
    Safety check: OK (no conflicts detected)
 
    Starting work.
@@ -71,7 +71,7 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop: "Parallel
 
 ## Behavioral Rules (active for entire session)
 
-- **All generated artifacts go into `docs/plans/BL-{NNN}-{descriptor}/`**. No exceptions.
+- **All generated artifacts go into `dsm-docs/plans/BL-{NNN}-{descriptor}/`**. No exceptions.
 - **Never modify shared or central files.** These are determined per-project from CLAUDE.md (source-of-truth files, trackers, READMEs, config files, profile documents, any file serving as a project-wide reference).
 - **Never modify files outside the BL folder** unless they are new files in an isolated subfolder that does not yet exist on main.
 - **No session transcript entries.** Do not append to `.claude/session-transcript.md`.

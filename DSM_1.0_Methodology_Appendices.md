@@ -2951,7 +2951,7 @@ Each experiment folder should contain a `README.md`:
 | Location | Purpose | Content |
 |----------|---------|---------|
 | `data/experiments/` | Executable artifacts | Scripts, results, test data |
-| `docs/experiments/` | Documentation | Detailed reports, methodology discussions |
+| `dsm-docs/experiments/` | Documentation | Detailed reports, methodology discussions |
 
 Link between them in README files for traceability.
 
@@ -4941,10 +4941,10 @@ Proposed -> Active -> [Superseded by DEC-XXX | Rejected | Completed]
 - [File list with paths]
 
 ## Next Session Prompt
-"Continuing [project]. Last completed [X]. Next: [Y]. Review handoff in docs/handoffs/."
+"Continuing [project]. Last completed [X]. Next: [Y]. Review handoff in dsm-docs/handoffs/."
 ```
 
-**Note:** Store in `docs/handoffs/` within the project repository for continuity across sessions.
+**Note:** Store in `dsm-docs/handoffs/` within the project repository for continuity across sessions.
 
 ---
 
@@ -5044,9 +5044,9 @@ print("-" * 70)
 
 required_files = [
     'data/processed/sprint[N]_final_dataset.pkl',
-    'docs/feature_dictionary_v[N].txt',
-    'docs/checkpoints/s0[N]_d05_checkpoint.md',
-    'docs/Sprint[N]_to_Sprint[N+1]_Handoff.md'
+    'dsm-docs/feature_dictionary_v[N].txt',
+    'dsm-docs/checkpoints/s0[N]_d05_checkpoint.md',
+    'dsm-docs/Sprint[N]_to_Sprint[N+1]_Handoff.md'
 ]
 
 missing = []
@@ -5123,7 +5123,7 @@ print("-" * 70)
 
 try:
     # Check checkpoint has no incomplete items
-    checkpoint_path = Path('docs/checkpoints/s0[N]_d05_checkpoint.md')
+    checkpoint_path = Path('dsm-docs/checkpoints/s0[N]_d05_checkpoint.md')
     if checkpoint_path.exists():
         checkpoint_text = checkpoint_path.read_text()
 
@@ -5136,7 +5136,7 @@ try:
             print(f"  OK: All checklist items complete")
 
     # Check handoff document exists and has key sections
-    handoff_path = Path('docs/Sprint[N]_to_Sprint[N+1]_Handoff.md')
+    handoff_path = Path('dsm-docs/Sprint[N]_to_Sprint[N+1]_Handoff.md')
     if handoff_path.exists():
         handoff_text = handoff_path.read_text()
         required_sections = [
@@ -5205,9 +5205,9 @@ python verify_sprint1_complete.py
 # Check 1: Required Files
 # ----------------------------------------------------------------------
 #   OK: data/processed/sprint1_final_dataset.pkl
-#   OK: docs/feature_dictionary_v1.txt
-#   OK: docs/checkpoints/s01_d05_checkpoint.md
-#   OK: docs/Sprint1_to_Sprint2_Handoff.md
+#   OK: dsm-docs/feature_dictionary_v1.txt
+#   OK: dsm-docs/checkpoints/s01_d05_checkpoint.md
+#   OK: dsm-docs/Sprint1_to_Sprint2_Handoff.md
 #   OK: All required files present
 #
 # Check 2: Dataset Quality
@@ -5311,7 +5311,7 @@ project/
 │       ├── features/      # sYY_dXX_FE_*.png
 │       ├── models/        # sYY_dXX_MODEL_*.png
 │       └── final/         # figXX_*.png (Sprint 4)
-└── docs/
+└── dsm-docs/
     ├── decisions/         # DEC-XXX_*.md
     ├── plans/             # sYY_dXX_checkpoint.md, SprintYY_*.md
     └── reports/           # sYY_PHASE_report.md
@@ -5462,12 +5462,12 @@ feedback for DSM improvement.
 
 **NOTE (v1.3.19):** The standalone Validation Tracker has been integrated into
 the project feedback system (Section 6.4.5). Section-level scoring is now part
-of `docs/feedback-to-dsm/methodology.md` rather than a separate file. The template
+of `dsm-docs/feedback-to-dsm/methodology.md` rather than a separate file. The template
 below is retained as reference for the scoring format.
 
 ### E.12.2. Template Structure (Reference)
 
-**File Location:** `docs/feedback-to-dsm/methodology.md` (integrated with project methodology record)
+**File Location:** `dsm-docs/feedback-to-dsm/methodology.md` (integrated with project methodology record)
 
 ```markdown
 # DSM Validation Tracker

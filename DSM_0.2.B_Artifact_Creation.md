@@ -11,7 +11,7 @@ via the Read tool when a protocol listed in the dispatch table is needed.
 
 ---
 
-## Composition Challenge Protocol
+## 1. Composition Challenge Protocol
 
 When the agent produces a multi-item artifact (a test suite, a set of backlog
 items, a batch of configuration entries, a multi-section document), it must
@@ -60,7 +60,7 @@ not more or fewer). Both are required when the artifact is a collection.
 
 ---
 
-## Edit Explanation Stop Protocol
+## 2. Edit Explanation Stop Protocol
 
 When an implementation involves multiple distinct edits within a single file, the
 agent must explain and execute each edit individually, stopping for human review
@@ -108,7 +108,7 @@ next edit.
 
 ---
 
-## Enabling File Content Protocol
+## 3. Enabling File Content Protocol
 
 Enabling files are scope-definition and tracking artifacts. They define *what*
 should be built and track *whether* it was built. They are never the target of
@@ -120,12 +120,12 @@ DSM_6, DSM_0.1, DSM_0.2) or in project deliverables.
 | Artifact | Role | Lives in |
 |----------|------|----------|
 | Backlog item | Defines scope, success criteria, priority | `plan/backlog/` |
-| Checkpoint | Snapshots milestone state, next steps | `docs/checkpoints/` |
-| Decision record | Records a decision and its rationale | `docs/decisions/` |
-| Plan | Structures phases, deliverables, timelines | `docs/plans/` |
-| Epoch/sprint log | Tracks sprint progress and boundaries | `docs/plans/` or project-specific |
-| Handoff | Enables session continuity | `docs/handoffs/` |
-| Blog artifact | Drafts, seeds, publication materials | `docs/blog/` |
+| Checkpoint | Snapshots milestone state, next steps | `dsm-docs/checkpoints/` |
+| Decision record | Records a decision and its rationale | `dsm-docs/decisions/` |
+| Plan | Structures phases, deliverables, timelines | `dsm-docs/plans/` |
+| Epoch/sprint log | Tracks sprint progress and boundaries | `dsm-docs/plans/` or project-specific |
+| Handoff | Enables session continuity | `dsm-docs/handoffs/` |
+| Blog artifact | Drafts, seeds, publication materials | `dsm-docs/blog/` |
 
 **Detection rule:** When the agent encounters any of these patterns in an
 enabling file, it must flag the issue and surface it to the user before
@@ -163,7 +163,7 @@ completed backlog items, which are not part of the active methodology surface.
 
 ---
 
-## Notebook Collaboration Protocol (DSM 1.0 Projects)
+## 4. Notebook Collaboration Protocol (DSM 1.0 Projects)
 
 When working on Jupyter notebook cells:
 
@@ -214,7 +214,7 @@ data shapes, distributions, and errors.
 
 ---
 
-## Notebook-to-Script Transition
+## 5. Notebook-to-Script Transition
 
 When working in notebooks, extract code to standalone scripts when:
 - The next step involves long-running computation (>2 minutes)
@@ -229,13 +229,13 @@ Reference: PM Guidelines Template 8 (Execution Mode)
 
 ---
 
-## App Development Protocol (DSM 4.0 Projects)
+## 6. App Development Protocol (DSM 4.0 Projects)
 
 When building application code (packages, modules, scripts), follow the File Creation
 Loop below. This replaces vague "wait for confirmation" language with a mechanical,
 predictable rhythm.
 
-### File Creation Loop
+### 6.1. File Creation Loop
 
 For each file to be created or modified:
 
@@ -250,7 +250,7 @@ For each file to be created or modified:
 **Build order:** imports, constants, one function, test, next function.
 **TDD:** Write tests in `tests/` alongside code.
 
-### Write Call Size Rule
+### 6.2. Write Call Size Rule
 
 When an initial Write call would produce more than ~150 lines, do not generate the
 entire file at once. Instead, build incrementally:
@@ -267,7 +267,7 @@ This operationalizes the Build order guidance above as a constraint on Write cal
 size. The File Creation Loop controls file-level granularity (one file at a time);
 this rule controls within-file granularity (one logical unit at a time).
 
-### Anti-Patterns
+### 6.3. Anti-Patterns
 
 **DO NOT:**
 - Batch-generate multiple files without stopping between each, user cannot review
@@ -277,7 +277,7 @@ this rule controls within-file granularity (one logical unit at a time).
 - Combine description + file creation in one step, user must review the explanation before the file is created
 - Generate a 300+ line file in a single Write call; build incrementally per the Write Call Size Rule
 
-### User Shortcuts
+### 6.4. User Shortcuts
 
 - "Y" or "yes" = proceed to create the file
 - "N" or "no" = stop, discuss, adjust
@@ -286,7 +286,7 @@ this rule controls within-file granularity (one logical unit at a time).
 
 ---
 
-## Revert Safeguards Protocol
+## 7. Revert Safeguards Protocol
 
 DSM changes often span multiple file categories with different reversibility
 characteristics. Git-tracked files have `git revert`; untracked files (user-level
@@ -300,7 +300,7 @@ changes with a defined trial period.
 safety net), session-scoped artifacts (transcript, baseline) that are ephemeral by
 design, routine mechanical edits (version bumps, date updates).
 
-### Pre-Implementation Snapshot
+### 7.1. Pre-Implementation Snapshot
 
 Before modifying any untracked file, create a snapshot:
 
@@ -328,7 +328,7 @@ The snapshot file uses this format:
 \`\`\`
 ```
 
-### Backlog Item Revert Section
+### 7.2. Backlog Item Revert Section
 
 Every backlog item that modifies untracked files MUST include a **Revert Procedure**
 section with:
@@ -341,7 +341,7 @@ section with:
 The `/dsm-backlog` command prompts for this section when untracked files are
 identified in the scope.
 
-### Feature Branch for Experimental Changes
+### 7.3. Feature Branch for Experimental Changes
 
 When a change is explicitly experimental (trial period, evaluation planned):
 
