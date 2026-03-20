@@ -55,13 +55,30 @@ These principles were developed and validated across real projects spanning:
 
 They are not theoretical; they emerged from daily practice with AI agents across these domains. Practitioners working on complex multi-session tasks independently recreate DSM patterns (checkpoint directories, session handoffs, decision logs) before encountering the framework. DSM formalizes behavior that emerges naturally from deliberate work.
 
-## What's Coming
+## Recent Features
 
-This repository currently contains the philosophical foundation. The full framework is being curated for external publication:
+<details>
+<summary>Latest additions to the framework (click to expand)</summary>
+
+- **Incomplete wrap-up recovery** — When a session ends unexpectedly, the next session detects the gap and reconstructs the missing summary from the archived transcript
+- **Two-Pass Reading Strategy** — Long structured files are read in two passes: structural scan first, then targeted reads of relevant sections
+- **Web Research Capture Protocol** — Raw findings are saved with source URLs before synthesis, ensuring every claim is traceable
+- **Session configuration recommendation** — Each session receives a tailored model and effort configuration based on planned work scope
+- **Strategic roadmap with GitHub Projects** — A three-layer planning system: strategic document, GitHub Projects board, and individual backlog files
+- **Mirror repo sync** — Methodology files are automatically copied to public distribution repos after changes
+- **Branch testing requirement** — Feature branches must be tested before merging, with specific test plans per backlog item
+- **DSM modularization** — Custom instructions split into a core file (always loaded) and four on-demand modules for context efficiency
+- **Ecosystem Path Registry** — Cross-repo paths declared in a local registry, eliminating hardcoded filesystem paths
+- **Parallel session protocol** — Run isolated evaluation tasks on independent branches without interfering with the main session
+
+</details>
+
+See the full timeline of 84+ features → [FEATURES.md](FEATURES.md)
+
+## What's Coming
 
 - **Methodology tracks** for data science, software engineering, documentation, and project management, with templates, case studies, and setup scripts
 - **A queryable knowledge graph** that compiles human-authored methodology into a navigable, interconnected structure, making the ecosystem's accumulated knowledge searchable across projects and sessions
-- **Competitive positioning research** mapping the landscape of human-AI collaboration approaches across three dimensions: human control (posture), knowledge provenance, and experience accumulation. No other framework occupies DSM's position as a living, domain-transferable, practitioner-oriented methodology
 
 ## Links
 
