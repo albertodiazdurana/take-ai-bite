@@ -74,12 +74,12 @@ deleted after processing.
 
 ---
 
-## 2. README Change Notification
+## 2. README and Feature Timeline Change Notification
 
-When a project's `README.md` is updated (content changes, not just formatting),
-send inbox entries to notify downstream consumers. The `/dsm-wrap-up` skill
-automates this check at session end; this section defines the notification
-targets and format.
+When a project's `README.md` or `FEATURES.md` is updated (content changes, not
+just formatting), send inbox entries to notify downstream consumers. The
+`/dsm-wrap-up` skill automates this check at session end; this section defines
+the notification targets and format.
 
 **Notification targets by project type:**
 
@@ -517,15 +517,43 @@ main session picks up merged artifacts
 These are off-limits. If the work scope expands to require shared file edits,
 the parallel session stops and defers to the main session.
 
+**Scope declaration (required at parallel session start):**
+
+The parallel session baseline must include a scope declaration:
+
+```
+# Parallel session baseline
+Task: [brief description]
+Scope: [list of folders/files to be modified]
+Parent branch: [parent session branch name]
+Parent working set: [folders modified by parent since session start]
+```
+
+Before approving the parallel session, verify that the declared scope does not
+overlap with the parent session's working set. If overlap exists, the parallel
+session must be rescoped or blocked.
+
 **Safety checks (before creating branch):**
 1. No uncommitted changes overlapping with planned work scope
 2. No existing `parallel/*` branch targeting the same folder or topic
 3. Planned work does not require shared file modifications
+4. Declared scope does not overlap with parent session's working set
 
 **BL staging folder:** `dsm-docs/plans/BL-{NNN}-{descriptor}/` contains all generated
 artifacts. The folder includes a README.md tracking task description, status, and
 artifact list. The main session reviews this folder after merge and distributes
 artifacts to their proper locations.
+
+**BL number collision prevention:** Before creating any BL in a parallel session,
+the agent must:
+1. Scan all backlog directories (`plan/backlog/improvements/`,
+   `plan/backlog/developments/`, `plan/backlog/done/`, and any subdirectories)
+   for the highest existing BL number
+2. Also check `dsm-docs/plans/` for BL files created outside standard locations
+3. Assign max + 1
+
+This check applies to all sessions but is critical for parallel sessions that
+operate in isolation from the parent session's numbering state.
 
 **Merge strategy:** Wrap-up attempts fast-forward merge to main. If conflicts
 arise, the merge is aborted, the branch is preserved, and the main session
@@ -542,6 +570,31 @@ resolves conflicts manually.
 | Feedback push | Main session handles DSM Central communication |
 | Ecosystem path validation | Unnecessary for isolated tasks |
 
+**Wrap-up conflict verification:** Before merging a parallel session branch,
+the agent must:
+1. Diff the parallel branch against the current parent branch tip
+2. Verify no files were modified outside the declared scope
+3. Verify no BL numbers collide with BLs created on the parent branch since
+   the parallel session started
+4. If conflicts are found, alert the user and abort the merge until resolved
+
+**VS Code branch revert mitigation:** When running parallel sessions via Claude
+Code in VS Code, the IDE may silently revert branch checkouts made by the CLI
+agent. This causes commits to land on the wrong branch.
+
+Mitigations:
+1. **Branch verification before every commit:** Run `git branch --show-current`
+   immediately before `git add`/`git commit`. If the result does not match the
+   expected branch, re-checkout and verify again before proceeding
+2. **Parallel session start gate:** After creating and checking out the parallel
+   branch, verify with `git branch --show-current` before any work begins. If
+   verification fails, warn and retry once. If it fails again, abort with:
+   "VS Code is interfering with branch checkout. Run this parallel session in
+   a separate terminal outside VS Code."
+3. **Worktree alternative:** For parallel sessions in VS Code, consider using
+   `git worktree add` to create an isolated working directory. This avoids the
+   branch checkout conflict entirely since each worktree has its own HEAD
+
 **Anti-Patterns:**
 
 **DO NOT:**
@@ -550,8 +603,10 @@ resolves conflicts manually.
 - Process inbox entries or push feedback from a parallel session
 - Run multiple parallel sessions targeting the same topic or folder
 - Treat parallel session output as final; the main session must review and distribute
+- Create BLs without checking the highest existing number across all backlog directories
+- Skip scope declaration or overlap verification at parallel session start
 
-Reference: BACKLOG-220
+Reference: BACKLOG-220, BACKLOG-243
 
 ---
 

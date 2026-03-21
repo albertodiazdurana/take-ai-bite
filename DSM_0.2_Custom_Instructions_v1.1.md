@@ -274,7 +274,7 @@ tool calls or file edits.
 - Output summary appended AFTER completing work
 - File is ephemeral: content cleared at session end, not committed
 - Transcript is append-only; never modify or backfill past entries
-- Always append at the end of the file; use the last line as the Edit anchor. Never use `old_string` matching earlier content as an insertion point, as this causes out-of-order timestamps
+- **Append technique (mandatory):** Every append to the session transcript MUST follow this sequence: (1) read the last 3 lines of the file, (2) use the last non-empty line as the `old_string` anchor, (3) the `new_string` includes that last line PLUS the new content appended after it. **NEVER** search for earlier content to use as an insertion point. The only valid anchor is the current last line of the file. This is not a style preference; mid-file insertions cause out-of-order timestamps, confuse the user reading the transcript in real time, and have been observed in multiple sessions despite existing guidance (portfolio S44, DSM Central S140)
 - If a past entry was missed, note the gap in the next entry rather than editing history
 
 **Anti-Patterns:**
@@ -285,7 +285,7 @@ tool calls or file edits.
 - Skip the transcript append on turns with non-trivial reasoning
 - Commit the transcript file; it is a session-scoped working artifact
 - Edit or rewrite past transcript entries; each entry reflects reasoning at the time it was written
-- Use Edit with `old_string` matching earlier content to insert entries mid-file; this causes out-of-order timestamps (observed: portfolio S44). Always target the last line for appends
+- Use Edit with `old_string` matching earlier content to insert entries mid-file; this causes out-of-order timestamps (observed: portfolio S44, DSM Central S140). Use the mandatory append technique above
 - Use reasoning delimiters in conversation text; VS Code collapses them after streaming
 
 ---
@@ -395,6 +395,39 @@ this protocol ensures the framework is followed.
 
 ---
 
+## Web Research Capture Protocol
+
+When the agent performs web research (web searches, URL fetches, API queries) whose
+findings will be synthesized into a deliverable, the raw findings must be captured
+before synthesis. Embedding research directly into a deliverable without a traceable
+artifact creates hallucination risk: claims appear research-backed but cannot be
+verified after the session.
+
+**Before synthesizing web research into any deliverable:**
+
+1. Save raw findings with source URLs to `dsm-docs/research/{date}_{topic}.md`
+2. Include: search queries used, URLs visited, key facts extracted, timestamps
+3. Then synthesize into the target document, referencing the research file
+4. Follow Citation Standards (DSM_0.1) for format within both files
+
+**When this protocol applies:**
+- Web searches that produce facts, claims, or data used in a deliverable
+- URL fetches whose content informs analysis or recommendations
+- Any research where the user might later ask "where did this come from?"
+
+**When this protocol does NOT apply:**
+- Internal file reads within the repository (already traceable via git)
+- Quick lookups that produce a single verifiable fact (e.g., checking a version number)
+- Research performed in dedicated research sessions where the deliverable IS the
+  research file itself
+
+This protocol is a behavioral trigger: when the agent recognizes that web research
+will feed into a deliverable, it captures findings first. The Citation Standards in
+DSM_0.1 cover format and placement of citations; this protocol ensures the underlying
+evidence exists to cite.
+
+---
+
 ## Context Budget Protocol
 
 The agent's context window is a finite resource. Large file reads and multi-document
@@ -433,6 +466,48 @@ When a session involves multiple large files or extensive research:
 - Wait until compaction is imminent to mention context pressure; by then the
   user has lost the ability to choose a clean wrap-up
 - Guess remaining context; use system warnings and file sizes as indicators
+
+---
+
+## Two-Pass Reading Strategy for Long Structured Files
+
+When the agent needs to read a structured text file of 200+ lines (markdown,
+plain text, or converted-to-markdown), use a two-pass approach instead of
+sequential chunk reading. Sequential chunks miss items at boundaries and
+provide no structural map before diving into content.
+
+**Trigger:** Structured text files of 200+ lines. Non-markdown, non-text files
+of any size should be converted to markdown first (see `scripts/convert_to_markdown.py`
+in DSM Central), then the protocol applies to the converted output.
+
+**Flow:**
+
+1. **Scope assessment offer:** Agent informs the user: "This file is N lines.
+   Would you like a scope assessment to identify sections we could skip?"
+2. **User decides:** Y (scope filtering) or N (read everything)
+3. **Pass 1 (structural scan):** Agent uses Grep to extract headings, entry
+   markers, and structural boundaries in a single tool call. Produces a skeleton:
+   section titles, nesting levels, approximate line ranges, item counts per section.
+   Patterns by file type:
+   - **Markdown:** `^#{1,6}`, `^- \*\*`, numbered lists, table headers
+   - **Plain text:** ALL CAPS lines, `===`/`---` underlines, numbered section
+     headers (e.g., `1.`, `1.1`), indentation level changes
+4. **Scope filtering gate (conditional):** If user said Y at step 2, the agent
+   presents the skeleton with recommendations: "Based on [current task], these
+   sections appear less relevant: [list with reasons]. Skip them?" User can
+   approve all, approve some, or dismiss all. If user said N, skip this step.
+5. **Pass 2 (semantic extraction):** Agent reads content of sections that
+   survived filtering (or all sections if no filtering). Targeted reads by line
+   range, extracting meaning, key data points, and actionable items.
+
+**Integration with Context Budget Protocol:** The two-pass strategy is the
+implementation technique for the "targeted sections" option in the Context
+Budget Protocol. When that protocol presents options for reading large files,
+the two-pass strategy provides the method for identifying which sections to target.
+
+**Does not apply to:** Code files (which have better tooling: Grep, Glob,
+language-aware search), files under 200 lines (overhead exceeds benefit),
+or files the agent has already read in the current session.
 
 ---
 
@@ -608,6 +683,8 @@ The `@` reference imports protocols as background context, but agents may deprio
   <------------Start Thinking / HH:MM------------>
   [reasoning content]
 - HH:MM is 24-hour local time when thinking begins; no end delimiter needed
+- Append technique: read last 3 lines, use last non-empty line as anchor.
+  NEVER match earlier content for mid-file insertion.
 ```
 
 **WARNING:** Spoke reinforcement blocks must include the literal delimiter syntax shown in the example above. Referencing "Reasoning Delimiter Format" by name is insufficient; agents default to markdown heading style when the syntax is absent from the local CLAUDE.md (observed: AMEX S2-S3, portfolio S35).
@@ -801,6 +878,37 @@ flag titles that fail the test and propose renames.
 
 ---
 
+## Protocol Violation Triage Response
+
+When the agent discovers that a DSM protocol was not followed, whether in the
+current session or inherited from a prior session, it must execute a three-step
+response before continuing other work:
+
+1. **Fix:** Address the immediate issue (e.g., renumber a duplicate BL,
+   move a misplaced file, correct a stale reference)
+2. **Root-cause:** Identify why the violation occurred (e.g., a protocol
+   lacks a validation step, a session skipped a required check, a parallel
+   session had no collision guard)
+3. **Prevent:** Propose a protocol fix or create a BL for the root cause.
+   If the fix is mechanical (adding a check to an existing protocol), propose
+   inline. If it requires design decisions, create a BL
+
+The agent must present all three steps to the user. Skipping steps 2 and 3,
+treating the violation as a one-off cleanup task, is the failure mode this
+protocol prevents.
+
+**Behavioral trigger:** This protocol activates whenever the agent observes:
+- A collision, conflict, or inconsistency caused by a protocol gap
+- An artifact in an unexpected format or location (e.g., BL file outside
+  `plan/backlog/`)
+- A required step that was skipped or executed incorrectly by a prior session
+
+**Scope:** This protocol is in DSM_0.2 core (always loaded via `@`) because
+it must be active in every session across all DSM projects. It is not gated
+behind a module read.
+
+---
+
 ## References
 
 - Preston-Werner, T. (2013). [Semantic Versioning 2.0.0](https://semver.org/)
@@ -819,7 +927,7 @@ All module files are in the same directory as this core file.
 | Protocol | Trigger | Module |
 |----------|---------|--------|
 | Session-End Inbox Push | Session wrap-up, feedback ready to send | [A](DSM_0.2.A_Session_Lifecycle.md) |
-| README Change Notification | README.md modified during session | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| README and Feature Timeline Change Notification | README.md or FEATURES.md modified during session | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | External Contribution Milestone Notification | External contribution session with notable milestone | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | DSM Feedback Tracking | Capturing methodology feedback or backlog proposals | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Technical Progress Reporting | Sprint boundary, engineering work to report | [A](DSM_0.2.A_Session_Lifecycle.md) |
