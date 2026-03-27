@@ -6,6 +6,22 @@
 
 ---
 
+## Contents
+
+1. [When to Use This Adaptation](#1-when-to-use-this-adaptation)
+2. [Project Structure Patterns](#2-project-structure-patterns)
+3. [File Naming Conventions](#3-file-naming-conventions)
+4. [Metadata Standards](#4-metadata-standards)
+5. [Cross-Reference Conventions](#5-cross-reference-conventions)
+6. [Versioning Workflow](#6-versioning-workflow)
+7. [Content Quality Standards](#7-content-quality-standards)
+8. [Session Management for Documentation Projects](#8-session-management-for-documentation-projects)
+9. [Documentation Review Cycle](#9-documentation-review-cycle)
+10. [Integration with Standard DSM](#10-integration-with-standard-dsm)
+11. [Version History](#11-version-history)
+
+---
+
 ## 1. When to Use This Adaptation
 
 Use DSM 5.0 when the project's primary output is written documentation: methodology guides, knowledge bases, portfolios, blog sites, or technical writing.
@@ -17,8 +33,8 @@ Use DSM 5.0 when the project's primary output is written documentation: methodol
 
 **Examples from the DSM ecosystem:**
 - DSM Central (hub, methodology repository)
-- dsm-data-science-portfolio (professional portfolio)
-- dsm-blog-poster (blog site)
+- A professional portfolio project (spoke)
+- A blog platform project (spoke)
 
 **What still applies from DSM 1.0/2.0:**
 - DSM 2.0: Sprint planning, checkpoint protocol, deliverable tracking
@@ -331,7 +347,7 @@ Every documentation project CLAUDE.md must include:
 5. Command execution rules (read-only vs write)
 6. Session management references
 
-See `dsm-data-science-portfolio/.claude/CLAUDE.md` for a working example.
+See a spoke project's `.claude/CLAUDE.md` for a working example.
 
 ---
 

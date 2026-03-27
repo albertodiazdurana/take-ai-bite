@@ -11,6 +11,18 @@ via the Read tool when a protocol listed in the dispatch table is needed.
 
 ---
 
+## Contents
+
+1. [Composition Challenge Protocol](#1-composition-challenge-protocol)
+2. [Edit Explanation Stop Protocol](#2-edit-explanation-stop-protocol)
+3. [Enabling File Content Protocol](#3-enabling-file-content-protocol)
+4. [Notebook Collaboration Protocol (DSM 1.0 Projects)](#4-notebook-collaboration-protocol-dsm-10-projects)
+5. [Notebook-to-Script Transition](#5-notebook-to-script-transition)
+6. [App Development Protocol (DSM 4.0 Projects)](#6-app-development-protocol-dsm-40-projects)
+7. [Revert Safeguards Protocol](#7-revert-safeguards-protocol)
+
+---
+
 ## 1. Composition Challenge Protocol
 
 When the agent produces a multi-item artifact (a test suite, a set of backlog

@@ -9,7 +9,7 @@ Before starting, verify there are uncommitted changes that warrant a version bum
 Walk through each step, showing the user what to do and waiting for confirmation before proceeding:
 
 ### Step 1: Determine Version Number
-- Read current version from `DSM_0_START_HERE_Complete_Guide.md` header
+- Read current version from `DSM_0.0_START_HERE_Complete_Guide.md` header
 - Suggest next patch version (e.g., 1.3.21 -> 1.3.22)
 - Ask user to confirm or specify different version
 

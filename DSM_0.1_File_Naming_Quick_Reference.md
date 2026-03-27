@@ -7,7 +7,25 @@
 
 ---
 
-## Phase Codes
+## Contents
+
+1. [Phase Codes](#1-phase-codes)
+2. [By File Type](#2-by-file-type)
+3. [Examples by Sprint](#3-examples-by-sprint)
+4. [Locations](#4-locations)
+5. [Rules](#5-rules)
+6. [Sprint 4 Consolidation](#6-sprint-4-consolidation)
+7. [Blog Artifacts](#7-blog-artifacts)
+8. [Citation Standards](#8-citation-standards)
+9. [Reference File Size Protocol](#9-reference-file-size-protocol)
+10. [Canonical Spoke Folder Names](#10-canonical-spoke-folder-names)
+11. [Root File Policy](#11-root-file-policy)
+12. [Document Structure: Section Numbering](#12-document-structure-section-numbering)
+13. [Quick Checklist](#13-quick-checklist)
+
+---
+
+## 1. Phase Codes
 - `SETUP` - Environment, data acquisition
 - `EDA` - Exploratory data analysis
 - `FE` - Feature engineering
@@ -16,7 +34,7 @@
 
 ---
 
-## By File Type
+## 2. By File Type
 
 | Type | Working (S1-3) | Final (S4) |
 |------|----------------|------------|
@@ -31,7 +49,7 @@
 
 ---
 
-## Examples by Sprint
+## 3. Examples by Sprint
 
 **Sprint 1 (EDA):**
 - `s01_d01_SETUP_data-inventory.ipynb`
@@ -63,7 +81,7 @@
 
 ---
 
-## Locations
+## 4. Locations
 
 ```
 notebooks/           # sYY_dXX_*.ipynb
@@ -85,7 +103,7 @@ dsm-docs/
 
 ---
 
-## Rules
+## 5. Rules
 
 1. **Sprint-first:** `sYY_dXX` not `dXX_sYY`
 2. **Lowercase descriptions:** `lag-validation` not `Lag_Validation`
@@ -95,7 +113,7 @@ dsm-docs/
 
 ---
 
-## Sprint 4 Consolidation
+## 6. Sprint 4 Consolidation
 
 **Notebooks:** Merge daily → Sequential (01, 02, 03...)
 **Datasets:** Move final to results/, archive working
@@ -104,7 +122,7 @@ dsm-docs/
 
 ---
 
-## Blog Artifacts
+## 7. Blog Artifacts
 
 Blog content follows a three-document pipeline. Each phase has its own file type;
 files progress through the pipeline and move to `dsm-docs/blog/done/` when published.
@@ -119,7 +137,7 @@ Session work → journal.md (append observations)
               dsm-docs/blog/done/ (all related files)
 ```
 
-### Phase 1: Journal (capture)
+### 7.1. Phase 1: Journal (capture)
 
 | File | Pattern | Persistent? |
 |------|---------|-------------|
@@ -138,7 +156,7 @@ Session work → journal.md (append observations)
 {Observation, story, pattern, or insight}
 ```
 
-### Phase 2: Materials (structuring)
+### 7.2. Phase 2: Materials (structuring)
 
 | File | Pattern | Example |
 |------|---------|---------|
@@ -149,7 +167,7 @@ Session work → journal.md (append observations)
 - Contains: working title, story arc, key insights, technical details, draft outline
 - Can also be created directly via explicit user request for specific events
 
-### Phase 3: Publish (drafting + posting)
+### 7.3. Phase 3: Publish (drafting + posting)
 
 | File | Pattern | Example |
 |------|---------|---------|
@@ -187,7 +205,7 @@ and static site generator compatibility.
 active work when you don't yet know which post an observation belongs to. The journal
 exists precisely to decouple capture from structuring.
 
-### Publication Tracker
+### 7.4. Publication Tracker
 
 Every project with blog artifacts maintains a publication tracker at
 `dsm-docs/blog/README.md`. This file serves as the index for all blog content and
@@ -224,7 +242,7 @@ Track creation and publication status of blog materials.
 
 ---
 
-## Citation Standards
+## 8. Citation Standards
 
 **When to cite:**
 
@@ -257,7 +275,7 @@ Track creation and publication status of blog materials.
 
 ---
 
-## Reference File Size Protocol
+## 9. Reference File Size Protocol
 
 Reference files (`_references/`, `dsm-docs/research/`, collected documentation) should
 remain small enough for both the agent and the human to review in a single pass.
@@ -279,7 +297,7 @@ materials should be digestible, not overwhelming.
 
 ---
 
-## Canonical Spoke Folder Names
+## 10. Canonical Spoke Folder Names
 
 Every DSM spoke project uses these exact folder names under `dsm-docs/`:
 
@@ -325,7 +343,7 @@ per-session files fragment the record and leave the canonical files empty.
 
 ---
 
-## Root File Policy
+## 11. Root File Policy
 
 Only ecosystem-required files belong in the project root. All project content
 (plans, documentation, research) goes in the appropriate `dsm-docs/` subdirectory.
@@ -366,7 +384,7 @@ If a file does not serve a tool or platform at root level, it belongs elsewhere.
 
 ---
 
-## Document Structure: Section Numbering
+## 12. Document Structure: Section Numbering
 
 All DSM methodology documents (DSM_0 through DSM_6, including modular files like
 DSM_0.2.A-D) use hierarchical decimal numbering with trailing period at every
@@ -392,7 +410,7 @@ can change, numbers stay), and ordered structure within documents.
 
 ---
 
-## Quick Checklist
+## 13. Quick Checklist
 
 Before creating any file, ask:
 - [ ] Is sprint number first? (`sYY_dXX`)

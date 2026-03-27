@@ -12,6 +12,19 @@ protocol listed in the dispatch table is needed.
 
 ---
 
+## Contents
+
+1. [Breaking Change Notification Protocol](#1-breaking-change-notification-protocol)
+2. [External DSM Descriptions](#2-external-dsm-descriptions)
+3. [Step 0: Situational Assessment](#3-step-0-situational-assessment)
+4. [Phase 0.5: Research and Grounding (Optional)](#4-phase-05-research-and-grounding-optional)
+5. [Environment Preflight Protocol (Optional)](#5-environment-preflight-protocol-optional)
+6. [First Session Prompt for New Projects](#6-first-session-prompt-for-new-projects)
+7. [Phase-to-DSM-Section Mapping](#7-phase-to-dsm-section-mapping)
+8. [Command File Version Tracking](#8-command-file-version-tracking)
+
+---
+
 ## 1. Breaking Change Notification Protocol
 
 When DSM_0.2 introduces a breaking change, DSM Central must notify all spoke projects

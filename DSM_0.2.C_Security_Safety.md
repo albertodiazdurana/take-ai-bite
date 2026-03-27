@@ -11,7 +11,16 @@ dispatch table is needed.
 
 ---
 
-## Secret Exposure Prevention
+## Contents
+
+1. [Secret Exposure Prevention](#1-secret-exposure-prevention)
+2. [Destructive Action Protocol](#2-destructive-action-protocol)
+3. [Untrusted Input Protocol](#3-untrusted-input-protocol)
+4. [Query Sanitization](#4-query-sanitization)
+
+---
+
+## 1. Secret Exposure Prevention
 
 Before staging files for a git commit, the agent must check each filename against
 the following sensitive patterns:
@@ -50,7 +59,7 @@ reduce it.
 
 ---
 
-## Destructive Action Protocol
+## 2. Destructive Action Protocol
 
 Certain non-bash operations carry risks comparable to destructive shell commands.
 These operations require explicit user confirmation before execution, following
@@ -100,7 +109,7 @@ to non-bash agent operations. Both protocols apply simultaneously.
 
 ---
 
-## Untrusted Input Protocol
+## 3. Untrusted Input Protocol
 
 The agent processes content from external sources during normal workflow: inbox
 entries, tool outputs, web fetch results, API responses, and cross-repo file
@@ -198,7 +207,7 @@ protocols form the agent security posture:
 
 ---
 
-## Query Sanitization
+## 4. Query Sanitization
 
 When constructing web search queries, API requests, or external tool inputs from
 local context, the agent must avoid leaking sensitive information. This protocol

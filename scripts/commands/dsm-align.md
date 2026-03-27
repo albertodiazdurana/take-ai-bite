@@ -26,8 +26,7 @@ Before starting alignment, check if git is initialized:
 
 2. **Check and fix `_inbox/` at project root:**
    - If `dsm-docs/backlog/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox (`~/dsm-agentic-ai-data-science-methodology/_inbox/{project-name}.md`).
-   - If `dsm-docs/inbox/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox.
-   - If `_inbox/` does not exist: create it.
+   - If `_inbox/` does not exist: create it. The canonical location is always `_inbox/` at project root; no other path should be used.
    - If `_inbox/done/` does not exist: create it.
    - If `_inbox/README.md` does not exist: create it from the Inbox Template below.
 
@@ -87,6 +86,26 @@ Before starting alignment, check if git is initialized:
    - If valid: report "CLAUDE.md `@` reference OK"
    - Do NOT auto-fix; report for user action (path depends on local filesystem layout)
 
+7b. **Check CLAUDE.md alignment section:**
+   Requires: Step 7 found a valid `@` reference. If Step 7 reported missing or stale `@`, skip this step.
+   - Look for `<!-- BEGIN DSM_0.2 ALIGNMENT -->` and `<!-- END DSM_0.2 ALIGNMENT -->` in `.claude/CLAUDE.md`
+   - **If delimiters are missing (first run / migration):**
+     a. Detect project type from Step 1
+     b. Read the CLAUDE.md Alignment Template System section in DSM_0.2 (follow the `@` reference to find it)
+     c. Generate the aligned section from the base template + project-type-specific additions
+     d. Identify where project-specific content starts in the current CLAUDE.md (first heading after the `@` reference line, or end of file)
+     e. Insert the delimiters and aligned content between the `@` reference and the project-specific content
+     f. Report: "CLAUDE.md alignment section added. [N] lines of managed content inserted."
+     g. The user reviews and approves via the IDE permission window (Gate 2)
+   - **If delimiters are present (subsequent runs):**
+     a. Extract content between delimiters
+     b. Generate the expected content from the current template for the detected project type
+     c. Compare extracted vs expected
+     d. If identical: report "CLAUDE.md alignment: OK (up to date)"
+     e. If different: report drift with specific lines that differ. Offer: "Regenerate aligned section? (This preserves all content outside the delimiters.)"
+     f. If user accepts: replace content between delimiters with current template
+   - **Validation-only mode:** If the user invoked `/dsm-align` with a `--check` argument or equivalent, report drift without modifying files
+
 8. **Check `.gitattributes`:**
    - If `.gitattributes` does not exist at project root: create it with the template below.
    - If it exists: check that it contains `* text=auto eol=lf`. If missing, **report as warning**: "`.gitattributes` exists but does not enforce LF line endings. CRLF can break the Edit tool on WSL."
@@ -115,6 +134,7 @@ Before starting alignment, check if git is initialized:
    - Fixed: [list of repairs made]
    - Collisions: [list of naming conflicts for user to resolve, or "none"]
    - Warnings: [feedback file violations, consumed handoffs, or "none"]
+   - CLAUDE.md alignment: [OK | Added (N lines) | Drift detected (N lines differ) | Skipped (no @ reference)]
    - .gitattributes: [OK | Created | Warning: missing LF enforcement]
    - Command sync: [OK: N | Drifted: N | Missing: N, or "N/A (not DSM Central)"]
    - Feedback pushed: [count of entries pushed to DSM Central, or "none pending"]

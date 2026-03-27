@@ -6,17 +6,21 @@ The user provides a backlog number (e.g., "042" or "BACKLOG-042").
 
 ## Steps
 
-1. Find the backlog file by searching `plan/backlog/developments/` and `plan/backlog/improvements/` for the matching BACKLOG-XXX number
+1. Find the backlog file by searching `dsm-docs/plans/`, `plan/backlog/developments/`, and `plan/backlog/improvements/` for the matching BACKLOG-XXX number
 2. If not found, report the error and list available backlog items
 3. Read the file and update:
-   - Change `**Status:** Proposed` to `**Status:** Implemented`
+   - Change `**Status:** Proposed` or `**Status:** Active` to `**Status:** Implemented`
    - Add `**Date Implemented:** YYYY-MM-DD` (today's date) after the Status line
-4. Move the file to `plan/backlog/done/` using `mv` (not `git mv`, since it may be untracked)
-5. Update the README in the source directory (`plan/backlog/{developments|improvements}/README.md`):
-   - Remove the item's row from the **Active Items** table
-   - Add a new row to the **Recently Completed** table (at the top, most recent first) with BL#, title, and today's date
-   - If the Recently Completed table does not exist, create it after the Active Items section
-6. Show the user what was done and remind them to commit when ready
+4. Move the file to the `done/` subdirectory of its current location using `mv` (not `git mv`, since it may be untracked). For files in `dsm-docs/plans/`, move to `dsm-docs/plans/done/`. For files in `plan/backlog/`, move to `plan/backlog/done/`.
+5. Update the consolidated README at `dsm-docs/plans/README.md`:
+   - Remove the item's row from its section table
+6. If the file came from `plan/backlog/improvements/` or `plan/backlog/developments/`, also update the README in that source directory:
+   - Remove the item's row from the table
+7. **Feature inventory check:** Ask the user: "Does this BL add a user-facing feature? If yes, I'll add an entry to FEATURES.md." If yes:
+   - Add a chronological entry to `FEATURES.md` at the top of the current month section
+   - Format: `- **F-NNN (YYYY-MM-DD) Feature name** — One-line plain language description`
+   - Increment the feature count in the header
+8. Show the user what was done and remind them to commit when ready
 
 ## Important
 
