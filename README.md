@@ -28,7 +28,7 @@ Seven principles govern how humans and AI agents work together. Each addresses a
 | **Match the Room** | Contribute proportionally to the project's culture and scale. |
 | **Own Your Process** | Disclose how the work was produced. Transparency about method is a professional obligation. |
 
-For the full framework, see [`DSM_AI_COLLABORATION_PRINCIPLES.md`](DSM_AI_COLLABORATION_PRINCIPLES.md).
+For the full framework, see [`DSM_6.0_AI_Collaboration_Principles_v1.0.md`](DSM_6.0_AI_Collaboration_Principles_v1.0.md).
 
 ## The Engine: Deliberate Systematic Methodology (DSM)
 
@@ -40,7 +40,7 @@ This is what makes the avatar possible. Session transcripts capture reasoning. C
 
 ## Start Here
 
-Read [`TAKE-AI-BITE.md`](TAKE-AI-BITE.md) for the short version of the founding principle. It takes two minutes and captures the core idea: someone offers you a bite of a cookie, you take a bite the size you will enjoy; too small and you won't taste the cookie, too much and it will cause a lot of issues.
+Read [`TAKE_A_BITE.md`](TAKE_A_BITE.md) for the short version of the founding principle. It takes two minutes and captures the core idea: someone offers you a bite of a cookie, you take a bite the size you will enjoy; too small and you won't taste the cookie, too much and it will cause a lot of issues.
 
 ## Field-Tested
 
@@ -88,4 +88,7 @@ See the full timeline of 84+ features → [FEATURES.md](FEATURES.md)
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+This project uses dual licensing:
+
+- **Methodology documentation** (DSM_0 through DSM_6, guides, TAKE_A_BITE.md): [CC BY-SA 4.0](LICENSE-DOCS.md)
+- **Software components** (scripts/, configuration files): [MIT](LICENSE)
