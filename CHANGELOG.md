@@ -1,9 +1,401 @@
 # Changelog
 
-All notable changes to the Agentic AI Data Science Methodology will be documented in this file.
+All notable changes to the Deliberate Systematic Methodology (DSM) will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.4.0] - 2026-03-27
+
+### Added - DSM_6.1: Systems Prompt Engineering (BL-258)
+
+- New methodology chapter: DSM_6.1 Systems Prompt Engineering v1.0
+- Core document (362 lines) + 3 modules: Operational Channels (A), Instruction Design Patterns (B), Evaluation and Evolution (C)
+- Covers prompt lifecycle, context layering, behavioral triggers, and evaluation frameworks
+
+### Added - BL-273: Project Finalization Skill
+
+- `/dsm-finalize-project` skill for structured project closure
+- Covers archival, documentation, and stakeholder notification
+
+### Changed - Document Modularization (BL-268, BL-269, BL-270)
+
+- DSM_1.0: Modularized into slim core + 4 modules (A: Core Workflow, B: Working Standards, C: Practices, D: Session Quality)
+- DSM_2.0: Modularized into slim core + 4 modules (A: Planning Templates, B: Advanced Planning, C: Sprint Assessment, D: Quality Operations)
+- DSM_3.0: Renamed from DSM_3, modularized into slim core + 5 modules (A: Templates, B: Hub-Spoke, C: External Contribution Guidelines, D: External Contribution Templates, E: Participation Patterns)
+- DSM_4.0: Modularized into slim core + 2 modules (A: Development Quality, B: Project Planning Setup)
+
+### Changed - Domain-Neutrality Audits (BL-201, BL-202, BL-203, BL-204, BL-254, BL-255, BL-256)
+
+- All numbered DSM files audited for domain-specific language
+- DSM_1.0: 7,421 → 7,087 lines (4.5% reduction)
+- DSM_4.0: 995 → 790 lines (20.6% reduction)
+- Removed data-science-specific examples, replaced with domain-neutral alternatives
+
+### Changed - Licensing
+
+- Dual-license structure: CC BY-SA 4.0 for methodology documentation, MIT for scripts/code
+- LICENSE-DOCS.md added with Creative Commons terms
+
+### Changed - Other Improvements
+
+- DSM_0.0 (renamed from DSM_0): rewritten as gentle introduction (BL-263)
+- TOC added to 8 methodology files (BL-264)
+- Parallel session worktree isolation (BL-272)
+- GitHub issue triage: 3-check system with research queue classification (BL-261)
+- Canonical inbox location clarified as `_inbox/` at project root (BL-266)
+
+## [1.3.70] - 2026-03-16
+
+### Added - BL-212: Strategic Thinking Layer
+
+- DSM_6.0 Principle 1.9 "Think Ahead": strategic thinking as fourth stage of collaboration maturity
+- Four-layer progression model: operational → philosophical → learning → strategic
+- Maturity indicators table (backlog self-generation, dependency clusters, audience expansion)
+- 4 Evolution protocol mappings in DSM_6.0 Guidelines (Roadmap System, Phase-Gated Work, Backlog Scope Rule, Feature Branch Rule)
+
+### Added - BL-211: Roadmap System
+
+- `plan/roadmap.md`: strategic phasing document (4 phases, 10 clusters, dependency graph)
+- GitHub Projects "DSM Roadmap" with 38 items, custom fields (Phase, Cluster, Priority)
+- Simplified `improvements/` and `developments/` READMEs to index + priority format
+- CLAUDE.md "Roadmap and Tracking" section with three-layer architecture guidance
+
+### Added - Research
+
+- `docs/research/2026-03-16_dsm-evolution-git-history-analysis.md`: 796 commits across 14 repos, unified timeline
+- `docs/research/2026-03-16_dsm-feature-inventory.md`: 83 features across 11 capability domains
+
+### Changed
+
+- DSM_6.0 version history: v1.6 (Principle 1.9, 4 protocol mappings)
+- DSM_0: nine principles (updated from eight)
+- BL-206 marked implemented (consolidation complete)
+
+## [1.3.69] - 2026-03-15
+
+### Added - BL-176: Reasoning Lessons Propagation
+
+- Scope classification for reasoning lessons: ecosystem, pattern, project labels
+- Cross-project propagation protocol: mandatory push to DSM Central at session wrap-up
+- Ecosystem aggregation file: `docs/reasoning-lessons-ecosystem.md`
+- Updated dsm-staa, dsm-wrap-up, dsm-quick-wrap-up with scope classification and push steps
+
+## [1.3.68] - 2026-03-15
+
+### Changed - BL-200: Rebranding Documentation Audit (Phase 1)
+
+- Replaced "Data Science Methodology" / "Agentic AI Data Science Methodology" with "Deliberate Systematic Methodology (DSM)" across README, DSM_0, DSM_0.1, DSM_0.2 header, Module A, DSM_3 Section 7 descriptions, CHANGELOG header, CODE_OF_CONDUCT
+- DSM_3 Section 7 short/medium/full descriptions rewritten for domain-neutral framing
+- Historical CHANGELOG entries and blog posts preserved
+
+### Source
+
+- BL-195 audit finding; Session 130
+
+## [1.3.67] - 2026-03-15
+
+### Changed - BL-195: Remove Personal Names from Documentation
+
+- DSM_0.2 Inclusive Language: new "Personal names" rule (no names in methodology docs)
+- DSM_1.0: replaced names in subtitle and case study examples with role-neutral references
+- DSM_1.0 Appendices: risk owner changed to role reference
+- DSM_3: DSM context description updated, also corrected "Data Science Methodology" to "Deliberate Systematic Methodology"
+
+### Source
+
+- User directive (2026-03-15); Session 130
+
+## [1.3.66] - 2026-03-15
+
+### Added - BL-194: Reasoning Lessons Promotion to Protocol
+
+- Reasoning Lessons Protocol: new prune action "promote to protocol" for ecosystem-wide patterns that graduate to formal DSM sections, DSM 6.0 principles, or vocabulary entries
+- Criteria: validated across 3+ sessions, applicable beyond originating project
+
+### Source
+
+- User idea (2026-03-15); Session 130
+
+## [1.3.65] - 2026-03-15
+
+### Changed - BL-190: Mandatory Ecosystem Pointers
+
+- DSM_0.2 Ecosystem Path Registry: changed from optional to required for all project types
+- `/dsm-align`: creates `.claude/dsm-ecosystem.md` with template when missing (step 9)
+- `/dsm-go`: flags missing ecosystem registry as action item for all project types (step 2a.5)
+
+### Source
+
+- dsm-stress-tester S9 feedback; Session 130
+
+## [1.3.64] - 2026-03-15
+
+### Added - BL-167: Consumption Directory Enforcement (completion)
+
+- `/dsm-align`: README templates for checkpoints, handoffs, plans, research directories
+- `/dsm-go`: step 2b.5 canonical folder check (suggests /dsm-align if folders missing)
+- File naming validation deferred to future scope
+
+### Source
+
+- Portfolio inbox feedback (S35), dsm-blog-poster S4, dsm-stress-tester S5; Session 130
+
+## [1.3.63] - 2026-03-15
+
+### Added - BL-192: Hybrid Branch Push Policy
+
+- DSM_0.2 core: new "Branch Push Policy" section (local by default, push on light-wrap-up or large changes)
+- CLAUDE.md Feature Branch Rule: hybrid push policy, agent behavior for light-wrap-up
+- `/dsm-light-wrap-up`: new step 2, push unpushed feature branches to remote before wrapping up
+
+### Source
+
+- S130 workflow discussion; Session 130
+
+## [1.3.62] - 2026-03-15
+
+### Added - BL-191: Mirror Repo Sync After Central Changes
+
+- Version Update Workflow step 9: mandatory sync of mirror repos after methodology file changes
+- DSM_0.2 Ecosystem Path Registry: `mirror: true` flag for repos that receive automatic file sync
+- Prevents public distribution repos (take-ai-bite) from falling out of sync with Central
+
+### Source
+
+- BL-090 implementation gap; Session 130
+
+## [1.3.61] - 2026-03-15
+
+### Changed - BL-090: DSM_0.2 Modularization
+
+- Split `DSM_0.2_Custom_Instructions_v1.1.md` (2,625 lines) into slim core (577 lines) + 4 on-demand modules:
+  - `DSM_0.2.A_Session_Lifecycle.md` (771 lines): inbox push, README notification, milestone notification, feedback tracking, technical progress, sprint cadence, delivery budget, mechanical vs decision edits, lightweight sessions, reasoning lessons, continuous learning, artifact lifecycle, session config recommendation
+  - `DSM_0.2.B_Artifact_Creation.md` (360 lines): composition challenge, edit explanation stop, enabling file content, notebook collaboration, notebook-to-script, app development, revert safeguards
+  - `DSM_0.2.C_Security_Safety.md` (242 lines): secret exposure, destructive action, untrusted input, query sanitization
+  - `DSM_0.2.D_Research_Onboarding.md` (437 lines): breaking change notification, external DSM descriptions, step 0 situational assessment, phase 0.5 research, environment preflight, first session prompt, phase-to-DSM mapping, command file version tracking
+- Core retains: project type detection, inbox check, version check, read-only access, reasoning delimiter, session transcript, pre-generation brief, context budget, inclusive language, CLAUDE.md configuration, AI collaboration principles, ecosystem path registry
+- Module Dispatch Table maps 28 protocols to their modules with trigger conditions
+- 78% reduction in always-loaded context (2,625 → 577 lines)
+
+### Source
+
+- S129 Phase 1 analysis; Session 130
+
+## [1.3.56] - 2026-03-14
+
+### Added - BL-159 Phase 1: Communication Channel Framework
+
+- New `docs/guides/communication-channels.md`: 6 channel types (blog, LinkedIn, stakeholder report, conference abstract, portfolio entry, README update) with audience, format, tone, and length guidance; selection workflow; tone transformation examples
+- Phases 2-3 (templates, implementation) remain as future scope
+
+### Source
+
+- S96 user idea; Session 128
+
+## [1.3.55] - 2026-03-14
+
+### Added - BL-171: DSM First-Time Setup and Adoption Guide
+
+- DSM_3 Section 6.7.4 (DSM Adoption for Existing Projects): pre-existing artifact migration checklist, hierarchical project scoping rule, agent-created memory vs DSM MEMORY.md relationship
+
+### Source
+
+- Artz project cold-start (S114); Session 128
+
+## [1.3.54] - 2026-03-14
+
+### Added - BL-149: Step 0, Situational Assessment Phase
+
+- DSM_0.2: new "Step 0: Situational Assessment" section before Phase 0.5; 5-point checklist (governance landscape, owner dynamics, contribution model, codebase orientation, governance boundaries); mandatory for external contributions, recommended for new spoke projects
+
+### Source
+
+- Reclaim Launcher retrospective (S87), stress-test feedback; Session 128
+
+## [1.3.53] - 2026-03-14
+
+### Added - BL-157: Project Initialization Quality Gate
+
+- DSM_3 Section 6.2.1 (Preliminary Scope Template): time budget field for realistic scoping
+- DSM_3 Section 6.7 (Spoke Initialization Checklist): README.md creation step (11), user convention inheritance step (12)
+- DSM_3 Section 6.7.2 (CLAUDE.md Essentials): multi-deliverable scope validation, DSM_1 methodology knowledge transfer references (Sections 2.1, 2.2, 2.5)
+- DSM_0.2 First Session Prompt: plan abstraction calibration guidance (plan at certainty level, not implementation detail)
+
+### Source
+
+- AI-in-Data-Science S1-S2 feedback (6 inbox entries); Session 128
+
+## [1.3.52] - 2026-03-14
+
+### Added - BL-163: Research Gate, Scale-Aware Planning Protocol
+
+- DSM_0.2 Phase 0.5: scale-aware research (feature/sprint/epoch depth table), proactive suggestion when uncertainty detected, tiered research pattern (broad → decision → assessment gate → deep-dive if needed), uncertainty type examples
+- DSM_2.0 Template 8 (Sprint Plan): Research Assessment section before deliverables; evaluate whether scope can be detailed enough for concrete task breakdown
+
+### Source
+
+- dsm-graph-explorer S22 + S107 feedback; Session 128
+
+## [1.3.51] - 2026-03-14
+
+### Added - BL-174: Experiment Template Enhancement (7-Element Framework)
+
+- Appendix C.1.3: new "General 7-Element Framework" subsection at the start of Capability Experiment Template; domain-agnostic structure (hypothesis, baseline, method, variables, success criteria, results, decision) grounded in 6 established frameworks; existing RAG-specific content restructured as a subheading
+
+### Source
+
+- dsm-graph-explorer S25 research; Session 128
+
+## [1.3.50] - 2026-03-14
+
+### Added - BL-170 Part A: Git Auto-Initialization Pre-Step
+
+- dsm-go: new Git Pre-Step before Git Awareness; detects absent git and auto-initializes (git init, branch rename to main, remote question, initial commit) before any other step
+- dsm-align: same Git Pre-Step added before Step 1
+- Rule: all DSM projects require a local git repository; no exceptions
+
+### Source
+
+- Artz cold-start (S114); Session 128
+
+## [1.3.49] - 2026-03-14
+
+### Added - BL-164: DSM Vocabulary, Formalized Term Registry
+
+- New `docs/guides/dsm-vocabulary.md`: canonical registry of DSM-coined terms (10 formal principles, 5 emergent concepts, 2 guidelines), contribution path, entry guidelines
+- DSM_6.0 Section 2.5 (The DSM Vocabulary): frames the vocabulary as the third layer of collaboration infrastructure (operational conventions, philosophical principles, linguistic vocabulary)
+- BL-000 principle inventory tables replaced with reference to vocabulary file
+- DSM_0 key sections listing updated for DSM_6.0
+
+### Source
+
+- S106-107 vocabulary accumulation; Session 128
+
+## [1.3.48] - 2026-03-14
+
+### Added - BL-173 Phases 1+2: Tool Dependency Analysis
+
+- DSM_0: new "Tool Dependencies" section with 4-level dependency table (fundamental, Claude Code-specific, VS Code-specific, platform-specific), transferability assessment, and adaptation invitation
+- Phase 3 (tool-agnostic DSM specification) remains as future scope
+
+### Source
+
+- Session 114 user reflection; Session 128
+
+## [1.3.47] - 2026-03-14
+
+### Added - BL-168: DSM Core Tools Registry
+
+- New `docs/core-tools.md`: authoritative registry of ecosystem-enabler repos (5 initial entries), definition, characteristics, registration rule, distinction from case-study projects
+- DSM_3 Project Registry: cross-reference to core-tools.md in DSM Tooling category
+
+### Source
+
+- Portfolio S35 feedback; Session 128
+
+## [1.3.46] - 2026-03-14
+
+### Added - BL-154: External Contribution Ecosystem Path Hardening
+
+- DSM_3 Section 6.6.7 Phase 3 Step 13: explicit required entries (`dsm-central`, `portfolio`, `contributions-docs`) for ecosystem path registry during External Contribution onboarding
+- DSM_0.2 Session-End Inbox Push: path validation step to prevent inbox routing to project's own governance inbox instead of DSM Central
+- dsm-go Step 2a.5: missing ecosystem registry in External Contribution projects escalated from warning to action item
+
+### Source
+
+- Reclaim Launcher S5-S7 feedback; Session 128
+
+## [1.3.45] - 2026-03-14
+
+### Added - BL-177: Sprint Boundary Gate in /dsm-go
+
+- dsm-go Step 3.6: verifies boundary artifacts (checkpoint, journal, feedback) exist for the most recently completed sprint before suggesting new sprint work; flags missing items for user action; skips for first sprint in a project
+
+### Source
+
+- dsm-graph-explorer S28 feedback (Entry 37, Proposal #32); Session 128
+
+## [1.3.44] - 2026-03-14
+
+### Added - BL-180 + BL-181: Sprint Alignment Review and Hub Notification
+
+- DSM_0.2 Sprint Cadence: alignment review step (planned vs actual, deviations, unplanned additions, next sprint scope for user confirmation before proceeding)
+- DSM_0.2 Sprint Cadence: hub/portfolio notification checklist item with structured sprint completion notification format for spoke projects via `_inbox/`
+
+### Source
+
+- dsm-graph-explorer S29-S30 feedback (Entry 39-40, Proposals #34-#35); Session 128
+
+## [1.3.43] - 2026-03-14
+
+### Added - BL-155: Debug Disambiguation and PR Description Maintenance
+
+- DSM_4.0 Section 4.6 (Bug Disambiguation): re-verify symptoms before assuming same root cause when user reports issue persistence
+- DSM_4.0 Section 4.7 (PR Description Maintenance): update PR title/body before next push when scope expands
+- DSM_0 key sections listing updated for DSM_4.0
+
+### Source
+
+- Reclaim Launcher Session 5 process review; Session 128
+
+## [1.3.42] - 2026-03-14
+
+### Added - BL-185: Self-Terminating Actions Protocol
+
+- DSM_0.2 Destructive Action Protocol: new "self-terminating actions" category covering operations that invalidate the agent's own session context (renaming working directory, moving .claude/, deleting CLAUDE.md, switching branches with stale context); requires confirmation + session-impact warning
+
+### Source
+
+- Stress-test project sessions (practice #8/#9, S4); Session 128
+
+## [1.3.41] - 2026-03-14
+
+### Added - BL-152: Testability Assessment at Validation Gates
+
+- DSM_0.2 Pre-Generation Brief Protocol, Gate 3: testability assessment checklist (what can be automated, what requires manual testing, what tool limitations exist) before committing to a test strategy
+
+### Source
+
+- Reclaim Launcher Issue #4 retrospective (S87); Session 128
+
+## [1.3.40] - 2026-03-14
+
+### Added - BL-167 Partial + BL-179: dsm-align and Lightweight Chain Improvements
+
+- dsm-align: `.gitattributes` canonical file check (step 8), creates `* text=auto eol=lf` if missing, warns if LF enforcement absent; template and report line added (BACKLOG-167 partial)
+- dsm-light-go: checkpoint fallback in safety gate; if `mode: light` marker missing but lightweight checkpoint exists, proceeds with warning instead of forcing full `/dsm-go` (BACKLOG-179)
+- dsm-light-wrap-up: commit before checkpoint (was: checkpoint before commit); checkpoint now reflects actual committed state; separate checkpoint commit as step 5 (BACKLOG-179)
+- DSM_0.2 Lightweight Session Lifecycle: safety gate description updated to document checkpoint fallback
+
+### Source
+
+- Stress-test project feedback (practice S1-S6), Artz S2-S4; Session 128
+
+## [1.3.39] - 2026-03-14
+
+### Added - BL-184: Notebook Cell Output Validation
+
+- DSM_0.2 Notebook Collaboration Protocol: every cell must produce output that validates its correctness; examples by cell type (imports with versions, data loading with shapes, feature engineering, model fitting, configuration); new anti-pattern for silent cells
+- BL-185 (Self-Terminating Actions Protocol): proposed, tracks agent actions that destroy session context (renaming working directory, moving .claude/, deleting CLAUDE.md)
+- Stress-test evidence annotated on BL-149, BL-163, BL-167, BL-179
+
+### Source
+
+- Stress-test project sessions (practice S1-S6); Session 128
+
+## [1.3.38] - 2026-03-16
+
+### Added - BL-156 Phase 3 Partial: Take AI Bite Spoke Configuration
+
+- Take AI Bite `.claude/CLAUDE.md`: spoke project configuration with Documentation (DSM 5.0) / Standard Spoke pattern, Protocol Applicability table, content sync workflow, public-facing content rules (DSM acronym disambiguation), Session Transcript and Pre-Generation Brief reinforcement blocks
+- DSM_3 Section 7 Project Registry: added Take AI Bite entry ("Public-facing framework distribution, curated DSM subset for external adoption")
+- DSM_3 Section 7: Graph Explorer metrics refreshed (218 -> 471 tests, Sprint 11)
+- 3 new backlog items from spoke feedback: BL-179 (Lightweight Chain Resilience), BL-180 (Sprint Alignment Review at Boundary), BL-181 (Sprint Boundary Hub/Portfolio Notification)
+
+### Source
+
+- BL-156 Phase 3 (Session 122); spoke feedback from Artz S2-S4 and Graph Explorer S29-S30
 
 ## [1.3.37] - 2026-03-10
 

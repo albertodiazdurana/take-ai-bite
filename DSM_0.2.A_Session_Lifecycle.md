@@ -11,6 +11,27 @@ when a protocol listed in the dispatch table is needed.
 
 ---
 
+## Contents
+
+1. [Session-End Inbox Push](#1-session-end-inbox-push)
+2. [README and Feature Timeline Change Notification](#2-readme-and-feature-timeline-change-notification)
+3. [External Contribution Milestone Notification](#3-external-contribution-milestone-notification)
+4. [DSM Feedback Tracking](#4-dsm-feedback-tracking)
+5. [Technical Progress Reporting](#5-technical-progress-reporting)
+6. [Lightweight Session Lifecycle](#6-lightweight-session-lifecycle)
+7. [Parallel Session Protocol](#7-parallel-session-protocol)
+8. [Reasoning Lessons Protocol](#8-reasoning-lessons-protocol)
+9. [Continuous Learning Protocol](#9-continuous-learning-protocol)
+10. [Artifact Lifecycle Management](#10-artifact-lifecycle-management)
+11. [Sprint Cadence and Feedback Boundaries](#11-sprint-cadence-and-feedback-boundaries)
+12. [Session Delivery Budget](#12-session-delivery-budget)
+13. [Mechanical vs Decision Edits](#13-mechanical-vs-decision-edits)
+14. [Session Configuration Recommendation](#14-session-configuration-recommendation)
+15. [Responsible Collaboration Timer](#15-responsible-collaboration-timer)
+16. [GitHub Issue Intake Protocol](#16-github-issue-intake-protocol)
+
+---
+
 ## 1. Session-End Inbox Push
 
 At session end (or at sprint boundaries), review `dsm-docs/feedback-to-dsm/` for per-session
@@ -242,8 +263,7 @@ purposes: auto-memory provides session-local context for the agent;
 `dsm-docs/feedback-to-dsm/` feeds the DSM Central governance pipeline via inbox push.
 Saving to one but not the other leaves the feedback invisible to either the
 agent (if only in `dsm-docs/feedback-to-dsm/`) or the hub (if only in auto-memory).
-Both writes are required. (Observed gap: portfolio S44, where feedback was
-saved to auto-memory but not to `dsm-docs/feedback-to-dsm/`, skipping the Central pipeline.)
+Both writes are required. (Observed gap: feedback saved to auto-memory but not to `dsm-docs/feedback-to-dsm/`, skipping the Central pipeline.)
 
 **Filing completeness:** Writing a feedback file to `dsm-docs/feedback-to-dsm/` is only
 half the action. The file must also be pushed to DSM Central's inbox per the
@@ -519,19 +539,23 @@ the parallel session stops and defers to the main session.
 
 **Scope declaration (required at parallel session start):**
 
-The parallel session baseline must include a scope declaration:
+The parallel session writes a baseline file (`.claude/parallel-session-baseline.txt`)
+with the scope declaration:
 
 ```
 # Parallel session baseline
 Task: [brief description]
 Scope: [list of folders/files to be modified]
 Parent branch: [parent session branch name]
-Parent working set: [folders modified by parent since session start]
+BL number: [NNN]
+BL file: [path to BL file]
+Created: [timestamp]
 ```
 
-Before approving the parallel session, verify that the declared scope does not
-overlap with the parent session's working set. If overlap exists, the parallel
-session must be rescoped or blocked.
+The wrap-up reads `Parent branch:` from this file instead of guessing. Before
+approving the parallel session, verify that the declared scope does not overlap
+with the parent session's working set. If overlap exists, the parallel session
+must be rescoped or blocked.
 
 **Safety checks (before creating branch):**
 1. No uncommitted changes overlapping with planned work scope
@@ -539,10 +563,10 @@ session must be rescoped or blocked.
 3. Planned work does not require shared file modifications
 4. Declared scope does not overlap with parent session's working set
 
-**BL staging folder:** `dsm-docs/plans/BL-{NNN}-{descriptor}/` contains all generated
-artifacts. The folder includes a README.md tracking task description, status, and
-artifact list. The main session reviews this folder after merge and distributes
-artifacts to their proper locations.
+**BL file location:** `plan/backlog/improvements/BACKLOG-{NNN}_{descriptor}.md` follows
+the standard backlog convention. Generated artifacts go into canonical folders
+(`dsm-docs/research/`, `dsm-docs/plans/`, etc.) as appropriate for their type; the
+BL file tracks all produced artifacts. The main session reviews after merge.
 
 **BL number collision prevention:** Before creating any BL in a parallel session,
 the agent must:
@@ -555,9 +579,10 @@ the agent must:
 This check applies to all sessions but is critical for parallel sessions that
 operate in isolation from the parent session's numbering state.
 
-**Merge strategy:** Wrap-up attempts fast-forward merge to main. If conflicts
-arise, the merge is aborted, the branch is preserved, and the main session
-resolves conflicts manually.
+**Merge strategy:** Wrap-up attempts direct merge to the parent session branch. If
+the merge fails due to branch protection, it falls back to creating a PR via `gh`.
+If conflicts arise, the merge is aborted, the branch is preserved, and the main
+session resolves conflicts manually.
 
 **What parallel sessions skip:**
 

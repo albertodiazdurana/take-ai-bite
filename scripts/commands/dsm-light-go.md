@@ -22,10 +22,16 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 - **Checkpoint moves (Step 2):** Use `mv` instead of `git mv`
 - **Git status (Step 3):** Skip; report "No git repository"
 - **Session baseline (Step 4):** Write only the timestamp line and `mode: light`; skip git fields
+- **Branch verification (Step 1.5):** Skip; no branch operations without git
 
 ## Steps (only if safety gate passes)
 
 1. **MEMORY.md:** Already loaded via auto memory context. Do NOT re-read; use the version in context.
+1.5. **Verify session branch:** Lightweight sessions continue an existing session; they do not create new branches.
+   - Run `git branch --show-current` to get the current branch name
+   - **If on a session branch (matches `session-*`):** Proceed normally. Report: "Continuing on session branch `{branch-name}`."
+   - **If on a task branch (matches `bl-*`, `sprint-*`, `parallel/*`):** Proceed normally. Report: "Continuing on task branch `{branch-name}`."
+   - **If on main/master:** Warn: "Currently on main, but lightweight sessions should continue an existing session branch. Either: (a) switch to the open session branch, or (b) fall back to full `/dsm-go` to create a new one." Check for open session branches (`git branch --list 'session-*'`) and offer to switch. If no session branch exists, fall back to `/dsm-go`.
 2. **Read latest checkpoint:** Run `ls -t dsm-docs/checkpoints/*.md 2>/dev/null | head -1` to find the most recent checkpoint. Read it in full. This provides the task context.
    **After reading, move the checkpoint to `done/`:**
    1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' dsm-docs/checkpoints/{filename}`
@@ -53,6 +59,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    ```
 6. **Report:** Brief summary:
    - Last session: [from MEMORY.md]
+   - Session branch: [branch name from Step 1.5, or "main (no git)" if GIT_AVAILABLE is false]
    - Task context: [from checkpoint, what remains]
    - Deferred items: [list from checkpoint]
    - Uncommitted changes: [from git status]
@@ -72,6 +79,5 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 - Do NOT check DSM version (deferred)
 - Do NOT validate ecosystem paths (deferred)
 - Do NOT check handoff lifecycle (deferred)
-- Do NOT report bandwidth (deferred)
 - Do NOT archive or reset the transcript (it persists from previous session)
 - Follow .claude/CLAUDE.md conventions for this project

@@ -5,9 +5,38 @@
 **Architecture:** Slim core + 4 on-demand modules (see Module Dispatch Table)
 ---
 
+## Contents
+
+1. [Project Type Detection](#1-project-type-detection)
+2. [Session-Start Version Check](#2-session-start-version-check)
+3. [Session-Start Inbox Check](#3-session-start-inbox-check)
+4. [Session-Start GitHub Issue Check](#4-session-start-github-issue-check)
+5. [Read-Only Access Within Repository](#5-read-only-access-within-repository)
+6. [Reasoning Delimiter Format](#6-reasoning-delimiter-format)
+7. [Session Transcript Protocol](#7-session-transcript-protocol)
+8. [Pre-Generation Brief Protocol](#8-pre-generation-brief-protocol)
+9. [Experiment Execution Protocol](#9-experiment-execution-protocol)
+10. [Web Research Capture Protocol](#10-web-research-capture-protocol)
+11. [Context Budget Protocol](#11-context-budget-protocol)
+12. [Two-Pass Reading Strategy for Long Structured Files](#12-two-pass-reading-strategy-for-long-structured-files)
+13. [Inclusive Language](#13-inclusive-language)
+14. [Heading Parsability Convention for DSM Documents](#14-heading-parsability-convention-for-dsm-documents)
+15. [AI Collaboration Principles](#15-ai-collaboration-principles)
+16. [Active Suggestion Protocol](#16-active-suggestion-protocol)
+17. [CLAUDE.md Configuration](#17-claudemd-configuration)
+18. [Ecosystem Path Registry](#18-ecosystem-path-registry)
+19. [Branch Testing Requirement](#19-branch-testing-requirement)
+20. [Three-Level Branching Strategy](#20-three-level-branching-strategy)
+21. [Backlog Scope Rule](#21-backlog-scope-rule)
+22. [Protocol Violation Triage Response](#22-protocol-violation-triage-response)
+23. [References](#23-references)
+24. [Module Dispatch Table](#24-module-dispatch-table)
+
+---
+
 Confirm that you understand what I need. Be concise in your work.
 
-## Project Type Detection
+## 1. Project Type Detection
 
 At session start, identify the project type by examining the directory structure:
 
@@ -27,7 +56,7 @@ clone but reference governance artifacts in `{contributions-docs-path}/{project}
 (resolved from the Ecosystem Path Registry). See DSM_3 Section 6.6 for the full
 governance structure.
 
-### Participation Pattern Detection
+### 1.1. Participation Pattern Detection
 
 The DSM track (above) is orthogonal to the participation pattern. After identifying
 the track, also identify which participation pattern governs communication and
@@ -50,7 +79,7 @@ Example: "This is a Documentation project (DSM 5.0) using the Private Project pa
 Apply the pattern's constraints for the session, even if CLAUDE.md does not
 explicitly override every inherited DSM_0.2 protocol.
 
-## Session-Start Version Check
+## 2. Session-Start Version Check
 
 At session start in spoke projects, compare the DSM version in the header above against the version recorded in the most recent handoff (`dsm-docs/handoffs/`). If the versions differ:
 1. Note the update: "DSM updated from vX.Y.Z to vA.B.C since last session"
@@ -59,7 +88,7 @@ At session start in spoke projects, compare the DSM version in the header above 
 
 If no previous handoff exists (first session), record the current DSM version for future reference.
 
-## Session-Start Inbox Check
+## 3. Session-Start Inbox Check
 
 At session start, check `_inbox/` for pending entries from DSM Central. If entries
 exist, surface them to the user before starting other work. When an entry
@@ -68,7 +97,7 @@ before evaluating the entry; the inbox is a notification, the source file
 contains the full evidence needed for decision-making. Process each entry per
 DSM_3 Section 6.4.3 (implement via BL workflow for substantive changes, defer, or reject; then move to `_inbox/done/`).
 
-**WARNING:** After processing, **move** the entry to `_inbox/done/`. Do not mark entries as "Status: Processed" or add completion markers while keeping the entry in place. Processed entries in `done/` preserve communication history and traceability; entries left in the inbox root cause stale re-processing in future sessions (observed: dsm-blog-poster S3-S4).
+**WARNING:** After processing, **move** the entry to `_inbox/done/`. Do not mark entries as "Status: Processed" or add completion markers while keeping the entry in place. Processed entries in `done/` preserve communication history and traceability; entries left in the inbox root cause stale re-processing in future sessions (observed in spoke project sessions).
 
 **External Contribution exception:** For External Contribution projects (identified
 by project type detection or explicit CLAUDE.md declaration), do NOT create `_inbox/`
@@ -103,9 +132,10 @@ copy full feedback files, methodology documents, or backlog lists into the inbox
 When creating `_inbox/`, also create the `_inbox/done/` subdirectory for
 processed entries.
 
-**Migration:** If `dsm-docs/backlog/` or `dsm-docs/inbox/` exists (legacy conventions),
-move contents to `_inbox/` at project root, create the README.md, and remove the
-old directory.
+**Migration:** If `dsm-docs/backlog/` exists (legacy convention), move contents
+to `_inbox/` at project root, create the README.md, and remove the old directory.
+The canonical inbox location is always `_inbox/` at project root; no other
+path (e.g., `dsm-docs/inbox/`) should be used or created.
 
 **Validation before confirmation:** Before sending the migration confirmation
 below, verify that:
@@ -130,32 +160,71 @@ import in this project's CLAUDE.md. Write the confirmation to
 **Priority:** Low
 **Source:** [this project name]
 
-Inbox system initialized. _inbox/ created at project root (or migrated from
-dsm-docs/inbox/). README.md with entry template installed. Ready to receive and
-send inbox entries per DSM_3 Section 6.4.
+Inbox system initialized. _inbox/ created at project root. README.md with
+entry template installed. Ready to receive and send inbox entries per
+DSM_3 Section 6.4.
 ```
 
-## Session-Start GitHub Issue Check
+## 4. Session-Start GitHub Issue Check
 
-At session start, check for unprocessed GitHub issues using:
+At session start, run three checks to surface unprocessed GitHub issues. If `gh`
+is not available, skip all checks silently.
+
+### 4.1. External Issues (Priority Path)
 
 ```
 gh issue list --label external --state open
 ```
 
-If open `external`-labeled issues exist, surface them to the user before starting
-other work. For each issue, read the body and comments, then triage:
+External-labeled issues come from outside contributors and take priority.
+
+### 4.2. New Issues Since Last Session
+
+```
+gh issue list --state open --search "created:>={YYYY-MM-DD}"
+```
+
+Replace `{YYYY-MM-DD}` with the date from MEMORY.md's "Latest Session" entry.
+This catches user-created issues (ideas, feedback, research items) that lack
+the `external` label.
+
+### 4.3. Untriaged Open Issues (Classified)
+
+```
+gh issue list --state open
+```
+
+Classify the results into two groups, excluding issues already surfaced by 4.1/4.2:
+
+**Research queue** (issues labeled `research`, or whose title starts with
+"read repo", "read document", or references an external URL/file to evaluate):
+- Present as a batched summary: "Research queue: N items pending"
+- List titles with issue numbers, no individual triage needed
+- These are knowledge intake tasks, not work items
+
+**Improvement issues** (everything else, excluding issues whose title starts
+with "BL-" and issues labeled `deferred`):
+- These need individual triage per §4.4
+
+### 4.4. Triage Actions
+
+**For improvement issues,** read the body and comments, then triage:
 
 - **New BL needed:** Follow the GitHub Issue Intake Protocol (Module A, Section 16)
 - **Absorbed by existing BL:** Close the issue with a reference to the existing BL
+- **Defer:** Apply the `deferred` label with a comment explaining why
 - **Not actionable:** Close with explanation
 
-This check applies to repos with the `external` label configured. If the label
-does not exist or `gh` is not available, skip silently.
+**For research queue items,** no per-item triage at session start. Instead:
+
+- If the session is research-focused, ask the user which items to tackle
+- Each selected item becomes a Phase 0.5 research task (see Module D)
+- After research is complete, document findings and close the issue
+- Items stay open in the queue until a session processes them
 
 ---
 
-## Read-Only Access Within Repository
+## 5. Read-Only Access Within Repository
 
 Reading files inside the repository never requires permission. This applies
 unconditionally, whether the agent is exploring, building context, validating
@@ -169,7 +238,7 @@ a change, or performing any other task:
 
 ---
 
-## Reasoning Delimiter Format
+## 6. Reasoning Delimiter Format
 
 Standard delimiters for reasoning entries in the session transcript file.
 See Session Transcript Protocol below for when and where to use them.
@@ -195,7 +264,7 @@ end delimiter is needed.
 
 ---
 
-## Session Transcript Protocol
+## 7. Session Transcript Protocol
 
 The session transcript is the **primary and only** channel for agent reasoning.
 The user keeps `.claude/session-transcript.md` open in VS Code and reads
@@ -274,7 +343,7 @@ tool calls or file edits.
 - Output summary appended AFTER completing work
 - File is ephemeral: content cleared at session end, not committed
 - Transcript is append-only; never modify or backfill past entries
-- **Append technique (mandatory):** Every append to the session transcript MUST follow this sequence: (1) read the last 3 lines of the file, (2) use the last non-empty line as the `old_string` anchor, (3) the `new_string` includes that last line PLUS the new content appended after it. **NEVER** search for earlier content to use as an insertion point. The only valid anchor is the current last line of the file. This is not a style preference; mid-file insertions cause out-of-order timestamps, confuse the user reading the transcript in real time, and have been observed in multiple sessions despite existing guidance (portfolio S44, DSM Central S140)
+- **Append technique (mandatory):** Every append to the session transcript MUST follow this sequence: (1) read the last 3 lines of the file, (2) use the last non-empty line as the `old_string` anchor, (3) the `new_string` includes that last line PLUS the new content appended after it. **NEVER** search for earlier content to use as an insertion point. The only valid anchor is the current last line of the file. This is not a style preference; mid-file insertions cause out-of-order timestamps, confuse the user reading the transcript in real time, and have been observed in multiple sessions despite existing guidance
 - If a past entry was missed, note the gap in the next entry rather than editing history
 
 **Anti-Patterns:**
@@ -285,18 +354,18 @@ tool calls or file edits.
 - Skip the transcript append on turns with non-trivial reasoning
 - Commit the transcript file; it is a session-scoped working artifact
 - Edit or rewrite past transcript entries; each entry reflects reasoning at the time it was written
-- Use Edit with `old_string` matching earlier content to insert entries mid-file; this causes out-of-order timestamps (observed: portfolio S44, DSM Central S140). Use the mandatory append technique above
+- Use Edit with `old_string` matching earlier content to insert entries mid-file; this causes out-of-order timestamps (observed in prior sessions). Use the mandatory append technique above
 - Use reasoning delimiters in conversation text; VS Code collapses them after streaming
 
 ---
 
-## Pre-Generation Brief Protocol
+## 8. Pre-Generation Brief Protocol
 
 Before creating any artifact (code file, test file, documentation, configuration),
 follow the three-gate approval model. Each gate requires explicit user approval
 before proceeding to the next.
 
-### Gate 1: Concept Approval
+### 8.1. Gate 1: Concept Approval
 
 Explain:
 
@@ -309,7 +378,7 @@ Explain:
 (`.gitkeep`, minor config), a single-sentence brief is sufficient, but the
 gate still applies.
 
-### Gate 2: Implementation Approval
+### 8.2. Gate 2: Implementation Approval
 
 Create the artifact using Write/Edit tools. The user reviews the diff in the
 IDE permission window.
@@ -318,7 +387,7 @@ IDE permission window.
 proceed to the next artifact or to execution until the user has reviewed
 the implementation.
 
-### Gate 3: Run Approval (when applicable)
+### 8.3. Gate 3: Run Approval (when applicable)
 
 When the artifact needs to be executed (tests, scripts, benchmarks, CI
 triggers, commands that modify state):
@@ -335,7 +404,7 @@ triggers, commands that modify state):
 Gate 3 does not apply to artifacts that are only created, not executed
 (documentation, configuration that takes effect passively, type definitions).
 
-### Gate Scope
+### 8.4. Gate Scope
 
 - Gates 1 and 2 are mandatory for every non-trivial artifact
 - Gate 3 applies only when the artifact will be executed in this session
@@ -359,7 +428,7 @@ Gate 3 does not apply to artifacts that are only created, not executed
 
 ---
 
-## Experiment Execution Protocol
+## 9. Experiment Execution Protocol
 
 When a task involves running an experiment (capability validation, tuning,
 model evaluation, or any EXP-XXX from the sprint plan), follow this protocol.
@@ -395,7 +464,7 @@ this protocol ensures the framework is followed.
 
 ---
 
-## Web Research Capture Protocol
+## 10. Web Research Capture Protocol
 
 When the agent performs web research (web searches, URL fetches, API queries) whose
 findings will be synthesized into a deliverable, the raw findings must be captured
@@ -428,7 +497,7 @@ evidence exists to cite.
 
 ---
 
-## Context Budget Protocol
+## 11. Context Budget Protocol
 
 The agent's context window is a finite resource. Large file reads and multi-document
 research can exhaust it mid-session, forcing compaction and losing earlier reasoning.
@@ -469,7 +538,7 @@ When a session involves multiple large files or extensive research:
 
 ---
 
-## Two-Pass Reading Strategy for Long Structured Files
+## 12. Two-Pass Reading Strategy for Long Structured Files
 
 When the agent needs to read a structured text file of 200+ lines (markdown,
 plain text, or converted-to-markdown), use a two-pass approach instead of
@@ -511,7 +580,7 @@ or files the agent has already read in the current session.
 
 ---
 
-## Inclusive Language
+## 13. Inclusive Language
 
 All DSM documents, code comments, commit messages, and generated artifacts must use
 inclusive, neutral language. This applies to both the human and the agent.
@@ -522,7 +591,7 @@ inclusive, neutral language. This applies to both the human and the agent.
 - Political language: "manifesto", "regime" (use "guide", "framework", "system")
 - Religious language: "soul", "blessing", "gospel" (use secular alternatives)
 - Superiority-implying language: cocky or dismissive tone, "obviously", "of course you know"
-- ASCII approximations for non-English characters: when writing in any language, use proper diacritical marks and special characters (German: ä, ö, ü, ß; French: é, è, ê, ç; Spanish: ñ, á, é, í, ó, ú). Substituting "oe" for "ö", "ue" for "ü", or "ss" for "ß" is incorrect and unprofessional (observed: portfolio S35)
+- ASCII approximations for non-English characters: when writing in any language, use proper diacritical marks and special characters (German: ä, ö, ü, ß; French: é, è, ê, ç; Spanish: ñ, á, é, í, ó, ú). Substituting "oe" for "ö", "ue" for "ü", or "ss" for "ß" is incorrect and unprofessional (observed in prior sessions)
 
 **Why this matters:** DSM documents are read by diverse audiences across projects.
 Language that excludes, alienates, or assumes shared cultural context reduces
@@ -546,14 +615,14 @@ conscious decision that the human acknowledges and accepts.
 
 ---
 
-## Heading Parsability Convention for DSM Documents
+## 14. Heading Parsability Convention for DSM Documents
 
 Since DSM is self-authored, heading conventions can eliminate cross-reference
 detection noise at the source rather than building complex NLP filters. This is
 the "Take a Bite" philosophy applied to documentation format: fix the input,
 not the parser.
 
-### Minimum Token Count (MUST)
+### 14.1. Minimum Token Count (MUST)
 
 Any referenceable heading MUST have at least 4 non-stopword tokens.
 
@@ -562,19 +631,19 @@ Any referenceable heading MUST have at least 4 non-stopword tokens.
 - Good: `## Experiment Gate Test Plan` (4 tokens)
 - Good: `## Sprint Planning Experiment Gate` (4 tokens)
 
-### Cross-Document Uniqueness (SHOULD)
+### 14.2. Cross-Document Uniqueness (SHOULD)
 
 Cross-referenceable headings SHOULD be unique across the DSM document set.
 This eliminates ambiguity when tools or agents resolve references.
 
-### Protocol Naming (SHOULD)
+### 14.3. Protocol Naming (SHOULD)
 
 Protocol-level headings SHOULD include the protocol or concept name.
 
 - Bad: `## Enforcement`
 - Good: `## Session Transcript Append-Only Enforcement`
 
-### Format Conversion Applicability
+### 14.4. Format Conversion Applicability
 
 When creating markdown files from other formats (PDF, DOCX, HTML, PPTX),
 short headings from the source document should be expanded or flagged for
@@ -582,14 +651,20 @@ manual review. This convention serves as a quality criterion for converted
 output and directly improves the effectiveness of structural scanning
 strategies (see BL-222).
 
-### Enforcement
+### 14.5. Enforcement
 
 Enforceable via Graph Explorer linter rule W004 (warning, not error). Projects
 using GE can validate heading compliance automatically.
 
+### 14.6. Document Structure Standard Reference
+
+For document-level structure rules including modularization triggers, line
+budgets, file indexes, and the intro paragraph requirement, see
+`dsm-docs/guides/document-structure-standard.md`.
+
 ---
 
-## AI Collaboration Principles
+## 15. AI Collaboration Principles
 
 The interaction protocols in this document (Notebook Collaboration, App Development,
 Pre-Generation Brief, Sprint Cadence, Session Transcript) implement the principles
@@ -602,7 +677,7 @@ DSM 6.0: can the reviewer engage with it and respond with substance? See
 
 ---
 
-## Active Suggestion Protocol
+## 16. Active Suggestion Protocol
 
 When the human explicitly invites input (phrases like "Any questions or
 suggestions?", "Thoughts?", "What do you think?", "Suggestions?", or
@@ -623,7 +698,7 @@ passive compliance and degrades the collaboration.
 
 ---
 
-## CLAUDE.md Configuration
+## 17. CLAUDE.md Configuration
 
 Every project CLAUDE.md must include an `@` reference to this Custom Instructions template:
 
@@ -653,7 +728,7 @@ transcript, pre-generation briefs, inbox checks, project type detection). A
 missing or stale `@` reference silently disables all inherited protocols.
 Run `/dsm-align` to validate the reference exists and points to the current path.
 
-**IDE Permission Mode:** When using Claude Code in VS Code, set `"claudeCode.initialPermissionMode": "default"` to require explicit approval for file writes. See DSM 4.0 Section 15 (IDE Configuration) for details.
+**IDE Permission Mode:** When using Claude Code in VS Code, set `"claudeCode.initialPermissionMode": "default"` to require explicit approval for file writes. See DSM 4.0 Section 11 (GitHub Repository Setup Checklist) for details.
 
 **WARNING: Protocol Reinforcement Required**
 
@@ -687,13 +762,103 @@ The `@` reference imports protocols as background context, but agents may deprio
   NEVER match earlier content for mid-file insertion.
 ```
 
-**WARNING:** Spoke reinforcement blocks must include the literal delimiter syntax shown in the example above. Referencing "Reasoning Delimiter Format" by name is insufficient; agents default to markdown heading style when the syntax is absent from the local CLAUDE.md (observed: AMEX S2-S3, portfolio S35).
+**WARNING:** Spoke reinforcement blocks must include the literal delimiter syntax shown in the example above. Referencing "Reasoning Delimiter Format" by name is insufficient; agents default to markdown heading style when the syntax is absent from the local CLAUDE.md (observed in spoke project sessions).
 
 Without reinforcement, the agent's default behavior (batching outputs, generating multiple steps) overrides the inherited protocol.
 
+### 17.1. CLAUDE.md Alignment Template System
+
+To eliminate reinforcement drift, `/dsm-align` manages a delimited section in each
+spoke's `.claude/CLAUDE.md`. This section is generated from templates defined below
+and updated automatically. Project-specific content lives outside the delimiters.
+
+**Structure of a spoke CLAUDE.md:**
+
+```markdown
+@{path-to}/DSM_0.2_Custom_Instructions_v1.1.md
+
+<!-- BEGIN DSM_0.2 ALIGNMENT - do not edit manually, managed by /dsm-align -->
+[template-generated content, varies by project type]
+<!-- END DSM_0.2 ALIGNMENT -->
+
+# Project: [Name]
+Domain: [domain]
+
+## Project-Specific Instructions
+[custom content, overrides, domain config]
+```
+
+**Delimiter rules:**
+- The `@` reference comes first (discovery mechanism)
+- The aligned section follows immediately after the `@` reference
+- Project-specific content comes after the `<!-- END -->` marker
+- `/dsm-align` only modifies content between the delimiters; everything outside is untouched
+- Manual edits between delimiters will be flagged as drift and overwritten on next alignment
+
+**Base template (all project types):**
+
+```markdown
+## DSM Alignment (managed by /dsm-align)
+
+**Project type:** [detected type] ([DSM version])
+**Participation pattern:** [detected pattern]
+
+### Session Transcript Protocol (reinforces inherited protocol)
+- Append thinking to `.claude/session-transcript.md` BEFORE acting
+- Output summary AFTER completing work
+- Conversation text = results only
+- Use Reasoning Delimiter Format for every thinking block:
+  <------------Start Thinking / HH:MM------------>
+  [reasoning content]
+- HH:MM is 24-hour local time when thinking begins; no end delimiter needed
+- Append technique: read last 3 lines, use last non-empty line as anchor.
+  NEVER match earlier content for mid-file insertion.
+
+### Pre-Generation Brief Protocol (reinforces inherited protocol)
+- Three-gate model: concept (explain) → implementation (diff review) → run (when applicable)
+- Each gate requires explicit user approval; gates are independent
+
+### Inbox Lifecycle (reinforces inherited protocol)
+- After processing an inbox entry, move it to `_inbox/done/`
+- Do not mark entries as "Status: Processed" while keeping them in place
+
+### Punctuation
+Use "," instead of "—" for connecting phrases in any language.
+```
+
+**DSM 1.0 (Data Science) addition:**
+
+```markdown
+### Notebook Collaboration Protocol (reinforces inherited protocol)
+- Generate ONE cell at a time, wait for user to run and share output
+- Number each cell with a comment (e.g., `# Cell 1`)
+- "Continue" = generate next cell; "Generate all cells" = explicit batch override
+```
+
+**DSM 4.0 (Application) addition:**
+
+```markdown
+### App Development Protocol (reinforces inherited protocol)
+- Explain why before each action
+- Create files via Write/Edit tools; user approves via permission window
+- Wait for user confirmation before proceeding to next step
+- Build incrementally: imports → constants → one function → test → next function
+```
+
+**Hybrid (DSM 1.0 + DSM 4.0) addition:**
+
+Both the Notebook and App Development blocks are included.
+
+**DSM 5.0 (Documentation):** Base template only (no additional blocks needed).
+
+**Template versioning:** Templates are versioned implicitly by this document's version.
+When DSM_0.2 is updated and a template changes, `/dsm-align` detects drift and
+offers to regenerate. The `@` reference chain ensures spokes always have access
+to the current template definitions.
+
 ---
 
-## Ecosystem Path Registry
+## 18. Ecosystem Path Registry
 
 Cross-repo paths (portfolio, contributions-docs, other ecosystem projects) are
 declared in `.claude/dsm-ecosystem.md`, a gitignored file local to each DSM
@@ -739,7 +904,7 @@ This ensures public distribution repos stay current without manual intervention.
 
 ---
 
-## Branch Testing Requirement
+## 19. Branch Testing Requirement
 
 Task branches (Level 3) must be tested before merging to their parent branch.
 No exceptions.
@@ -764,16 +929,16 @@ proposing merge. Never suggest "ready to merge" without a testing step.
 
 ---
 
-## Three-Level Branching Strategy
+## 20. Three-Level Branching Strategy
 
 A universal branching model for all DSM projects, regardless of whether they
 use BLs, sprints, or neither.
 
-### Level 1: Main Branch (`main` / `master`)
+### 20.1. Level 1: Main Branch (`main` / `master`)
 
 The production line. Only receives merges from Level 2 session branches.
 
-### Level 2: Session Branch
+### 20.2. Level 2: Session Branch
 
 Created at every session start (`/dsm-go`, `/dsm-light-go`). This is the
 universal working branch for all project types, including portfolio, notebook,
@@ -786,7 +951,7 @@ and projects without BLs or sprints.
 merged back. If Level 3 branches remain open, the session branch stays open
 and is pushed to remote for cross-session continuity.
 
-### Level 3: Task Branches
+### 20.3. Level 3: Task Branches
 
 Created during a session for specific work items. Three types:
 
@@ -803,7 +968,7 @@ merge to the session branch, not directly to main.
 (BL moved to done/), trivial fixes (typos, dates), session artifacts (handoffs,
 checkpoints, feedback).
 
-### Branch Push Policy
+### 20.4. Branch Push Policy
 
 **Default: local only.** Branches are not pushed to GitHub unless needed.
 
@@ -820,7 +985,7 @@ checkpoints, feedback).
 after merging to their parent branch. Exception: consolidation branches are
 deleted only when all referenced BLs are resolved.
 
-### Session-Start Branch Resumption Protocol
+### 20.5. Session-Start Branch Resumption Protocol
 
 At session start (`/dsm-go`, `/dsm-light-go`), the agent checks for open
 branches from previous sessions:
@@ -831,14 +996,14 @@ branches from previous sessions:
    to finalize this work before starting new work."
 3. Resume on the open branch rather than creating a new session branch
 
-### Why Session Branches
+### 20.6. Why Session Branches
 
 Some projects (portfolio, notebook-based, spoke projects) do not work with BLs
 or sprints. A session branch provides isolation and reversibility for every
 session regardless of workflow type. If a session produces no formal task
 branches, all commits land on the session branch and merge to main at wrap-up.
 
-### Relationship to Branch Testing Requirement
+### 20.7. Relationship to Branch Testing Requirement
 
 The Branch Testing Requirement (above) applies to Level 3 → Level 2 merges.
 Before merging a task branch to the session branch, run the minimum verification
@@ -846,7 +1011,7 @@ and any BL-specific test plan conditions.
 
 ---
 
-## Backlog Scope Rule
+## 21. Backlog Scope Rule
 
 A backlog item must address a single, independently completable topic. When
 creating or reviewing a BL, check for split indicators:
@@ -862,7 +1027,7 @@ marked "done" because an unrelated part is pending is too broad.
 implementation, flag it to the user: "This BL addresses [N] independent topics.
 Split before implementing?"
 
-### Backlog Naming Rule
+### 21.1. Backlog Naming Rule
 
 Backlog item titles must be self-explanatory. A user scanning the backlog README
 should understand each item's purpose without opening the file. The title is the
@@ -878,7 +1043,7 @@ flag titles that fail the test and propose renames.
 
 ---
 
-## Protocol Violation Triage Response
+## 22. Protocol Violation Triage Response
 
 When the agent discovers that a DSM protocol was not followed, whether in the
 current session or inherited from a prior session, it must execute a three-step
@@ -909,20 +1074,50 @@ behind a module read.
 
 ---
 
-## References
+## 23. References
 
 - Preston-Werner, T. (2013). [Semantic Versioning 2.0.0](https://semver.org/)
 - Procida, D. (2017). [Diataxis Documentation Framework](https://diataxis.fr/)
 
 ---
 
-## Module Dispatch Table
+## 24. Module Dispatch Table
 
 DSM_0.2 protocols are split into this core file (always loaded via `@`) and
 four on-demand modules. When a task requires a protocol from this table, read
 the corresponding module file using the Read tool before applying the protocol.
 
 All module files are in the same directory as this core file.
+
+### 24.1. Core Sections (this file)
+
+| § | Protocol |
+|---|----------|
+| 1 | Project Type Detection |
+| 2 | Session-Start Version Check |
+| 3 | Session-Start Inbox Check |
+| 4 | Session-Start GitHub Issue Check |
+| 5 | Read-Only Access Within Repository |
+| 6 | Reasoning Delimiter Format |
+| 7 | Session Transcript Protocol |
+| 8 | Pre-Generation Brief Protocol |
+| 9 | Experiment Execution Protocol |
+| 10 | Web Research Capture Protocol |
+| 11 | Context Budget Protocol |
+| 12 | Two-Pass Reading Strategy for Long Structured Files |
+| 13 | Inclusive Language |
+| 14 | Heading Parsability Convention for DSM Documents |
+| 15 | AI Collaboration Principles |
+| 16 | Active Suggestion Protocol |
+| 17 | CLAUDE.md Configuration |
+| 18 | Ecosystem Path Registry |
+| 19 | Branch Testing Requirement |
+| 20 | Three-Level Branching Strategy |
+| 21 | Backlog Scope Rule |
+| 22 | Protocol Violation Triage Response |
+| 23 | References |
+
+### 24.2. Module Protocols (on-demand)
 
 | Protocol | Trigger | Module |
 |----------|---------|--------|

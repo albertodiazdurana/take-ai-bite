@@ -235,10 +235,10 @@ and ensures their own governance remains sovereign. The upstream's AI governance
 informs what the contribution should look like; the contributor's governance
 determines how the work is produced.
 
-Evidence: Reclaim Launcher external contribution (Sessions 82-89) maintained
-DSM governance in a fork with its own CLAUDE.md while all 3 PRs merged
-upstream with zero governance leakage. The contributor acted as intermediary
-between two governance worlds, translating deliverables to match each context.
+Evidence: an external contribution project maintained DSM governance in a fork
+with its own CLAUDE.md while all PRs merged upstream with zero governance
+leakage. The contributor acted as intermediary between two governance worlds,
+translating deliverables to match each context.
 
 See DSM_3 Section 6.6.10 (Fork Governance Isolation) for operational guidance
 including file handling, conflict resolution, and anti-patterns.
@@ -342,7 +342,7 @@ across blog, GitHub, and LinkedIn. Recraft's free tier retains full
 ownership of generated images (policy effective 2024-08-12). Discovery
 required replacement across 6+ deployment targets (favicon, navigation
 bar, OpenGraph, social preview, GitHub repository image, LinkedIn post).
-Full incident documented in `dsm-blog-poster/dsm-docs/logo-creation.md`.
+Full incident documented in the affected spoke project's governance folder.
 
 ### 1.9 Think Ahead
 
@@ -580,7 +580,7 @@ patterns (emergent concepts like Ripple Effect and My Fork, My Rules).
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-02-14 | Initial release. Five principles codified from IronCalc collaboration experience and DSM core philosophy. BACKLOG-122. |
+| 1.0 | 2026-02-14 | Initial release. Five principles codified from external collaboration experience and DSM core philosophy. BACKLOG-122. |
 | 1.1 | 2026-02-14 | Added "Earn Your Assertions" (principle 1.3). Renamed "The Human Brings the Soul" to "The Human Brings the Spark". Added 7 missing protocol mappings (Tests vs Capability Experiments, Daily Documentation, Gateway Review, Factual Accuracy, Destructive Command, DSM Version Propagation, External AI Contribution Guidelines). Re-mapped Phase 0.5, Plan Mode, and First Session Prompt to include Earn Your Assertions. BACKLOG-123. |
 | 1.2 | 2026-02-15 | Added Inclusive Language protocol mapping (Communication table). Added guardrail to Match the Room: agent must surface conflicts between external conventions and DSM inclusive language standards, human decides consciously. |
 | 1.3 | 2026-02-15 | Updated gap table (Section 2.2): added Status column, marked 3 gaps as addressed by BACKLOG-122 (Session Delivery Budget, PR Size Guidance, Research Phase Guard). Added Research phase guard row. |

@@ -15,7 +15,7 @@ Re-read all DSM context sources without session-start overhead. Use when CLAUDE.
 
 - No baseline creation (that is /dsm-go)
 - No transcript reset (that is /dsm-go)
-- No git status or bandwidth check
+- No git status check
 - No checkpoint creation (that is /dsm-checkpoint)
 - No journal appending (that is /dsm-wrap-up)
 - No "What would you like to work on?" prompt

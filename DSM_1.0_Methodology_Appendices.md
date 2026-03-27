@@ -11,13 +11,14 @@
 
 ## Appendices Overview
 
-This document consolidates all five appendices for the Data Science Collaboration Methodology:
+This document consolidates all appendices for the Data Science Collaboration Methodology:
 
-- **Appendix A:** Environment Setup Details (Package specifications, troubleshooting)
-- **Appendix B:** Phase Deep Dives (Detailed guidance with examples)
-- **Appendix C:** Advanced Practices Detailed (Implementation guides)
-- **Appendix D:** Domain Adaptations (Time series, NLP, CV, clustering)
+- **Appendix A:** Environment Setup (Tool selection, troubleshooting, cross-platform setup)
+- **Appendix B:** Phase Deep Dives (Decision frameworks, templates, orientation per phase)
+- **Appendix C:** Advanced Practices (Experiment tracking, capability templates, risk/debt registers)
+- **Appendix D:** Domain Adaptations (Orientation blocks for time series, NLP, CV, clustering, supervised learning)
 - **Appendix E:** Quick Reference (Checklists, templates, commands)
+- **Appendix F:** Coding Anti-Patterns (Python, data science, ML engineering patterns)
 
 **Cross-references to main methodology:** Use "Section X.Y" format (e.g., "See Section 2.2")
 
@@ -26,383 +27,52 @@ This document consolidates all five appendices for the Data Science Collaboratio
 # Appendix A: Environment Setup Details
 
 **Part of:** Data Science Collaboration Methodology v1.1  
-**Main Document:** `1.0_Data_Science_Collaboration_Methodology.md` â†’ Section 2.1  
-**Purpose:** Detailed environment setup guidance, package rationale, and troubleshooting
+**Main Document:** `1.0_Data_Science_Collaboration_Methodology.md` → Section 2.1  
+**Purpose:** Environment setup guidance, tool selection, and troubleshooting
 
 ---
 
 ## A.1. Base Environment (Minimal)
 
-### A.1.1. Package List and Rationale
+**Core Data Science Stack:** jupyter, ipykernel, pandas, numpy, matplotlib, seaborn (~82 MB total)
 
-**Core Data Science Stack (5 packages):**
+**Setup steps:**
+1. Create virtual environment: `python -m venv .venv`
+2. Activate: `source .venv/bin/activate` (Linux/Mac) or `.venv\Scripts\activate` (Windows)
+3. Install: `pip install jupyter ipykernel pandas numpy matplotlib seaborn`
+4. Register kernel: `python -m ipykernel install --user --name=project_kernel`
+5. Verify: import all packages, check versions, run a basic plot
 
-**jupyter (latest)**
-- **Purpose:** Notebook interface for interactive analysis
-- **Why Essential:** Primary development environment for data science
-- **Components:** JupyterLab, Jupyter Notebook, IPython
-- **Size:** ~10 MB
-
-**ipykernel (latest)**
-- **Purpose:** Jupyter kernel for Python
-- **Why Essential:** Enables notebook execution with Python
-- **Use:** Registers Python environment as Jupyter kernel
-- **Size:** ~2 MB
-
-**pandas (>=2.0.0)**
-- **Purpose:** Data manipulation and analysis
-- **Why Essential:** Core tool for tabular data operations
-- **Key Features:** DataFrame operations, groupby, merging, time series
-- **Size:** ~30 MB
-
-**numpy (>=1.24.0)**
-- **Purpose:** Numerical computing foundation
-- **Why Essential:** Underlies pandas, enables efficient array operations
-- **Key Features:** N-dimensional arrays, mathematical functions
-- **Size:** ~20 MB
-
-**matplotlib (>=3.7.0)**
-- **Purpose:** Data visualization library
-- **Why Essential:** Foundation for plotting in Python
-- **Key Features:** Static plots, customizable visualizations
-- **Size:** ~15 MB
-
-**seaborn (>=0.12.0)**
-- **Purpose:** Statistical data visualization
-- **Why Essential:** High-level interface for attractive plots
-- **Built on:** matplotlib
-- **Key Features:** Distribution plots, categorical plots, heatmaps
-- **Size:** ~5 MB
-
-**Total Minimal Setup:** ~82 MB
-
-### A.1.2. Installation Steps
-
-**Step 1: Create Virtual Environment**
-```bash
-# From project root directory
-python -m venv .venv
-
-# Verify creation
-# Windows
-dir .venv
-
-# Mac/Linux
-ls -la .venv
-```
-
-**Step 2: Activate Virtual Environment**
-```bash
-# Windows
-.venv\Scripts\activate
-
-# Mac/Linux
-source .venv/bin/activate
-
-# Verify activation (prompt should show (.venv))
-```
-
-**Step 3: Upgrade pip**
-```bash
-python -m pip install --upgrade pip
-
-# Verify pip version
-pip --version
-# Should show pip 23.x or higher
-```
-
-**Step 4: Install Base Packages**
-```bash
-pip install jupyter ipykernel pandas numpy matplotlib seaborn
-
-# Or from requirements file
-pip install -r requirements_base.txt
-```
-
-**Expected Output:**
-```
-Collecting jupyter
-  Downloading jupyter-1.0.0-py2.py3-none-any.whl
-Collecting ipykernel
-  Downloading ipykernel-6.25.0-py3-none-any.whl
-...
-Successfully installed jupyter-1.0.0 ipykernel-6.25.0 pandas-2.0.3 numpy-1.24.3 matplotlib-3.7.2 seaborn-0.12.2
-```
-
-**Step 5: Register Jupyter Kernel**
-```bash
-python -m ipykernel install --user --name=project_base_kernel --display-name="Python (project_base)"
-
-# Verify kernel registration
-jupyter kernelspec list
-```
-
-**Expected Output:**
-```
-Available kernels:
-  project_base_kernel    C:\Users\...\jupyter\kernels\project_base_kernel
-  python3                /usr/share/jupyter/kernels/python3
-```
-
-### A.1.3. Verification Procedures
-
-**Test 1: Kernel Registration**
-```bash
-jupyter kernelspec list | grep project_base_kernel
-# Should return kernel path
-```
-
-**Test 2: Package Imports**
-```python
-# Create test notebook or Python script
-import sys
-print(f"Python: {sys.version}")
-print(f"Executable: {sys.executable}")
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-print(f"pandas: {pd.__version__}")
-print(f"numpy: {np.__version__}")
-print(f"matplotlib: {plt.matplotlib.__version__}")
-print(f"seaborn: {sns.__version__}")
-
-print("OK: All packages imported successfully")
-```
-
-**Expected Output:**
-```
-Python: 3.10.x
-Executable: /path/to/project/.venv/bin/python
-pandas: 2.0.3
-numpy: 1.24.3
-matplotlib: 3.7.2
-seaborn: 0.12.2
-OK: All packages imported successfully
-```
-
-**Test 3: Basic Operations**
-```python
-# Test DataFrame creation
-df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-print(df)
-
-# Test plotting
-plt.plot([1, 2, 3], [1, 4, 9])
-plt.title("Test Plot")
-plt.show()
-
-print("OK: Basic operations functional")
-```
+See A.7 for environment tool selection (venv, uv, Poetry, Conda).
 
 ---
 
 ## A.2. Base Environment (Full with Code Quality)
 
-### A.2.1. Additional Packages
+**Additional tools:** black (formatter), flake8 (linter), isort (import sorter), autopep8 (auto-fix)
 
-**Code Quality Tools (4 additional packages):**
+**When to use full setup:**
+- Team projects, code review expected, production deployment planned
 
-**black (latest)**
-- **Purpose:** Code formatter
-- **Why Useful:** Automatic PEP 8 compliance
-- **When to Use:** Team projects, production code
-- **When to Skip:** Academic work (can be annoying)
-- **Size:** ~5 MB
+**When to skip:**
+- Individual academic projects, exploratory analysis, early exploration
 
-**flake8 (latest)**
-- **Purpose:** Linting (style checking)
-- **Why Useful:** Catches style issues and potential bugs
-- **When to Use:** Code reviews, team standards
-- **When to Skip:** Exploratory analysis
-- **Size:** ~2 MB
-
-**isort (latest)**
-- **Purpose:** Import statement sorting
-- **Why Useful:** Consistent import organization
-- **When to Use:** Team projects with standards
-- **When to Skip:** Individual projects
-- **Size:** ~1 MB
-
-**autopep8 (latest)**
-- **Purpose:** Automatic PEP 8 fixes
-- **Why Useful:** Quick style corrections
-- **When to Use:** Cleaning up code before sharing
-- **When to Skip:** Early exploration
-- **Size:** ~2 MB
-
-**Total Full Setup:** ~92 MB
-
-### A.2.2. When to Use Full Setup
-
-**Use Full Setup If:**
-- Working in team environment
-- Code will be reviewed by others
-- Production deployment planned
-- Organizational standards require it
-- Learning professional practices
-
-**Skip Full Setup If:**
-- Individual academic project
-- Exploratory analysis only
-- No code review expected
-- Prefer flexibility over standards
-- Find linting distracting
-
-### A.2.3. Configuration Details
-
-**VS Code settings.json:**
-```json
-{
-  "python.defaultInterpreterPath": "./.venv/Scripts/python.exe",
-  "jupyter.jupyterServerType": "local",
-  "python.formatting.provider": "black",
-  "python.linting.flake8Enabled": true,
-  "python.linting.enabled": true,
-  "editor.formatOnSave": true,
-  "python.sortImports.args": [
-    "--profile",
-    "black"
-  ]
-}
-```
-
-**Optional: .flake8 Configuration**
-```ini
-[flake8]
-max-line-length = 100
-exclude = .venv,__pycache__
-ignore = E203, W503
-```
+Configuration: Add formatter/linter settings to `.vscode/settings.json` or equivalent IDE config.
 
 ---
 
 ## A.3. Domain-Specific Extensions
 
-### A.3.1. Time Series Packages
+Domain-specific packages (time series, NLP, deep learning, computer vision) should
+be installed only when the project requires them. Install after project planning
+identifies actual needs, not speculatively.
 
-**statsmodels (>=0.14.0)**
-- **Purpose:** Statistical models (ARIMA, VAR, etc.)
-- **Use Cases:** Time series forecasting, econometric models
-- **Size:** ~20 MB
-
-**prophet (>=1.1)**
-- **Purpose:** Facebook's forecasting library
-- **Use Cases:** Business time series with seasonality
-- **Size:** ~15 MB
-
-**Installation:**
-```bash
-pip install statsmodels prophet
-```
-
-**Verification:**
-```python
-import statsmodels.api as sm
-from prophet import Prophet
-print("OK: Time series packages installed")
-```
-
-### A.3.2. NLP Packages
-
-**nltk (>=3.8)**
-- **Purpose:** Natural Language Toolkit
-- **Use Cases:** Tokenization, stemming, POS tagging
-- **Size:** ~10 MB (+ data downloads)
-
-**spacy (>=3.6)**
-- **Purpose:** Industrial-strength NLP
-- **Use Cases:** Named entity recognition, dependency parsing
-- **Size:** ~20 MB (+ model downloads)
-
-**scikit-learn (>=1.3.0)**
-- **Purpose:** ML library (includes TF-IDF, clustering)
-- **Use Cases:** Text classification, vectorization
-- **Size:** ~30 MB
-
-**Installation:**
-```bash
-pip install nltk spacy scikit-learn
-python -m spacy download en_core_web_sm  # Small English model
-```
-
-**Verification:**
-```python
-import nltk
-import spacy
-from sklearn.feature_extraction.text import TfidfVectorizer
-print("OK: NLP packages installed")
-```
-
-### A.3.3. Deep Learning Packages
-
-**tensorflow (>=2.13.0) OR pytorch (>=2.0.0)**
-- **Purpose:** Deep learning frameworks
-- **Use Cases:** Neural networks, complex ML models
-- **Size:** ~400 MB (large!)
-
-**Installation (TensorFlow):**
-```bash
-pip install tensorflow
-```
-
-**Installation (PyTorch):**
-```bash
-# CPU version
-pip install torch torchvision torchaudio
-
-# GPU version (CUDA 11.8)
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-```
-
-**WARNING:** Deep learning packages are large. Only install if needed for project.
-
-### A.3.4. Computer Vision Packages
-
-**opencv-python (>=4.8.0)**
-- **Purpose:** Computer vision library
-- **Use Cases:** Image processing, transformation
-- **Size:** ~30 MB
-
-**Pillow (>=10.0.0)**
-- **Purpose:** Python Imaging Library
-- **Use Cases:** Image loading, basic processing
-- **Size:** ~5 MB
-
-**Installation:**
-```bash
-pip install opencv-python Pillow
-```
-
-**Verification:**
-```python
-import cv2
-from PIL import Image
-print("OK: Computer vision packages installed")
-```
-
-### A.3.5. Extension Script Generation
-
-**Create Domain-Specific Requirements:**
-```bash
-# After installing domain packages
-pip freeze > requirements_domain.txt
-
-# Or create manually
-cat > requirements_timeseries.txt << EOF
-statsmodels>=0.14.0
-prophet>=1.1
-EOF
-```
-
-**Install Domain Requirements:**
-```bash
-# Base + domain
-pip install -r requirements_base.txt
-pip install -r requirements_timeseries.txt
-```
+**Key considerations:**
+- Create separate requirements files per domain (`requirements_timeseries.txt`, etc.)
+- Deep learning frameworks are large (400+ MB); only install if needed
+- Some packages require additional downloads (spaCy models, NLTK data)
+- Verify imports after installation before proceeding to analysis
+- Document why each domain package was chosen in the project README
 
 ---
 
@@ -410,154 +80,42 @@ pip install -r requirements_timeseries.txt
 
 ### A.4.1. Common Installation Errors
 
-**Error: "pip is not recognized"**
-- **Cause:** Python not in PATH or pip not installed
-- **Solution:** Reinstall Python with "Add to PATH" option
-- **Verification:** `python --version` and `pip --version`
+| Error | Cause | Solution |
+|-------|-------|----------|
+| "pip is not recognized" | Python not in PATH | Reinstall Python with "Add to PATH" |
+| "No module named pip" | pip missing | `python -m ensurepip --upgrade` |
+| "Could not find version" | Name misspelled or version incompatible | Check package name and Python version |
+| "Visual C++ 14.0 required" | Missing build tools (Windows) | Install MS C++ Build Tools or use wheels |
+| Long path issues (Windows) | MAX_PATH limitation | Enable long path support or use shorter paths |
 
-**Error: "No module named 'pip'"**
-- **Cause:** pip not installed in environment
-- **Solution:** `python -m ensurepip --upgrade`
+### A.4.2. Platform-Specific Notes
 
-**Error: "Could not find a version that satisfies the requirement"**
-- **Cause:** Package name misspelled or not available for Python version
-- **Solution:** Check package name, verify Python version compatibility
-- **Example:** Some packages require Python 3.8+
-
-**Error: "Microsoft Visual C++ 14.0 or greater is required"**
-- **Cause:** Missing C++ build tools (Windows)
-- **Solution:** Install Microsoft C++ Build Tools
-- **Alternative:** Use pre-compiled wheels
-
-**Error: Long path issues (Windows)**
-- **Cause:** Windows MAX_PATH limitation
-- **Solution:** Enable long path support in registry
-- **Alternative:** Use shorter project path
-
-### A.4.2. Platform-Specific Issues
-
-**Windows:**
-- Use `Scripts\activate` not `bin/activate`
-- Use backslashes `\` in paths
-- May need admin rights for some installations
-- Long path names can cause issues
-
-**Mac/Linux:**
-- Use `bin/activate`
-- Use forward slashes `/` in paths
-- May need `sudo` for system-wide installations
-- Prefer virtual environments over system Python
-
-**Mac (Apple Silicon M1/M2):**
-- Some packages need Rosetta 2
-- TensorFlow requires specific versions
-- Use miniforge for better ARM support
+- **Windows:** Use `Scripts\activate`, backslash paths, may need admin rights
+- **Mac/Linux:** Use `bin/activate`, forward slash paths, prefer venvs over system Python
+- **Apple Silicon:** Some packages need Rosetta 2; use miniforge for ARM support
 
 ### A.4.3. Dependency Conflicts
 
-**Symptom:** Package installation fails due to version conflicts
-```
-ERROR: pip's dependency resolver does not currently take into account all the packages that are installed.
-```
-
-**Solution 1: Create Fresh Environment**
-```bash
-# Deactivate current
-deactivate
-
-# Remove old environment
-rm -rf .venv  # Mac/Linux
-rmdir /s .venv  # Windows
-
-# Create new
-python -m venv .venv
-```
-
-**Solution 2: Use Constraints File**
-```bash
-# Pin compatible versions
-pip install pandas==2.0.3 numpy==1.24.3
-```
-
-**Solution 3: Install in Order**
-```bash
-# Install dependencies first
-pip install numpy
-pip install pandas
-# Then higher-level packages
-pip install scikit-learn
-```
+If installation fails due to version conflicts:
+1. **Create fresh environment** (deactivate, remove .venv, recreate)
+2. **Pin versions** in requirements file
+3. **Install in dependency order** (numpy before pandas before sklearn)
 
 ### A.4.4. Jupyter Kernel Issues
 
-**Issue: Kernel not found in VS Code**
-- **Check:** Is kernel registered? `jupyter kernelspec list`
-- **Solution:** Re-register kernel with install command
-- **VS Code:** Reload window (Ctrl+Shift+P â†’ "Reload Window")
+| Issue | Check | Solution |
+|-------|-------|----------|
+| Kernel not found | `jupyter kernelspec list` | Re-register kernel, reload IDE |
+| Wrong Python version | `cat .../kernel.json` | Uninstall old kernel, re-register |
+| Kernel dies immediately | Test imports in terminal | Verify activation and packages |
 
-**Issue: Wrong Python version in kernel**
-- **Check:** Which Python is registered?
-```bash
-jupyter kernelspec list
-cat /path/to/kernel/kernel.json
-```
-- **Solution:** Remove old kernel, re-register correct one
-```bash
-jupyter kernelspec uninstall project_base_kernel
-python -m ipykernel install --user --name=project_base_kernel
-```
+### A.4.5. Environment Maintenance Orientation
 
-**Issue: Kernel dies immediately**
-- **Check:** Environment activation worked?
-- **Check:** All packages installed?
-- **Solution:** Test Python directly in terminal first
-```bash
-.venv\Scripts\activate
-python
->>> import pandas
->>> import numpy
-```
-
-### A.4.5. Environment Maintenance
-
-**Update Packages:**
-```bash
-# Update single package
-pip install --upgrade pandas
-
-# Update all packages
-pip list --outdated
-pip install --upgrade pip setuptools wheel
-pip install --upgrade -r requirements_base.txt
-```
-
-**Check for Security Issues:**
-```bash
-pip install pip-audit
-pip-audit
-```
-
-**Clean Environment:**
-```bash
-# Remove unused packages
-pip uninstall package_name
-
-# Or recreate environment from scratch
-deactivate
-rm -rf .venv
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements_base.txt
-```
-
-**Export Current Environment:**
-```bash
-# All packages
-pip freeze > requirements_full.txt
-
-# Or manually maintain requirements
-pip list --format=freeze > requirements.txt
-```
+Key maintenance tasks:
+- Update packages: `pip install --upgrade <package>` or `pip list --outdated`
+- Security audit: `pip-audit`
+- Export: `pip freeze > requirements.txt`
+- Clean rebuild: deactivate, remove .venv, recreate from requirements file
 
 ---
 
@@ -605,12 +163,7 @@ pip install pandas
 
 ## A.6. Environment Transition Checklist
 
-**Purpose:** Guide for transitioning between development environments (e.g., Windows to WSL2/Linux for GPU training).
-
-**Source:** Favorita Demand Forecasting Project
-- Development: Windows 11, CPU-only TensorFlow
-- Production: WSL2 Ubuntu 22.04, GPU-enabled TensorFlow
-- Transition required careful planning to avoid path and package issues
+**Purpose:** Guide for transitioning between development environments (e.g., Windows to WSL2/Linux, CPU to GPU, local to cloud).
 
 ### A.6.1. When Environment Transition Is Needed
 
@@ -619,308 +172,56 @@ pip install pandas
 - CPU training to GPU training (cloud or local)
 - Local development to Docker container
 - Single machine to distributed computing
-- Academic laptop to HPC cluster
 
 **Signs You Need to Plan Transition:**
 - Dataset exceeds local memory (need cloud/HPC)
 - Training time exceeds acceptable threshold (need GPU)
 - Deployment target differs from development OS
-- Team members use different operating systems
 
 ### A.6.2. Pre-Transition Checklist
 
 **Before Starting Transition:**
-
-```markdown
-## Environment Transition Planning
-
-**Source Environment:**
-- OS: [e.g., Windows 11]
-- Python: [e.g., 3.11.5]
-- Key packages: [e.g., TensorFlow 2.20.0 CPU]
-- Working directory: [e.g., D:\projects\forecasting]
-
-**Target Environment:**
-- OS: [e.g., Ubuntu 22.04 on WSL2]
-- Python: [e.g., 3.11.x]
-- Key packages: [e.g., TensorFlow 2.20.0 GPU]
-- Working directory: [e.g., /mnt/d/projects/forecasting]
-
-**Transition Checklist:**
 - [ ] Requirements file is current (`pip freeze > requirements.txt`)
-- [ ] All code uses relative paths from project root
-- [ ] No hardcoded Windows paths (C:\, D:\, backslashes)
+- [ ] All code uses relative paths from project root (use `pathlib`)
+- [ ] No hardcoded OS-specific paths
 - [ ] Data files accessible from target environment
-- [ ] Model artifacts are portable (no absolute paths in pickles)
+- [ ] Model artifacts are portable (no absolute paths in serialized objects)
 - [ ] Tests exist to validate pipeline works end-to-end
-```
 
 ### A.6.3. Path Handling for Cross-Platform Compatibility
 
-**Use pathlib for All Paths:**
+Use `pathlib.Path` for all file operations. Define paths relative to project root
+in a configuration cell at the top of each notebook. Avoid hardcoded OS-specific
+paths (`D:\`, `/home/user/`).
 
-```python
-# BAD: Windows-specific
-data_path = "D:\\projects\\forecasting\\data\\train.csv"
+**Key principle:** `Path(__file__).parent` or `Path.cwd()` as base, then compose
+with `/` operator: `DATA_DIR = PROJECT_ROOT / "data" / "raw"`.
 
-# BAD: Unix-specific
-data_path = "/home/user/projects/forecasting/data/train.csv"
+### A.6.4. GPU Environment Setup
 
-# GOOD: Cross-platform
-from pathlib import Path
+When transitioning to GPU compute (WSL2, cloud, HPC):
+- Verify GPU driver and CUDA version compatibility with your framework
+- Enable memory growth to prevent OOM errors
+- Test GPU detection before starting training
+- Common issues: driver mismatch, CUDA version conflicts, memory limits
 
-PROJECT_ROOT = Path(__file__).parent.parent  # Or define explicitly
-DATA_DIR = PROJECT_ROOT / "data"
-TRAIN_PATH = DATA_DIR / "train.csv"
+### A.6.5. Post-Transition Validation
 
-# Works on both Windows and Linux
-df = pd.read_csv(TRAIN_PATH)
-```
+After transitioning, verify:
+1. Python version matches or is compatible
+2. All required packages import successfully
+3. GPU is detected (if applicable)
+4. Project paths resolve correctly
+5. Data files are accessible
+6. Pipeline runs end-to-end
 
-**Constants Pattern for Notebooks:**
+### A.6.6. Best Practices for Environment Transitions
 
-```python
-# Cell 1: Environment Configuration (works on both platforms)
-from pathlib import Path
-import os
-
-# Detect environment
-IS_WSL = 'microsoft' in os.uname().release.lower() if hasattr(os, 'uname') else False
-IS_WINDOWS = os.name == 'nt'
-
-# Set project root (adjust based on notebook location)
-if IS_WSL:
-    PROJECT_ROOT = Path("/mnt/d/projects/forecasting")
-elif IS_WINDOWS:
-    PROJECT_ROOT = Path("D:/projects/forecasting")
-else:
-    PROJECT_ROOT = Path.cwd().parent
-
-# Define all paths relative to root
-DATA_DIR = PROJECT_ROOT / "data"
-RAW_DIR = DATA_DIR / "raw"
-PROCESSED_DIR = DATA_DIR / "processed"
-ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
-OUTPUTS_DIR = PROJECT_ROOT / "outputs"
-
-print(f"Environment: {'WSL' if IS_WSL else 'Windows' if IS_WINDOWS else 'Other'}")
-print(f"Project root: {PROJECT_ROOT}")
-print(f"Project root exists: {PROJECT_ROOT.exists()}")
-```
-
-### A.6.4. GPU Environment Setup (WSL2 Example)
-
-**WSL2 + CUDA Setup Checklist:**
-
-```bash
-# 1. Check WSL version
-wsl --version
-
-# 2. Check NVIDIA driver (from Windows PowerShell)
-nvidia-smi
-
-# 3. In WSL2 Ubuntu, verify CUDA access
-nvidia-smi  # Should work if driver is installed
-
-# 4. Create Python environment in WSL2
-python3 -m venv .venv_gpu
-source .venv_gpu/bin/activate
-
-# 5. Install TensorFlow with GPU support
-pip install tensorflow[and-cuda]
-
-# 6. Verify GPU is detected
-python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
-```
-
-**Common GPU Setup Issues:**
-
-| Issue | Symptom | Solution |
-|-------|---------|----------|
-| No GPU detected | Empty list from TensorFlow | Update NVIDIA driver in Windows |
-| CUDA version mismatch | cuDNN errors | Match TensorFlow version to CUDA |
-| Out of memory | OOM during training | Reduce batch size, enable memory growth |
-| WSL memory limit | Training killed | Increase WSL memory in .wslconfig |
-
-**Memory Growth Configuration:**
-
-```python
-# Add to notebook start to prevent OOM
-import tensorflow as tf
-
-gpus = tf.config.list_physical_devices('GPU')
-if gpus:
-    try:
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-        print(f"OK: GPU memory growth enabled for {len(gpus)} GPU(s)")
-    except RuntimeError as e:
-        print(f"WARNING: GPU memory growth failed: {e}")
-```
-
-### A.6.5. Transition Validation Script
-
-**Run This After Environment Transition:**
-
-```python
-#!/usr/bin/env python3
-"""
-validate_environment_transition.py
-Run after transitioning to new environment to verify setup.
-"""
-
-import sys
-from pathlib import Path
-
-def validate_transition():
-    """Validate environment transition was successful."""
-
-    results = []
-
-    # 1. Python version
-    py_version = sys.version_info
-    results.append({
-        'check': 'Python version',
-        'status': 'OK' if py_version >= (3, 9) else 'WARNING',
-        'detail': f"{py_version.major}.{py_version.minor}.{py_version.micro}"
-    })
-
-    # 2. Core packages
-    packages = ['pandas', 'numpy', 'sklearn', 'tensorflow', 'xgboost']
-    for pkg in packages:
-        try:
-            module = __import__(pkg.replace('sklearn', 'sklearn'))
-            version = getattr(module, '__version__', 'unknown')
-            results.append({
-                'check': f'Package: {pkg}',
-                'status': 'OK',
-                'detail': version
-            })
-        except ImportError as e:
-            results.append({
-                'check': f'Package: {pkg}',
-                'status': 'ERROR',
-                'detail': str(e)
-            })
-
-    # 3. GPU availability (if TensorFlow)
-    try:
-        import tensorflow as tf
-        gpus = tf.config.list_physical_devices('GPU')
-        results.append({
-            'check': 'GPU availability',
-            'status': 'OK' if gpus else 'WARNING',
-            'detail': f"{len(gpus)} GPU(s) detected" if gpus else "No GPU (CPU only)"
-        })
-    except Exception as e:
-        results.append({
-            'check': 'GPU availability',
-            'status': 'ERROR',
-            'detail': str(e)
-        })
-
-    # 4. Project paths
-    project_root = Path.cwd()
-    critical_paths = [
-        project_root / "data",
-        project_root / "notebooks",
-        project_root / "artifacts"
-    ]
-
-    for path in critical_paths:
-        results.append({
-            'check': f'Path: {path.name}/',
-            'status': 'OK' if path.exists() else 'ERROR',
-            'detail': str(path)
-        })
-
-    # 5. Data file access
-    data_dir = project_root / "data" / "raw"
-    if data_dir.exists():
-        file_count = len(list(data_dir.glob("*")))
-        results.append({
-            'check': 'Data files accessible',
-            'status': 'OK' if file_count > 0 else 'WARNING',
-            'detail': f"{file_count} files in data/raw/"
-        })
-
-    # Print results
-    print("\n" + "=" * 60)
-    print("ENVIRONMENT TRANSITION VALIDATION")
-    print("=" * 60)
-
-    for r in results:
-        status_icon = {'OK': 'OK:', 'WARNING': 'WARNING:', 'ERROR': 'ERROR:'}[r['status']]
-        print(f"{status_icon} {r['check']}: {r['detail']}")
-
-    print("=" * 60)
-
-    errors = [r for r in results if r['status'] == 'ERROR']
-    warnings = [r for r in results if r['status'] == 'WARNING']
-
-    if errors:
-        print(f"\nERROR: {len(errors)} critical issue(s) found. Fix before proceeding.")
-        return False
-    elif warnings:
-        print(f"\nWARNING: {len(warnings)} warning(s). Review but can proceed.")
-        return True
-    else:
-        print("\nOK: Environment transition validated successfully!")
-        return True
-
-if __name__ == "__main__":
-    success = validate_transition()
-    sys.exit(0 if success else 1)
-```
-
-### A.6.6. Best Practices for Smooth Transitions
-
-**DO:**
-- Test transition early (Sprint 2-3, not Sprint 4)
-- Keep requirements.txt synchronized
-- Use pathlib for all file operations
+- Test transition early (Sprint 2-3), not at delivery time
+- Keep `requirements.txt` synchronized across environments
+- Use `pathlib` for all file operations
 - Document environment-specific configurations
-- Run validation script after each transition
-
-**DON'T:**
-- Wait until production to test GPU environment
-- Hardcode absolute paths
-- Assume packages behave identically across platforms
-- Forget to update .gitignore for platform-specific files
-- Skip end-to-end pipeline validation after transition
-
-**Transition Documentation Template:**
-
-```markdown
-## Environment Transition Log
-
-**Date:** [YYYY-MM-DD]
-**From:** [Source environment]
-**To:** [Target environment]
-
-### Pre-Transition
-- [ ] Requirements exported
-- [ ] Paths verified cross-platform
-- [ ] Data accessible from target
-
-### Transition Steps
-1. [Step 1]
-2. [Step 2]
-...
-
-### Post-Transition Validation
-- [ ] Validation script passed
-- [ ] Pipeline runs end-to-end
-- [ ] Model training completes
-- [ ] Predictions match expected format
-
-### Issues Encountered
-- [Issue 1]: [Resolution]
-- [Issue 2]: [Resolution]
-
-### Notes for Future Transitions
-- [Lesson learned]
-```
+- Run end-to-end pipeline validation after each transition
 
 ---
 
@@ -1012,49 +313,15 @@ Cross-reference: Section 2.1 (Environment Setup), DSM 4.0 Section 3 (Development
 
 ## A.8. Model & Data Cache Management
 
-Large model downloads (embeddings, transformers, NLTK data) can consume
+Large model downloads (embeddings, transformers, pretrained models) can consume
 significant disk space. Document and manage these to avoid storage surprises.
 
-### A.8.1. Common Cache Locations
-
-| Library | Default Cache Path | Typical Size |
-|---------|-------------------|-------------|
-| gensim | `~/gensim-data/` | 500MB-2GB |
-| HuggingFace | `~/.cache/huggingface/` | 500MB-5GB+ |
-| NLTK | `~/nltk_data/` | 50-500MB |
-| spaCy | Python site-packages | 50-500MB per model |
-| PyTorch | `~/.cache/torch/` | Varies |
-| TensorFlow | `~/.keras/` (legacy) or `~/.cache/` | Varies |
-
-### A.8.2. Size Checking
-
-```bash
-# Check all common cache locations
-du -sh ~/gensim-data/ ~/.cache/huggingface/ ~/nltk_data/ 2>/dev/null
-
-# Check specific model sizes
-du -sh ~/gensim-data/glove-twitter-200/
-du -sh ~/.cache/huggingface/hub/sentence-transformers*/
-```
-
-### A.8.3. Cleanup Commands
-
-```bash
-# Remove specific library caches
-rm -rf ~/gensim-data/              # All gensim models
-rm -rf ~/.cache/huggingface/hub/   # All HuggingFace models
-rm -rf ~/nltk_data/                # All NLTK data
-
-# Selective cleanup (keep some models)
-rm -rf ~/gensim-data/fasttext-wiki-news-subwords-300/  # Remove one model
-```
-
-### A.8.4. Best Practices
-
-- **Document downloads:** Note large model downloads in project README with expected sizes
-- **Clean after project:** Remove domain-specific caches not needed for other work
-- **Share awareness:** If using shared compute, coordinate cache management
-- **Gitignore caches:** Ensure cache directories are in `.gitignore`
+**Key practices:**
+- Document large model downloads in project README with expected sizes
+- Check cache sizes periodically: `du -sh ~/.cache/` and library-specific locations
+- Clean domain-specific caches after project completion
+- Ensure cache directories are in `.gitignore`
+- On shared compute, coordinate cache management with the team
 
 Cross-reference: Appendix A.3 (Domain-Specific Extensions)
 
@@ -1169,360 +436,67 @@ Return to main document: **Section 2.1: Phase 0: Environment Setup**
 # Appendix B: Phase Deep Dives
 
 **Part of:** Data Science Collaboration Methodology v1.1  
-**Main Document:** `1.0_Data_Science_Collaboration_Methodology.md` â†’ Section 2  
-**Purpose:** Detailed implementation guidance and examples for each project phase
+**Main Document:** `1.0_Data_Science_Collaboration_Methodology.md` → Section 2  
+**Purpose:** Implementation guidance and decision frameworks for each project phase
 
 ---
 
 ## B.1. Phase 0 Deep Dive: Environment Setup
 
-### B.1.1. Setup Script Walkthrough
+Setup scripts and VS Code configuration are covered in Appendix A.
 
-**Minimal Setup Script Structure:**
-```python
-#!/usr/bin/env python3
-"""
-setup_base_environment_minimal.py
-Creates virtual environment with essential data science packages
-"""
-
-import subprocess
-import sys
-import os
-from pathlib import Path
-
-def run_command(cmd, description):
-    """Execute shell command with status reporting"""
-    print(f"\n{description}...")
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    if result.returncode == 0:
-        print(f"OK: {description} complete")
-        return True
-    else:
-        print(f"ERROR: {description} failed")
-        print(result.stderr)
-        return False
-
-def main():
-    # Step 1: Create virtual environment
-    if not run_command("python -m venv .venv", "Creating virtual environment"):
-        sys.exit(1)
-    
-    # Step 2: Activate and upgrade pip
-    activate_cmd = ".venv\\Scripts\\activate" if os.name == 'nt' else "source .venv/bin/activate"
-    pip_cmd = ".venv\\Scripts\\pip" if os.name == 'nt' else ".venv/bin/pip"
-    
-    if not run_command(f"{pip_cmd} install --upgrade pip", "Upgrading pip"):
-        sys.exit(1)
-    
-    # Step 3: Install packages
-    packages = "jupyter ipykernel pandas numpy matplotlib seaborn"
-    if not run_command(f"{pip_cmd} install {packages}", "Installing base packages"):
-        sys.exit(1)
-    
-    # Step 4: Register kernel
-    python_cmd = ".venv\\Scripts\\python" if os.name == 'nt' else ".venv/bin/python"
-    kernel_cmd = f"{python_cmd} -m ipykernel install --user --name=project_base_kernel"
-    if not run_command(kernel_cmd, "Registering Jupyter kernel"):
-        sys.exit(1)
-    
-    # Step 5: Generate requirements.txt
-    if not run_command(f"{pip_cmd} freeze > requirements_base.txt", "Generating requirements"):
-        sys.exit(1)
-    
-    # Step 6: Create VS Code settings
-    create_vscode_settings()
-    
-    print("\nOK: Environment setup complete!")
-    print("Next steps:")
-    print("1. Activate environment")
-    print(f"   {activate_cmd}")
-    print("2. Open VS Code in this directory")
-    print("3. Create first notebook with project_base_kernel")
-
-def create_vscode_settings():
-    """Create .vscode/settings.json"""
-    vscode_dir = Path(".vscode")
-    vscode_dir.mkdir(exist_ok=True)
-    
-    settings = {
-        "python.defaultInterpreterPath": "./.venv/Scripts/python.exe" if os.name == 'nt' else "./.venv/bin/python",
-        "jupyter.jupyterServerType": "local"
-    }
-    
-    import json
-    with open(vscode_dir / "settings.json", "w") as f:
-        json.dump(settings, f, indent=2)
-    print("OK: VS Code settings created")
-
-if __name__ == "__main__":
-    main()
-```
-
-### B.1.2. VS Code Configuration Details
-
-**Recommended Extensions:**
-- Python (Microsoft)
-- Jupyter (Microsoft)
-- Pylance (Microsoft)
-
-**Workspace Settings (`.vscode/settings.json`):**
-```json
-{
-  "python.defaultInterpreterPath": "./.venv/Scripts/python.exe",
-  "jupyter.jupyterServerType": "local",
-  "jupyter.notebookFileRoot": "${workspaceFolder}",
-  "files.exclude": {
-    "**/__pycache__": true,
-    "**/.venv": true,
-    "**/*.pyc": true
-  },
-  "python.analysis.extraPaths": [
-    "${workspaceFolder}"
-  ]
-}
-```
-
-### B.1.3. Kernel Management
-
-**List All Kernels:**
-```bash
-jupyter kernelspec list
-```
-
-**Remove Old Kernel:**
-```bash
-jupyter kernelspec uninstall old_kernel_name
-```
-
-**Change Kernel Display Name:**
-```bash
-# Find kernel location
-jupyter kernelspec list
-
-# Edit kernel.json
-# Change "display_name" field
-```
-
-**Multiple Project Kernels:**
-```bash
-# Project 1
-python -m ipykernel install --user --name=project1 --display-name="Project 1"
-
-# Project 2
-python -m ipykernel install --user --name=project2 --display-name="Project 2"
-```
+**Key IDE setup points:**
+- Configure your IDE to point to the project virtual environment interpreter
+- Register separate Jupyter kernels per project for isolation
 
 ---
 
 ## B.2. Phase 1 Deep Dive: Exploration
 
-### B.2.1. Data Quality Assessment Techniques
+### B.2.1. Data Quality Assessment Orientation
 
-**Comprehensive Quality Check:**
-```python
-def assess_data_quality(df, name="Dataset"):
-    """Comprehensive data quality assessment"""
-    print(f"=== {name} Quality Assessment ===\n")
-    
-    # Basic structure
-    print(f"Shape: {df.shape[0]:,} rows x {df.shape[1]} columns")
-    print(f"Memory: {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB\n")
-    
-    # Duplicates
-    dup_count = df.duplicated().sum()
-    print(f"Duplicates: {dup_count:,} ({dup_count/len(df)*100:.2f}%)")
-    
-    # Missing values
-    missing = df.isnull().sum()
-    missing_pct = (missing / len(df) * 100).round(2)
-    missing_df = pd.DataFrame({
-        'Missing': missing,
-        'Percent': missing_pct
-    })
-    missing_df = missing_df[missing_df['Missing'] > 0].sort_values('Missing', ascending=False)
-    
-    if len(missing_df) > 0:
-        print(f"\nMissing Values:\n{missing_df}")
-    else:
-        print("\nOK: No missing values")
-    
-    # Data types
-    print(f"\nData Types:\n{df.dtypes.value_counts()}")
-    
-    # Numeric column statistics
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
-    if len(numeric_cols) > 0:
-        print(f"\nNumeric Columns ({len(numeric_cols)}):")
-        print(df[numeric_cols].describe())
-    
-    # Categorical unique counts
-    cat_cols = df.select_dtypes(include=['object', 'category']).columns
-    if len(cat_cols) > 0:
-        print(f"\nCategorical Unique Values:")
-        for col in cat_cols:
-            print(f"  {col}: {df[col].nunique():,} unique")
-    
-    return missing_df
-```
+A quality assessment should cover:
+- **Structure:** shape, memory usage, data types
+- **Completeness:** missing values by column (count and percentage)
+- **Uniqueness:** duplicate rows, unique value counts for categorical columns
+- **Validity:** outlier detection, value range checks
+- **Statistics:** descriptive statistics for numeric columns
 
-**Outlier Detection:**
-```python
-def detect_outliers(df, column, method='iqr'):
-    """Detect outliers using IQR or z-score method"""
-    if method == 'iqr':
-        Q1 = df[column].quantile(0.25)
-        Q3 = df[column].quantile(0.75)
-        IQR = Q3 - Q1
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
-    else:  # z-score
-        from scipy import stats
-        z_scores = np.abs(stats.zscore(df[column].dropna()))
-        outliers = df[z_scores > 3]
-    
-    print(f"Outliers in {column}: {len(outliers):,} ({len(outliers)/len(df)*100:.2f}%)")
-    return outliers
-```
+Print actual values at each step.
 
 ### B.2.2. Cohort Definition Strategies
 
-**Example: TravelTide Active User Cohort**
-```python
-# Define cohort with clear criteria
-def define_active_cohort(users_df, sessions_df, ref_date='2023-01-01'):
-    """
-    Active User Cohort Definition:
-    - At least 1 session in 2023
-    - Account created before 2023
-    - Has complete profile data
-    """
-    print("=== Cohort Definition ===\n")
-    
-    # Start with all users
-    cohort = users_df.copy()
-    print(f"Starting users: {len(cohort):,}")
-    
-    # Filter 1: Has 2023 activity
-    active_users = sessions_df[sessions_df['session_date'] >= ref_date]['user_id'].unique()
-    cohort = cohort[cohort['user_id'].isin(active_users)]
-    print(f"After activity filter: {len(cohort):,}")
-    
-    # Filter 2: Account created before 2023
-    cohort = cohort[cohort['signup_date'] < ref_date]
-    print(f"After signup filter: {len(cohort):,}")
-    
-    # Filter 3: Complete profile
-    required_fields = ['user_id', 'signup_date', 'home_country']
-    cohort = cohort.dropna(subset=required_fields)
-    print(f"After completeness filter: {len(cohort):,}")
-    
-    print(f"\nFinal cohort: {len(cohort):,} users")
-    return cohort
-```
+When defining analysis cohorts:
+- Start with full population, apply filters sequentially
+- Print population size after each filter to track reduction
+- Document filter criteria explicitly (time window, activity threshold, completeness requirements)
+- Validate final cohort against business expectations
 
 ### B.2.3. EDA Best Practices
 
-**Distribution Analysis:**
-```python
-def analyze_distribution(df, column, bins=50):
-    """Comprehensive distribution analysis"""
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4))
-    
-    # Histogram
-    df[column].hist(bins=bins, ax=axes[0])
-    axes[0].set_title(f'{column} Distribution')
-    axes[0].set_xlabel(column)
-    axes[0].set_ylabel('Frequency')
-    
-    # Box plot
-    df[column].plot(kind='box', ax=axes[1])
-    axes[1].set_title(f'{column} Box Plot')
-    
-    # Q-Q plot
-    from scipy import stats
-    stats.probplot(df[column].dropna(), dist="norm", plot=axes[2])
-    axes[2].set_title(f'{column} Q-Q Plot')
-    
-    plt.tight_layout()
-    plt.show()
-    
-    # Statistics
-    print(f"{column} Statistics:")
-    print(df[column].describe())
-```
+For distribution analysis, combine multiple views:
+- Histogram (shape), box plot (outliers), Q-Q plot (normality)
+- Always print descriptive statistics alongside visualizations
 
 ### B.2.4. EDA Techniques by Data Type
 
-**Numeric Data:**
+Select techniques appropriate to data type:
 
-| Technique | Purpose | Code Pattern |
-|-----------|---------|--------------|
-| 5-number summary | Distribution overview | `df.describe()` |
-| Histogram + KDE | Shape visualization | `sns.histplot(kde=True)` |
-| Box plot | Outlier detection | `sns.boxplot()` |
-| Q-Q plot | Normality check | `scipy.stats.probplot()` |
-| Correlation heatmap | Relationships | `sns.heatmap(df.corr())` |
-
-**Categorical Data:**
-
-| Technique | Purpose | Code Pattern |
-|-----------|---------|--------------|
-| Value counts | Category distribution | `df['col'].value_counts()` |
-| Bar chart | Visual distribution | `sns.countplot()` |
-| Crosstab | Category interactions | `pd.crosstab()` |
-| Chi-square | Independence test | `scipy.stats.chi2_contingency()` |
-
-**Temporal Data:**
-
-| Technique | Purpose | Code Pattern |
-|-----------|---------|--------------|
-| Time series plot | Trend visualization | `df.plot()` with datetime index |
-| Rolling statistics | Smoothed trends | `df.rolling(window).mean()` |
-| Seasonal decomposition | Pattern separation | `statsmodels.tsa.seasonal_decompose()` |
-| Autocorrelation | Lag relationships | `plot_acf()`, `plot_pacf()` |
-
-**Text Data:**
-
-| Technique | Purpose | Code Pattern |
-|-----------|---------|--------------|
-| Length distribution | Text size patterns | `df['text'].str.len()` |
-| Word frequency | Common terms | `Counter` or `sklearn.CountVectorizer` |
-| Word cloud | Visual frequency | `wordcloud.WordCloud()` |
-| Language detection | Multi-language check | `langdetect` |
+- **Numeric:** Distribution summary, histograms, box plots, Q-Q plots, correlation heatmaps
+- **Categorical:** Value counts, bar charts, cross-tabulations, independence tests
+- **Temporal:** Time series plots, rolling statistics, seasonal decomposition, autocorrelation
+- **Text:** Length distribution, word frequency, language detection
 
 ### B.2.5. Business Understanding Integration
 
 **Domain Briefing Template (Before EDA):**
 
-```markdown
-### Domain Briefing
 
-**Business Context:**
-- What problem is the business trying to solve?
-- How is this handled today (without ML)?
-- What would a successful outcome look like?
-
-**Domain Knowledge:**
-- What do domain experts expect to see in the data?
-- What relationships should exist based on domain knowledge?
-- What would be surprising or concerning?
-
-**Historical Context:**
-- Has this been attempted before? Results?
-- What's changed in the business/environment?
-- Any known data quality issues?
-
-**Terminology:**
-- [Term 1]: [Definition in business context]
-- [Term 2]: [Definition in business context]
-```
 
 **EDA Validation Checklist (After EDA):**
 
 Before moving to Feature Engineering, validate findings with domain expert:
-- [ ] Shared Layer 1-3 summaries with stakeholder
+- [ ] Shared summaries with stakeholder
 - [ ] Confirmed entity definitions match business understanding
 - [ ] Validated surprising findings (expected or investigate?)
 - [ ] Agreed on analysis direction
@@ -1532,12 +506,9 @@ Before moving to Feature Engineering, validate findings with domain expert:
 
 **EDA Framework Foundations:**
 
-This section draws from established data science practices with DSM-specific adaptations:
-
-- **Three-Layer Framework:** Adapted from DIKW hierarchy (Ackoff, 1989) and general BI principles (Facts → Insights → Actions). Simplified for practical EDA workflow.
-- **Exploratory Data Analysis Philosophy:** Based on John Tukey's seminal work (1977) emphasizing letting data speak through visualization and systematic questioning.
-- **Business Understanding Integration:** Inspired by CRISP-DM (Chapman et al., 1999) but implemented as iterative dialogue rather than sequential phase.
-- **Layer Summary Templates:** Original DSM contribution combining documentation standards with structured understanding capture.
+- **Three-Layer Framework:** Adapted from DIKW hierarchy (Ackoff, 1989) and general BI principles (Facts → Insights → Actions)
+- **Exploratory Data Analysis Philosophy:** Based on John Tukey's seminal work (1977)
+- **Business Understanding Integration:** Inspired by CRISP-DM (Chapman et al., 1999)
 
 **Key References:**
 - Tukey, J. W. (1977). *Exploratory Data Analysis*. Addison-Wesley.
@@ -1550,606 +521,81 @@ This section draws from established data science practices with DSM-specific ada
 
 ### B.3.1. Feature Generation Strategies
 
-**Behavioral Aggregation Pattern:**
-```python
-def create_behavioral_features(transactions_df, users_df):
-    """Generate behavioral features from transactions"""
-    
-    # Aggregations
-    user_features = transactions_df.groupby('user_id').agg({
-        'booking_id': 'count',                    # trip_count
-        'booking_value': ['sum', 'mean', 'std'],  # spend metrics
-        'booking_date': ['min', 'max'],           # first/last trip
-        'hotel_nights': ['sum', 'mean'],          # accommodation usage
-        'cancelled': 'sum'                        # cancellation count
-    })
-    
-    # Flatten multi-level columns
-    user_features.columns = [
-        'trip_count', 'total_spend', 'avg_spend', 'std_spend',
-        'first_trip_date', 'last_trip_date', 'total_nights', 'avg_nights',
-        'cancellation_count'
-    ]
-    
-    # Derived features
-    user_features['cancellation_rate'] = (
-        user_features['cancellation_count'] / user_features['trip_count']
-    )
-    
-    ref_date = pd.Timestamp('2023-12-31')
-    user_features['days_since_last_trip'] = (
-        (ref_date - user_features['last_trip_date']).dt.days
-    )
-    
-    user_features['customer_tenure_days'] = (
-        (ref_date - user_features['first_trip_date']).dt.days
-    )
-    
-    return user_features.reset_index()
-```
+**Common feature generation patterns:**
+- **Behavioral aggregations:** Group by entity, compute count/sum/mean/std/min/max
+- **Derived ratios:** Rates, propensities (category_count / total_count)
+- **Temporal features:** Days since last event, tenure, recency
+- **Flatten multi-level columns** after groupby aggregation for clean feature names
 
-**Propensity Modeling:**
-```python
-def calculate_propensities(user_features):
-    """Calculate behavioral propensities"""
-    
-    # Discount propensity
-    user_features['discount_propensity'] = (
-        user_features['discount_bookings'] / user_features['trip_count']
-    ).fillna(0)
-    
-    # Luxury propensity (high-value bookings)
-    luxury_threshold = user_features['avg_spend'].quantile(0.75)
-    user_features['luxury_propensity'] = (
-        (user_features['avg_spend'] > luxury_threshold).astype(int)
-    )
-    
-    # Weekend trip propensity
-    user_features['weekend_propensity'] = (
-        user_features['weekend_trips'] / user_features['trip_count']
-    ).fillna(0)
-    
-    return user_features
-```
+**Key considerations:**
+- Print feature count and shapes after generation
+- Document each feature in a feature dictionary
+- Use a reference date for temporal features (document which date and why)
 
 ### B.3.2. Feature Selection Methods
 
-**Correlation-Based Selection:**
-```python
-def select_features_by_correlation(df, target=None, threshold=0.95):
-    """Remove highly correlated features"""
-    
-    # Calculate correlation matrix
-    corr_matrix = df.corr().abs()
-    
-    # Find pairs with correlation > threshold
-    upper = corr_matrix.where(
-        np.triu(np.ones(corr_matrix.shape), k=1).astype(bool)
-    )
-    
-    # Identify features to drop
-    to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
-    
-    print(f"Dropping {len(to_drop)} highly correlated features:")
-    for feature in to_drop:
-        correlations = upper[feature][upper[feature] > threshold]
-        print(f"  {feature}: corr > {threshold} with {correlations.index.tolist()}")
-    
-    return df.drop(columns=to_drop)
-```
+**Correlation-based selection orientation:**
+- Compute absolute correlation matrix, identify pairs above threshold (e.g., 0.95)
+- Use upper triangle to avoid duplicate pairs
+- Print which features are dropped and why
+- Correlation alone is insufficient; validate with importance methods (see B.3.3)
 
 ### B.3.3. Feature Ablation Study Methodology
 
-**Purpose:** Systematically validate which features improve model performance
+**Purpose:** Systematically validate which features improve model performance.
 
 **When to Use:**
-- After Sprint 2 (feature engineering complete)
-- Before Sprint 3 final model training
-- When feature count is high (>30 features)
-- When concerned about overfitting
-
-**Why It Matters:**
-"More features != better performance" - Redundant or low-value features can hurt generalization.
-
----
-
-#### Case Study: Retail Forecasting Feature Reduction
-
-**Starting Point:**
-- Features: 45 engineered features (Sprint 2 output)
-- Baseline RMSE: 7.21 (XGBoost with all 45 features)
-
-**Goal:** Identify which features to keep vs remove
-
-**Method:** Three-stage validation
-
----
-
-#### Stage 1: Permutation Importance (Quick Filter)
-
-**How it Works:**
-1. Train model with all features
-2. For each feature:
-   - Randomly shuffle its values
-   - Measure performance drop
-   - Higher drop = more important
-3. Rank features by importance
-
-**Implementation:**
-```python
-from sklearn.inspection import permutation_importance
-
-# Train baseline model
-model = xgb.XGBRegressor(**params)
-model.fit(X_train, y_train)
-baseline_score = mean_squared_error(y_test, model.predict(X_test))
-
-# Permutation importance
-perm_importance = permutation_importance(
-    model, X_test, y_test,
-    n_repeats=10,
-    random_state=42,
-    scoring='neg_mean_squared_error'
-)
-
-# Rank features
-importance_df = pd.DataFrame({
-    'feature': X_train.columns,
-    'importance': perm_importance.importances_mean,
-    'std': perm_importance.importances_std
-}).sort_values('importance', ascending=False)
-
-# Identify low-value features
-threshold = 0.01  # Importance < 1% of baseline score
-low_value = importance_df[importance_df['importance'] < threshold]
-```
-
-**Results (Retail Project):**
-
-Low-importance features identified:
-- Rolling std (3 features): importance < 0.005
-- Oil features (6 features): importance < 0.01
-- Some promotion interactions (3 features): importance < 0.008
-
----
-
-#### Stage 2: Ablation Study (Confirm Removal)
-
-**How it Works:**
-1. Remove suspected low-value features
-2. Retrain model
-3. Measure performance change
-4. Keep removed if performance improves or stays same
-
-**Implementation:**
-```python
-# Test removal of low-importance features
-features_to_remove = ['oil_price', 'oil_price_lag7', ...] # 12 features
-
-X_train_reduced = X_train.drop(columns=features_to_remove)
-X_test_reduced = X_test.drop(columns=features_to_remove)
-
-# Retrain
-model_reduced = xgb.XGBRegressor(**params)
-model_reduced.fit(X_train_reduced, y_train)
-
-# Evaluate
-baseline_rmse = np.sqrt(mean_squared_error(y_test, model.predict(X_test)))
-reduced_rmse = np.sqrt(mean_squared_error(y_test, model_reduced.predict(X_test_reduced)))
-
-print(f"Baseline (45 features): RMSE = {baseline_rmse:.4f}")
-print(f"Reduced (33 features): RMSE = {reduced_rmse:.4f}")
-print(f"Improvement: {(baseline_rmse - reduced_rmse) / baseline_rmse * 100:.2f}%")
-```
-
-**Results (Retail Project):**
-- Baseline (45 features): RMSE = 7.2127
-- Reduced (33 features): RMSE = 6.8852
-- **Improvement: +4.54%** (removing features IMPROVED performance)
-
----
-
-#### Stage 3: SHAP Values (Deep Validation - Optional)
-
-**How it Works:**
-Use SHAP (SHapley Additive exPlanations) to understand feature contributions
-
-**Implementation:**
-```python
-import shap
-
-# Train model with final feature set
-model_final = xgb.XGBRegressor(**params)
-model_final.fit(X_train_reduced, y_train)
-
-# SHAP analysis
-explainer = shap.TreeExplainer(model_final)
-shap_values = explainer.shap_values(X_test_reduced)
-
-# Visualize
-shap.summary_plot(shap_values, X_test_reduced, plot_type="bar")
-
-# Validate removed features had low SHAP importance
-# (confirmation that removal was justified)
-```
-
-**Note:** SHAP is computationally expensive. Use for final validation, not initial screening.
-
----
-
-#### Decision Framework: Which Features to Remove?
-
-```
-FOR each feature:
-    IF permutation_importance < 0.01:
-        Mark as "candidate for removal"
-
-    ELSE IF highly correlated with another feature (r > 0.9):
-        Mark as "redundant, candidate for removal"
-
-    ELSE:
-        Mark as "keep"
-
-THEN:
-    Remove candidates
-    Retrain model
-
-    IF performance improves OR stays same:
-        Confirm removal
-
-    ELSE IF performance drops >5%:
-        Reject removal (feature was valuable despite low permutation score)
-```
-
----
-
-#### Features Removed (DEC-014 Example)
-
-**Category 1: Rolling Std (3 features)**
-- `unit_sales_7d_std`, `14d_std`, `30d_std`
-- **Reason:** Permutation importance < 0.005, highly correlated with rolling mean
-- **Validation:** Ablation showed no performance drop
-
-**Category 2: Oil Features (6 features)**
-- `oil_price`, `oil_price_lag7/14/30`, `oil_price_change7/14`
-- **Reason:** Weak granular correlation (r ~ 0.01), permutation importance < 0.01
-- **Note:** Kept in Sprint 2 despite weak correlation, removed in Sprint 3 based on importance
-
-**Category 3: Promotion Interactions (3 features)**
-- `promo_holiday_category`, `promo_item_avg`, `promo_cluster`
-- **Reason:** Low importance, redundant with base `onpromotion` flag
-
-**Total Removed:** 12 features
-**Final Set:** 33 features
-**Performance:** +4.54% improvement (7.21 -> 6.89 RMSE)
-
----
-
-#### Implementation Checklist
-
-**Sprint 2 (Feature Engineering):**
-- [ ] Create all candidate features (cast wide net)
-- [ ] Document each feature in feature dictionary
-- [ ] Note: Some features may be redundant or low-value
-
-**Sprint 3 Day 1-2 (Feature Validation):**
-- [ ] Compute permutation importance on all features
-- [ ] Identify candidates for removal (importance < threshold)
-- [ ] Run ablation study (retrain without candidates)
-- [ ] Validate performance impact
-- [ ] Document decision (DEC-XXX)
-
-**Sprint 3 Day 3+ (Model Training):**
-- [ ] Train final models with reduced feature set
-- [ ] (Optional) SHAP analysis for deep validation
-- [ ] Update feature dictionary (mark removed features)
-
----
-
-#### Common Pitfalls to Avoid
-
-**Pitfall 1: Removing features based on correlation alone**
-- ERROR: "Oil has r=0.01, remove it"
-- OK: "Oil has r=0.01 AND low permutation importance AND ablation confirms no impact, remove it"
-
-**Pitfall 2: Keeping all features "just in case"**
-- ERROR: "Maybe the model will find a use for it"
-- OK: "Less is more - simpler models generalize better"
-
-**Pitfall 3: Removing features without validation**
-- ERROR: "This feature seems useless, delete it"
-- OK: "Run ablation study to confirm removal doesn't hurt performance"
-
-**Pitfall 4: Ignoring domain knowledge**
-- ERROR: "The model says it's not important, remove it"
-- OK: "The model says it's not important, but business logic says it should matter - investigate why"
-
----
-
-#### Documentation Template
-
-```markdown
-## DEC-XXX: Feature Reduction Based on Ablation
-
-**Context:**
-Baseline model with [N] features showed [metric]. Concerned about overfitting.
-
-**Method:**
-1. Permutation importance analysis
-2. Ablation study (retrain without low-importance features)
-3. (Optional) SHAP validation
-
-**Features Removed ([M] total):**
-- [Feature 1]: Importance [X], Reason: [Why]
-- [Feature 2]: Importance [Y], Reason: [Why]
-...
-
-**Alternatives Considered:**
-1. Keep all features - Rejected: Overfitting risk, no performance benefit
-2. Use L1 regularization - Rejected: Less interpretable than explicit removal
-3. More aggressive cuts - Rejected: Removed valuable features, hurt performance
-
-**Impact:**
-- Features: [N] -> [N-M] ([percentage]% reduction)
-- Performance: [metric before] -> [metric after] ([percentage]% improvement)
-- Interpretability: Simpler model, easier to explain
-- Generalization: Reduced overfitting risk
-
-**Validation:**
-- Ablation study confirmed no performance loss
-- SHAP analysis validated low contribution of removed features
-```
-
----
-
-#### Best Practice Summary
-
-1. **Create first, validate later:** Sprint 2 = generate features, Sprint 3 = validate
-2. **Use multiple validation methods:** Permutation + Ablation + (optional) SHAP
-3. **Document removals:** Explain what was removed and why
-4. **Update feature dictionary:** Mark removed features with Sprint/reason
-5. **Celebrate simplicity:** Fewer features = better generalization + easier interpretation
-
-**Portfolio Value:**
-Demonstrates systematic feature validation methodology, not just "throw features at model and hope for best."
+- After feature engineering and before final model training
+- When feature count is high (>30 features) or overfitting is a concern
+
+**Three-Stage Validation:**
+
+1. **Permutation Importance (Quick Filter):** Shuffle each feature's values, measure performance drop. Features with importance below threshold are candidates for removal.
+2. **Ablation Study (Confirm Removal):** Remove candidate features, retrain, compare metrics. Confirm removal only if performance stays same or improves.
+3. **SHAP Values (Optional Deep Validation):** Computationally expensive; use for final confirmation, not initial screening.
+
+**Common Pitfalls:**
+- Removing features based on correlation alone (use importance + ablation)
+- Keeping all features "just in case" (simpler models generalize better)
+- Removing without validation (always retrain and measure)
+- Ignoring domain knowledge (investigate if model disagrees with business logic)
 
 ---
 
 ## B.4. Phase 3 Deep Dive: Analysis
 
-### B.4.1. Algorithm Selection (Clustering Example)
+### B.4.1. Algorithm Selection Orientation
 
-**K-Means vs. Hierarchical Comparison:**
-```python
-def compare_clustering_methods(X, k_range=range(2, 8)):
-    """Compare K-Means and Hierarchical clustering"""
-    from sklearn.cluster import KMeans, AgglomerativeClustering
-    from sklearn.metrics import silhouette_score, davies_bouldin_score
-    
-    results = []
-    
-    for k in k_range:
-        # K-Means
-        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-        kmeans_labels = kmeans.fit_predict(X)
-        
-        # Hierarchical
-        hierarchical = AgglomerativeClustering(n_clusters=k)
-        hierarchical_labels = hierarchical.fit_predict(X)
-        
-        # Metrics
-        results.append({
-            'k': k,
-            'kmeans_silhouette': silhouette_score(X, kmeans_labels),
-            'kmeans_db': davies_bouldin_score(X, kmeans_labels),
-            'hierarchical_silhouette': silhouette_score(X, hierarchical_labels),
-            'hierarchical_db': davies_bouldin_score(X, hierarchical_labels)
-        })
-    
-    results_df = pd.DataFrame(results)
-    print(results_df)
-    
-    # Plot comparison
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    
-    axes[0].plot(results_df['k'], results_df['kmeans_silhouette'], 'o-', label='K-Means')
-    axes[0].plot(results_df['k'], results_df['hierarchical_silhouette'], 's-', label='Hierarchical')
-    axes[0].set_xlabel('Number of Clusters (k)')
-    axes[0].set_ylabel('Silhouette Score')
-    axes[0].set_title('Silhouette Score Comparison')
-    axes[0].legend()
-    axes[0].grid(True)
-    
-    axes[1].plot(results_df['k'], results_df['kmeans_db'], 'o-', label='K-Means')
-    axes[1].plot(results_df['k'], results_df['hierarchical_db'], 's-', label='Hierarchical')
-    axes[1].set_xlabel('Number of Clusters (k)')
-    axes[1].set_ylabel('Davies-Bouldin Index')
-    axes[1].set_title('Davies-Bouldin Index Comparison (lower is better)')
-    axes[1].legend()
-    axes[1].grid(True)
-    
-    plt.tight_layout()
-    plt.show()
-    
-    return results_df
-```
+When selecting algorithms:
+- Compare at least 2-3 candidate approaches with consistent metrics
+- Use internal validation metrics appropriate to the problem type
+- Document the comparison in a structured decision log entry
 
-### B.4.2. Validation Techniques
+### B.4.2. Validation Techniques Orientation
 
-**Cross-Validation for Clustering:**
-```python
-def validate_clustering_stability(X, n_clusters=3, n_trials=10):
-    """Test clustering stability across random initializations"""
-    from sklearn.cluster import KMeans
-    from sklearn.metrics import silhouette_score, adjusted_rand_score
-    
-    scores = []
-    label_sets = []
-    
-    for trial in range(n_trials):
-        kmeans = KMeans(n_clusters=n_clusters, random_state=trial, n_init=10)
-        labels = kmeans.fit_predict(X)
-        score = silhouette_score(X, labels)
-        scores.append(score)
-        label_sets.append(labels)
-    
-    # Check consistency across trials
-    ari_scores = []
-    for i in range(len(label_sets)-1):
-        ari = adjusted_rand_score(label_sets[i], label_sets[i+1])
-        ari_scores.append(ari)
-    
-    print(f"Silhouette Score: {np.mean(scores):.4f} Â± {np.std(scores):.4f}")
-    print(f"Adjusted Rand Index (consistency): {np.mean(ari_scores):.4f}")
-    
-    if np.mean(ari_scores) > 0.9:
-        print("OK: Clustering is stable")
-    else:
-        print("WARNING: Clustering shows variation across runs")
-    
-    return scores, ari_scores
-```
+Key validation considerations:
+- Test stability across random seeds or initializations
+- Use appropriate cross-validation strategy (temporal for time series, grouped for entity data)
+- Report confidence intervals, not just point estimates
 
 ### B.4.3. Scale-Dependent Validation Protocol
 
 **Critical Finding:** Model selection at sample scale may not hold at production scale.
 
-**Source:** Favorita Demand Forecasting Project (2025)
-- LSTM won by 4.5% on 300K sample (RMSE 6.26 vs 6.49)
-- At 4.8M production scale, LSTM failed to converge
-- XGBoost proved more stable and was used for production
-
 **Why This Happens:**
-- Neural networks: Hyperparameters tuned on sample may not generalize
-- Tree models: Different computational patterns at scale
-- Memory/batch dynamics: Change behavior with dataset size
-- Convergence: Small datasets may find local optima that don't scale
+- Hyperparameters tuned on samples may not generalize
+- Different computational patterns at scale (memory, batch dynamics)
+- Convergence behavior changes with dataset size
 
-**Scale Validation Protocol:**
+**Protocol:**
+1. **Sample Development (10-30% of data):** Train and compare candidate models
+2. **Scale Validation (50-100% of data):** Test top 2-3 models at production scale before finalizing
+3. **Compare and Document:** If the winner changes at scale, document in decision log
 
-**Stage 1: Sample Development (10-30% of data)**
-```python
-# Development phase - fast iteration
-sample_size = int(len(df) * 0.1)  # 10% sample
-df_sample = df.sample(n=sample_size, random_state=42)
-
-# Train and compare models on sample
-models = {
-    'xgboost': XGBRegressor(**sample_params),
-    'lstm': build_lstm_model(**sample_params),
-    'random_forest': RandomForestRegressor(**sample_params)
-}
-
-sample_results = {}
-for name, model in models.items():
-    model.fit(X_train_sample, y_train_sample)
-    pred = model.predict(X_test_sample)
-    sample_results[name] = {
-        'rmse': np.sqrt(mean_squared_error(y_test_sample, pred)),
-        'converged': True  # Track convergence
-    }
-    print(f"{name} (sample): RMSE = {sample_results[name]['rmse']:.4f}")
-```
-
-**Stage 2: Scale Validation (50-100% of data)**
-```python
-# Before finalizing model choice, validate at scale
-print("=" * 50)
-print("SCALE VALIDATION - Testing top models at production scale")
-print("=" * 50)
-
-# Take top 2-3 models from sample phase
-top_models = sorted(sample_results.items(), key=lambda x: x[1]['rmse'])[:3]
-
-scale_results = {}
-for name, _ in top_models:
-    try:
-        model = models[name]
-        model.fit(X_train_full, y_train_full)
-        pred = model.predict(X_test_full)
-        scale_results[name] = {
-            'rmse': np.sqrt(mean_squared_error(y_test_full, pred)),
-            'converged': True,
-            'status': 'SUCCESS'
-        }
-    except Exception as e:
-        scale_results[name] = {
-            'rmse': float('inf'),
-            'converged': False,
-            'status': f'FAILED: {str(e)}'
-        }
-
-    print(f"{name} (full scale): {scale_results[name]['status']}")
-    if scale_results[name]['converged']:
-        print(f"  RMSE = {scale_results[name]['rmse']:.4f}")
-```
-
-**Stage 3: Compare and Document**
-```python
-# Create comparison table
-comparison = pd.DataFrame({
-    'Model': list(sample_results.keys()),
-    'Sample_RMSE': [r['rmse'] for r in sample_results.values()],
-    'Scale_RMSE': [scale_results.get(k, {'rmse': None})['rmse']
-                   for k in sample_results.keys()],
-    'Scale_Status': [scale_results.get(k, {'status': 'Not tested'})['status']
-                     for k in sample_results.keys()]
-})
-
-comparison['RMSE_Change'] = (
-    (comparison['Scale_RMSE'] - comparison['Sample_RMSE'])
-    / comparison['Sample_RMSE'] * 100
-)
-
-print("\nSCALE VALIDATION RESULTS:")
-print(comparison.to_string(index=False))
-
-# Alert if sample winner changed
-sample_winner = comparison.loc[comparison['Sample_RMSE'].idxmin(), 'Model']
-scale_winner = comparison.loc[comparison['Scale_RMSE'].idxmin(), 'Model']
-
-if sample_winner != scale_winner:
-    print(f"\nWARNING: Model selection changed at scale!")
-    print(f"  Sample winner: {sample_winner}")
-    print(f"  Scale winner: {scale_winner}")
-    print("  Document this finding in decision log.")
-```
-
-**Decision Log Template for Scale Findings:**
-```markdown
-## DEC-XXX: Scale-Dependent Model Selection
-
-**Context:** Model comparison showed different results at sample vs production scale
-
-**Sample Results (N=300K):**
-- Model A: RMSE 6.26 (winner)
-- Model B: RMSE 6.49
-
-**Scale Results (N=4.8M):**
-- Model A: FAILED (did not converge)
-- Model B: RMSE 6.52 (stable)
-
-**Decision:** Use Model B for production despite sample results
-
-**Rationale:**
-- Production stability outweighs sample performance
-- Model A optimization was sample-specific
-- Business requires reliable predictions
-
-**Validation:** Monitor production metrics for first 30 days
-```
-
-**When to Apply This Protocol:**
+**When to Apply:**
 - Production dataset >10x sample size
-- Models with many hyperparameters (neural networks)
-- Time-sensitive production requirements
+- Models with many hyperparameters
 - When sample winner has narrow margin (<5% improvement)
-
-**Best Practices:**
-- Always test top 2-3 models at scale before finalizing
-- Document scale validation in decision log
-- Consider scale stability as a selection criterion
-- Plan for GPU/memory requirements at scale early
 
 ---
 
@@ -2159,250 +605,67 @@ if sample_winner != scale_winner:
 
 **Consolidation Process:**
 
-1. **Identify Essential Code:**
-   - Remove exploratory dead ends
-   - Keep only successful approaches
-   - Consolidate similar analyses
-
-2. **Add Narrative:**
-   - Clear markdown headers
-   - Explain rationale for choices
-   - Interpret results in context
-
-3. **Clean Outputs:**
-   - Remove excessive print statements
-   - Keep key visualizations
-   - Add result summaries
-
-**Example Structure:**
-```markdown
-# Customer Segmentation Analysis - Consolidated
-
-## 1. Setup & Data Loading
-[Essential imports and data loading only]
-
-## 2. Data Quality & Cohort Definition
-[Key quality checks, final cohort definition]
-
-## 3. Feature Engineering
-[Core features with business interpretation]
-
-## 4. Clustering Analysis
-[Model selection, validation, final clusters]
-
-## 5. Segment Interpretation
-[Cluster profiles, business insights]
-
-## 6. Recommendations
-[Actionable recommendations by segment]
-
-## 7. Implementation Considerations
-[Next steps, limitations, monitoring]
-```
+1. **Identify Essential Code:** Remove dead ends, keep successful approaches, consolidate similar analyses
+2. **Add Narrative:** Clear headers, explain rationale, interpret results
+3. **Clean Outputs:** Remove excessive prints, keep key visualizations, add summaries
 
 ### B.5.2. Report Writing Guidelines
 
 **Executive Summary Template:**
-```markdown
-# Executive Summary: [Project Name]
 
-## Key Findings
-1. [Most important finding with impact]
-2. [Second most important finding]
-3. [Third finding]
-
-## Recommended Actions
-1. [Specific action with expected outcome]
-2. [Specific action with expected outcome]
-3. [Specific action with expected outcome]
-
-## Business Impact
-- [Quantified benefit if possible]
-- [Risk mitigation]
-- [Strategic alignment]
-
-## Next Steps
-- [Immediate next steps]
-- [Timeline]
-- [Resources needed]
-```
 
 **Technical Report Structure:**
-```markdown
-# Technical Report: [Project Name]
 
-## 1. Business Context
-- Problem statement
-- Objectives
-- Success criteria
-
-## 2. Data Overview
-- Data sources
-- Cohort definition
-- Data quality assessment
-
-## 3. Methodology
-- Approach rationale
-- Feature engineering
-- Model selection
-- Validation strategy
-
-## 4. Results
-- Key findings with statistical support
-- Visualizations
-- Performance metrics
-
-## 5. Interpretation
-- Business meaning of results
-- Actionable insights
-- Segment profiles (if applicable)
-
-## 6. Limitations & Assumptions
-- Data limitations
-- Methodological assumptions
-- Caveats
-
-## 7. Recommendations
-- Specific actions
-- Implementation considerations
-- Monitoring approach
-
-## Appendices
-- Technical details
-- Code repository
-- Data dictionary
-- Feature dictionary
-```
 
 ### B.5.3. Presentation Design
 
 **Slide Deck Structure:**
-
-**Slide 1: Title**
-- Project name
-- Date
-- Presenter
-
-**Slide 2-3: Executive Summary**
-- Key findings (3-5 bullets)
-- Bottom-line recommendation
-
-**Slides 4-5: Business Context**
-- Problem statement
-- Objectives
-- Success criteria
-
-**Slides 6-7: Approach**
-- Methodology overview (simplified)
-- Data sources
-- Key techniques
-
-**Slides 8-12: Results**
-- Main findings (1 per slide)
-- Visualizations (clear, labeled)
-- Business interpretation
-
-**Slides 13-14: Recommendations**
-- Actionable recommendations
-- Expected impact
-- Next steps
-
-**Slide 15: Q&A / Appendix**
-- Technical details available
-- Contact information
+- **Title** (1 slide): Project name, date, presenter
+- **Executive Summary** (2 slides): Key findings, bottom-line recommendation
+- **Business Context** (2 slides): Problem, objectives, success criteria
+- **Approach** (2 slides): Methodology overview, data sources
+- **Results** (4-5 slides): Main findings (1 per slide), visualizations, business interpretation
+- **Recommendations** (2 slides): Actions, expected impact, next steps
+- **Q&A / Appendix** (1 slide): Technical details available
 
 ---
 
 **End of Appendix B**
 
 Return to main document: **Section 2: Core Workflow**
--e 
+
 ---
 
 # Appendix C: Advanced Practices Detailed
 
 **Part of:** Data Science Collaboration Methodology v1.1  
-**Main Document:** `1.0_Data_Science_Collaboration_Methodology.md` â†’ Section 5  
+**Main Document:** `1.0_Data_Science_Collaboration_Methodology.md` → Section 5  
 **Purpose:** Detailed implementation guidance for advanced practices (Tiers 2-4)
 
 ---
 
 ## C.1. Experiment Tracking Implementation
 
-**When to Use:** ML projects with multiple model iterations, parameter tuning, or algorithm comparisons.
+**When to Use:** Projects with multiple model iterations, parameter tuning, or algorithm comparisons.
 
-### C.1.1. Manual Experiment Tracking
+### C.1.1. Experiment Tracking Orientation
 
-**Simple CSV-Based Tracking:**
-```python
-import pandas as pd
-from datetime import datetime
+Track experiments systematically using either manual methods (CSV/spreadsheet logging) or dedicated tools (MLflow, Weights & Biases, Neptune.ai). Key requirements:
+- Log parameters, metrics, and notes for every experiment run
+- Maintain a central registry of all experiments
+- Ensure reproducibility: another practitioner should be able to rerun from the log
 
-def log_experiment(experiment_name, params, metrics, notes=""):
-    """Log experiment to CSV file"""
-    log_entry = {
-        'timestamp': datetime.now(),
-        'experiment_name': experiment_name,
-        'notes': notes,
-        **params,
-        **metrics
-    }
-    
-    log_file = 'experiments_log.csv'
-    
-    # Append to existing log or create new
-    try:
-        df = pd.read_csv(log_file)
-        df = pd.concat([df, pd.DataFrame([log_entry])], ignore_index=True)
-    except FileNotFoundError:
-        df = pd.DataFrame([log_entry])
-    
-    df.to_csv(log_file, index=False)
-    print(f"OK: Experiment logged - {experiment_name}")
+### C.1.2. Tool Selection Guidance
 
-# Usage
-log_experiment(
-    experiment_name="kmeans_k3",
-    params={'k': 3, 'random_state': 42, 'n_init': 10},
-    metrics={'silhouette': 0.38, 'db_index': 1.2},
-    notes="Using all 89 features"
-)
-```
+| Approach | Best For | Trade-off |
+|----------|----------|-----------|
+| Manual CSV | Small projects, quick prototyping | Simple but no versioning |
+| MLflow | Team projects, model registry needed | Setup overhead, full features |
+| W&B / Neptune | Collaborative research, visualization | Cloud dependency, cost |
 
-### C.1.2. MLflow Implementation
+Choose based on project complexity and team size. Manual tracking is sufficient for solo academic projects.
 
-**Setup:**
-```bash
-pip install mlflow
-```
-
-**Basic Usage:**
-```python
-import mlflow
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-
-mlflow.set_experiment("customer_segmentation")
-
-with mlflow.start_run(run_name="kmeans_k3"):
-    # Log parameters
-    mlflow.log_param("k", 3)
-    mlflow.log_param("algorithm", "k-means")
-    mlflow.log_param("n_features", 89)
-    
-    # Train model
-    kmeans = KMeans(n_clusters=3, random_state=42)
-    labels = kmeans.fit_predict(X_scaled)
-    
-    # Log metrics
-    silhouette = silhouette_score(X_scaled, labels)
-    mlflow.log_metric("silhouette_score", silhouette)
-    
-    # Log model
-    mlflow.sklearn.log_model(kmeans, "model")
-    
-    print(f"Logged run with silhouette: {silhouette:.4f}")
-```
+---
 
 ### C.1.3. Capability Experiment Template
 
@@ -2656,6 +919,7 @@ Every external concept referenced in the implementation should appear here.
 - Implement source recency weighting
 ```
 
+
 ### C.1.4. RAG Evaluation Metrics Reference
 
 **Framework Overview (per Chen et al., 2025 Survey):**
@@ -2685,71 +949,18 @@ Every external concept referenced in the implementation should appear here.
 | **Fairness** | Bias detection | Demographic parity in responses |
 | **Efficiency** | Resource usage | Latency, tokens, cost-per-query |
 
-**RAGAS Quick Reference:**
-
-```python
-from ragas import evaluate
-from ragas.metrics import (
-    faithfulness,
-    context_precision,
-    context_recall,
-    answer_relevancy
-)
-
-# Prepare evaluation dataset
-eval_dataset = Dataset.from_dict({
-    "question": questions,
-    "answer": answers,
-    "contexts": contexts,
-    "ground_truth": ground_truths
-})
-
-# Run evaluation
-results = evaluate(
-    eval_dataset,
-    metrics=[
-        faithfulness,        # Is answer grounded in context?
-        context_precision,   # Is retrieved context relevant?
-        context_recall,      # Is all needed info retrieved?
-        answer_relevancy     # Does answer address the question?
-    ]
-)
-
-print(results)
-# {'faithfulness': 0.87, 'context_precision': 0.92, ...}
-```
-
-**RAGBench TRACe Metrics:**
-
-| Metric | Definition |
-|--------|------------|
-| **Utility** | Does the response help accomplish the user's task? |
-| **Relevance** | Is the response pertinent to the query? |
-| **Adherence** | Does the response stick to retrieved context (no hallucination)? |
-| **Completeness** | Does the response cover all aspects of the query? |
-
 **Best Practice - Combined Evaluation:**
 
-```markdown
-## Evaluation Strategy
+1. **Baseline Quantitative (Required):** Faithfulness, context precision/recall, efficiency metrics
+2. **Extended Quantitative (Recommended):** TRACe metrics, traditional NLG metrics for ground truth comparison
+3. **Qualitative Capability (Required):** Use C.1.3 template for behavioral tests
+4. **Safety Evaluation (For Production):** Adversarial prompt testing, PII/privacy checks, factuality under conflicting sources
 
-1. **Baseline Quantitative (Required)**
-   - RAGAS: faithfulness, context_precision, context_recall
-   - Efficiency: latency, cost-per-query
+**References:**
+1. Chen et al. (2025). "Retrieval Augmented Generation Evaluation in the Era of Large Language Models." arXiv:2504.14891
+2. RAGAS Documentation: https://docs.ragas.io/en/stable/concepts/metrics/overview/
 
-2. **Extended Quantitative (Recommended)**
-   - RAGBench TRACe metrics
-   - Traditional: ROUGE/BERTScore for ground truth comparison
-
-3. **Qualitative Capability (Required)**
-   - Use C.1.3 template for behavioral tests
-   - Document pass/fail/partial for edge cases
-
-4. **Safety Evaluation (For Production)**
-   - Adversarial prompt testing
-   - PII/privacy checks
-   - Factuality under conflicting sources
-```
+---
 
 ### C.1.5. Limitation Discovery Protocol
 
@@ -2972,6 +1183,7 @@ Link between them in README files for traceability.
 
 ---
 
+
 ## C.2. Hypothesis Management Implementation
 
 **When to Use:** Research projects, stakeholder validation, or projects with clear hypotheses.
@@ -2986,14 +1198,8 @@ Link between them in README files for traceability.
 **Priority:** [High | Medium | Low]
 
 ## Hypothesis Statement
-**Formal:** [Statistical hypothesis, e.g., "H1: Î¼_high_clv > Î¼_low_clv for exclusive_perk_preference"]
-**Plain Language:** [Business hypothesis, e.g., "High CLV customers prefer exclusive perks over discounts"]
-
-## Background
-Why we believe this hypothesis might be true.
-- Prior evidence
-- Domain knowledge
-- Stakeholder input
+**Formal:** [Statistical hypothesis]
+**Plain Language:** [Business hypothesis]
 
 ## Variables
 **Independent:** [What we're testing]
@@ -3001,14 +1207,11 @@ Why we believe this hypothesis might be true.
 **Controls:** [What we're holding constant]
 
 ## Pre-Registration
-**Test Method:** [Statistical test to use, e.g., t-test, chi-square]
-**Sample Size:** [Required sample]
-**Significance Level:** [Î± = 0.05]
-**Expected Effect Size:** [If known]
+**Test Method:** [Statistical test to use]
+**Significance Level:** [e.g., 0.05]
 
 ## Test Results
 **Test Date:** YYYY-MM-DD
-**Sample Size:** [Actual n]
 **Test Statistic:** [Value]
 **P-Value:** [Value]
 **Effect Size:** [Value]
@@ -3021,216 +1224,64 @@ Why we believe this hypothesis might be true.
 [Action items based on results]
 ```
 
-### C.2.2. Statistical Testing
+### C.2.2. Statistical Testing Orientation
 
-**T-Test Example:**
-```python
-from scipy import stats
-
-def test_hypothesis(group1, group2, hypothesis_name):
-    """Test difference between two groups"""
-    # Descriptive statistics
-    print(f"=== {hypothesis_name} ===")
-    print(f"Group 1: n={len(group1)}, mean={group1.mean():.2f}, std={group1.std():.2f}")
-    print(f"Group 2: n={len(group2)}, mean={group2.mean():.2f}, std={group2.std():.2f}")
-    
-    # T-test
-    t_stat, p_value = stats.ttest_ind(group1, group2)
-    
-    # Effect size (Cohen's d)
-    pooled_std = np.sqrt((group1.std()**2 + group2.std()**2) / 2)
-    cohens_d = (group1.mean() - group2.mean()) / pooled_std
-    
-    print(f"\nResults:")
-    print(f"t-statistic: {t_stat:.4f}")
-    print(f"p-value: {p_value:.4f}")
-    print(f"Cohen's d: {cohens_d:.4f}")
-    
-    if p_value < 0.05:
-        print(f"OK: Hypothesis supported (p < 0.05)")
-    else:
-        print(f"WARNING: Hypothesis not supported (p >= 0.05)")
-    
-    return {'t_stat': t_stat, 'p_value': p_value, 'cohens_d': cohens_d}
-```
+Choose the appropriate statistical test based on your data:
+- **Two independent groups:** t-test (continuous) or chi-square (categorical)
+- **Paired observations:** Paired t-test or Wilcoxon signed-rank
+- **Multiple groups:** ANOVA or Kruskal-Wallis
+- Always report effect size alongside p-values; statistical significance alone is insufficient
 
 ---
 
-## C.3. Performance Baseline Implementation
+## C.3. Performance Baseline Orientation
 
 **When to Use:** Evaluating model improvements or justifying approach complexity.
 
-### C.3.1. Baseline Establishment
+Establish baselines before building complex models:
+- **Naive baseline:** Majority class (classification) or mean value (regression)
+- **Simple model baseline:** Logistic regression or decision tree with default parameters
+- **Domain baseline:** Current business process performance (if available)
 
-**Naive Baseline:**
-```python
-def create_naive_baseline(y_true):
-    """Simplest possible prediction: majority class or mean"""
-    if y_true.dtype == 'object' or len(np.unique(y_true)) < 10:
-        # Classification: predict majority class
-        baseline_pred = [y_true.mode()[0]] * len(y_true)
-        from sklearn.metrics import accuracy_score
-        score = accuracy_score(y_true, baseline_pred)
-        print(f"Naive Baseline (majority class): Accuracy = {score:.4f}")
-    else:
-        # Regression: predict mean
-        baseline_pred = [y_true.mean()] * len(y_true)
-        from sklearn.metrics import mean_squared_error
-        score = mean_squared_error(y_true, baseline_pred)
-        print(f"Naive Baseline (mean): MSE = {score:.4f}")
-    
-    return baseline_pred, score
-```
-
-**Simple Model Baseline:**
-```python
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_val_score
-
-def create_simple_baseline(X, y):
-    """Simple linear model baseline"""
-    model = LogisticRegression(random_state=42)
-    scores = cross_val_score(model, X, y, cv=5)
-    print(f"Simple Baseline (Logistic Regression): {scores.mean():.4f} Â± {scores.std():.4f}")
-    return scores.mean()
-```
+Any model must demonstrably outperform the baseline to justify its complexity.
 
 ---
 
-## C.4. Ethics & Bias Implementation
+## C.4. Ethics and Bias Audit Orientation
 
 **When to Use:** Models affecting people, sensitive attributes, or regulated industries.
 
-### C.4.1. Bias Audit
-
-```python
-def audit_for_bias(df, sensitive_attrs, outcome_var):
-    """Check for bias in outcomes across sensitive attributes"""
-    print("=== Bias Audit ===\n")
-    
-    for attr in sensitive_attrs:
-        print(f"Attribute: {attr}")
-        group_outcomes = df.groupby(attr)[outcome_var].agg(['mean', 'count'])
-        print(group_outcomes)
-        
-        # Statistical test
-        groups = [group[outcome_var].values for name, group in df.groupby(attr)]
-        if len(groups) == 2:
-            from scipy import stats
-            stat, p_value = stats.ttest_ind(*groups)
-            print(f"T-test p-value: {p_value:.4f}")
-            if p_value < 0.05:
-                print(f"WARNING: Significant difference detected (p < 0.05)")
-        print()
-```
-
-### C.4.2. Fairness Metrics
-
-```python
-def calculate_fairness_metrics(y_true, y_pred, sensitive_attr):
-    """Calculate demographic parity and equalized odds"""
-    from sklearn.metrics import confusion_matrix
-    
-    # Demographic Parity: P(Å·=1 | A=a) for all a
-    for group in sensitive_attr.unique():
-        mask = sensitive_attr == group
-        positive_rate = y_pred[mask].mean()
-        print(f"Group {group}: Positive prediction rate = {positive_rate:.4f}")
-    
-    # Equalized Odds: TPR and FPR should be equal across groups
-    for group in sensitive_attr.unique():
-        mask = sensitive_attr == group
-        tn, fp, fn, tp = confusion_matrix(y_true[mask], y_pred[mask]).ravel()
-        tpr = tp / (tp + fn) if (tp + fn) > 0 else 0
-        fpr = fp / (fp + tn) if (fp + tn) > 0 else 0
-        print(f"Group {group}: TPR = {tpr:.4f}, FPR = {fpr:.4f}")
-```
+Key audit steps:
+- Check outcome distributions across sensitive attributes (gender, age, location)
+- Calculate fairness metrics: demographic parity, equalized odds
+- Test for disparate impact using the four-fifths rule
+- Document findings and mitigation strategies in the decision log
 
 ---
 
-## C.5. Testing Strategy Implementation
+## C.5. Testing Strategy Orientation
 
 **When to Use:** Production deployments, team collaboration, or code reuse.
 
-### C.5.1. Data Validation Tests
+Essential test categories:
+- **Data validation:** Schema checks, type enforcement, range constraints
+- **Function unit tests:** Verify transformations produce expected results
+- **Pipeline integration tests:** End-to-end data flow verification
 
-```python
-import pytest
-
-def test_data_schema(df):
-    """Test that DataFrame has expected structure"""
-    expected_columns = ['user_id', 'signup_date', 'total_spend']
-    assert all(col in df.columns for col in expected_columns), "Missing required columns"
-    
-def test_data_types(df):
-    """Test that columns have expected types"""
-    assert df['user_id'].dtype == 'int64', "user_id should be integer"
-    assert pd.api.types.is_datetime64_any_dtype(df['signup_date']), "signup_date should be datetime"
-    
-def test_data_ranges(df):
-    """Test that values are in expected ranges"""
-    assert (df['total_spend'] >= 0).all(), "Negative spend detected"
-    assert (df['signup_date'] <= pd.Timestamp.now()).all(), "Future signup dates detected"
-```
-
-### C.5.2. Function Unit Tests
-
-```python
-def calculate_clv(transactions, revenue):
-    """Calculate customer lifetime value"""
-    return transactions * revenue
-
-def test_calculate_clv():
-    """Test CLV calculation"""
-    assert calculate_clv(10, 100) == 1000
-    assert calculate_clv(0, 100) == 0
-    assert calculate_clv(5, 0) == 0
-```
+Use pytest or equivalent. Write tests alongside code, not after.
 
 ---
 
-## C.6. Data Versioning Implementation
+## C.6. Data Versioning Orientation
 
 **When to Use:** Multiple data versions, reproducibility critical, or team data sharing.
 
-### C.6.1. Simple File Versioning
+Versioning approaches:
+- **Simple file versioning:** `{entity}_v{N.N}_{YYYYMMDD}.csv` naming convention
+- **DVC (Data Version Control):** Git-like versioning for large data files
+- **Database snapshots:** For SQL-based data sources
 
-```python
-def save_versioned_data(df, base_name, version=None):
-    """Save data with version and date"""
-    from datetime import datetime
-    
-    if version is None:
-        # Auto-increment version
-        import glob
-        existing = glob.glob(f"{base_name}_v*.csv")
-        if existing:
-            versions = [int(f.split('_v')[1].split('_')[0].replace('.', '')) for f in existing]
-            version = max(versions) + 1
-        else:
-            version = 1.0
-    
-    date_str = datetime.now().strftime('%Y%m%d')
-    filename = f"{base_name}_v{version}_{date_str}.csv"
-    df.to_csv(filename, index=False)
-    print(f"OK: Saved {filename}")
-    return filename
-```
-
-### C.6.2. DVC (Data Version Control)
-
-**Setup:**
-```bash
-pip install dvc
-dvc init
-```
-
-**Track Data File:**
-```bash
-dvc add data/users.csv
-git add data/users.csv.dvc data/.gitignore
-git commit -m "Track users data with DVC"
-```
+Choose based on data size and team needs. Simple file versioning is sufficient for most individual projects.
 
 ---
 
@@ -3243,31 +1294,27 @@ git commit -m "Track users data with DVC"
 ```markdown
 # Technical Debt Register
 
-## TD-001: Hardcoded File Paths
+## TD-001: [Debt Title]
 
-**Created:** 2025-11-15
-**Priority:** High
-**Effort:** 2 hours
+**Created:** YYYY-MM-DD
+**Priority:** High / Medium / Low
+**Effort:** [Estimated hours]
 
 ### Current State
-File paths hardcoded in 5 notebooks:
-- `01_EDA.ipynb`: line 23
-- `02_EDA.ipynb`: line 15
-- `03_FE.ipynb`: line 10, 45, 67
+[What exists now and why it is problematic]
 
 ### Ideal State
-Path constants defined in config file or notebook start.
+[What the code/process should look like]
 
 ### Impact
-- **Maintenance:** High - changes require editing multiple files
-- **Portability:** High - notebooks break on different machines
-- **Risk:** Medium - easy to miss when updating paths
+- **Maintenance:** [How this affects ongoing work]
+- **Portability:** [How this affects deployment/sharing]
+- **Risk:** [What could go wrong]
 
 ### Paydown Plan
-1. Create `config.py` with path constants
-2. Update all notebooks to import config
-3. Test on different machine
-**Estimated time:** 2 hours
+1. [Step 1]
+2. [Step 2]
+**Estimated time:** [hours]
 
 ### Status
 - [ ] Planned
@@ -3277,24 +1324,15 @@ Path constants defined in config file or notebook start.
 
 ---
 
-## C.8. Scalability Implementation
+## C.8. Scalability Orientation
 
 **When to Use:** Data growth expected, user base expansion, or performance issues.
 
-### C.8.1. Resource Estimation
-
-```python
-def estimate_memory_requirements(n_rows, n_cols, dtype='float64'):
-    """Estimate memory for DataFrame"""
-    bytes_per_value = {'float64': 8, 'int64': 8, 'object': 50}
-    total_bytes = n_rows * n_cols * bytes_per_value.get(dtype, 8)
-    total_mb = total_bytes / 1024**2
-    print(f"Estimated memory: {total_mb:,.2f} MB")
-    
-    if total_mb > 1000:
-        print("WARNING: Consider chunking or Dask")
-    return total_mb
-```
+Key considerations:
+- Estimate memory requirements before loading full datasets
+- Use chunked processing or distributed frameworks (Dask, Spark) for datasets exceeding available RAM
+- Profile code to identify bottlenecks before optimizing
+- Design data pipelines for incremental processing where possible
 
 ---
 
@@ -3302,41 +1340,29 @@ def estimate_memory_requirements(n_rows, n_cols, dtype='float64'):
 
 **When to Use:** Novel problems, research projects, or no established best practices.
 
-### C.9.1. Information Extraction
+### C.9.1. Information Extraction Template
 
 ```markdown
-# Literature Review: Customer Segmentation Methods
+# Literature Review: [Topic]
 
-## Paper 1: "K-Means vs Hierarchical Clustering"
+## Paper 1: "[Title]"
 
-**Citation:** Smith et al. (2023). Journal of ML, 45(2), 123-145.
+**Citation:** [Author et al. (Year). Journal, Volume(Issue), Pages.]
 
 ### Problem Addressed
-Comparing clustering methods for customer segmentation.
+[What the paper tackles]
 
 ### Approach
-- Tested K-Means, Hierarchical, DBSCAN on 5 datasets
-- Used silhouette score, Davies-Bouldin index
-- Sample sizes: 1K - 100K customers
+[Methods used]
 
 ### Key Findings
-- K-Means faster but assumes spherical clusters
-- Hierarchical better for non-spherical
-- DBSCAN good for noise handling
-
-### Metrics & Results
-- K-Means: silhouette 0.35 Â± 0.05
-- Hierarchical: silhouette 0.32 Â± 0.08
-- Speed: K-Means 10x faster on 100K samples
+[Main results]
 
 ### Relevant to Our Project
-- Similar dataset size (5K customers)
-- Confirms K-Means appropriate choice
-- Validates silhouette score usage
+[How this informs our work]
 
 ### Limitations
-- Only tested B2C, not B2B
-- No feature engineering comparison
+[What the paper does not cover]
 ```
 
 ---
@@ -3345,37 +1371,32 @@ Comparing clustering methods for customer segmentation.
 
 **When to Use:** High-stakes decisions, multiple dependencies, or uncertain requirements.
 
-### C.10.1. Risk Register
+### C.10.1. Risk Register Template
 
 ```markdown
 # Risk Register
 
-## Risk R-001: Stakeholder Requirements Change
+## Risk R-001: [Risk Title]
 
-**Probability:** Medium (40%)
-**Impact:** High (could require re-analysis)
-**Risk Score:** Medium-High
+**Probability:** [High / Medium / Low]
+**Impact:** [High / Medium / Low]
+**Risk Score:** [Combined assessment]
 
 ### Description
-Marketing stakeholder may change segment requirements mid-project based on business priorities.
+[What could go wrong]
 
 ### Mitigation
-- Sprint check-ins with stakeholder
-- Document requirements formally
-- Design flexible clustering approach
-- Keep decision log of all changes
+[Steps to reduce probability or impact]
 
 ### Contingency
-- Build 2-3 day buffer in timeline
-- Have alternative K values ready
-- Document pivot criteria upfront
+[Plan if the risk materializes]
 
 ### Owner
-The data scientist
+[Who is responsible]
 
 ### Status
-- [x] Identified
-- [x] Mitigation in place
+- [ ] Identified
+- [ ] Mitigation in place
 - [ ] Triggered
 - [ ] Resolved
 ```
@@ -3385,7 +1406,7 @@ The data scientist
 **End of Appendix C**
 
 Return to main document: **Section 5: Advanced Practices**
--e 
+
 ---
 
 # Appendix D: Domain Adaptations
@@ -3413,53 +1434,18 @@ DSM 4.0 provides:
 
 ### D.1.1. Phase Adaptations
 
-**Phase 1: Exploration**
-- Focus on temporal patterns, trends, seasonality
-- Decomposition analysis (trend, seasonal, residual)
-- Stationarity testing (ADF test, KPSS test)
-- Autocorrelation analysis (ACF, PACF plots)
+Each DSM phase requires domain-specific adjustments for time series work:
 
-**Phase 2: Feature Engineering**
-- Lag features (t-1, t-2, ... t-n)
-- Rolling statistics (moving averages, moving std)
-- Seasonal indicators (month, day of week, holidays)
-- Time-based aggregations
-
-**Phase 3: Analysis**
-- Model selection: ARIMA, Prophet, LSTM, XGBoost
-- Train/test split: respect temporal order (no random shuffle)
-- Cross-validation: time series CV (forward chaining)
-- Forecast horizon: define clearly
-
-**Phase 4: Communication**
-- Forecast vs actual plots
-- Confidence intervals
-- Forecast horizon limitations
-- Model updating strategy
+- **Exploration:** Focus on temporal patterns, stationarity, decomposition, and autocorrelation
+- **Feature Engineering:** Lag features, rolling statistics, seasonal indicators, time-based aggregations
+- **Analysis:** Respect temporal order in splits and cross-validation; define forecast horizon clearly
+- **Communication:** Forecast vs actual plots, confidence intervals, horizon limitations, update strategy
 
 ### D.1.2. Key Techniques
 
-**Stationarity Testing:**
-```python
-from statsmodels.tts.stattools import adfuller
-
-def test_stationarity(series):
-    result = adfuller(series.dropna())
-    print(f"ADF Statistic: {result[0]:.4f}")
-    print(f"p-value: {result[1]:.4f}")
-    if result[1] < 0.05:
-        print("OK: Series is stationary")
-    else:
-        print("WARNING: Series is non-stationary, consider differencing")
-```
-
-**Seasonal Decomposition:**
-```python
-from statsmodels.tsa.seasonal import seasonal_decompose
-
-decomposition = seasonal_decompose(series, model='additive', period=12)
-decomposition.plot()
-```
+- Stationarity testing (ADF, KPSS) to determine differencing needs
+- Seasonal decomposition to separate trend, seasonal, and residual components
+- Autocorrelation analysis (ACF/PACF) to inform model order selection
 
 ### D.1.3. Common Challenges
 
@@ -3477,946 +1463,86 @@ decomposition.plot()
 
 Use RECENT, SEASONALLY-RELEVANT data over MORE but MISMATCHED data.
 
----
+**Key considerations:**
+- More data does not always mean better performance; seasonal alignment matters more than volume
+- Training and test ranges should be aligned to avoid extrapolation
+- Validate training period choices with ablation studies
+- Document rationale, especially when rejecting "use all data" defaults
 
-#### Case Study: Training Period Selection
-
-**Hypothesis:**
-More training data (full 2013) will improve March 2014 forecast accuracy.
-
-**Test Results:**
-
-| Training Period | Samples | Seasonal Coverage | Test RMSE | vs Q1-only |
-|-----------------|---------|-------------------|-----------|-----------|
-| **Q1 2014 only** | 12K | Jan-Feb (winter) | 7.21 | 0% baseline |
-| **Full 2013 + Jan-Feb 2014** | 50K | All seasons (Jan-Dec) | 14.88 | **+106% WORSE** |
-| **Q4 2013 + Q1 2014** | 19K | Fall-Winter (Oct-Feb) | 6.84 | **+5% BETTER** |
-
-**Findings:**
-
-1. **More data != better performance** (50K worse than 12K)
-2. **Seasonal alignment matters more than volume** (19K beats both)
-3. **Catastrophic failure possible** (106% worse with "more" data)
-
----
-
-#### Why Full 2013 Failed
-
-**Problem:** Seasonal mismatch between training and test
-
-**Training period (Full 2013):**
-- Includes summer (May-Aug): Different demand patterns, irrelevant for March forecast
-- Includes extreme holidays (Nov-Dec): Black Friday (1,332 units max), Christmas peaks
-- Pattern learned: "Normal sales" = summer, "High sales" = Nov-Dec holidays
-
-**Test period (March 2014):**
-- Spring season: Different from summer AND winter
-- No extreme holidays: March sales max = 222 units (6x LOWER than training max)
-- Reality: "Normal" March sales look like "low outliers" to model trained on Nov-Dec
-
-**Result:** Model learned extreme patterns that don't exist in March -> terrible generalization
-
----
-
-#### Why Q4+Q1 Succeeded
-
-**Seasonal Alignment:**
-- Training: Oct-Nov-Dec (fall/early winter) + Jan-Feb (late winter)
-- Test: March (early spring)
-- Smooth transition: Training ends Feb 28, test starts Mar 1 (continuous season)
-
-**Pattern Matching:**
-- Q4+Q1 range: 0-222 units (matches March range)
-- No extreme holiday spikes (Christmas excluded from training for March test)
-- Captures: Post-holiday normalization (Jan-Feb) relevant for March baseline
-
-**Data Volume Trade-off:**
-- Sacrificed: 31K samples (summer irrelevant months)
-- Gained: Seasonal coherence + stable range alignment
-- **Net result:** +54% better than full year despite 2.6x less data
-
----
-
-#### Decision Framework: Training Period Selection
-
-**Step 1: Identify test period seasonality**
-```
-Test period: March 2014 (early spring, no major holidays)
-```
-
-**Step 2: Find RECENT periods with SIMILAR seasonality**
-```
-Candidates:
-- January-February 2014 (same year, winter -> spring transition) OK
-- October-February 2013-2014 (fall -> winter -> early spring) OK
-- March 2013 (same month last year, spring) WARNING: (only 1 month, too small)
-- Full 2013 (all seasons) ERROR: (includes irrelevant summer, extreme holidays)
-```
-
-**Step 3: Validate range alignment**
-```
-Training range should match test range (avoid extrapolation)
-
-Q4+Q1: Max = 222 units OK (matches March test max)
-Full 2013: Max = 1,332 units ERROR (6x higher, model learns unrealistic peaks)
-```
-
-**Step 4: Choose most recent, seasonally-aligned period**
-```
-Winner: Q4 2013 + Q1 2014 (Oct-Feb, 5 months, 19K samples)
-```
-
----
-
-#### When to Use Full Year vs Seasonal Subset
-
-**Use Full Year Training When:**
-- Test period is "average" month (no strong seasonality)
-- Data is stationary (no seasonal patterns exist)
-- Very small dataset (need all data to train)
-- Forecasting annual totals (not specific months)
-
-**Use Seasonal Subset When:**
-- Strong seasonality present (retail, tourism, energy)
-- Test period has known seasonal characteristics
-- Sufficient data in relevant season (>=1000 samples minimum)
-- Extrapolation risk exists (holiday extremes, summer vs winter)
-
----
-
-#### Implementation Guidelines
-
-**For Seasonal Time Series:**
-
-```python
-# DON'T: Use all available data blindly
-train = df[df['date'] < test_start]  # All historical data
-
-# DO: Filter to seasonally-relevant periods
-test_month = 3  # March
-test_year = 2014
-
-# Option 1: Same season last year + current year up to test
-train = df[
-    ((df['date'].dt.month >= 10) & (df['date'].dt.year == test_year - 1)) |  # Q4 last year
-    ((df['date'].dt.month <= 2) & (df['date'].dt.year == test_year))         # Q1 this year
-]
-
-# Option 2: Rolling N-month window
-train = df[
-    (df['date'] >= test_start - pd.DateOffset(months=6)) &  # Last 6 months
-    (df['date'] < test_start)
-]
-
-# Validate: Check training max ~ test max
-print(f"Training max: {train['target'].max()}")
-print(f"Test max: {test['target'].max()}")
-# If training max >> test max -> seasonal mismatch risk!
-```
-
-**Document Decision:**
-
-```markdown
-## DEC-XXX: Training Period Selection
-
-**Context:**
-Forecasting March 2014 sales (early spring, no major holidays).
-Full year 2013 available but includes summer and extreme Nov-Dec holidays.
-
-**Decision:**
-Use Q4 2013 + Q1 2014 (Oct 1 - Feb 28) for training (5 months, 19K samples).
-
-**Rationale:**
-- Seasonal alignment: Fall/winter -> early spring matches test period
-- Range alignment: Training max (222) matches test max (no extrapolation)
-- Excludes irrelevant summer patterns and extreme holiday spikes
-- Recent data: Captures current trends better than older data
-
-**Alternatives Considered:**
-1. Full 2013 + Jan-Feb 2014 (50K samples) -> REJECTED: Includes summer (irrelevant) and Nov-Dec extremes (6x test max)
-2. Q1 2014 only (12K samples) -> Smaller, less robust
-3. March 2013 (same month last year) -> Too small (1 month)
-
-**Impact:**
-- RMSE: 6.84 vs 14.88 (full year) -> 54% improvement
-- Training time: Faster (19K vs 50K samples)
-- Generalization: Better (avoids learning irrelevant patterns)
-
-**Validation:**
-- RMSE improved 5% vs Q1-only baseline
-- No extrapolation warnings (training/test ranges aligned)
-- Model metrics stable (no overfitting to specific season)
-```
-
----
-
-#### Key Takeaways
-
-1. **More data != better** (quality > quantity for seasonal series)
-2. **Seasonal relevance > recency** (2-year-old relevant data beats 6-month-old irrelevant)
-3. **Range alignment critical** (training max should match test max +/-20%)
-4. **Validate assumptions** (test on seasonal subset before full year)
-5. **Document rationale** (stakeholders will ask "why not use all data?")
-
-**Portfolio Value:**
-This demonstrates deep time series understanding beyond basic ML. Many practitioners default to "use all data" without considering seasonal coherence. This finding shows analytical maturity and domain expertise.
-
-### D.1.5. Aggregation Level Impacts Correlation
-
-**Critical Finding from Retail Forecasting Project:**
-
-Correlation coefficients are HIGHLY sensitive to aggregation level in time series data. Results can:
-- Change magnitude dramatically (97% drop observed)
-- Flip sign (negative -> positive)
-- Mislead about feature utility
-
----
-
-#### Case Study: Oil Price Correlation
-
-**Sprint 1 (Aggregate level):**
-- Data: Daily sales aggregated across all stores and items
-- Correlation: r = -0.55 (moderate negative)
-- Interpretation: "When oil prices rise, sales fall"
-- Business logic: Makes sense for oil-dependent economy
-
-**Sprint 2 (Granular level):**
-- Data: Daily sales per store-item combination (300K rows)
-- Correlation: r = +0.01 (negligible positive)
-- Result: 97% magnitude drop + sign flip!
-
----
-
-#### Why This Happens
-
-1. **Simpson's Paradox:** Aggregate correlation != disaggregate correlation
-2. **Sparse data dilution:** 99.1% of store-item-date combinations have zero sales
-3. **Confounding variables:** Store/item effects dominate oil price signal at granular level
-4. **Measurement level mismatch:** National oil price vs local store sales
-
----
-
-#### Implications for Feature Engineering
-
-**DON'T:**
-- ERROR: Reject features based on correlation at wrong aggregation level
-- ERROR: Assume correlation stability across aggregation levels
-- ERROR: Use Sprint 1 aggregate correlations to guide Sprint 2 granular feature selection
-
-**DO:**
-- OK: Compute correlations at MODELING granularity (not aggregate)
-- OK: Use feature importance (permutation, SHAP) instead of correlation
-- OK: Keep features with weak correlation if business logic supports (tree models find non-linear patterns)
-- OK: Document aggregation level in correlation reports
-
----
-
-#### Decision Framework
-
-```
-IF aggregate correlation strong (|r| > 0.5)
-AND granular correlation weak (|r| < 0.1)
-THEN:
-  1. Document finding (don't panic)
-  2. Keep feature (tree models may find non-linear patterns)
-  3. Validate in Sprint 3 via:
-     - Permutation importance
-     - Ablation study (remove feature, measure impact)
-     - SHAP values
-  4. Drop feature only if ALL validation methods show no impact
-```
-
----
-
-#### Example (Oil Features - DEC-012)
-
-Despite granular correlation of r = 0.01:
-- OK: Kept all 6 oil features
-- Rationale: Tree models can find non-linear relationships correlation misses
-- Different products may respond to different oil price timescales
-- Sprint 3 feature importance will validate utility
-
-Result (Sprint 3): Oil features removed in DEC-014 (low permutation importance), but decision was evidence-based, not correlation-based.
-
----
-
-#### Best Practice
-
-Always report correlation WITH aggregation level:
-- ERROR: "Oil price correlation: r = -0.55"
-- OK: "Oil price correlation (aggregate): r = -0.55"
-- OK: "Oil price correlation (granular store-item): r = +0.01"
-- OK: "Correlation magnitude and sign are aggregation-dependent"
-
----
 
 ## D.2. NLP Projects
 
-### D.2.1. Phase Adaptations
+### D.2.1. Orientation
 
-**Phase 1: Exploration**
-- Text distribution analysis (length, vocabulary)
-- Token frequency analysis
-- Language detection
-- Data quality (encoding issues, special characters)
+Each DSM phase requires domain-specific adjustments for NLP work:
 
-**Phase 2: Feature Engineering**
-- Text cleaning (lowercase, punctuation, stopwords)
-- Tokenization strategies
-- Feature extraction: TF-IDF, word embeddings
-- Document representation
+- **Exploration:** Text distribution analysis, token frequencies, language detection, class balance for labeled data
+- **Feature Engineering:** Text cleaning, tokenization, vectorization choices (TF-IDF, embeddings), dimensionality
+- **Analysis:** Model selection appropriate to task (classification, generation, extraction); evaluation metrics that account for text ambiguity
+- **Communication:** Include example predictions, confusion patterns, and vocabulary-level insights
 
-**Phase 3: Analysis**
-- Model selection: Naive Bayes, SVM, BERT, etc.
-- Text classification or clustering
-- Topic modeling (LDA, NMF)
-- Sentiment analysis
-
-**Phase 4: Communication**
-- Word clouds for interpretability
-- Example documents per class/topic
-- Confusion matrices
-- Error analysis (misclassified examples)
-
-### D.2.2. Key Techniques
-
-**Text Preprocessing:**
-```python
-import re
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-
-def preprocess_text(text):
-    # Lowercase
-    text = text.lower()
-    # Remove special characters
-    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
-    # Tokenize
-    tokens = word_tokenize(text)
-    # Remove stopwords
-    tokens = [t for t in tokens if t not in stopwords.words('english')]
-    return ' '.join(tokens)
-```
-
-**TF-IDF Vectorization:**
-```python
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-vectorizer = TfidfVectorizer(max_features=1000, min_df=5, max_df=0.8)
-X = vectorizer.fit_transform(documents)
-```
-
-### D.2.3. Common Challenges
-
-- High dimensionality of text features
-- Class imbalance
-- Out-of-vocabulary words
-- Domain-specific terminology
-- Multilingual data
-
-### D.2.4. NLP EDA Checklist
-
-Extends Section 2.2 (Exploration) with text-specific patterns. Use alongside
-the Three-Layer EDA Framework.
-
-**Text-Specific EDA:**
-
-| Check | What to Look For | Why It Matters |
-|-------|-----------------|----------------|
-| Class distribution | Balance/imbalance ratio | Drives sampling strategy |
-| Text length distribution | Characters, words, sentences per sample | Short vs. long text affects method choice |
-| Vocabulary size | Unique tokens before/after preprocessing | Indicates feature space complexity |
-| Word frequency distribution | Zipf's law shape, long tail | Informs min_df/max_df settings |
-| Missing/empty text | Null values, empty strings, whitespace-only | Must handle before vectorization |
-| Special character patterns | URLs, mentions, hashtags, emojis | Informs cleaning pipeline decisions |
-| Language detection | Single vs. multilingual data | Determines preprocessing tools |
-
-**Classification-Specific EDA:**
-
-| Check | What to Look For | Why It Matters |
-|-------|-----------------|----------------|
-| Top N-grams per class | Unigrams, bigrams distinctive to each class | Reveals discriminative features |
-| Text length vs. class | Length differences between classes | Length alone may be a signal (or bias) |
-| Duplicate text detection | Exact or near-duplicates across classes | Duplicates inflate metrics if split across train/test |
-| Label quality assessment | Ambiguous cases, annotation disagreement | Sets realistic accuracy ceiling |
-| Word overlap between classes | Shared vs. unique vocabulary per class | Low overlap suggests easier task |
-
-**Preprocessing Impact Assessment:**
-
-After each preprocessing step, verify:
-- Vocabulary size change (before → after)
-- Empty text count introduced
-- Information loss estimation (compare sample texts before/after)
-- Class distribution stability (preprocessing should not change class balance)
-
-Cross-reference: Section 2.2 (Three-Layer EDA Framework), Appendix B.2.4 (EDA Techniques by Data Type)
-
-### D.2.5. NLP Preprocessing & Vectorization Guide
-
-Extends Section 2.3 (Feature Engineering) with NLP-specific parameter guidance
-and common configurations.
-
-**Text Cleaning Pipeline (Recommended Order):**
-
-| Step | Operation | Decision Point |
-|------|-----------|---------------|
-| 1 | Lowercase conversion | Skip for case-sensitive tasks (NER, acronym detection) |
-| 2 | URL removal (`http\S+`) | Almost always remove for classification |
-| 3 | HTML tag removal | Required for web-scraped text |
-| 4 | Special character handling | Keep: hashtags if meaningful. Remove: most punctuation |
-| 5 | Number handling | Keep, remove, or replace with `<NUM>` token (task-dependent) |
-| 6 | Stopword removal | Helps TF-IDF; skip for embeddings/transformers |
-| 7 | Lemmatization vs. stemming | Lemmatization preferred (preserves meaning); stemming faster |
-
-**TF-IDF Parameter Guide:**
-
-| Parameter | Typical Range | Start With | Notes |
-|-----------|--------------|-----------|-------|
-| `max_features` | 5,000-50,000 | 10,000 | Increase if large vocabulary; decrease for short texts |
-| `ngram_range` | (1,1) to (1,3) | (1,2) | Bigrams often help classification |
-| `min_df` | 2-5 | 2 | Remove terms appearing in fewer than N documents |
-| `max_df` | 0.9-0.95 | 0.95 | Remove near-universal terms (alternative to stopwords) |
-| `sublinear_tf` | True/False | True | Log-scale TF; usually improves classification |
-
-**Edge Case Handling:**
-
-| Issue | Detection | Resolution |
-|-------|-----------|-----------|
-| Empty strings after preprocessing | `df[df['clean_text'].str.strip() == '']` | Remove from dataset or flag for review |
-| Encoding issues | `chardet.detect()` on sample | Standardize to UTF-8 before processing |
-| Very short texts (< 3 words after cleaning) | Length filter post-cleaning | Keep but monitor performance separately |
-| Duplicate texts with different labels | Group by text, check label variance | Resolve or remove conflicting labels |
-
-WARNING: Apply Section 2.3.7 (Data Leakage Prevention) to all text preprocessing.
-Fit vectorizers on training data only; transform validation/test sets.
-
-Cross-reference: Section 2.3 (Feature Engineering), Section 2.3.7 (Data Leakage Prevention)
-
-### D.2.6. NLP Performance Expectations
-
-Guides realistic expectations for NLP model selection. "More advanced" does not
-mean "better for every task." Empirical comparison is always required (Section 2.4).
-
-**Method Selection by Task Characteristics:**
-
-| Task Characteristic | TF-IDF + Classical ML | Word Embeddings | Transformers |
-|--------------------|----------------------|-----------------|-------------|
-| Short text (< 50 words) | Strong | Moderate | Strong |
-| Long documents | Moderate | Good | Strong |
-| Small dataset (< 5K samples) | Strong | Weak-Moderate | Weak (without fine-tuning data) |
-| Large dataset (> 50K samples) | Good | Good | Strong |
-| Keyword-driven task | Strong | Moderate | Strong |
-| Semantic similarity | Weak | Strong | Strong |
-| Context-dependent meaning | Weak | Moderate | Strong |
-| Compute-limited environment | Strong | Moderate | Weak |
-
-**When TF-IDF Typically Wins:**
-- Short text classification (tweets, titles, headlines)
-- Tasks where word presence matters more than meaning
-- Small datasets where pretrained embeddings may add noise
-- Keyword-heavy domains (disaster detection, spam filtering)
-
-**When Embeddings Typically Win:**
-- Semantic similarity and matching tasks
-- Longer documents where word relationships matter
-- Cross-domain transfer (pretrained embeddings capture general knowledge)
-- Tasks requiring synonym and paraphrase understanding
-
-**When Transformers Typically Win:**
-- Context-dependent meaning ("fire" as disaster vs. slang)
-- Nuanced sentiment analysis
-- Tasks where word order and surrounding context are critical
-- Large datasets with sufficient compute resources
-
-**Baseline Expectations by Task:**
-
-| Task Type | Reasonable Baseline (F1) | Good Performance (F1) | Notes |
-|-----------|--------------------------|----------------------|-------|
-| Binary text classification | 0.70-0.80 | 0.85+ | Depends on class separability |
-| Multi-class (3-5 classes) | 0.60-0.75 | 0.80+ | Per-class performance varies |
-| Multi-class (10+ classes) | 0.50-0.65 | 0.75+ | Some classes inherently harder |
-| Sentiment (pos/neg) | 0.75-0.85 | 0.90+ | Well-studied task |
-| Topic classification | 0.70-0.80 | 0.85+ | Clear topic boundaries help |
-
-NOTE: These ranges are approximate starting points. Actual performance depends on
-data quality, class separability, and domain specifics. Always establish your own
-baseline before comparing to these ranges.
-
-**Key Principle:** Start with the simplest method that could work (TF-IDF + Logistic Regression).
-Add complexity only when empirical results justify it.
-
-Cross-reference: Section 2.4 (Analysis), Section 2.3.7 (Data Leakage Prevention)
-
-### D.2.7. Embedding Visualization
-
-When comparing multiple text representation methods (TF-IDF, word embeddings, sentence
-transformers), 2D projections of the embedding spaces provide visual evidence for why
-certain methods produce better classification results.
-
-**When to Visualize:**
-- Comparing multiple representation methods
-- Debugging unexpectedly poor model performance
-- Understanding cluster structure before or after classification
-- Communicating results to non-technical stakeholders (2D plots are intuitive)
-
-**Techniques:**
-
-| Technique | Best For | Key Parameter | Speed |
-|-----------|----------|---------------|-------|
-| PCA | Quick overview, preserves global variance | `n_components=2` | Fast |
-| t-SNE | Local structure, cluster visualization | `perplexity` (5-50, try multiple) | Moderate |
-| UMAP | Global + local structure, large datasets | `n_neighbors`, `min_dist` | Fast |
-
-**Standard Approach:**
-
-1. Generate embeddings for each method using the same dataset
-2. Apply dimensionality reduction (same technique and parameters across methods)
-3. Color points by class label
-4. Plot in a grid layout for side-by-side comparison
-5. Look for: class separation, cluster tightness, overlap regions
-
-**Interpretation Guidelines:**
-- Well-separated clusters suggest the representation captures class-relevant features
-- Overlapping regions indicate ambiguous samples -- cross-reference with error analysis
-- Scattered distributions suggest the representation does not capture task-relevant structure
-- Compare cluster separation across methods to explain performance differences
-
-**Comparison Layout:**
-Use a grid of subplots (one per representation method) with consistent axis ranges
-and color schemes. This enables direct visual comparison of how each method organizes
-the data in the embedding space.
-
-NOTE: t-SNE and UMAP are stochastic -- set `random_state` for reproducibility.
-Perplexity/neighbor choices affect t-SNE/UMAP output significantly; try multiple
-values and document which was used.
-
-Cross-reference: Section 2.4.6 (Model Comparison), Section 2.4.7 (Error Analysis),
-Appendix D.2.6 (NLP Performance Expectations)
+**Key considerations:**
+- Preprocessing choices (stemming, lemmatization, stopwords) significantly affect results
+- Embedding dimensionality and pretrained model selection are critical design decisions
+- Human baseline is often the ceiling; establish inter-annotator agreement early
+- Visualize embeddings to validate that representations capture expected structure
 
 ---
 
 ## D.3. Computer Vision Projects
 
-### D.3.1. Phase Adaptations
+### D.3.1. Orientation
 
-**Phase 1: Exploration**
-- Image quality assessment (corrupted files, artifacts)
-- Resolution and format checks (consistent dimensions, color channels)
-- Class distribution analysis (imbalance detection)
-- Visual inspection of samples per class
-- Dataset size assessment for training strategy
+Each DSM phase requires domain-specific adjustments for computer vision work:
 
-**Phase 2: Feature Engineering**
-- Image preprocessing (resize, normalize to [0,1] or [-1,1])
-- Data augmentation as model layers (modern approach)
-- Input size decisions (native vs upscaled for pre-trained models)
-- Transfer learning preparation (base model selection)
+- **Exploration:** Image quality assessment, class distribution, annotation quality review, resolution analysis
+- **Feature Engineering:** Augmentation strategy, preprocessing pipeline, transfer learning base model selection
+- **Analysis:** Architecture selection (pretrained vs custom), validation strategy accounting for data leakage through augmentation
+- **Communication:** Visual examples of predictions, failure cases, and model attention (saliency/activation maps)
 
-**Phase 3: Analysis**
-- Model architecture: CNN from scratch vs transfer learning
-- Training strategy: frozen layers → fine-tuning (two-phase)
-- Learning rate scheduling (ReduceLROnPlateau, cosine decay)
-- Validation strategy (see D.3.4)
-- VRAM management (batch size optimization)
-
-**Phase 4: Communication**
-- Visual results (predictions on test images)
-- Confusion matrix with class-wise metrics
-- Model interpretability (Grad-CAM attention maps)
-- Performance analysis by class and image characteristics
-- Training curves (loss, accuracy, learning rate)
-
-### D.3.2. Key Techniques
-
-**Data Augmentation (Modern Layer-Based Approach):**
-```python
-# Modern approach: Augmentation as model layers
-# Benefits: GPU-accelerated, applied only during training
-import tensorflow as tf
-from tensorflow.keras import layers
-
-data_augmentation = tf.keras.Sequential([
-    layers.RandomFlip("horizontal"),
-    layers.RandomRotation(0.1),      # 10% rotation
-    layers.RandomZoom(0.1),          # 10% zoom
-    layers.RandomContrast(0.1),      # Optional: contrast variation
-])
-
-# Integrate into model
-model = tf.keras.Sequential([
-    layers.Input(shape=(32, 32, 3)),
-    data_augmentation,               # Applied only during training
-    base_model,
-    layers.GlobalAveragePooling2D(),
-    layers.Dense(128, activation='relu'),
-    layers.Dense(num_classes, activation='softmax')
-])
-```
-
-**Transfer Learning (Two-Phase Training):**
-```python
-from tensorflow.keras.applications import ResNet50
-
-# Phase 1: Frozen base layers
-base_model = ResNet50(
-    weights='imagenet',
-    include_top=False,
-    input_shape=(224, 224, 3)  # Or native size if appropriate
-)
-base_model.trainable = False
-
-# Train custom head with higher learning rate
-model.compile(optimizer=tf.keras.optimizers.Adam(1e-3), ...)
-model.fit(train_data, epochs=10, ...)
-
-# Phase 2: Fine-tuning (unfreeze and train with lower LR)
-base_model.trainable = True
-model.compile(optimizer=tf.keras.optimizers.Adam(1e-5), ...)  # Lower LR
-model.fit(train_data, epochs=10, ...)
-```
-
-**Learning Rate Scheduling:**
-```python
-from tensorflow.keras.callbacks import ReduceLROnPlateau
-
-lr_scheduler = ReduceLROnPlateau(
-    monitor='val_loss',
-    factor=0.5,          # Reduce LR by half
-    patience=3,          # Wait 3 epochs before reducing
-    min_lr=1e-7,
-    verbose=1
-)
-
-# Use in training
-model.fit(train_data, callbacks=[lr_scheduler], ...)
-```
-
-**Grad-CAM Implementation:**
-```python
-import numpy as np
-import tensorflow as tf
-
-def make_gradcam_heatmap(img_array, model, last_conv_layer_name, pred_index=None):
-    """Generate Grad-CAM heatmap for model interpretability."""
-    # Create model that outputs conv layer activations and predictions
-    grad_model = tf.keras.models.Model(
-        [model.inputs],
-        [model.get_layer(last_conv_layer_name).output, model.output]
-    )
-
-    # Compute gradients
-    with tf.GradientTape() as tape:
-        conv_outputs, predictions = grad_model(img_array)
-        if pred_index is None:
-            pred_index = tf.argmax(predictions[0])
-        class_channel = predictions[:, pred_index]
-
-    # Gradient pooling and heatmap generation
-    grads = tape.gradient(class_channel, conv_outputs)
-    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
-    conv_outputs = conv_outputs[0]
-    heatmap = conv_outputs @ pooled_grads[..., tf.newaxis]
-    heatmap = tf.squeeze(heatmap)
-    heatmap = tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)
-    return heatmap.numpy()
-
-# Usage
-heatmap = make_gradcam_heatmap(
-    img_array=np.expand_dims(image, axis=0),
-    model=model,
-    last_conv_layer_name='conv5_block3_out'  # ResNet50 last conv layer
-)
-```
-
-**Comprehensive Evaluation:**
-```python
-from sklearn.metrics import confusion_matrix, classification_report
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-# Predictions
-y_pred = model.predict(X_test)
-y_pred_classes = np.argmax(y_pred, axis=1)
-y_true_classes = np.argmax(y_test, axis=1)
-
-# Confusion Matrix
-cm = confusion_matrix(y_true_classes, y_pred_classes)
-plt.figure(figsize=(10, 8))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
-            xticklabels=class_names, yticklabels=class_names)
-plt.xlabel('Predicted')
-plt.ylabel('True')
-plt.title('Confusion Matrix')
-plt.show()
-
-# Classification Report (precision, recall, F1 per class)
-print(classification_report(y_true_classes, y_pred_classes,
-                           target_names=class_names))
-```
-
-### D.3.3. Common Challenges
-
-**Memory Constraints:**
-- Start with smaller batch sizes (16-32) on limited VRAM
-- Use `tf.keras.backend.clear_session()` between experiments
-- Monitor GPU memory: `nvidia-smi` or `tf.config.experimental.get_memory_info('GPU:0')`
-
-**Input Size Mismatch:**
-- Pre-trained models (ResNet, VGG) expect 224x224 input
-- Options: (a) Resize images to 224x224, (b) Use native size with modified architecture
-- Document decision and rationale
-
-**Class Imbalance:**
-- Use class weights: `class_weight={0: 1.0, 1: 2.5, ...}`
-- Or oversample minority classes in data generator
-- Monitor per-class metrics, not just overall accuracy
-
-**Overfitting on Small Datasets:**
-- Aggressive data augmentation
-- Dropout layers in custom head
-- Early stopping callback
-- Regularization (L2 weight decay)
-
-**Transfer Learning Domain Mismatch:**
-- ImageNet features may not transfer well to specialized domains
-- Consider domain-specific pre-trained models when available
-- Fine-tuning usually improves over frozen-only training
-
-**Computational Requirements:**
-- Use mixed precision training: `tf.keras.mixed_precision.set_global_policy('mixed_float16')`
-- Gradient checkpointing for very deep models
-- Consider cloud GPU for large-scale training
-
-### D.3.4. Validation Strategy for CV Projects
-
-**Why Validation Strategy Matters:**
-- Prevents overfitting detection issues
-- Ensures reliable performance estimates
-- Critical for model selection decisions
-
-**Standard Split (Most Common):**
-```python
-# Option 1: Use provided test set as holdout
-# Training data split for validation during training
-from sklearn.model_selection import train_test_split
-
-X_train_full, X_test, y_train_full, y_test = load_data()  # Test = holdout
-X_train, X_val, y_train, y_val = train_test_split(
-    X_train_full, y_train_full,
-    test_size=0.2,
-    stratify=y_train_full,  # Maintain class distribution
-    random_state=42
-)
-
-# Use X_val for validation_data during training
-# Use X_test only for final evaluation
-```
-
-**Validation Options:**
-
-| Strategy | When to Use | Implementation |
-|----------|-------------|----------------|
-| **Train/Val/Test Split** | Standard approach, sufficient data | Split training into train+val, keep test as holdout |
-| **K-Fold Cross-Validation** | Small datasets, need robust estimates | `sklearn.model_selection.StratifiedKFold` |
-| **Validation Split in fit()** | Quick experiments | `model.fit(..., validation_split=0.2)` |
-| **Separate Val Set** | When provided by dataset | Use directly |
-
-**Key Principles:**
-1. **Never use test set during training** - only for final evaluation
-2. **Stratify splits** - maintain class distribution in all subsets
-3. **Document your choice** - include in project plan and notebook
-4. **Use same split for all experiments** - enables fair comparison
-
-**Validation Strategy Documentation Template:**
-```markdown
-## Validation Strategy
-
-**Approach:** [Train/Val/Test Split | K-Fold | etc.]
-
-**Data Allocation:**
-- Training: X,XXX images (XX%)
-- Validation: X,XXX images (XX%)
-- Test (Holdout): X,XXX images (XX%)
-
-**Stratification:** Yes/No (maintain class distribution)
-
-**Random Seed:** 42 (for reproducibility)
-
-**Rationale:** [Why this approach was chosen]
-```
-
-### D.3.5. CV Project Checklist
-
-**Phase 1 Completion:**
-- [ ] Dataset loaded and shapes verified
-- [ ] Class distribution analyzed
-- [ ] Sample images visualized per class
-- [ ] Data quality issues identified (if any)
-- [ ] Input size decision documented
-
-**Phase 2 Completion:**
-- [ ] Preprocessing pipeline implemented (normalize, resize)
-- [ ] Data augmentation configured
-- [ ] Validation strategy documented
-- [ ] Base model loaded (if transfer learning)
-- [ ] Model architecture finalized and compiled
-
-**Phase 3 Completion:**
-- [ ] Training completed (all phases)
-- [ ] Training curves saved (loss, accuracy)
-- [ ] Best model saved/checkpointed
-- [ ] Hyperparameters documented
-
-**Phase 4 Completion:**
-- [ ] Final test evaluation completed
-- [ ] Confusion matrix generated
-- [ ] Per-class metrics calculated
-- [ ] Grad-CAM visualizations created
-- [ ] Results documented with interpretation
+**Key considerations:**
+- Data augmentation is essential but must be applied correctly (only to training set)
+- Transfer learning from pretrained models is standard practice; fine-tuning strategy matters
+- Validation must account for augmented copies of the same source image
+- Model interpretability tools (Grad-CAM, saliency maps) are critical for stakeholder trust
 
 ---
 
 ## D.4. Clustering Projects
 
-### D.4.1. Phase Adaptations
+### D.4.1. Orientation
 
-**Phase 1: Exploration**
-- Feature distribution analysis
-- Correlation analysis
-- Dimensionality assessment
-- Initial cluster hypothesis
+Each DSM phase requires domain-specific adjustments for clustering work:
 
-**Phase 2: Feature Engineering**
-- Feature scaling (standardization critical for K-Means)
-- Dimensionality reduction (PCA, t-SNE for visualization)
-- Feature selection (remove highly correlated)
-- Domain-specific propensities
+- **Exploration:** Feature distributions, scale differences, distance metric appropriateness, dimensionality
+- **Feature Engineering:** Scaling strategy, handling mixed data types (numeric + categorical), dimensionality reduction
+- **Analysis:** Algorithm selection (partitional, hierarchical, density-based), K selection with internal metrics, cluster profiling
+- **Communication:** Cluster profiles with business-meaningful descriptions, segment sizes, actionable characteristics
 
-**Phase 3: Analysis**
-- Algorithm selection (K-Means, Hierarchical, DBSCAN)
-- Optimal K selection (elbow, silhouette, business logic)
-- Cluster validation (silhouette, Davies-Bouldin, Calinski-Harabasz)
-- Cluster interpretation
-
-**Phase 4: Communication**
-- Cluster profiles (mean values per cluster)
-- Segment personas (business descriptions)
-- 2D visualizations (PCA, t-SNE)
-- Assignment strategy (hard vs fuzzy)
-
-### D.4.2. Key Techniques
-
-**Optimal K Selection:**
-```python
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-
-scores = []
-for k in range(2, 11):
-    kmeans = KMeans(n_clusters=k, random_state=42)
-    labels = kmeans.fit_predict(X_scaled)
-    score = silhouette_score(X_scaled, labels)
-    scores.append({'k': k, 'silhouette': score})
-    print(f"K={k}: Silhouette={score:.4f}")
-```
-
-**Cluster Profiling:**
-```python
-def profile_clusters(df, cluster_col, features):
-    """Create cluster profile summary"""
-    profiles = df.groupby(cluster_col)[features].agg(['mean', 'std', 'count'])
-    return profiles
-```
-
-### D.4.3. Common Challenges
-
-- Determining optimal number of clusters
-- Interpreting clusters in business terms
-- Handling mixed data types (numeric + categorical)
-- Scaling features appropriately
-- Validating cluster quality
-
-### D.4.4. TravelTide Example
-
-**Project:** Customer segmentation for personalized rewards program
-
-**Approach:**
-- 89 features engineered from booking and user data
-- K-Means clustering with K=3 (data-driven pivot from K=5)
-- Silhouette score validation (0.38 - moderate separation)
-- Fuzzy perk assignment across segments
-
-**Key Decision:** Pivoted from business-requested K=5 to statistical optimum K=3, implemented creative perk distribution strategy.
+**Key considerations:**
+- K selection should be data-driven; be prepared to pivot from business expectations
+- Use multiple validation metrics (silhouette, Davies-Bouldin, domain-specific)
+- Cluster profiling is the deliverable, not the clustering itself
+- Scale and distance metric choices can change results dramatically
 
 ---
 
 ## D.5. Regression/Classification Projects
 
-### D.5.1. Phase Adaptations
+### D.5.1. Orientation
 
-**Phase 1: Exploration**
-- Target variable distribution
-- Class balance (classification)
-- Feature-target relationships
-- Outlier impact on target
+Each DSM phase requires domain-specific adjustments for supervised learning work:
 
-**Phase 2: Feature Engineering**
-- Encoding categorical variables (one-hot, target encoding)
-- Handling missing values
-- Feature interactions
-- Polynomial features
+- **Exploration:** Target variable distribution, class balance, feature-target relationships, outlier impact
+- **Feature Engineering:** Encoding strategy for categoricals, interaction features, target-informed features (with leakage prevention)
+- **Analysis:** Model selection, hyperparameter tuning, cross-validation strategy, threshold optimization (classification)
+- **Communication:** Performance metrics appropriate to problem type, feature importance, decision boundaries, error analysis
 
-**Phase 3: Analysis**
-- Model selection: Linear, Tree-based, Ensemble
-- Train/validation/test split
-- Cross-validation strategy
-- Hyperparameter tuning
-- Feature importance analysis
-
-**Phase 4: Communication**
-- Performance metrics (accuracy, precision, recall, F1, ROC-AUC)
-- Feature importance charts
-- Prediction examples (correct and incorrect)
-- Business impact of predictions
-
-### D.5.2. Key Techniques
-
-**Classification Metrics:**
-```python
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
-
-def evaluate_classifier(y_true, y_pred, y_pred_proba=None):
-    print("Confusion Matrix:")
-    print(confusion_matrix(y_true, y_pred))
-    print("\nClassification Report:")
-    print(classification_report(y_true, y_pred))
-    if y_pred_proba is not None:
-        auc = roc_auc_score(y_true, y_pred_proba)
-        print(f"\nROC-AUC: {auc:.4f}")
-```
-
-**Regression Metrics:**
-```python
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-
-def evaluate_regressor(y_true, y_pred):
-    mse = mean_squared_error(y_true, y_pred)
-    rmse = np.sqrt(mse)
-    mae = mean_absolute_error(y_true, y_pred)
-    r2 = r2_score(y_true, y_pred)
-    
-    print(f"RMSE: {rmse:.4f}")
-    print(f"MAE: {mae:.4f}")
-    print(f"RÂ²: {r2:.4f}")
-```
-
-### D.5.3. Common Challenges
-
-- Class imbalance (classification)
-- Feature leakage
-- Overfitting
-- Hyperparameter tuning
-- Model interpretability vs accuracy trade-off
+**Key considerations:**
+- Class imbalance requires explicit handling (sampling, loss weighting, threshold tuning)
+- Feature importance interpretation depends on model type; use model-agnostic methods when comparing
+- Regression outlier sensitivity varies by model; robust methods may be needed
+- Threshold selection (classification) should be driven by business cost asymmetry
 
 ---
 
@@ -4453,7 +1579,7 @@ def evaluate_regressor(y_true, y_pred):
 Return to main document: **Section 2: Core Workflow**
 
 For package recommendations by domain, see: **`1.1_Domain_Specific_Package_Reference.md`**
--e 
+
 ---
 
 # Appendix E: Quick Reference
@@ -4617,7 +1743,7 @@ print("Ready for next step!")  # Generic confirmation
 |-----------|---------|---------|
 | Notebook | `[##]_[PHASE]_[description].ipynb` | `01_EDA_data_quality.ipynb` |
 | Data | `[entity]_v[#.#]_[YYYYMMDD].csv` | `users_v2.1_20251115.csv` |
-| Report | `[Project]_[Type]_[Audience].ext` | `TravelTide_Executive_Summary.pdf` |
+| Report | `[Project]_[Type]_[Audience].ext` | `ProjectName_Executive_Summary.pdf` |
 
 ### Phase Codes
 
@@ -4719,54 +1845,6 @@ print("Ready for next step!")  # Generic confirmation
 [How will we verify this was the right decision? What metrics will we track?]
 ```
 
-**Example (Real Project):**
-
-```markdown
-## DEC-014: Feature Reduction Based on Ablation (45 -> 33 features)
-
-**Date:** 2025-11-18
-**Notebook:** s03_d02_MODEL_mlflow-features.ipynb
-**Status:** Active
-
-**Context:**
-Baseline XGBoost model with 45 engineered features showed RMSE = 7.2127.
-Permutation importance analysis revealed some features contributed negligibly or hurt performance.
-Need to determine which features to keep for optimal generalization.
-
-**Decision:**
-Remove 12 low-value features, retaining 33 high-impact features:
-
-Removed:
-- Rolling std (3): unit_sales_7d_std, 14d_std, 30d_std
-- Oil features (6): oil_price, oil_price_lag7/14/30, oil_price_change7/14
-- Promotion interactions (3): promo_holiday_category, promo_item_avg, promo_cluster
-
-**Rationale:**
-Ablation study showed:
-- 33-feature model: RMSE = 6.8852 (4.54% improvement)
-- Removed features had low permutation importance (<0.01)
-- Simpler model reduces overfitting risk
-- Correlation analysis: oil features showed r ~ 0.01 (negligible linear relationship)
-
-**Alternatives Considered:**
-1. Keep all 45 features - Rejected: Led to overfitting (validation RMSE worse)
-2. Remove only oil features (39 total) - Rejected: Still included low-value rolling std
-3. More aggressive cuts (25 features) - Rejected: Removed valuable lag features, hurt performance
-4. Use L1 regularization instead - Rejected: Feature removal more interpretable than penalization
-
-**Impact:**
-- **Scope:** Feature set reduced 27% (45 -> 33)
-- **Timeline:** Faster training (marginal, <1 sec difference)
-- **Quality:** +4.54% RMSE improvement (7.21 -> 6.89)
-- **Interpretability:** Simpler model easier to explain to stakeholders
-- **Risk:** Mitigated overfitting, improved generalization
-
-**Validation Plan:**
-- Sprint 3 Day 3: Validate on temporal split (Q4+Q1 training)
-- Sprint 3 Day 4: Test with LSTM architecture
-- Sprint 3 Day 5: Final production validation
-```
-
 **Benefits of Enhanced Format:**
 - **Transparency:** Clear reasoning for future reference
 - **Learning:** Failed alternatives teach as much as successes
@@ -4797,11 +1875,6 @@ Ablation study showed:
 ### E.6.1. Decision Invalidation Arc Documentation
 
 **Purpose:** Track how decisions evolve over time, including when earlier decisions are invalidated by later findings.
-
-**Source:** Favorita Demand Forecasting Project
-- DEC-012 (Sprint 2): "Include oil price features based on macro correlation"
-- DEC-014 (Sprint 3): "Remove oil features based on ablation study"
-- The arc from DEC-012 to DEC-014 represents a decision invalidation
 
 **Why Document Invalidation Arcs:**
 - Decisions made with incomplete information may need revision
@@ -4854,58 +1927,6 @@ Ablation study showed:
 
 ### Decision Chain
 DEC-YYY (Sprint X) -> [Invalidation reason] -> DEC-XXX (Sprint Y)
-```
-
-**Example: Oil Features Invalidation Arc (Favorita)**
-
-```markdown
-## DEC-014: Remove Oil Features from Model
-
-**Date:** 2025-12-10
-**Status:** Active
-**Invalidates:** DEC-012 (Include oil price features)
-
-### Invalidation Context
-
-**Original Decision (DEC-012):**
-- Date: 2025-12-05
-- Decision: Include 6 oil price features (price, lags, changes)
-- Rationale at the time: Ecuador's oil-dependent economy shows macro correlation (r=0.23 at aggregated level)
-
-**New Evidence:**
-- Permutation importance: Oil features ranked 40-45 out of 45 (near zero)
-- Granular correlation: r ~ 0.01 at store-item-day level
-- Ablation study: Removing oil improved RMSE by 3.14%
-- Discovered in Sprint 3, Day 2 during feature validation
-
-### Current Decision
-
-**Decision:**
-Remove all 6 oil features from the final model.
-
-**Rationale:**
-- Simpson's Paradox: Aggregate correlation doesn't hold at granular level
-- Oil affects macro economy, not individual product demand
-- Features added noise, not signal
-- Model performs better without them
-
-### Arc Analysis
-
-**What We Learned:**
-Macro-economic correlations rarely translate to granular forecasting. Always validate features at the prediction granularity.
-
-**Was DEC-012 Wrong?**
-[ ] Yes - Should have been caught earlier
-[X] No - Made sense with available information at the time
-[ ] Partially - Some aspects were incorrect
-
-Note: DEC-012 was reasonable given macro correlation. The invalidation came from Sprint 3 validation that wasn't possible until features were engineered.
-
-**Process Improvement:**
-Add early granular correlation check in Sprint 2 before committing to feature engineering effort.
-
-### Decision Chain
-DEC-012 (Sprint 2) -> [Granular validation failed] -> DEC-014 (Sprint 3)
 ```
 
 **Best Practices for Invalidation Arcs:**
@@ -5007,237 +2028,19 @@ Proposed -> Active -> [Superseded by DEC-XXX | Rejected | Completed]
 - [ ] Clear execution order
 - [ ] No manual data edits
 
-### E.10.4. Sprint Transition Verification Script
+### E.10.4. Sprint Transition Verification
 
-**Purpose:** Automated check that sprint is complete before proceeding to next sprint
+**Purpose:** Automated check that sprint is complete before proceeding.
 
-**When to Run:** End of each sprint, before starting next sprint
+**When to Run:** End of each sprint, before starting next sprint.
 
-**Location:** Create as `verify_sprint[N]_complete.py` in project root
+**What to Verify:**
+1. **Required files exist:** Final dataset, feature dictionary, checkpoint, handoff document
+2. **Dataset quality:** Shape matches expectations, target variable present, no unexpected nulls
+3. **Documentation complete:** Checkpoint checklist items done, handoff has required sections
 
-**Template:**
-
-```python
-"""
-Sprint [N] Completion Verification Script
-Project: [Project Name]
-Purpose: Verify all deliverables present and valid before Sprint [N+1]
-"""
-
-from pathlib import Path
-import pandas as pd
-import sys
-
-print("=" * 70)
-print(f"Sprint [N] Completion Verification")
-print("=" * 70)
-
-# Track errors
-errors = []
-warnings = []
-
-# ============================================================================
-# Check 1: Required Files Exist
-# ============================================================================
-print("\nCheck 1: Required Files")
-print("-" * 70)
-
-required_files = [
-    'data/processed/sprint[N]_final_dataset.pkl',
-    'dsm-docs/feature_dictionary_v[N].txt',
-    'dsm-docs/checkpoints/s0[N]_d05_checkpoint.md',
-    'dsm-docs/Sprint[N]_to_Sprint[N+1]_Handoff.md'
-]
-
-missing = []
-for file_path in required_files:
-    if not Path(file_path).exists():
-        missing.append(file_path)
-        errors.append(f"Missing required file: {file_path}")
-    else:
-        print(f"  OK: {file_path}")
-
-if missing:
-    print(f"\n  ERROR: {len(missing)} required files missing")
-else:
-    print("  OK: All required files present")
-
-# ============================================================================
-# Check 2: Dataset Quality
-# ============================================================================
-print("\nCheck 2: Dataset Quality")
-print("-" * 70)
-
-try:
-    df = pd.read_pickle('data/processed/sprint[N]_final_dataset.pkl')
-
-    # Expected shape
-    expected_rows = 300896  # Adjust for your project
-    expected_cols_min = 28  # Minimum expected
-
-    actual_rows, actual_cols = df.shape
-
-    print(f"  Shape: {actual_rows:,} rows x {actual_cols} columns")
-
-    # Validate shape
-    if actual_rows != expected_rows:
-        warnings.append(f"Row count mismatch: {actual_rows:,} (expected {expected_rows:,})")
-        print(f"  WARNING: Row count differs from expected")
-    else:
-        print(f"  OK: Row count matches expected")
-
-    if actual_cols < expected_cols_min:
-        errors.append(f"Too few columns: {actual_cols} (expected >={expected_cols_min})")
-        print(f"  ERROR: Column count below minimum")
-    else:
-        print(f"  OK: Column count acceptable")
-
-    # Check target variable
-    target_col = 'unit_sales'  # Adjust for your project
-    if target_col not in df.columns:
-        errors.append(f"Target variable '{target_col}' not found")
-        print(f"  ERROR: Target variable missing")
-    else:
-        target_nulls = df[target_col].isnull().sum()
-        print(f"  OK: Target variable present")
-        print(f"    Missing values: {target_nulls} ({target_nulls/len(df)*100:.2f}%)")
-
-        if target_nulls > 0:
-            errors.append(f"Target has {target_nulls} missing values")
-
-    # Check date range (if applicable)
-    if 'date' in df.columns:
-        date_min = df['date'].min()
-        date_max = df['date'].max()
-        print(f"  OK: Date range: {date_min.date()} to {date_max.date()}")
-
-except Exception as e:
-    errors.append(f"Failed to load dataset: {str(e)}")
-    print(f"  ERROR: Cannot load dataset")
-
-# ============================================================================
-# Check 3: Documentation Complete
-# ============================================================================
-print("\nCheck 3: Documentation Completeness")
-print("-" * 70)
-
-try:
-    # Check checkpoint has no incomplete items
-    checkpoint_path = Path('dsm-docs/checkpoints/s0[N]_d05_checkpoint.md')
-    if checkpoint_path.exists():
-        checkpoint_text = checkpoint_path.read_text()
-
-        # Look for incomplete checklist items
-        incomplete_items = checkpoint_text.count('[ ]')
-        if incomplete_items > 0:
-            warnings.append(f"Checkpoint has {incomplete_items} incomplete items")
-            print(f"  WARNING: {incomplete_items} incomplete checklist items")
-        else:
-            print(f"  OK: All checklist items complete")
-
-    # Check handoff document exists and has key sections
-    handoff_path = Path('dsm-docs/Sprint[N]_to_Sprint[N+1]_Handoff.md')
-    if handoff_path.exists():
-        handoff_text = handoff_path.read_text()
-        required_sections = [
-            'Executive Summary',
-            'Deliverables',
-            'Next Sprint Starting Point',
-            'Quick Start Code'
-        ]
-
-        missing_sections = []
-        for section in required_sections:
-            if section not in handoff_text:
-                missing_sections.append(section)
-
-        if missing_sections:
-            warnings.append(f"Handoff missing sections: {missing_sections}")
-            print(f"  WARNING: Missing handoff sections: {', '.join(missing_sections)}")
-        else:
-            print(f"  OK: Handoff document complete")
-
-except Exception as e:
-    warnings.append(f"Documentation check failed: {str(e)}")
-
-# ============================================================================
-# Summary
-# ============================================================================
-print("\n" + "=" * 70)
-print("Verification Summary")
-print("=" * 70)
-
-if errors:
-    print(f"\nERRORS ({len(errors)}):")
-    for i, error in enumerate(errors, 1):
-        print(f"  {i}. {error}")
-
-if warnings:
-    print(f"\nWARNINGS ({len(warnings)}):")
-    for i, warning in enumerate(warnings, 1):
-        print(f"  {i}. {warning}")
-
-if not errors and not warnings:
-    print("\nOK: All checks passed - Sprint [N] complete!")
-    print(f"OK: Ready to proceed to Sprint [N+1]")
-    sys.exit(0)
-elif not errors:
-    print(f"\nWARNING: Sprint [N] complete with {len(warnings)} warnings")
-    print(f"WARNING: Review warnings before proceeding to Sprint [N+1]")
-    sys.exit(0)
-else:
-    print(f"\nERROR: Sprint [N] verification FAILED")
-    print(f"ERROR: Fix {len(errors)} errors before proceeding")
-    sys.exit(1)
-```
-
-**Usage:**
-
-```bash
-# At end of Sprint 1
-python verify_sprint1_complete.py
-
-# Expected output:
-# ==================================================================
-# Sprint 1 Completion Verification
-# ==================================================================
-#
-# Check 1: Required Files
-# ----------------------------------------------------------------------
-#   OK: data/processed/sprint1_final_dataset.pkl
-#   OK: dsm-docs/feature_dictionary_v1.txt
-#   OK: dsm-docs/checkpoints/s01_d05_checkpoint.md
-#   OK: dsm-docs/Sprint1_to_Sprint2_Handoff.md
-#   OK: All required files present
-#
-# Check 2: Dataset Quality
-# ----------------------------------------------------------------------
-#   Shape: 300,896 rows x 28 columns
-#   OK: Row count matches expected
-#   OK: Column count acceptable
-#   OK: Target variable present
-#     Missing values: 0 (0.00%)
-#   OK: Date range: 2013-01-02 to 2017-08-15
-#
-# Check 3: Documentation Completeness
-# ----------------------------------------------------------------------
-#   OK: All checklist items complete
-#   OK: Handoff document complete
-#
-# ==================================================================
-# Verification Summary
-# ==================================================================
-#
-# OK: All checks passed - Sprint 1 complete!
-# OK: Ready to proceed to Sprint 2
-```
-
-**Benefits:**
-- Catches incomplete work before sprint transition
-- Automated vs manual checklist review (faster, less error-prone)
-- Clear pass/fail criteria
-- Documents exact state at handoff
-- Prevents starting next sprint with missing prerequisites
+Create a project-specific verification script (`verify_sprint[N]_complete.py`) that
+checks these categories and reports errors/warnings with clear pass/fail criteria.
 
 ---
 
@@ -5737,7 +2540,7 @@ See DSM_0.2 Untrusted Input Protocol for the complementary agent-behavior protoc
 - **Context:** In notebooks (DSM 1.0), queries typically use hardcoded values or
   DataFrame operations, making this low risk. In applications (DSM 4.0) with
   user-facing inputs, this is critical.
-- **DSM Reference:** DSM_0.2 (Untrusted Input Protocol), DSM 4.0 Section 10
+- **DSM Reference:** DSM_0.2 (Untrusted Input Protocol), DSM 4.0 Section 4.5 (Package Verification)
 
 **Anti-Pattern: XSS in Generated HTML**
 - **Problem:** Inserting user-provided data into HTML without escaping allows script injection
@@ -5758,7 +2561,7 @@ See DSM_0.2 Untrusted Input Protocol for the complementary agent-behavior protoc
   ```
 - **Context:** Relevant for Streamlit apps, Flask/FastAPI frontends, and HTML
   report generation. Not applicable to pure notebook analysis.
-- **DSM Reference:** DSM 4.0 Section 10
+- **DSM Reference:** DSM 4.0 Section 4.5 (Package Verification)
 
 **Anti-Pattern: Path Traversal in File Operations**
 - **Problem:** Using user-provided file paths without validation allows access to files outside the intended directory
@@ -5782,7 +2585,7 @@ See DSM_0.2 Untrusted Input Protocol for the complementary agent-behavior protoc
   ```
 - **Context:** Relevant in any project that processes user-provided filenames:
   upload handlers, data loading APIs, file export features.
-- **DSM Reference:** DSM 4.0 Section 10
+- **DSM Reference:** DSM 4.0 Section 4.5 (Package Verification)
 
 **Anti-Pattern: Command Injection via subprocess**
 - **Problem:** Passing unsanitized input to shell commands allows arbitrary command execution
@@ -5806,7 +2609,7 @@ See DSM_0.2 Untrusted Input Protocol for the complementary agent-behavior protoc
   ```
 - **Context:** Common in automation scripts, data pipeline orchestration, and
   MCP server implementations. Prefer Python standard library over shell commands.
-- **DSM Reference:** DSM_0.2 (Untrusted Input Protocol), DSM 4.0 Section 10
+- **DSM Reference:** DSM_0.2 (Untrusted Input Protocol), DSM 4.0 Section 4.5 (Package Verification)
 
 ---
 

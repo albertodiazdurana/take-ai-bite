@@ -32,7 +32,6 @@ This command is only valid when the session will continue with `/dsm-light-go` n
      - [ ] Feedback push
      - [ ] Full MEMORY.md update
      - [ ] README change notification check
-     - [ ] Bandwidth report
      - [ ] Contributor profile check
      ```
 5. **Baseline mode marker:** Append `mode: light` to `.claude/session-baseline.txt` so that `/dsm-light-go` can verify the chain.
@@ -46,7 +45,6 @@ This command is only valid when the session will continue with `/dsm-light-go` n
 - Do NOT push feedback (deferred)
 - Do NOT refresh memory backup (deferred)
 - Do NOT check contributor profile (deferred)
-- Do NOT report bandwidth (deferred)
 - Do NOT delete `.claude/session-baseline.txt` (it carries the mode marker for the next session)
 - No co-author lines in commits
 - If $ARGUMENTS is provided, use it as the session description in MEMORY.md
