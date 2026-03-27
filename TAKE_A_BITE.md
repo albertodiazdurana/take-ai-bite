@@ -32,5 +32,12 @@ what is presented. Self-regulation, thinking about your own thinking, is what
 keeps both sides honest. The human sets the direction; the agent follows the
 plan and questions its own choices before asking the human to trust them.
 
+This philosophy scales. What starts as a sizing rule becomes a full
+engineering practice: version-controlled instruction systems, feedback loops
+across projects, and session protocols that accumulate your expertise over
+time. The discipline is called Systems Prompt Engineering, and it emerges
+naturally from taking the right-sized bite, consistently.
+
 For the full framework of principles and guidelines, see
-`DSM_6.0_AI_Collaboration_Principles_v1.0.md`.
+`DSM_6.0_AI_Collaboration_Principles_v1.0.md`. For the engineering practice,
+see `DSM_6.1_Systems_Prompt_Engineering_v1.0.md`.
