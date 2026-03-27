@@ -16,7 +16,7 @@ But it goes further than review sizing. Take AI Bite builds an agent ecosystem t
 
 ## The Principles
 
-Seven principles govern how humans and AI agents work together. Each addresses a specific failure mode in human-AI collaboration.
+Nine principles govern how humans and AI agents work together. Each addresses a specific failure mode in human-AI collaboration.
 
 | Principle | Core idea |
 |-----------|-----------|
@@ -27,6 +27,8 @@ Seven principles govern how humans and AI agents work together. Each addresses a
 | **Know Your Context** | The agent manages its own resource consumption. Don't charge ahead until overflow. |
 | **Match the Room** | Contribute proportionally to the project's culture and scale. |
 | **Own Your Process** | Disclose how the work was produced. Transparency about method is a professional obligation. |
+| **Know What You Own** | Verify licensing before deployment. Free tier does not mean free use. |
+| **Think Ahead** | Build the map before you walk the territory. Strategy emerges from operational maturity. |
 
 For the full framework, see [`DSM_6.0_AI_Collaboration_Principles_v1.0.md`](DSM_6.0_AI_Collaboration_Principles_v1.0.md).
 
@@ -37,6 +39,22 @@ These principles are operationalized by DSM, a living, versioned methodology tha
 DSM is not a static document. It evolves through a hub-spoke feedback loop where every session, every project, and every practitioner's experience feeds back into the methodology. Protocols are tested, refined, and propagated across the ecosystem. What one project discovers improves every future project.
 
 This is what makes the avatar possible. Session transcripts capture reasoning. Checkpoints preserve milestones. Memory files retain context across sessions. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that accumulates your expertise, not just your files.
+
+## Systems Prompt Engineering
+
+Most prompt engineering focuses on crafting individual prompts. Take AI Bite operates at a different level: designing, versioning, and governing entire instruction systems across an ecosystem of projects.
+
+This is Systems Prompt Engineering, a discipline that applies project management rigor to AI instruction artifacts. DSM's instruction ecosystem covers 7 of 10 PMP knowledge areas (scope, schedule, cost, quality, communication, risk, and integration management) through version-controlled protocols, automated feedback loops, and cross-project propagation.
+
+The framework operates at three levels:
+
+| Level | What it manages | Example |
+|-------|----------------|---------|
+| **Individual** | A single prompt or instruction | A system prompt, a chat message |
+| **System** | Coordinated instructions for one project | CLAUDE.md + command files + session protocols |
+| **Ecosystem** | Instruction architecture across projects | Hub-spoke propagation, feedback loops, mirror sync |
+
+For the full chapter, see [`DSM_6.1_Systems_Prompt_Engineering_v1.0.md`](DSM_6.1_Systems_Prompt_Engineering_v1.0.md).
 
 ## Start Here
 
@@ -60,14 +78,14 @@ They are not theoretical; they emerged from daily practice with AI agents across
 <details>
 <summary>Latest additions to the framework (click to expand)</summary>
 
+- **Systems Prompt Engineering (DSM_6.1)** — A full chapter naming the discipline: version-controlled instruction systems, failure mode taxonomy, practitioner maturity model, and PMP knowledge area mapping
+- **Document modularization** — All methodology documents split into slim cores with on-demand modules, reducing context consumption while preserving full coverage
+- **Dual licensing** — CC BY-SA 4.0 for methodology documentation, MIT for scripts and code
+- **Domain-neutrality audits** — All numbered DSM files reviewed and trimmed of domain-specific language, making the framework applicable to any project type
 - **Incomplete wrap-up recovery** — When a session ends unexpectedly, the next session detects the gap and reconstructs the missing summary from the archived transcript
-- **Two-Pass Reading Strategy** — Long structured files are read in two passes: structural scan first, then targeted reads of relevant sections
-- **Web Research Capture Protocol** — Raw findings are saved with source URLs before synthesis, ensuring every claim is traceable
 - **Session configuration recommendation** — Each session receives a tailored model and effort configuration based on planned work scope
-- **Strategic roadmap with GitHub Projects** — A three-layer planning system: strategic document, GitHub Projects board, and individual backlog files
 - **Mirror repo sync** — Methodology files are automatically copied to public distribution repos after changes
 - **Branch testing requirement** — Feature branches must be tested before merging, with specific test plans per backlog item
-- **DSM modularization** — Custom instructions split into a core file (always loaded) and four on-demand modules for context efficiency
 - **Ecosystem Path Registry** — Cross-repo paths declared in a local registry, eliminating hardcoded filesystem paths
 - **Parallel session protocol** — Run isolated evaluation tasks on independent branches without interfering with the main session
 
@@ -77,8 +95,9 @@ See the full timeline of 84+ features → [FEATURES.md](FEATURES.md)
 
 ## What's Coming
 
-- **Methodology tracks** for data science, software engineering, documentation, and project management, with templates, case studies, and setup scripts
+- **Structural compliance retrofit** — Applying document structure standards (TOC, intro paragraphs, line budgets) across all methodology files
 - **A queryable knowledge graph** that compiles human-authored methodology into a navigable, interconnected structure, making the ecosystem's accumulated knowledge searchable across projects and sessions
+- **Onboarding guide** — A newcomer-friendly path into the framework for practitioners encountering DSM for the first time
 
 ## Links
 
