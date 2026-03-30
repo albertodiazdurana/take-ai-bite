@@ -8,11 +8,20 @@
 
 **This document is part of an Integrated System** → Refer to `0_Integrated_System_Guide-START-HERE.md` for complete guide
 
+## Contents
+
+1. [Introduction](#1-introduction)
+2. [Module Dispatch Table](#module-dispatch-table)
+3. [Version History and Closing](#8-version-history--closing)
+
 ---
 
-# 1. Introduction
+## 1. Introduction
 
-## 1.1. Overview & Purpose
+This section covers the methodology's purpose, target audience, core philosophy,
+and accuracy standards for data science work.
+
+### 1.1. Overview & Purpose
 
 This methodology provides a systematic framework for collaborative data science projects between human analysts and an AI agent. It emerged from real-world project experience where rigorous methodology enabled data-driven pivots and successful stakeholder communication.
 
@@ -22,7 +31,7 @@ This methodology provides a systematic framework for collaborative data science 
 - **Scalability:** Core practices for all projects + advanced practices for complex scenarios
 - **Stakeholder Focus:** Technical rigor balanced with business communication needs
 
-## 1.2. When to Use This Methodology
+### 1.2. When to Use This Methodology
 
 **Ideal For:**
 - Academic data science projects (thesis, coursework, research)
@@ -47,9 +56,9 @@ This methodology provides a systematic framework for collaborative data science 
 **For Software Engineering Projects:**
 If your primary deliverable is a working application (not analytical insights), see **DSM 4.0: Software Engineering Adaptation** which provides adapted phases, architectural decision templates, and code organization standards for ML application development.
 
-## 1.3. Core Philosophy
+### 1.3. Core Philosophy
 
-### 1.3.1. Communication Style
+#### 1.3.1. Communication Style
 - **Concise responses**: Direct answers without unnecessary elaboration
 - **Clarifying questions first**: Before generating artifacts or lengthy outputs, confirm understanding
 - **Token monitoring**: Track conversation length and warn at 95% capacity for session summary
@@ -59,13 +68,13 @@ If your primary deliverable is a working application (not analytical insights), 
   - Use "ERROR:" instead of cross mark
   - No emojis in professional deliverables
 
-### 1.3.2. Project Structure Philosophy
+#### 1.3.2. Project Structure Philosophy
 - **Phased approach**: Break complex projects into 3-5 major phases
 - **Sprint iteration cycles**: Each sprint represents a distinct analytical stage
 - **Daily objectives**: Each day within a sprint has clear deliverables
 - **Progressive execution**: Each phase builds on validated outputs from previous stages
 
-### 1.3.3. Code Organization Standards
+#### 1.3.3. Code Organization Standards
 - **Consolidated notebooks**: Prefer fewer, well-structured notebooks (~400 lines, 5-6 sections) over many small files
 - **Stage-based naming**: Use sequential numbers with descriptive names (See Section 3.3 for details)
 - **Section structure per notebook**:
@@ -77,13 +86,13 @@ If your primary deliverable is a working application (not analytical insights), 
 - **Path management**: Relative paths with constants defined at notebook start
 - **Reproducibility**: Each notebook must run end-to-end without manual intervention
 
-### 1.3.4. Data-Driven Decision Making
+#### 1.3.4. Data-Driven Decision Making
 - **Validate assumptions**: Never trust predetermined business expectations without verification
 - **Pivot when necessary**: Statistical validity overrides initial hypotheses
 - **Document decisions**: Every significant choice needs rationale and evidence (See Section 4.1)
 - **Honest limitations**: Better to remove uncertain features than include misleading metrics
 
-### 1.3.5. Factual Accuracy - No Guessing
+#### 1.3.5. Factual Accuracy - No Guessing
 
 **Core Principle:** Never provide information based on estimation, assumption, or speculation in data science work.
 
@@ -141,7 +150,7 @@ ERROR: "Probably..." (without evidence)
 
 **This is non-negotiable in data science where precision and reproducibility are paramount.**
 
-## 1.4. Version History
+### 1.4. Version History
 
 **v1.1 (November 2025):**
 - Reorganized with hierarchical numbering (4 levels: # ## ### ####)
@@ -158,7 +167,7 @@ ERROR: "Probably..." (without evidence)
 
 ---
 
-# Module Dispatch Table
+## Module Dispatch Table
 
 DSM 1.0 content is split into this core file and four on-demand modules. When a
 task requires content from a module, read the corresponding file using the Read
@@ -166,14 +175,14 @@ tool before applying the guidance.
 
 All module files are in the same directory as this core file.
 
-## Core Sections (this file)
+### Core Sections (this file)
 
 | § | Content |
 |---|---------|
 | 1 | Introduction (Overview, Philosophy, Accuracy Standards) |
 | 8 | Version History & Closing (Getting Started, Customization, Extensibility) |
 
-## Module Protocols (on-demand)
+### Module Protocols (on-demand)
 
 | § | Content | Module |
 |---|---------|--------|
@@ -186,9 +195,12 @@ All module files are in the same directory as this core file.
 
 ---
 
-# 8. Version History & Closing
+## 8. Version History & Closing
 
-## 8.1. Version History
+This section contains version history, getting started guidance, extensibility
+notes, appendix references, and future enhancement plans.
+
+### 8.1. Version History
 
 **v1.1.1 (November 2025):**
 - File consolidation for better maintainability
@@ -225,9 +237,9 @@ All module files are in the same directory as this core file.
 
 ---
 
-## 8.2. Using This Methodology
+### 8.2. Using This Methodology
 
-### 8.2.1. Getting Started
+#### 8.2.1. Getting Started
 
 **For New Projects:**
 1. Read Section 1 (Introduction) to understand when this methodology applies
@@ -248,7 +260,7 @@ All module files are in the same directory as this core file.
 - Consult Appendix C for advanced practice implementations
 - Reference decision log examples (Module C, Section 4.1.4)
 
-### 8.2.2. Customization Guidelines
+#### 8.2.2. Customization Guidelines
 
 **Adapt This Methodology:**
 - Phase names and lengths (adjust to your domain)
@@ -262,7 +274,7 @@ All module files are in the same directory as this core file.
 - Data-driven decision making (let data guide pivots)
 - Quality standards (reproducibility, clear outputs)
 
-### 8.2.3. Domain Adaptations
+#### 8.2.3. Domain Adaptations
 
 **For domain-specific guidance:**
 - Time Series: See Appendix D.1
@@ -279,7 +291,7 @@ All module files are in the same directory as this core file.
 
 ---
 
-## 8.3. Extensibility
+### 8.3. Extensibility
 
 **This Methodology Supports:**
 - Addition of domain-specific practices
@@ -299,7 +311,7 @@ This methodology is open for feedback and contributions. Suggested additions or 
 
 ---
 
-## 8.4. Appendix References
+### 8.4. Appendix References
 
 **Complete methodology system includes:**
 - **This document:** Core methodology (slim core + module dispatch table)
@@ -321,7 +333,7 @@ This methodology is open for feedback and contributions. Suggested additions or 
 
 ---
 
-## 8.5. Future Enhancements
+### 8.5. Future Enhancements
 
 **Planned Additions:**
 - Case study examples from multiple domains

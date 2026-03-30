@@ -8,7 +8,7 @@ kickoff (6.2), version propagation (6.3), and the bidirectional inbox (6.4).
 
 ## Contents
 
-1. [DSM Project Participation Patterns](#dsm-project-participation-patterns)
+1. [DSM Project Participation Patterns](#60-dsm-project-participation-patterns)
 2. [Spoke-to-Hub Feedback Handover](#61-spoke-to-hub-feedback-handover)
 3. [Hub-to-Spoke Project Kickoff](#62-hub-to-spoke-project-kickoff)
 4. [DSM Version Propagation Protocol](#63-dsm-version-propagation-protocol)
@@ -21,7 +21,7 @@ kickoff (6.2), version propagation (6.3), and the bidirectional inbox (6.4).
 This is the hub-spoke communication module. For external contributions, see
 Module C. For project initialization patterns, see Modules E and F.
 
-### DSM Project Participation Patterns
+### 6.0. DSM Project Participation Patterns
 
 Every DSM project follows one of three participation patterns. The pattern
 governs git configuration, communication with DSM Central, and isolation

@@ -234,7 +234,7 @@ This project uses:
 
 ## 6. Module Dispatch Table for Implementation Guide
 
-The full Implementation Guide is organized as this core file plus five
+The full Implementation Guide is organized as this core file plus six
 companion modules. Each module is self-contained with its own TOC,
 numbered headings, and intro paragraphs.
 
@@ -245,10 +245,12 @@ numbered headings, and intro paragraphs.
 | [C](DSM_3.0.C_External_Contribution_Guidelines.md) | External Contribution Guidelines | AI policy assessment, governance framework, onboarding lifecycle |
 | [D](DSM_3.0.D_External_Contribution_Templates.md) | External Contribution Templates | CLAUDE.md template, codebase analysis, anti-patterns |
 | [E](DSM_3.0.E_Participation_Patterns.md) | Participation Patterns | Spoke initialization, private project pattern, standard spoke pattern |
+| [F](DSM_3.0.F_Project_Finalization.md) | Project Finalization Protocol | Finalization checklist, scaling by project size, retrospective templates |
 
 **When to read modules:** The core provides the template and usage guide.
 Read modules when you need examples (A), communication protocols (B),
-external contribution guidance (C-D), or project setup patterns (E).
+external contribution guidance (C-D), project setup patterns (E), or
+project finalization (F).
 
 ---
 
