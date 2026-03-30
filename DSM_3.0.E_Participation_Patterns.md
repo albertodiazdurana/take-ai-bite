@@ -44,7 +44,7 @@ upstream-specific concerns.
 | 9 | Send first-session prompt to spoke's `_inbox/` | `_inbox/` | See template below |
 | 10 | Send inbox confirmation to DSM Central's `_inbox/` | Hub `_inbox/` | DSM_0.2 migration confirmation |
 | 11 | Create AI collaboration norms | `dsm-docs/guides/` | See Section 6.7.3 below |
-| 12 | Create README.md | Project root | Project name, purpose, setup, structure |
+| 12 | Create README.md | Project root | See `dsm-docs/guides/readme-sections-guide.md` for required sections by project type |
 | 13 | Check `~/.claude/CLAUDE.md` for user conventions | `.claude/CLAUDE.md` | Inherit punctuation, formatting, tone preferences |
 | 14 | Initial commit | Project root | |
 
