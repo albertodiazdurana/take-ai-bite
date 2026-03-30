@@ -42,3 +42,19 @@ Present a summary table:
 ```
 
 Then create accepted BACKLOG items and confirm with the user.
+
+## Finalization Context
+
+If the project has been finalized (`/dsm-finalize-project`), the feedback
+directory may contain additional artifacts from finalization: a project-level
+STAA file (`*_project-staa.md`) and a project retrospective
+(`*_project-retrospective.md`). Process these alongside the standard
+methodology and backlog files.
+
+**Recommended sequence for project closure:**
+1. Final `/dsm-wrap-up` in the spoke project
+2. `/dsm-finalize-project` in the spoke project
+3. `/dsm-review-feedback` in DSM Central (triages all feedback including
+   finalization outputs)
+
+See DSM_3 Module F (Project Finalization Protocol) for the full protocol.

@@ -12,11 +12,19 @@
 
 **For academic or individual projects:** Use only `2_ProjectManagement_Guidelines_v2.md`
 
----
+## Contents
+
+1. [Project Governance and Roles](#1-project-governance-and-roles)
+2. [Data Management and Versioning](#2-data-management-and-versioning)
+3. [Quality Assurance and Peer Review](#3-quality-assurance-and-peer-review)
+4. [Risk Management](#4-risk-management)
+5. [Communication and Reporting Standards](#5-communication-and-reporting-standards)
+6. [Post-Project Review](#6-post-project-review)
+7. [Integration with Main Guidelines](#7-integration-with-main-guidelines)
 
 ---
 
-## Project Governance and Roles
+## 1. Project Governance and Roles
 
 Each project must define clear ownership and communication lines.
 
@@ -49,7 +57,7 @@ Include a **RACI matrix** (Responsible, Accountable, Consulted, Informed) for al
 
 ---
 
-## Data Management and Versioning
+## 2. Data Management and Versioning
 
 All datasets, transformations, and intermediate outputs must be version-controlled and traceable.
 
@@ -83,7 +91,7 @@ Examples:
 - **Transformations Applied:** [List or reference to script]
 ```
 
-### Environment Versioning
+### 2.1. Environment Versioning
 
 **Requirements:**
 - Pin package versions for production deployment
@@ -112,7 +120,7 @@ Examples:
 
 ---
 
-## Quality Assurance and Peer Review
+## 3. Quality Assurance and Peer Review
 
 Every deliverable must pass a formal quality review before sign-off.
 
@@ -174,7 +182,7 @@ Every deliverable must pass a formal quality review before sign-off.
 
 ---
 
-## Risk Management
+## 4. Risk Management
 
 Projects must proactively identify and manage potential risks.
 
@@ -210,7 +218,7 @@ Projects must proactively identify and manage potential risks.
 
 ---
 
-## Communication and Reporting Standards
+## 5. Communication and Reporting Standards
 
 To maintain transparency and alignment across technical and business teams:
 
@@ -273,7 +281,7 @@ To maintain transparency and alignment across technical and business teams:
 
 ---
 
-## Post-Project Review
+## 6. Post-Project Review
 
 At the conclusion of each project phase or full engagement:
 
@@ -362,7 +370,7 @@ At the conclusion of each project phase or full engagement:
 
 ---
 
-## Integration with Main Guidelines
+## 7. Integration with Main Guidelines
 
 **How to use this extension with the main document:**
 
