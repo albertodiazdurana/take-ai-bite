@@ -25,6 +25,25 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 - All filesystem-only steps (MEMORY.md, transcript, inbox) run unchanged.
 - **Session branch setup (Step 0):** Skip; no branch operations without git
 
+## Step 0.5: Scaffold Completeness Check
+
+Before project type detection or branch setup, verify that the project has the
+canonical DSM scaffold. The scaffold is project-type-agnostic; it must exist
+before any session-start protocol can run correctly.
+
+1. Count how many of the 9 canonical `dsm-docs/` subdirectories exist:
+   `blog`, `checkpoints`, `decisions`, `feedback-to-dsm`, `guides`, `handoffs`,
+   `plans`, `research`, `inbox`
+2. Also check for `_inbox/` at project root
+3. **If fewer than 5 of 9 `dsm-docs/` subdirectories exist, or `_inbox/` is missing:**
+   - Warn: "Project scaffold incomplete ({N}/9 dsm-docs/ folders found). Running
+     `/dsm-align` to create base scaffold before continuing."
+   - Invoke `/dsm-align` to create the base scaffold (folders, README templates,
+     CLAUDE.md @ reference). The project-type-specific CLAUDE.md alignment section
+     is deferred until project type detection completes.
+   - After `/dsm-align` completes, continue to Step 0.
+4. **If scaffold is complete (5+ folders and `_inbox/` exists):** Continue to Step 0.
+
 ## Step 0: Session Branch Setup
 
 **Requires:** GIT_AVAILABLE = true. If false, skip this step entirely.
@@ -75,6 +94,22 @@ Also check for remote branches not yet checked out:
 If multiple branches exist at the same level, present the list and ask the
 user which one to resume.
 
+### 0d. Stale branch cleanup
+
+After branch setup, clean up stale refs from prior sessions:
+
+1. **Prune stale remote tracking refs:** Run `git fetch --prune` silently.
+   This removes local tracking refs for branches already deleted on the remote.
+2. **Check for stale local branches:** Run
+   `git branch --merged main | grep -v '^\*\|main\|session-'` to find local
+   branches that are fully merged into main and are not the current session branch.
+   This catches orphaned worktree branches (`worktree-agent-*`) and old task
+   branches that were merged but not deleted.
+3. **If stale branches found:** Report: "Found N stale local branches merged
+   into main: [list]. Delete them? (y/n)". On approval, delete with
+   `git branch -d {branch}` for each. On rejection, skip silently.
+4. **If no stale branches:** Skip silently.
+
 ## Steps
 
 1. **Read MEMORY.md:** Find and load this project's MEMORY.md from the auto memory directory to restore session context. **If MEMORY.md does not exist or fails to load**, continue to Step 2 but note that the agent is operating without prior session context, which increases the risk of applying generic rules to a project with specific overrides.
@@ -84,7 +119,8 @@ user which one to resume.
    - **2a.5. Ecosystem Path Registry:** Read `.claude/dsm-ecosystem.md` if it exists. Parse the Paths table and cache each Name -> Path mapping for the session. For each entry, verify the path exists on the filesystem:
      - If the path exists: note as validated
      - If the path does not exist: warn "Ecosystem path '{name}' points to '{path}' which does not exist. Cross-repo operations using this path will be skipped."
-     If the file does not exist, present as an **action item** for all project types: "Missing `.claude/dsm-ecosystem.md`. Run `/dsm-align` to create it with required ecosystem pointers (`dsm-central`, `portfolio`)." Use fallback resolution (dsm-central from `@` reference) for the current session but flag the gap. Continue to 2b.
+     If the file does not exist, present as an **action item** for all project types: "Missing `.claude/dsm-ecosystem.md`. Run `/dsm-align` to create it with required ecosystem pointers (`dsm-central`, `portfolio`)." Use fallback resolution (dsm-central from `@` reference) for the current session but flag the gap. Continue to 2a.7.
+   - **2a.7. CLAUDE.md content validation (DSM_0.2 §17.2):** Cross-reference project-specific CLAUDE.md sections against the project type from 2a. Flag sections that reference workflows the project does not use (e.g., Notebook Protocol in a Documentation project). Skip insurance sections (Destructive Command Protocol, Secret Exposure Prevention, Plan Mode, Branching Strategy). Report mismatches as observations: "CLAUDE.md contains [section] which is not typical for a [project type] project. Remove to save context budget?" Do not auto-remove.
    - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). For spoke projects, if `_inbox/` is missing or dsm-docs/ structure is incomplete, suggest running `/dsm-align`. **Inbox location by project type:**
      - **DSM hub (DSM Central):** `_inbox/` at repo root
      - **DSM spoke:** `_inbox/` at repo root
@@ -93,6 +129,13 @@ user which one to resume.
      Process any pending inbox entries: when an entry references a source file (Full evidence, Full report), read the referenced file before evaluating; the inbox is a notification, the source file contains the full evidence. Then evaluate impact, propose action (implement, defer, or reject per DSM_3 Section 6.4.3), and ask the user how to proceed. Do not merely list entry titles.
    - **2b.5. Governance folder check:** First, check if the project uses `docs/` instead of `dsm-docs/`. If `docs/` exists but `dsm-docs/` does not, inform the user: "This project uses `docs/` instead of `dsm-docs/`. Rename to match the current DSM convention? Run `/dsm-align` to migrate." Then verify that all 9 canonical `dsm-docs/` subfolders exist (`blog`, `checkpoints`, `decisions`, `feedback-to-dsm`, `guides`, `handoffs`, `plans`, `research`, `inbox`). If any are missing, suggest: "Missing canonical folders: [list]. Run `/dsm-align` to fix." Do not create folders here; dsm-align handles creation with proper templates.
    - **2c. Version check:** Compare DSM version against last handoff, note changes.
+     If versions differ:
+     1. Read CHANGELOG entries between the old and new versions
+     2. Extract lines matching `**Spoke action:**`
+     3. Surface actions to user: "DSM updated from vX.Y.Z to vA.B.C. Spoke actions required: [list]"
+     4. For `/dsm-align` actions, offer to run immediately
+     5. For review actions, note which sections to review
+     If no spoke actions found, report the version change without action prompts.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
 3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:
