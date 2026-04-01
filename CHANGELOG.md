@@ -5,6 +5,30 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2026-04-01
+
+### Added - CLAUDE.md Content Validation Protocol (BL-294)
+
+- §17.2: cross-reference CLAUDE.md sections against project type to detect drift
+- Insurance section exemption list for rarely-used but critical protocols
+- `/dsm-go` step 2a.7: validation at session start
+- `/dsm-align` step 8: validation scan after alignment regeneration
+
+### Changed - DSM_0.2 Core Slimming (BL-299)
+
+- §1-4 (session-start checks) and §11-12 (context/two-pass) moved to Module A §17-22
+- Core sections replaced with one-line stubs preserving stable section numbers
+- 65 cross-references unchanged, no ecosystem-wide renumbering needed
+- Core: 1,317 → 1,032 lines (-22%)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block
+
+### Changed - Session 161 Protocol Improvements (BL-292, BL-293, BL-296)
+
+- §6 renamed to Session Transcript Delimiter Format, 3 universal typed delimiters (BL-292)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block
+- Stale branch cleanup at session start: `/dsm-go` Step 0d, `/dsm-light-go` Step 1.6 (BL-293)
+- CHANGELOG spoke action annotation convention §2.1, version check enhancement (BL-296)
+
 ## [1.4.0] - 2026-03-27
 
 ### Added - DSM_6.1: Systems Prompt Engineering (BL-258)
@@ -44,6 +68,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Parallel session worktree isolation (BL-272)
 - GitHub issue triage: 3-check system with research queue classification (BL-261)
 - Canonical inbox location clarified as `_inbox/` at project root (BL-266)
+- README unified: adopted Take AI Bite public-facing README as single source for both repos
+- README and TAKE_A_BITE.md updated with Systems Prompt Engineering section and 9 principles (was 7)
+- GitHub repo description updated to reflect current scope
 
 ## [1.3.70] - 2026-03-16
 

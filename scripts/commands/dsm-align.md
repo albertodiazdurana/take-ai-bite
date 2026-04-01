@@ -38,7 +38,6 @@ Before starting alignment, check if git is initialized:
 
    | Folder | Has done/? | Template file(s) |
    |--------|-----------|-------------------|
-   | `plan/backlog/` | Yes | README.md |
    | `dsm-docs/blog/` | Yes | journal.md |
    | `dsm-docs/checkpoints/` | Yes | README.md |
    | `dsm-docs/decisions/` | No | None |
@@ -106,16 +105,23 @@ Before starting alignment, check if git is initialized:
      f. If user accepts: replace content between delimiters with current template
    - **Validation-only mode:** If the user invoked `/dsm-align` with a `--check` argument or equivalent, report drift without modifying files
 
-8. **Check `.gitattributes`:**
+8. **CLAUDE.md content validation (DSM_0.2 §17.2):**
+   - Using the project type from step 1, scan the project-specific sections of `.claude/CLAUDE.md` (content outside the alignment delimiters) for type mismatches.
+   - Flag sections referencing workflows the project does not use (e.g., Notebook Development Protocol in a Documentation project, App Development Protocol in a Data Science project).
+   - Skip insurance sections: Destructive Command Protocol, Secret Exposure Prevention, Plan Mode Protocol, Branching Strategy.
+   - Report mismatches as warnings: "CLAUDE.md contains [section] not typical for [project type]. Consider removing to save context budget."
+   - Do not auto-remove; the user decides.
+
+9. **Check `.gitattributes`:**
    - If `.gitattributes` does not exist at project root: create it with the template below.
    - If it exists: check that it contains `* text=auto eol=lf`. If missing, **report as warning**: "`.gitattributes` exists but does not enforce LF line endings. CRLF can break the Edit tool on WSL."
    - Report result in the summary.
 
-9. **Check .claude/ files:**
+10. **Check .claude/ files:**
    - If `.claude/session-transcript.md` does not exist: create it (empty file).
    - If `.claude/dsm-ecosystem.md` does not exist: create it from the Ecosystem Pointers Template below. Resolve `dsm-central` path from the `@` reference in `.claude/CLAUDE.md`. Leave `portfolio` path as a placeholder for the user to fill in. Report: "Created `.claude/dsm-ecosystem.md` with ecosystem pointers. Update the `portfolio` path."
 
-10. **Check command file drift (DSM Central only):**
+11. **Check command file drift (DSM Central only):**
    - Skip this step if the project is not DSM Central (no `scripts/commands/` directory).
    - For each `.md` file in `scripts/commands/`:
      - Compare against `~/.claude/commands/{same filename}` using `diff -q`
@@ -125,7 +131,7 @@ Before starting alignment, check if git is initialized:
    - Report drift summary in the report.
    - Reference: BACKLOG-130 (Command File Version Tracking)
 
-11. **Report** results in this format:
+12. **Report** results in this format:
    ```
    /dsm-align report:
    - Project type: [detected type]
@@ -135,12 +141,13 @@ Before starting alignment, check if git is initialized:
    - Collisions: [list of naming conflicts for user to resolve, or "none"]
    - Warnings: [feedback file violations, consumed handoffs, or "none"]
    - CLAUDE.md alignment: [OK | Added (N lines) | Drift detected (N lines differ) | Skipped (no @ reference)]
+   - CLAUDE.md content: [OK | N mismatches found (list sections)]
    - .gitattributes: [OK | Created | Warning: missing LF enforcement]
    - Command sync: [OK: N | Drifted: N | Missing: N, or "N/A (not DSM Central)"]
    - Feedback pushed: [count of entries pushed to DSM Central, or "none pending"]
    ```
 
-12. **Persist report:** Write the alignment report to `dsm-docs/decisions/YYYY-MM-DD_sN_align-report.md`
+13. **Persist report:** Write the alignment report to `dsm-docs/decisions/YYYY-MM-DD_sN_align-report.md`
    so it survives session end. The file uses this header:
    ```markdown
    # Alignment Report — Session N
@@ -181,18 +188,6 @@ are removed. Reference: DSM_3 Section 6.4.
 # Enforce LF line endings for all text files.
 # Prevents CRLF issues on WSL that break the Edit tool.
 * text=auto eol=lf
-```
-
-### Spoke Backlog Template (`plan/backlog/README.md`)
-
-```markdown
-# Project Backlog
-
-Enhancement proposals and technical debt items for this project.
-Completed items move to `done/`.
-
-| BL# | Title | Priority |
-|-----|-------|----------|
 ```
 
 ### Blog Journal Template (`dsm-docs/blog/journal.md`)
@@ -269,14 +264,15 @@ Reference: DSM_0.2 (via /dsm-go Step 3).
 ### Plans README Template (`dsm-docs/plans/README.md`)
 
 ```markdown
-# Plans
+# DSM Backlog and Plans
 
-Sprint plans, project plans, and phase plans. Completed plans move to `done/`.
-Reference: DSM_2.0 (PM Guidelines).
+Active backlog items and project plans. Completed items move to `done/`.
 
-## Naming
+**Format:** `BACKLOG-###_short-description.md`
+**Required fields:** Status, Priority (High/Medium/Low), Date Created, Origin, Author
 
-`YYYY-MM-DD_{plan-type}.md` or descriptive name (e.g., `sprint-3-plan.md`)
+| BL# | Title | Priority |
+|-----|-------|----------|
 ```
 
 ### Research README Template (`dsm-docs/research/README.md`)

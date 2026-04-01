@@ -6,8 +6,10 @@
 
 This module contains session lifecycle protocols: inbox communication,
 notifications, feedback tracking, sprint cadence, session management,
-and cross-session learning. The agent reads this file via the Read tool
-when a protocol listed in the dispatch table is needed.
+and cross-session learning. It also hosts session-start protocols (§17-20)
+and context management protocols (§21-22) moved from the core to reduce
+always-loaded context. The agent reads this file via the Read tool when a
+protocol listed in the dispatch table is needed.
 
 ---
 
@@ -29,6 +31,12 @@ when a protocol listed in the dispatch table is needed.
 14. [Session Configuration Recommendation](#14-session-configuration-recommendation)
 15. [Responsible Collaboration Timer](#15-responsible-collaboration-timer)
 16. [GitHub Issue Intake Protocol](#16-github-issue-intake-protocol)
+17. [Project Type Detection](#17-project-type-detection)
+18. [Session-Start Version Check](#18-session-start-version-check)
+19. [Session-Start Inbox Check](#19-session-start-inbox-check)
+20. [Session-Start GitHub Issue Check](#20-session-start-github-issue-check)
+21. [Context Budget Protocol](#21-context-budget-protocol)
+22. [Two-Pass Reading Strategy for Long Structured Files](#22-two-pass-reading-strategy-for-long-structured-files)
 
 ---
 
@@ -483,6 +491,13 @@ neither marker nor checkpoint exists, the agent falls back to full `/dsm-go`.
 | Bandwidth report | Transcript boundary marker |
 | Contributor profile check | Checkpoint (minimal) |
 
+**Thinking step mandate:** Lightweight mode reduces context loading, not reasoning
+documentation. The Session Transcript Protocol (thinking-before-acting) is
+mandatory in lightweight mode. Both cascading failure incidents observed in spoke
+projects (redundant searches, wrong routing, secret leaks) occurred when the
+thinking step was skipped under time pressure in light or wrap-up mode. Sessions
+that maintained explicit thinking entries had the fewest errors.
+
 **Transcript behavior:** In lightweight mode, the transcript is not archived or
 reset. `/dsm-light-go` appends a boundary marker; reasoning accumulates across
 the lightweight chain. When a full `/dsm-go` eventually runs, it archives the
@@ -498,93 +513,166 @@ Reference: BACKLOG-151
 
 ## 7. Parallel Session Protocol
 
-When a human needs to orchestrate multiple concurrent AI sessions on independent
-tasks within the same repository, parallel sessions provide isolation. Each
-parallel session operates on its own Level 3 git branch (type: parallel-session,
-see DSM_0.2 Three-Level Branching Strategy) with all output confined to a
-dedicated staging folder. The main session retains exclusive control over shared
-files, memory, inbox, and session transcripts.
+Parallel sessions allow multiple concurrent AI sessions to work on independent
+tasks within the same repository. All sessions share the Level 2 session branch
+(no Level 3 branches, no worktrees). Isolation is enforced through typed session
+prefixes, file scope declarations, and a commit booking system.
 
 **Commands:** `/dsm-parallel-session-go` (start) and `/dsm-parallel-session-wrap-up` (end).
 
-**When to use:** Short, isolated evaluation tasks: research collection, document
-assessment, artifact generation, BL drafting. Parallel sessions are not full
-sprints; they produce artifacts that the main session reviews and distributes.
+**When to use:** Short, isolated tasks: QA validation, document assessment,
+scoped BL implementation. Parallel sessions produce artifacts that the main
+session reviews and distributes.
 
-**Lifecycle:**
+**Free-text detection trigger:** When the agent receives a prompt matching
+`QA dsm parallel session` or `BL-{NNN} dsm parallel session` (case-insensitive,
+with or without colon and task description) but `/dsm-parallel-session-go` was
+not explicitly invoked, the agent MUST invoke `/dsm-parallel-session-go` with
+the full prompt as `$ARGUMENTS`. Do not process the prompt as a main session
+task. This trigger prevents protocol violations (transcript writes, Level 3
+branch creation, main-session behavioral patterns) that occur when parallel
+session intent is not detected.
+
+### 7.1. Session Types and Mandatory Prompt Prefix
+
+Every parallel session requires a typed prefix in the first prompt. The prefix
+serves two purposes: (1) it gates unscoped work, and (2) it generates a
+descriptive session name in VS Code's chat history.
+
+| Type | Prompt prefix | Scope | Writes |
+|------|--------------|-------|--------|
+| QA | `QA dsm parallel session` | Read-only analysis, validation | `.claude/` only (findings, notes) |
+| BL | `BL-{NNN} dsm parallel session` | File-scoped edits per BL definition | Files declared in BL scope |
+
+**Guided failure mode:** If `/dsm-parallel-session-go` does not detect a valid
+prefix (QA or BL-{NNN}) in the prompt, the agent must:
+
+1. Refuse to proceed with any work
+2. Explain the two valid prefix formats with examples:
+   ```
+   This session requires a typed prefix to proceed. Valid formats:
+
+   For read-only analysis (QA):
+     QA dsm parallel session: [describe the validation task]
+
+   For scoped BL implementation:
+     dsm parallel session: [describe the implementation task]
+
+   Please start a new session with one of these prefixes.
+   ```
+3. Wait for the user to provide a correctly prefixed prompt
+
+**Recovery path:** If the user started without a prefix, the simplest recovery
+is to close the session and open a new one with the correct prefix. The session
+tab name is auto-generated from the first prompt and cannot be changed after
+the fact.
+
+### 7.2. Parallel Session Lifecycle
 
 ```
-main session running -> user opens new Claude Code instance
-  -> /dsm-parallel-session-go {task} -> creates parallel/{descriptor} branch
-  -> work (all output to BL staging folder)
-  -> /dsm-parallel-session-wrap-up -> merge to session branch (Level 2), delete branch
-main session picks up merged artifacts
+main session running -> user opens new Claude Code chat panel in VS Code
+  -> types: "QA dsm parallel session: [task]" or "dsm parallel session: [task]"
+  -> /dsm-parallel-session-go activates
+  -> work (scoped to declared files)
+  -> /dsm-parallel-session-wrap-up -> commit on shared session branch
+main session picks up committed artifacts
 ```
 
-**Isolation rules:**
+All sessions share the same working directory and the same Level 2 session
+branch. There are no Level 3 branches and no worktrees.
 
-| Allowed (parallel session) | Prohibited (main session only) |
-|---------------------------|-------------------------------|
-| Create files in BL staging folder | Modify MEMORY.md |
-| Read MEMORY.md, CLAUDE.md | Modify session transcript |
-| Read any repo file | Process inbox entries |
-| Create new files in isolated subfolders | Edit shared/central files |
-| Commit on parallel branch | Push feedback to DSM Central |
+### 7.3. File Scope Declaration and Enforcement
 
-**Shared file identification:** At session start, the parallel session reads
-`.claude/CLAUDE.md` to identify files that serve as project-wide references
-(READMEs, config files, trackers, profile documents, source-of-truth files).
-These are off-limits. If the work scope expands to require shared file edits,
-the parallel session stops and defers to the main session.
+**Main session responsibilities (before launching a parallel session):**
+- Validate file disjointness: no two parallel sessions may edit the same file
+- Assign parallel session number (X.Y format, see §7.6)
+- Communicate the allowed file list to the parallel session via the prompt
 
-**Scope declaration (required at parallel session start):**
+**Parallel session responsibilities (at startup):**
+- Read the BL file (for BL type) to confirm scope
+- Declare file scope as the first output:
+  ```
+  This session will only edit: [file list].
+  Any edit outside this scope will be refused.
+  ```
+- Refuse any edit request outside the declared scope
+- QA sessions: no tracked file edits; only `.claude/` writes (findings, notes)
 
-The parallel session writes a baseline file (`.claude/parallel-session-baseline.txt`)
-with the scope declaration:
+**Scope declaration file:** The parallel session writes
+`.claude/parallel-session-baseline.txt` with:
 
 ```
-# Parallel session baseline
+# Parallel session X.Y baseline
+Type: QA | BL-{NNN}
 Task: [brief description]
-Scope: [list of folders/files to be modified]
-Parent branch: [parent session branch name]
-BL number: [NNN]
-BL file: [path to BL file]
+Scope: [list of files to be modified, or "read-only" for QA]
+Session branch: [current session branch name]
 Created: [timestamp]
 ```
 
-The wrap-up reads `Parent branch:` from this file instead of guessing. Before
-approving the parallel session, verify that the declared scope does not overlap
-with the parent session's working set. If overlap exists, the parallel session
-must be rescoped or blocked.
+### 7.4. Commit Window Booking System
 
-**Safety checks (before creating branch):**
-1. No uncommitted changes overlapping with planned work scope
-2. No existing `parallel/*` branch targeting the same folder or topic
-3. Planned work does not require shared file modifications
-4. Declared scope does not overlap with parent session's working set
+Multiple sessions sharing a branch need serialized commits. A lock file
+prevents concurrent staging and committing.
 
-**BL file location:** `plan/backlog/improvements/BACKLOG-{NNN}_{descriptor}.md` follows
-the standard backlog convention. Generated artifacts go into canonical folders
-(`dsm-docs/research/`, `dsm-docs/plans/`, etc.) as appropriate for their type; the
-BL file tracks all produced artifacts. The main session reviews after merge.
+**Lock file:** `.claude/commit-lock` (gitignored)
 
-**BL number collision prevention:** Before creating any BL in a parallel session,
-the agent must:
+**Booking flow:**
+1. Before committing, check `.claude/commit-lock`
+2. If absent or stale (>5 minutes old): create lock with
+   `{session-id}\n{ISO-timestamp}`
+3. If present and fresh: wait 10 seconds, retry (max 3 retries), then warn user
+4. Perform `git add` + `git commit` while holding the lock
+5. Run `git pull --rebase` before committing if other sessions may have pushed
+6. Delete lock file after commit completes
+
+**Stale protection:** If lock timestamp is older than 5 minutes, treat as
+orphaned (session crashed). Override with a warning message.
+
+**Branch verification:** Run `git branch --show-current` immediately before
+`git add`. If the result does not match the expected session branch, warn the
+user and abort (VS Code can silently switch branches).
+
+### 7.5. BL Lifecycle in Parallel Sessions
+
+- Parallel session does **not** move BL to `done/`
+- Parallel session updates BL status to: `Implemented by parallel session #X.Y`
+- Main session validates the work and moves BL to `done/`
+- This separation ensures the main session reviews parallel work before closing
+
+### 7.6. Session Numbering Format
+
+Format: `X.Y` where X is the main session number and Y is the parallel session
+sequence number (assigned by the main session at launch time).
+
+Example: Main session 156 launches two parallels:
+- 156.1 (QA: validate cross-references)
+- 156.2 (BL-271: structural compliance)
+
+### 7.7. Parallel Session Isolation Rules
+
+| Allowed (parallel session) | Prohibited (main session only) |
+|---------------------------|-------------------------------|
+| Read any repo file | Modify MEMORY.md |
+| Edit files in declared scope (BL type) | Modify session transcript |
+| Write to `.claude/` (findings, notes) | Process inbox entries |
+| Commit on shared session branch (via booking) | Push feedback to DSM Central |
+| Read MEMORY.md, CLAUDE.md | Edit files outside declared scope |
+| Use `/dsm-parallel-session-wrap-up` | Run `/dsm-wrap-up`, `/dsm-light-wrap-up`, `/dsm-quick-wrap-up` |
+
+### 7.8. BL Number Collision Prevention
+
+Before creating any BL in a parallel session, the agent must:
 1. Scan all backlog directories (`plan/backlog/improvements/`,
-   `plan/backlog/developments/`, `plan/backlog/done/`, and any subdirectories)
+   `plan/backlog/developments/`, `plan/backlog/done/`, and subdirectories)
    for the highest existing BL number
-2. Also check `dsm-docs/plans/` for BL files created outside standard locations
+2. Also check `dsm-docs/plans/` and `dsm-docs/plans/done/`
 3. Assign max + 1
 
 This check applies to all sessions but is critical for parallel sessions that
-operate in isolation from the parent session's numbering state.
+operate in isolation from the main session's numbering state.
 
-**Merge strategy:** Wrap-up attempts direct merge to the parent session branch. If
-the merge fails due to branch protection, it falls back to creating a PR via `gh`.
-If conflicts arise, the merge is aborted, the branch is preserved, and the main
-session resolves conflicts manually.
-
-**What parallel sessions skip:**
+### 7.9. What Parallel Sessions Skip
 
 | Skipped | Reason |
 |---------|--------|
@@ -595,43 +683,42 @@ session resolves conflicts manually.
 | Feedback push | Main session handles DSM Central communication |
 | Ecosystem path validation | Unnecessary for isolated tasks |
 
-**Wrap-up conflict verification:** Before merging a parallel session branch,
-the agent must:
-1. Diff the parallel branch against the current parent branch tip
-2. Verify no files were modified outside the declared scope
-3. Verify no BL numbers collide with BLs created on the parent branch since
-   the parallel session started
-4. If conflicts are found, alert the user and abort the merge until resolved
-
-**VS Code branch revert mitigation:** When running parallel sessions via Claude
-Code in VS Code, the IDE may silently revert branch checkouts made by the CLI
-agent. This causes commits to land on the wrong branch.
-
-Mitigations:
-1. **Branch verification before every commit:** Run `git branch --show-current`
-   immediately before `git add`/`git commit`. If the result does not match the
-   expected branch, re-checkout and verify again before proceeding
-2. **Parallel session start gate:** After creating and checking out the parallel
-   branch, verify with `git branch --show-current` before any work begins. If
-   verification fails, warn and retry once. If it fails again, abort with:
-   "VS Code is interfering with branch checkout. Run this parallel session in
-   a separate terminal outside VS Code."
-3. **Worktree alternative:** For parallel sessions in VS Code, consider using
-   `git worktree add` to create an isolated working directory. This avoids the
-   branch checkout conflict entirely since each worktree has its own HEAD
-
-**Anti-Patterns:**
+### 7.10. Parallel Session Anti-Patterns
 
 **DO NOT:**
 - Use parallel sessions for full sprint work; they are for short, isolated tasks
-- Modify files outside the BL staging folder (except new files in isolated subfolders)
+- Edit files outside the declared scope
 - Process inbox entries or push feedback from a parallel session
-- Run multiple parallel sessions targeting the same topic or folder
-- Treat parallel session output as final; the main session must review and distribute
-- Create BLs without checking the highest existing number across all backlog directories
-- Skip scope declaration or overlap verification at parallel session start
+- Run multiple parallel sessions targeting the same file
+- Treat parallel session output as final; the main session must review
+- Create BLs without checking the highest existing number across all directories
+- Skip scope declaration or file disjointness verification
+- Create Level 3 branches or worktrees for parallel sessions
+- Skip the commit booking system when committing
+- Invoke main session lifecycle skills (`/dsm-wrap-up`, `/dsm-light-wrap-up`,
+  `/dsm-quick-wrap-up`) from a parallel session; these merge, push, and update
+  session state, which would break the main session's in-progress work
 
-Reference: BACKLOG-220, BACKLOG-243
+Reference: BACKLOG-276 (supersedes BACKLOG-220, BACKLOG-243, BACKLOG-272),
+BACKLOG-281 (lifecycle skill prohibition)
+
+### 7.11. Parallel Session Guard for Wrap-Up Skills
+
+**Applies to:** `/dsm-wrap-up`, `/dsm-light-wrap-up`, `/dsm-quick-wrap-up`
+
+Before executing any wrap-up skill, check for `.claude/parallel-session-baseline.txt`.
+If the file exists and the current context is a parallel session (no session
+transcript header was written by this session), refuse execution:
+
+> "Wrap-up skills cannot run from parallel sessions. Use
+> `/dsm-parallel-session-wrap-up` to end this parallel session, or switch to
+> the main session tab for full wrap-up."
+
+This guard prevents a parallel session from merging the session branch to main,
+pushing incomplete work, updating MEMORY.md, or running mirror sync while the
+main session has in-progress work.
+
+Reference: BACKLOG-281
 
 ---
 
@@ -1272,3 +1359,340 @@ The label serves as:
 - Remove the `external` label after processing; it preserves traceability
 - Create the `external` label on repos that do not use this protocol; the
   session-start check skips repos without the label
+
+---
+
+## 17. Project Type Detection
+
+> **Core reference:** DSM_0.2 §1. Moved here from core to reduce always-loaded context.
+
+At session start, identify the project type by examining the directory structure:
+
+| Indicator | Project Type | DSM Track |
+|-----------|--------------|-----------|
+| `notebooks/` only, no `src/` | Data Science | DSM 1.0 (Sections 2.1-2.5) |
+| `src/`, `tests/`, `app.py` | Application | DSM 4.0 |
+| Both `notebooks/` and `src/` | Hybrid | DSM 1.0 for analysis, DSM 4.0 for modules |
+| `dsm-docs/`, markdown-only, no `notebooks/` or `src/` | Documentation | DSM 5.0 |
+| `{contributions-docs-path}/{project}/` exists | External Contribution | DSM_3 Section 6.6 |
+
+**State the identified type at session start:**
+"This appears to be a [Notebook/Application/Hybrid/Documentation/External Contribution] project. I'll follow [DSM 1.0/DSM 4.0/both/DSM 5.0/Section 6.6] accordingly."
+
+**External contribution sessions:** Open the project in the external repo's local
+clone but reference governance artifacts in `{contributions-docs-path}/{project}/`
+(resolved from the Ecosystem Path Registry). See DSM_3 Section 6.6 for the full
+governance structure.
+
+### 17.1. Participation Pattern Detection
+
+The DSM track (above) is orthogonal to the participation pattern. After identifying
+the track, also identify which participation pattern governs communication and
+isolation rules:
+
+| Indicator | Participation Pattern | Reference |
+|-----------|----------------------|-----------|
+| Git remote configured + DSM_3 Section 7 entry | Standard Spoke | DSM_3 Section 6.9 |
+| `contributions-docs/{project}/` exists or CLAUDE.md declares "External Contribution" | External Contribution | DSM_3 Section 6.6 |
+| CLAUDE.md declares "Private" or "DSM private project pattern" | Private Project | DSM_3 Section 6.8 |
+| No indicator found | Assume Standard Spoke | DSM_3 Section 6.9 |
+
+**State both dimensions at session start:**
+"This is a [track] project ([DSM version]) using the [pattern] pattern."
+
+Example: "This is a Documentation project (DSM 5.0) using the Private Project pattern."
+
+**Pattern governs:** inbox behavior (bidirectional vs receive-only), feedback push
+(automatic vs manual), README notifications (yes/no), and cross-repo write scope.
+Apply the pattern's constraints for the session, even if CLAUDE.md does not
+explicitly override every inherited DSM_0.2 protocol.
+
+---
+
+## 18. Session-Start Version Check
+
+> **Core reference:** DSM_0.2 §2. Moved here from core to reduce always-loaded context.
+
+At session start in spoke projects, compare the DSM version in the header above against the version recorded in the most recent handoff (`dsm-docs/handoffs/`). If the versions differ:
+1. Note the update: "DSM updated from vX.Y.Z to vA.B.C since last session"
+2. Check the DSM CHANGELOG for changes between those versions
+3. Extract any `**Spoke action:**` annotations from new CHANGELOG entries
+4. Surface spoke actions to the user, grouped by type
+5. For actionable items (e.g., "Run `/dsm-align`"), offer to execute immediately
+6. Apply any updated protocols for this session
+
+If no previous handoff exists (first session), record the current DSM version for future reference.
+
+### 18.1. Spoke Action Annotation Convention
+
+CHANGELOG entries that require action from spoke projects include a
+`**Spoke action:**` annotation inline:
+
+```markdown
+- §6 renamed, §7 format example updated, §17.1 templates updated
+  **Spoke action:** Run `/dsm-align` to update reinforcement block
+```
+
+This convention makes the CHANGELOG the broadcast notification channel from
+hub to all spokes. Because CHANGELOG is mirrored to distribution repos, it
+works in any ecosystem (original DSM Central, TAB forks, or independent hubs).
+
+**Common spoke actions:**
+
+| Annotation | Meaning |
+|-----------|---------|
+| `Run /dsm-align` | Template change, regenerate alignment section |
+| `Review [section]` | Protocol change, manual review needed |
+| `Update [file]` | Specific file needs manual update |
+
+Entries without a `**Spoke action:**` annotation require no spoke response.
+
+---
+
+## 19. Session-Start Inbox Check
+
+> **Core reference:** DSM_0.2 §3. Moved here from core to reduce always-loaded context.
+
+At session start, check `_inbox/` for pending entries from DSM Central. If entries
+exist, surface them to the user before starting other work. When an entry
+references a source file (Full evidence, Full report), read the referenced file
+before evaluating the entry; the inbox is a notification, the source file
+contains the full evidence needed for decision-making. Process each entry per
+DSM_3 Section 6.4.3 (implement via BL workflow for substantive changes, defer, or reject; then move to `_inbox/done/`).
+
+**WARNING:** After processing, **move** the entry to `_inbox/done/`. Do not mark entries as "Status: Processed" or add completion markers while keeping the entry in place. Processed entries in `done/` preserve communication history and traceability; entries left in the inbox root cause stale re-processing in future sessions (observed in spoke project sessions).
+
+**External Contribution exception:** For External Contribution projects (identified
+by project type detection or explicit CLAUDE.md declaration), do NOT create `_inbox/`
+in the external repo. The external repo belongs to an upstream maintainer; only code
+contributions belong there. If an inbox is needed, create it under
+`{contributions-docs-path}/{project}/_inbox/`. Skip the migration
+confirmation sub-protocol below.
+
+If `_inbox/` does not exist, create it at project root with a `README.md` containing:
+
+```markdown
+# Project Inbox
+
+Transit point for hub-spoke communication. Entries arrive, get processed, and
+move to `done/`. Reference: DSM_3 Section 6.4.
+
+**Entries are brief notifications, not full file copies.** Each entry summarizes
+what was observed and points to the source file for the complete record. Do not
+copy full feedback files, methodology documents, or backlog lists into the inbox.
+
+## Entry Template
+
+### [YYYY-MM-DD] Entry title
+
+**Type:** Backlog Proposal | Methodology Observation | Action Item | Notification
+**Priority:** High | Medium | Low
+**Source:** [project name or "DSM Central"]
+
+[Description: problem statement, proposed solution, or action requested]
+```
+
+When creating `_inbox/`, also create the `_inbox/done/` subdirectory for
+processed entries.
+
+**Migration:** If `dsm-docs/backlog/` exists (legacy convention), move contents
+to `_inbox/` at project root, create the README.md, and remove the old directory.
+The canonical inbox location is always `_inbox/` at project root; no other
+path (e.g., `dsm-docs/inbox/`) should be used or created.
+
+**Validation before confirmation:** Before sending the migration confirmation
+below, verify that:
+- The `_inbox/` was created inside the contributor's governance scope (not in
+  an external repo)
+- The location is consistent with the project CLAUDE.md's governance rules
+- For External Contribution projects, the `_inbox/` must be in
+  `{contributions-docs-path}/{project}/`, not in the external repo
+
+If validation fails, delete the incorrectly placed `_inbox/` and alert the user.
+
+**Migration confirmation:** After creating or migrating `_inbox/`, send a
+confirmation entry to DSM Central's inbox. The DSM Central repo path is the parent
+directory of the `DSM_0.2_Custom_Instructions_v1.1.md` file referenced by the `@`
+import in this project's CLAUDE.md. Write the confirmation to
+`{dsm-central-path}/_inbox/{this-project-name}.md` using the entry template:
+
+```markdown
+### [YYYY-MM-DD] Inbox migration confirmed
+
+**Type:** Notification
+**Priority:** Low
+**Source:** [this project name]
+
+Inbox system initialized. _inbox/ created at project root. README.md with
+entry template installed. Ready to receive and send inbox entries per
+DSM_3 Section 6.4.
+```
+
+---
+
+## 20. Session-Start GitHub Issue Check
+
+> **Core reference:** DSM_0.2 §4. Moved here from core to reduce always-loaded context.
+
+At session start, run three checks to surface unprocessed GitHub issues. If `gh`
+is not available, skip all checks silently.
+
+### 20.1. External Issues (Priority Path)
+
+```
+gh issue list --label external --state open
+```
+
+External-labeled issues come from outside contributors and take priority.
+
+### 20.2. New Issues Since Last Session
+
+```
+gh issue list --state open --search "created:>={YYYY-MM-DD}"
+```
+
+Replace `{YYYY-MM-DD}` with the date from MEMORY.md's "Latest Session" entry.
+This catches user-created issues (ideas, feedback, research items) that lack
+the `external` label.
+
+### 20.3. Untriaged Open Issues (Classified)
+
+```
+gh issue list --state open
+```
+
+Classify the results into two groups, excluding issues already surfaced by 20.1/20.2:
+
+**Research queue** (issues labeled `research`, or whose title starts with
+"read repo", "read document", or references an external URL/file to evaluate):
+- Present as a batched summary: "Research queue: N items pending"
+- List titles with issue numbers, no individual triage needed
+- These are knowledge intake tasks, not work items
+
+**Improvement issues** (everything else, excluding issues whose title starts
+with "BL-" and issues labeled `deferred`):
+- These need individual triage per §20.4
+
+### 20.4. Triage Actions
+
+**For improvement issues,** read the body and comments, then triage:
+
+- **New BL needed:** Follow the GitHub Issue Intake Protocol (Module A, Section 16)
+- **Absorbed by existing BL:** Close the issue with a reference to the existing BL
+- **Defer:** Apply the `deferred` label with a comment explaining why
+- **Not actionable:** Close with explanation
+
+**For research queue items,** no per-item triage at session start. Instead:
+
+- If the session is research-focused, ask the user which items to tackle
+- Each selected item becomes a Phase 0.5 research task (see Module D)
+- After research is complete, follow §20.5 (Research Output and Action Routing)
+- Items stay open in the queue until a session processes them
+
+### 20.5. Research Output and Action Routing
+
+When a research queue item is processed (in any session type, including
+parallel sessions), the output must include both findings and an action
+recommendation. Without action routing, research files accumulate in
+`dsm-docs/research/` without connecting back to the backlog.
+
+**Required output:**
+
+1. Save findings to `dsm-docs/research/{YYYY-MM-DD}_{topic}.md`
+2. Include an **Action Recommendation** section at the bottom of the file:
+   - **New BL:** [description of proposed backlog item], follow the GitHub
+     Issue Intake Protocol (Module A, Section 16) to create it
+   - **Enriches BL-NNN:** [what the research adds], update the existing BL
+     file with a reference to the research findings
+   - **No action:** [why not applicable now], close the issue
+3. Close the GitHub issue with a link to the research file
+4. If the recommendation is "New BL" or "Enriches BL-NNN" and the current
+   session cannot act on it, create an `_inbox/` entry so the next main
+   session picks it up
+
+---
+
+## 21. Context Budget Protocol
+
+> **Core reference:** DSM_0.2 §11. Moved here from core to reduce always-loaded context.
+
+The agent's context window is a finite resource. Large file reads and multi-document
+research can exhaust it mid-session, forcing compaction and losing earlier reasoning.
+This protocol makes context consumption visible and gives the user control.
+
+**Before reading large files (500+ lines):**
+
+Present options to the user:
+1. Read the full file (accept context cost)
+2. Read targeted sections (specify which parts are needed)
+3. Split the file first, then read the relevant fragment (see DSM_0.1 Reference
+   File Size Protocol)
+4. Defer to a new session with full context available
+
+**Context threshold warning:**
+
+When estimated remaining context drops below ~40%, proactively alert the user:
+- State the estimated remaining capacity
+- Suggest session wrap-up or scope reduction
+- Do not wait for the system warning at 80%; surface the concern early enough
+  for the user to make a deliberate choice
+
+**Session planning:**
+
+When a session involves multiple large files or extensive research:
+- Estimate total context needs at planning time
+- If the estimate suggests the session will approach context limits, scope
+  accordingly: prioritize files, defer secondary reads, or plan a continuation
+  session
+
+**Anti-Patterns:**
+
+**DO NOT:**
+- Read a 2,000-line file without warning the user about context impact
+- Wait until compaction is imminent to mention context pressure; by then the
+  user has lost the ability to choose a clean wrap-up
+- Guess remaining context; use system warnings and file sizes as indicators
+
+---
+
+## 22. Two-Pass Reading Strategy for Long Structured Files
+
+> **Core reference:** DSM_0.2 §12. Moved here from core to reduce always-loaded context.
+
+When the agent needs to read a structured text file of 200+ lines (markdown,
+plain text, or converted-to-markdown), use a two-pass approach instead of
+sequential chunk reading. Sequential chunks miss items at boundaries and
+provide no structural map before diving into content.
+
+**Trigger:** Structured text files of 200+ lines. Non-markdown, non-text files
+of any size should be converted to markdown first (see `scripts/convert_to_markdown.py`
+in DSM Central), then the protocol applies to the converted output.
+
+**Flow:**
+
+1. **Scope assessment offer:** Agent informs the user: "This file is N lines.
+   Would you like a scope assessment to identify sections we could skip?"
+2. **User decides:** Y (scope filtering) or N (read everything)
+3. **Pass 1 (structural scan):** Agent uses Grep to extract headings, entry
+   markers, and structural boundaries in a single tool call. Produces a skeleton:
+   section titles, nesting levels, approximate line ranges, item counts per section.
+   Patterns by file type:
+   - **Markdown:** `^#{1,6}`, `^- \*\*`, numbered lists, table headers
+   - **Plain text:** ALL CAPS lines, `===`/`---` underlines, numbered section
+     headers (e.g., `1.`, `1.1`), indentation level changes
+4. **Scope filtering gate (conditional):** If user said Y at step 2, the agent
+   presents the skeleton with recommendations: "Based on [current task], these
+   sections appear less relevant: [list with reasons]. Skip them?" User can
+   approve all, approve some, or dismiss all. If user said N, skip this step.
+5. **Pass 2 (semantic extraction):** Agent reads content of sections that
+   survived filtering (or all sections if no filtering). Targeted reads by line
+   range, extracting meaning, key data points, and actionable items.
+
+**Integration with Context Budget Protocol:** The two-pass strategy is the
+implementation technique for the "targeted sections" option in the Context
+Budget Protocol. When that protocol presents options for reading large files,
+the two-pass strategy provides the method for identifying which sections to target.
+
+**Does not apply to:** Code files (which have better tooling: Grep, Glob,
+language-aware search), files under 200 lines (overhead exceeds benefit),
+or files the agent has already read in the current session.

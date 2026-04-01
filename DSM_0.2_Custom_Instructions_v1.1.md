@@ -1,5 +1,5 @@
 ---
-**DSM Custom Instructions: v1.3.69**
+**DSM Custom Instructions: v1.4.1**
 **Last Breaking Change:** 2026-03-15 (DSM_0.2 Modularization, BACKLOG-090)
 **Status:** Active, Cross-Project Governance
 **Architecture:** Slim core + 4 on-demand modules (see Module Dispatch Table)
@@ -7,18 +7,18 @@
 
 ## Contents
 
-1. [Project Type Detection](#1-project-type-detection)
-2. [Session-Start Version Check](#2-session-start-version-check)
-3. [Session-Start Inbox Check](#3-session-start-inbox-check)
-4. [Session-Start GitHub Issue Check](#4-session-start-github-issue-check)
+1. [Project Type Detection](#1-project-type-detection) → Module A
+2. [Session-Start Version Check](#2-session-start-version-check) → Module A
+3. [Session-Start Inbox Check](#3-session-start-inbox-check) → Module A
+4. [Session-Start GitHub Issue Check](#4-session-start-github-issue-check) → Module A
 5. [Read-Only Access Within Repository](#5-read-only-access-within-repository)
-6. [Reasoning Delimiter Format](#6-reasoning-delimiter-format)
+6. [Session Transcript Delimiter Format](#6-session-transcript-delimiter-format)
 7. [Session Transcript Protocol](#7-session-transcript-protocol)
 8. [Pre-Generation Brief Protocol](#8-pre-generation-brief-protocol)
 9. [Experiment Execution Protocol](#9-experiment-execution-protocol)
 10. [Web Research Capture Protocol](#10-web-research-capture-protocol)
-11. [Context Budget Protocol](#11-context-budget-protocol)
-12. [Two-Pass Reading Strategy for Long Structured Files](#12-two-pass-reading-strategy-for-long-structured-files)
+11. [Context Budget Protocol](#11-context-budget-protocol) → Module A
+12. [Two-Pass Reading Strategy for Long Structured Files](#12-two-pass-reading-strategy-for-long-structured-files) → Module A
 13. [Inclusive Language](#13-inclusive-language)
 14. [Heading Parsability Convention for DSM Documents](#14-heading-parsability-convention-for-dsm-documents)
 15. [AI Collaboration Principles](#15-ai-collaboration-principles)
@@ -29,8 +29,9 @@
 20. [Three-Level Branching Strategy](#20-three-level-branching-strategy)
 21. [Backlog Scope Rule](#21-backlog-scope-rule)
 22. [Protocol Violation Triage Response](#22-protocol-violation-triage-response)
-23. [References](#23-references)
-24. [Module Dispatch Table](#24-module-dispatch-table)
+23. [Third-Party Skill Governance](#23-third-party-skill-governance)
+24. [References](#24-references)
+25. [Module Dispatch Table](#25-module-dispatch-table)
 
 ---
 
@@ -38,189 +39,19 @@ Confirm that you understand what I need. Be concise in your work.
 
 ## 1. Project Type Detection
 
-At session start, identify the project type by examining the directory structure:
-
-| Indicator | Project Type | DSM Track |
-|-----------|--------------|-----------|
-| `notebooks/` only, no `src/` | Data Science | DSM 1.0 (Sections 2.1-2.5) |
-| `src/`, `tests/`, `app.py` | Application | DSM 4.0 |
-| Both `notebooks/` and `src/` | Hybrid | DSM 1.0 for analysis, DSM 4.0 for modules |
-| `dsm-docs/`, markdown-only, no `notebooks/` or `src/` | Documentation | DSM 5.0 |
-| `{contributions-docs-path}/{project}/` exists | External Contribution | DSM_3 Section 6.6 |
-
-**State the identified type at session start:**
-"This appears to be a [Notebook/Application/Hybrid/Documentation/External Contribution] project. I'll follow [DSM 1.0/DSM 4.0/both/DSM 5.0/Section 6.6] accordingly."
-
-**External contribution sessions:** Open the project in the external repo's local
-clone but reference governance artifacts in `{contributions-docs-path}/{project}/`
-(resolved from the Ecosystem Path Registry). See DSM_3 Section 6.6 for the full
-governance structure.
-
-### 1.1. Participation Pattern Detection
-
-The DSM track (above) is orthogonal to the participation pattern. After identifying
-the track, also identify which participation pattern governs communication and
-isolation rules:
-
-| Indicator | Participation Pattern | Reference |
-|-----------|----------------------|-----------|
-| Git remote configured + DSM_3 Section 7 entry | Standard Spoke | DSM_3 Section 6.9 |
-| `contributions-docs/{project}/` exists or CLAUDE.md declares "External Contribution" | External Contribution | DSM_3 Section 6.6 |
-| CLAUDE.md declares "Private" or "DSM private project pattern" | Private Project | DSM_3 Section 6.8 |
-| No indicator found | Assume Standard Spoke | DSM_3 Section 6.9 |
-
-**State both dimensions at session start:**
-"This is a [track] project ([DSM version]) using the [pattern] pattern."
-
-Example: "This is a Documentation project (DSM 5.0) using the Private Project pattern."
-
-**Pattern governs:** inbox behavior (bidirectional vs receive-only), feedback push
-(automatic vs manual), README notifications (yes/no), and cross-repo write scope.
-Apply the pattern's constraints for the session, even if CLAUDE.md does not
-explicitly override every inherited DSM_0.2 protocol.
+Moved to [Module A §17](DSM_0.2.A_Session_Lifecycle.md). Read at session start.
 
 ## 2. Session-Start Version Check
 
-At session start in spoke projects, compare the DSM version in the header above against the version recorded in the most recent handoff (`dsm-docs/handoffs/`). If the versions differ:
-1. Note the update: "DSM updated from vX.Y.Z to vA.B.C since last session"
-2. Check the DSM CHANGELOG for changes between those versions
-3. Apply any updated protocols for this session
-
-If no previous handoff exists (first session), record the current DSM version for future reference.
+Moved to [Module A §18](DSM_0.2.A_Session_Lifecycle.md). Read at session start.
 
 ## 3. Session-Start Inbox Check
 
-At session start, check `_inbox/` for pending entries from DSM Central. If entries
-exist, surface them to the user before starting other work. When an entry
-references a source file (Full evidence, Full report), read the referenced file
-before evaluating the entry; the inbox is a notification, the source file
-contains the full evidence needed for decision-making. Process each entry per
-DSM_3 Section 6.4.3 (implement via BL workflow for substantive changes, defer, or reject; then move to `_inbox/done/`).
-
-**WARNING:** After processing, **move** the entry to `_inbox/done/`. Do not mark entries as "Status: Processed" or add completion markers while keeping the entry in place. Processed entries in `done/` preserve communication history and traceability; entries left in the inbox root cause stale re-processing in future sessions (observed in spoke project sessions).
-
-**External Contribution exception:** For External Contribution projects (identified
-by project type detection or explicit CLAUDE.md declaration), do NOT create `_inbox/`
-in the external repo. The external repo belongs to an upstream maintainer; only code
-contributions belong there. If an inbox is needed, create it under
-`{contributions-docs-path}/{project}/_inbox/`. Skip the migration
-confirmation sub-protocol below.
-
-If `_inbox/` does not exist, create it at project root with a `README.md` containing:
-
-```markdown
-# Project Inbox
-
-Transit point for hub-spoke communication. Entries arrive, get processed, and
-move to `done/`. Reference: DSM_3 Section 6.4.
-
-**Entries are brief notifications, not full file copies.** Each entry summarizes
-what was observed and points to the source file for the complete record. Do not
-copy full feedback files, methodology documents, or backlog lists into the inbox.
-
-## Entry Template
-
-### [YYYY-MM-DD] Entry title
-
-**Type:** Backlog Proposal | Methodology Observation | Action Item | Notification
-**Priority:** High | Medium | Low
-**Source:** [project name or "DSM Central"]
-
-[Description: problem statement, proposed solution, or action requested]
-```
-
-When creating `_inbox/`, also create the `_inbox/done/` subdirectory for
-processed entries.
-
-**Migration:** If `dsm-docs/backlog/` exists (legacy convention), move contents
-to `_inbox/` at project root, create the README.md, and remove the old directory.
-The canonical inbox location is always `_inbox/` at project root; no other
-path (e.g., `dsm-docs/inbox/`) should be used or created.
-
-**Validation before confirmation:** Before sending the migration confirmation
-below, verify that:
-- The `_inbox/` was created inside the contributor's governance scope (not in
-  an external repo)
-- The location is consistent with the project CLAUDE.md's governance rules
-- For External Contribution projects, the `_inbox/` must be in
-  `{contributions-docs-path}/{project}/`, not in the external repo
-
-If validation fails, delete the incorrectly placed `_inbox/` and alert the user.
-
-**Migration confirmation:** After creating or migrating `_inbox/`, send a
-confirmation entry to DSM Central's inbox. The DSM Central repo path is the parent
-directory of the `DSM_0.2_Custom_Instructions_v1.1.md` file referenced by the `@`
-import in this project's CLAUDE.md. Write the confirmation to
-`{dsm-central-path}/_inbox/{this-project-name}.md` using the entry template:
-
-```markdown
-### [YYYY-MM-DD] Inbox migration confirmed
-
-**Type:** Notification
-**Priority:** Low
-**Source:** [this project name]
-
-Inbox system initialized. _inbox/ created at project root. README.md with
-entry template installed. Ready to receive and send inbox entries per
-DSM_3 Section 6.4.
-```
+Moved to [Module A §19](DSM_0.2.A_Session_Lifecycle.md). Read at session start.
 
 ## 4. Session-Start GitHub Issue Check
 
-At session start, run three checks to surface unprocessed GitHub issues. If `gh`
-is not available, skip all checks silently.
-
-### 4.1. External Issues (Priority Path)
-
-```
-gh issue list --label external --state open
-```
-
-External-labeled issues come from outside contributors and take priority.
-
-### 4.2. New Issues Since Last Session
-
-```
-gh issue list --state open --search "created:>={YYYY-MM-DD}"
-```
-
-Replace `{YYYY-MM-DD}` with the date from MEMORY.md's "Latest Session" entry.
-This catches user-created issues (ideas, feedback, research items) that lack
-the `external` label.
-
-### 4.3. Untriaged Open Issues (Classified)
-
-```
-gh issue list --state open
-```
-
-Classify the results into two groups, excluding issues already surfaced by 4.1/4.2:
-
-**Research queue** (issues labeled `research`, or whose title starts with
-"read repo", "read document", or references an external URL/file to evaluate):
-- Present as a batched summary: "Research queue: N items pending"
-- List titles with issue numbers, no individual triage needed
-- These are knowledge intake tasks, not work items
-
-**Improvement issues** (everything else, excluding issues whose title starts
-with "BL-" and issues labeled `deferred`):
-- These need individual triage per §4.4
-
-### 4.4. Triage Actions
-
-**For improvement issues,** read the body and comments, then triage:
-
-- **New BL needed:** Follow the GitHub Issue Intake Protocol (Module A, Section 16)
-- **Absorbed by existing BL:** Close the issue with a reference to the existing BL
-- **Defer:** Apply the `deferred` label with a comment explaining why
-- **Not actionable:** Close with explanation
-
-**For research queue items,** no per-item triage at session start. Instead:
-
-- If the session is research-focused, ask the user which items to tackle
-- Each selected item becomes a Phase 0.5 research task (see Module D)
-- After research is complete, document findings and close the issue
-- Items stay open in the queue until a session processes them
+Moved to [Module A §20](DSM_0.2.A_Session_Lifecycle.md). Read at session start.
 
 ---
 
@@ -238,29 +69,35 @@ a change, or performing any other task:
 
 ---
 
-## 6. Reasoning Delimiter Format
+## 6. Session Transcript Delimiter Format
 
-Standard delimiters for reasoning entries in the session transcript file.
+Standard delimiters for all entry types in the session transcript file.
 See Session Transcript Protocol below for when and where to use them.
 
-**Format:**
+**Three delimiter types:**
 
 ```
 <------------Start Thinking / HH:MM------------>
-
-[reasoning content]
+<------------Start Output / HH:MM------------>
+<------------Start User / HH:MM------------>
 ```
 
-The next `<------------Start Thinking / ...------------>`, `**User:**`, or
-`**Output:**` block implicitly closes the previous thinking block. No explicit
-end delimiter is needed.
+| Type | When to use |
+|------|-------------|
+| Thinking | Agent reasoning, decision processes, planning (before acting) |
+| Output | Summary of completed work (after acting) |
+| User | Summary of the user's prompt (start of each turn) |
+
+The next `<------------Start ... / HH:MM------------>` delimiter of any type
+implicitly closes the previous block. No explicit end delimiter is needed.
 
 **Rules:**
-- HH:MM is the time of day when thinking begins (24-hour, local timezone)
+- HH:MM is the time of day when the block begins (24-hour, local timezone)
 - Blank line after the delimiter for readability
 - These delimiters are used exclusively inside `.claude/session-transcript.md`
 - Do NOT output delimiters in conversation text; the VS Code extension
   collapses them after streaming (microsoft/vscode#287658)
+- All three types follow the same format; only the type label differs
 
 ---
 
@@ -305,16 +142,20 @@ tool calls or file edits.
 | `.claude/session-transcript.md` | Reasoning, decision processes, multi-step planning (the "why") |
 | Conversation text | Results, summaries, questions, file descriptions (the "what") |
 
-**Format** (uses Reasoning Delimiter Format above):
+**Format** (uses Session Transcript Delimiter Format above):
 
 ```
-**User:** [prompt summary]
+<------------Start User / HH:MM------------>
+
+[prompt summary]
 
 <------------Start Thinking / HH:MM------------>
 
 [reasoning content]
 
-**Output:** [summary of what was done]
+<------------Start Output / HH:MM------------>
+
+[summary of what was done]
 ```
 
 **Header** (created by `/dsm-go`):
@@ -499,84 +340,11 @@ evidence exists to cite.
 
 ## 11. Context Budget Protocol
 
-The agent's context window is a finite resource. Large file reads and multi-document
-research can exhaust it mid-session, forcing compaction and losing earlier reasoning.
-This protocol makes context consumption visible and gives the user control.
-
-**Before reading large files (500+ lines):**
-
-Present options to the user:
-1. Read the full file (accept context cost)
-2. Read targeted sections (specify which parts are needed)
-3. Split the file first, then read the relevant fragment (see DSM_0.1 Reference
-   File Size Protocol)
-4. Defer to a new session with full context available
-
-**Context threshold warning:**
-
-When estimated remaining context drops below ~40%, proactively alert the user:
-- State the estimated remaining capacity
-- Suggest session wrap-up or scope reduction
-- Do not wait for the system warning at 80%; surface the concern early enough
-  for the user to make a deliberate choice
-
-**Session planning:**
-
-When a session involves multiple large files or extensive research:
-- Estimate total context needs at planning time
-- If the estimate suggests the session will approach context limits, scope
-  accordingly: prioritize files, defer secondary reads, or plan a continuation
-  session
-
-**Anti-Patterns:**
-
-**DO NOT:**
-- Read a 2,000-line file without warning the user about context impact
-- Wait until compaction is imminent to mention context pressure; by then the
-  user has lost the ability to choose a clean wrap-up
-- Guess remaining context; use system warnings and file sizes as indicators
-
----
+Moved to [Module A §21](DSM_0.2.A_Session_Lifecycle.md). Read when handling large files or context pressure.
 
 ## 12. Two-Pass Reading Strategy for Long Structured Files
 
-When the agent needs to read a structured text file of 200+ lines (markdown,
-plain text, or converted-to-markdown), use a two-pass approach instead of
-sequential chunk reading. Sequential chunks miss items at boundaries and
-provide no structural map before diving into content.
-
-**Trigger:** Structured text files of 200+ lines. Non-markdown, non-text files
-of any size should be converted to markdown first (see `scripts/convert_to_markdown.py`
-in DSM Central), then the protocol applies to the converted output.
-
-**Flow:**
-
-1. **Scope assessment offer:** Agent informs the user: "This file is N lines.
-   Would you like a scope assessment to identify sections we could skip?"
-2. **User decides:** Y (scope filtering) or N (read everything)
-3. **Pass 1 (structural scan):** Agent uses Grep to extract headings, entry
-   markers, and structural boundaries in a single tool call. Produces a skeleton:
-   section titles, nesting levels, approximate line ranges, item counts per section.
-   Patterns by file type:
-   - **Markdown:** `^#{1,6}`, `^- \*\*`, numbered lists, table headers
-   - **Plain text:** ALL CAPS lines, `===`/`---` underlines, numbered section
-     headers (e.g., `1.`, `1.1`), indentation level changes
-4. **Scope filtering gate (conditional):** If user said Y at step 2, the agent
-   presents the skeleton with recommendations: "Based on [current task], these
-   sections appear less relevant: [list with reasons]. Skip them?" User can
-   approve all, approve some, or dismiss all. If user said N, skip this step.
-5. **Pass 2 (semantic extraction):** Agent reads content of sections that
-   survived filtering (or all sections if no filtering). Targeted reads by line
-   range, extracting meaning, key data points, and actionable items.
-
-**Integration with Context Budget Protocol:** The two-pass strategy is the
-implementation technique for the "targeted sections" option in the Context
-Budget Protocol. When that protocol presents options for reading large files,
-the two-pass strategy provides the method for identifying which sections to target.
-
-**Does not apply to:** Code files (which have better tooling: Grep, Glob,
-language-aware search), files under 200 lines (overhead exceeds benefit),
-or files the agent has already read in the current session.
+Moved to [Module A §22](DSM_0.2.A_Session_Lifecycle.md). Read when processing structured files of 200+ lines.
 
 ---
 
@@ -739,7 +507,7 @@ The `@` reference imports protocols as background context, but agents may deprio
 | Notebook Collaboration Protocol | DSM 1.0 or Hybrid projects | "Generate ONE cell at a time, wait for output" |
 | App Development Protocol | DSM 4.0 projects | "Guide step by step, user approves via permission window" |
 | Pre-Generation Brief Protocol | All projects | "Three-gate model: concept (explain) → implementation (diff review) → run (when applicable); each gate = explicit stop" |
-| Session Transcript Protocol | All projects | "Append thinking to .claude/session-transcript.md BEFORE acting; output AFTER; conversation text = results only; use Reasoning Delimiter Format with `<------------Start Thinking / HH:MM------------>`; no end delimiter needed" |
+| Session Transcript Protocol | All projects | "Append thinking to .claude/session-transcript.md BEFORE acting; output AFTER; conversation text = results only; use Session Transcript Delimiter Format: `<------------Start Thinking / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`" |
 
 **Example reinforcement in project CLAUDE.md:**
 ```markdown
@@ -754,15 +522,16 @@ The `@` reference imports protocols as background context, but agents may deprio
 - Append thinking to `.claude/session-transcript.md` BEFORE acting
 - Output summary AFTER completing work
 - Conversation text = results only
-- Use Reasoning Delimiter Format for every thinking block:
+- Use Session Transcript Delimiter Format for every block:
   <------------Start Thinking / HH:MM------------>
-  [reasoning content]
-- HH:MM is 24-hour local time when thinking begins; no end delimiter needed
+  <------------Start Output / HH:MM------------>
+  <------------Start User / HH:MM------------>
+- HH:MM is 24-hour local time when the block begins; no end delimiter needed
 - Append technique: read last 3 lines, use last non-empty line as anchor.
   NEVER match earlier content for mid-file insertion.
 ```
 
-**WARNING:** Spoke reinforcement blocks must include the literal delimiter syntax shown in the example above. Referencing "Reasoning Delimiter Format" by name is insufficient; agents default to markdown heading style when the syntax is absent from the local CLAUDE.md (observed in spoke project sessions).
+**WARNING:** Spoke reinforcement blocks must include the literal delimiter syntax shown in the example above. Referencing "Session Transcript Delimiter Format" by name is insufficient; agents default to markdown heading style when the syntax is absent from the local CLAUDE.md (observed in spoke project sessions).
 
 Without reinforcement, the agent's default behavior (batching outputs, generating multiple steps) overrides the inherited protocol.
 
@@ -807,10 +576,11 @@ Domain: [domain]
 - Append thinking to `.claude/session-transcript.md` BEFORE acting
 - Output summary AFTER completing work
 - Conversation text = results only
-- Use Reasoning Delimiter Format for every thinking block:
+- Use Session Transcript Delimiter Format for every block:
   <------------Start Thinking / HH:MM------------>
-  [reasoning content]
-- HH:MM is 24-hour local time when thinking begins; no end delimiter needed
+  <------------Start Output / HH:MM------------>
+  <------------Start User / HH:MM------------>
+- HH:MM is 24-hour local time when the block begins; no end delimiter needed
 - Append technique: read last 3 lines, use last non-empty line as anchor.
   NEVER match earlier content for mid-file insertion.
 
@@ -856,6 +626,51 @@ When DSM_0.2 is updated and a template changes, `/dsm-align` detects drift and
 offers to regenerate. The `@` reference chain ensures spokes always have access
 to the current template definitions.
 
+### 17.2. CLAUDE.md Content Validation Protocol
+
+Project-specific CLAUDE.md content drifts as the project evolves. Sections
+written at setup may reference workflows the project never used or no longer
+uses, consuming context budget without providing value. This protocol defines
+criteria for detecting and resolving content drift.
+
+**Validation criteria:**
+
+Cross-reference each project-specific CLAUDE.md section against the project
+type detected by §1:
+
+| Project Type | Sections that indicate drift if present |
+|-------------|----------------------------------------|
+| Documentation (DSM 5.0) | Notebook Development Protocol, App Development Protocol, Code Output Standards (notebook-specific) |
+| Data Science (DSM 1.0) | App Development Protocol |
+| Application (DSM 4.0) | Notebook Development Protocol |
+
+**Insurance section exemption:** Some sections are rarely invoked but critical
+when needed. These must never be flagged as stale regardless of usage frequency:
+
+- Destructive Command Protocol
+- Secret Exposure Prevention
+- Plan Mode Protocol
+- Branching Strategy (Three-Level Model)
+
+**When to validate:**
+
+| Trigger | Action |
+|---------|--------|
+| `/dsm-go` (full session start) | Check project type against CLAUDE.md sections; flag mismatches |
+| `/dsm-align` | After regenerating the alignment section, scan project-specific content for type mismatches |
+| On-demand (user request) | Full validation with recommendations |
+
+**Agent behavior:** When validation detects a mismatch at session start, report
+it as an observation, not an automatic fix: "CLAUDE.md contains [section] which
+is not typical for a [project type] project. Remove it to save context budget?"
+The user decides whether to remove, keep (with justification), or defer.
+
+**What validation does NOT do (deferred):**
+- Accumulation tracking across sessions (requires state storage design)
+- Relevance scoring based on invocation frequency
+- Automated addition of missing sections based on observed patterns
+- Dedicated `/dsm-validate-config` command
+
 ---
 
 ## 18. Ecosystem Path Registry
@@ -897,10 +712,19 @@ continue the session. Do not fail silently and do not halt.
 **File format:** Markdown table with Name, Path, Description, and optional Mirror columns.
 See the template in the DSM_0.2 source or create with `/dsm-align`.
 
-**Mirror repos:** Entries with `mirror: true` receive automatic file sync after
-Central methodology changes. When the Version Update Workflow completes (step 9),
-the agent copies changed methodology files to each mirror repo, commits, and pushes.
-This ensures public distribution repos stay current without manual intervention.
+**Mirror repos:** Entries with `mirror: true` receive automatic file sync whenever
+methodology files change, not only on version releases. Two sync triggers exist:
+
+1. **Session wrap-up:** The wrap-up protocol (`/dsm-wrap-up`) checks whether
+   methodology files changed during the session. If they did, it syncs changed
+   files to each mirror repo regardless of whether a version was bumped. This
+   prevents silent drift between sessions.
+2. **Version Update Workflow:** Step 9 syncs all changed methodology files as
+   part of a version release, ensuring mirrors match the tagged version.
+
+For both triggers, the agent copies changed methodology files to each mirror
+repo, commits, and pushes. If push fails (branch protection), use the
+protected-branch sub-protocol (create sync branch, PR, merge).
 
 ---
 
@@ -953,20 +777,23 @@ and is pushed to remote for cross-session continuity.
 
 ### 20.3. Level 3: Task Branches
 
-Created during a session for specific work items. Three types:
+Created during a session for specific work items. Two types:
 
 | Type | Trigger | Naming | Merge condition |
 |------|---------|--------|-----------------|
 | BL branch | BL implementation starts | `bl-NNN/short-description` | BL moved to `done/` |
 | Sprint branch | Sprint work begins | `sprint-N/short-description` | All sprint plan items checked off |
-| Parallel-session branch | `/dsm-parallel-session-go` | `parallel/short-description` | `/dsm-parallel-session-wrap-up` |
+
+**Parallel sessions** do not create Level 3 branches. They commit directly to
+the Level 2 session branch using the commit booking system. See Module A §7
+(Parallel Session Protocol) for the shared branch model.
 
 **Merge to Level 2:** Only when formal exit criteria are met. Level 3 branches
 merge to the session branch, not directly to main.
 
 **Exceptions (commit directly to session branch):** Mechanical status updates
 (BL moved to done/), trivial fixes (typos, dates), session artifacts (handoffs,
-checkpoints, feedback).
+checkpoints, feedback), parallel session commits (via commit booking).
 
 ### 20.4. Branch Push Policy
 
@@ -1074,14 +901,53 @@ behind a module read.
 
 ---
 
-## 23. References
+## 23. Third-Party Skill Governance
+
+Claude Code skills (`~/.claude/skills/` for global, `.claude/skills/` for
+project-level) inject prompt content that the agent follows alongside DSM
+protocols. Ungoverned skills can silently override DSM behavior (approval
+gates, punctuation rules, style conventions). This section establishes
+lightweight governance for third-party skills.
+
+### 23.1. Skill Registry
+
+Each DSM installation maintains a skill registry at `.claude/skills-registry.md`
+(gitignored, local to each instance). The registry tracks installed skills:
+
+| Skill | Source | Version | Scope | Purpose | Conflicts |
+|-------|--------|---------|-------|---------|-----------|
+
+**Scope values:** `global` (`~/.claude/skills/`) or `project` (`.claude/skills/`).
+Project-level skills are preferred when only one project uses the skill.
+
+### 23.2. Evaluation Gate for Skill Installation
+
+Before installing a third-party skill, check for protocol conflicts:
+
+1. Read the skill's `SKILL.md` (or equivalent prompt file)
+2. Check for instructions that contradict DSM protocols: approval gates
+   (§8), punctuation rules (CLAUDE.md), style conventions (§13), commit
+   workflow, or file creation patterns
+3. If conflicts exist, document them in the Conflicts column of the registry
+   and decide: adapt the skill, restrict its scope, or reject it
+
+### 23.3. Conflict Resolution Rule
+
+When a third-party skill's instructions conflict with DSM protocols, **DSM
+protocols take precedence**. The agent must follow DSM governance even when
+a skill instructs otherwise. This is the same precedence model as
+project-specific CLAUDE.md overriding generic DSM_0.2 protocols (§17).
+
+---
+
+## 24. References
 
 - Preston-Werner, T. (2013). [Semantic Versioning 2.0.0](https://semver.org/)
 - Procida, D. (2017). [Diataxis Documentation Framework](https://diataxis.fr/)
 
 ---
 
-## 24. Module Dispatch Table
+## 25. Module Dispatch Table
 
 DSM_0.2 protocols are split into this core file (always loaded via `@`) and
 four on-demand modules. When a task requires a protocol from this table, read
@@ -1089,22 +955,22 @@ the corresponding module file using the Read tool before applying the protocol.
 
 All module files are in the same directory as this core file.
 
-### 24.1. Core Sections (this file)
+### 25.1. Core Sections (this file)
 
 | § | Protocol |
 |---|----------|
-| 1 | Project Type Detection |
-| 2 | Session-Start Version Check |
-| 3 | Session-Start Inbox Check |
-| 4 | Session-Start GitHub Issue Check |
+| 1 | Project Type Detection → [Module A §17](DSM_0.2.A_Session_Lifecycle.md) |
+| 2 | Session-Start Version Check → [Module A §18](DSM_0.2.A_Session_Lifecycle.md) |
+| 3 | Session-Start Inbox Check → [Module A §19](DSM_0.2.A_Session_Lifecycle.md) |
+| 4 | Session-Start GitHub Issue Check → [Module A §20](DSM_0.2.A_Session_Lifecycle.md) |
 | 5 | Read-Only Access Within Repository |
-| 6 | Reasoning Delimiter Format |
+| 6 | Session Transcript Delimiter Format |
 | 7 | Session Transcript Protocol |
 | 8 | Pre-Generation Brief Protocol |
 | 9 | Experiment Execution Protocol |
 | 10 | Web Research Capture Protocol |
-| 11 | Context Budget Protocol |
-| 12 | Two-Pass Reading Strategy for Long Structured Files |
+| 11 | Context Budget Protocol → [Module A §21](DSM_0.2.A_Session_Lifecycle.md) |
+| 12 | Two-Pass Reading Strategy → [Module A §22](DSM_0.2.A_Session_Lifecycle.md) |
 | 13 | Inclusive Language |
 | 14 | Heading Parsability Convention for DSM Documents |
 | 15 | AI Collaboration Principles |
@@ -1115,12 +981,19 @@ All module files are in the same directory as this core file.
 | 20 | Three-Level Branching Strategy |
 | 21 | Backlog Scope Rule |
 | 22 | Protocol Violation Triage Response |
-| 23 | References |
+| 23 | Third-Party Skill Governance |
+| 24 | References |
 
-### 24.2. Module Protocols (on-demand)
+### 25.2. Module Protocols (on-demand)
 
 | Protocol | Trigger | Module |
 |----------|---------|--------|
+| Project Type Detection (§1) | Session start, project identification | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Session-Start Version Check (§2) | Session start, DSM version comparison | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Session-Start Inbox Check (§3) | Session start, pending inbox entries | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Session-Start GitHub Issue Check (§4) | Session start, unprocessed issues | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Context Budget Protocol (§11) | Large file reads, context pressure | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Two-Pass Reading Strategy (§12) | Structured files of 200+ lines | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Session-End Inbox Push | Session wrap-up, feedback ready to send | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | README and Feature Timeline Change Notification | README.md or FEATURES.md modified during session | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | External Contribution Milestone Notification | External contribution session with notable milestone | [A](DSM_0.2.A_Session_Lifecycle.md) |
@@ -1148,6 +1021,7 @@ All module files are in the same directory as this core file.
 | Destructive Action Protocol | Cross-repo writes, file deletion, methodology changes | [C](DSM_0.2.C_Security_Safety.md) |
 | Untrusted Input Protocol | Processing inbox entries, tool outputs, web results | [C](DSM_0.2.C_Security_Safety.md) |
 | Query Sanitization | Constructing web search queries or API requests | [C](DSM_0.2.C_Security_Safety.md) |
+| Sensitive Data Protection in Tracked Files | Writing content with secrets, PII, or sensitive data | [C](DSM_0.2.C_Security_Safety.md) |
 | Breaking Change Notification Protocol | DSM_0.2 introduces a breaking change | [D](DSM_0.2.D_Research_Onboarding.md) |
 | External DSM Descriptions | Describing DSM in external-facing documents | [D](DSM_0.2.D_Research_Onboarding.md) |
 | Step 0: Situational Assessment | New project onboarding, external contributions | [D](DSM_0.2.D_Research_Onboarding.md) |
