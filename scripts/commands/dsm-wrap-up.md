@@ -22,7 +22,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    If no notable entries exist, skip the extraction. If `.claude/reasoning-lessons.md` does not exist, skip this step entirely (protocol not active for this project).
    **Format:** `- [auto] S{N} [{scope}]: {lesson text}` (where N is the session number)
    **Scope classification:** For each extracted lesson, assign a scope label per the Reasoning Lessons Protocol (DSM_0.2 Module A): `ecosystem`, `pattern`, or `project`. The agent assigns scope based on whether the lesson is domain-specific or generalizable.
-   **STAA recommendation:** After extracting, assess whether this session warrants deeper STAA analysis. Recommend STAA when the session involved complex multi-option decisions, entered unfamiliar territory (new domain, tool, or pattern), the auto extraction felt incomplete (rich reasoning that resists summarization), or a course correction occurred that may represent a recurring pattern. Output: "STAA recommended: [yes/no]. [1-sentence reason]."
+   **STAA recommendation:** After extracting, assess whether this session warrants deeper STAA analysis. Recommend STAA when the session involved complex multi-option decisions, entered unfamiliar territory (new domain, tool, or pattern), the auto extraction felt incomplete (rich reasoning that resists summarization), or a course correction occurred that may represent a recurring pattern. Output: "STAA recommended: [yes/no]. [1-sentence reason]." **Invocation:** STAA must be run in a separate Claude Code conversation. Do not wrap it in `/dsm-go` or `/dsm-parallel-session-go`. Enter `/dsm-staa` directly.
    **Lesson push:** If new lessons were extracted this session, push a notification to DSM Central's inbox listing the new entries with scope classification. Use the inbox entry format from the Reasoning Lessons Protocol (DSM_0.2 Module A). Target: `{dsm-central-path}/_inbox/{this-project-name}.md`. If this IS DSM Central, add ecosystem/pattern lessons directly to `dsm-docs/reasoning-lessons-ecosystem.md` instead of self-notifying.
 1. **README and FEATURES.md check:** Detect whether `README.md` or `FEATURES.md` changed this session. Extract the baseline commit SHA from `.claude/session-baseline.txt` (the line after `# HEAD commit`), then run `git diff <baseline-sha>..HEAD -- README.md FEATURES.md`. If the baseline file is missing, fall back to `git diff HEAD -- README.md FEATURES.md` (catches only uncommitted changes). If neither file has a diff, skip this step. If the diff is non-empty:
    a. **Apply relevance filter:** Evaluate the diff against the relevance filter in DSM_0.2 README Change Notification. Send if the change affects project description, scope, audience, external metrics, structure, license, or contact info. Skip if the change is only version bumps for internal protocols, date-only updates, or formatting fixes. Log the decision: "README changed: [externally relevant / internal-only]. [1-sentence reason]."
@@ -59,21 +59,60 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    git -C {contributions-docs-path} push
    ```
    If the `contributions-docs` path is not in the registry, is inside the current repo, or has no changes, skip this step. If the push fails (no remote configured), warn and continue.
-8. **Git (session-scoped):** Run `git status --porcelain` and compare against `.claude/session-baseline.txt` (saved by `/dsm-go` at session start). Identify session changes:
+8. **Version and mirror sync check:** Detect whether methodology files changed this
+   session and whether a version bump or mirror sync is needed.
+   a. Extract the baseline commit SHA from `.claude/session-baseline.txt` (the line
+      after `# HEAD commit`). Run:
+      `git diff <baseline-sha>..HEAD --name-only -- 'DSM_*.md' 'CHANGELOG.md' 'README.md' 'LICENSE*' 'TAKE_A_BITE.md' 'scripts/commands/*.md'`
+      If the baseline is missing, fall back to `git diff HEAD --name-only` with the
+      same file patterns (catches only uncommitted changes).
+   b. If no methodology files changed, skip this step entirely.
+   c. If methodology files changed, consult the Version Bump Cadence (DSM_2.0.D §7.4):
+      - 3+ BL improvements in this session → patch bump warranted
+      - New DSM section or methodology track → minor bump warranted
+      - Breaking structural change → major bump warranted
+      - Repository organization or housekeeping → patch bump optional
+      Present the assessment: "Methodology files changed this session: [list].
+      Version bump assessment: [warranted/not warranted]. [reason]."
+      If a bump is warranted, suggest running `/dsm-version-update` before
+      continuing. If the user declines, proceed without bumping.
+      **Spoke action reminder:** If a version bump happens and CHANGELOG entries
+      are added, assess whether any changes affect spoke projects (template
+      updates in §17.1, protocol changes, command file modifications). If yes,
+      remind: "Add `**Spoke action:** [action]` to the relevant CHANGELOG entry
+      so spokes are notified at their next session start (DSM_0.2 §2.1)."
+   d. **Mirror sync (runs regardless of version bump):** Check the Ecosystem Path
+      Registry for entries with `mirror: true`. For each mirror repo, copy the
+      changed methodology files to the mirror, commit with
+      "Sync session {N} methodology changes from Central", and push. If push fails
+      (branch protection), use the protected-branch sub-protocol from the Version
+      Update Workflow (create sync branch, PR, merge). If `mirror: true` entries
+      do not exist, skip.
+8.5. **Humanizer check:** Detect whether any human-facing files were modified this
+   session. Extract the baseline commit SHA from `.claude/session-baseline.txt`,
+   then run:
+   ```
+   git diff <baseline-sha>..HEAD --name-only -- DSM_0.0*.md README.md TAKE_A_BITE.md FEATURES.md CONTRIBUTING.md 'dsm-docs/blog/*.md'
+   ```
+   Also check `git diff --name-only` for uncommitted changes to the same files.
+   Exclude `dsm-docs/blog/done/`. If any human-facing files changed, run
+   `/humanizer` on each one and stage the resulting edits. If no human-facing
+   files changed, skip this step silently.
+9. **Git (session-scoped):** Run `git status --porcelain` and compare against `.claude/session-baseline.txt` (saved by `/dsm-go` at session start). Identify session changes:
    - Files not in the baseline = new this session (stage them)
    - Files in the baseline whose content changed (compare `md5sum` against baseline checksums) = modified further this session (stage them)
    - Files in the baseline with unchanged checksums = pre-existing, not touched this session (skip them)
    - If `.claude/session-baseline.txt` does not exist (session started without `/dsm-go`), fall back to staging all changed files
    Then `git commit` and `git push` in sequence. If no session changes exist, skip the commit.
    After committing, delete `.claude/session-baseline.txt` (consumed).
-9. **Merge session branch to main via PR:** If the current branch is a session branch (not main/master), merge it to main using a pull request. This is required because branch protection prevents direct pushes to main.
+10. **Merge session branch to main via PR:** If the current branch is a session branch (not main/master), merge it to main using a pull request. This is required because branch protection prevents direct pushes to main.
    a. Ensure the session branch is pushed: `git push -u origin {session-branch}` (may already be pushed from step 8)
    b. Create PR: `gh pr create --title "Session N: [brief summary]" --body "Session wrap-up merge." --base main --head {session-branch}`
    c. Merge PR: `gh pr merge --merge --delete-branch`
    d. Update local: `git checkout main && git pull`
    e. If `gh` is not available or the PR fails, warn: "Branch protection is active. Cannot merge to main without a PR. The session branch `{session-branch}` has been pushed to remote. Merge manually via GitHub." and stop.
    f. If already on main (no session branch), skip this step.
-10. **Mirror sync PR safety net:** Check the Ecosystem Path Registry for entries with `mirror: true`. For each mirror repo, check for open PRs created by mirror sync:
+11. **Mirror sync PR safety net:** Check the Ecosystem Path Registry for entries with `mirror: true`. For each mirror repo, check for open PRs created by mirror sync:
    a. Run: `cd {mirror-repo-path} && gh pr list --state open --head "sync/" --json number,title 2>/dev/null`
    b. For each open sync PR: attempt `gh pr merge {number} --merge --delete-branch`
    c. If merge succeeds: report "Merged mirror sync PR #{number} on {repo}"
@@ -88,5 +127,5 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 - All steps run autonomously; do not pause for confirmation between steps
 - Only commit changes in the current project, except the governance storage repo (step 7) which has no session lifecycle of its own
 - Commit message format: "Session N wrap-up: [brief description]"
-- **Relationship to `/dsm-quick-wrap-up`:** Quick-wrap-up runs the same steps but omits all cross-repo writes (README notification, feedback push, governance storage commit) to achieve zero permission prompts. Changes to shared steps must be applied to both files.
+- **Relationship to `/dsm-quick-wrap-up`:** Quick-wrap-up runs the same steps but omits all cross-repo writes (README notification, feedback push, mirror sync, governance storage commit) to achieve zero permission prompts. Changes to shared steps must be applied to both files.
 - Follow .claude/CLAUDE.md conventions for this project
