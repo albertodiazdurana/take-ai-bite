@@ -22,10 +22,9 @@
 
 ## 1. What is DSM?
 
-DSM is a structured way to collaborate with an AI agent on real work: organizing
-files, building projects, writing documents, analyzing data, developing software,
-or anything else you care about. Think of it as the **rules of the game** for
-working with AI effectively.
+DSM is a structured way to collaborate with an AI agent on real work: file
+organization, project builds, documents, data analysis, software, whatever you
+need done. Think of it as the **rules of the game** for working with AI.
 
 - **Take AI Bite** is the guiding philosophy: work in small, understandable steps.
   The agent creates things (research, summaries, ideas, code, plans) and presents
@@ -33,14 +32,13 @@ working with AI effectively.
   Can you imagine what comes next? If not, you refine it together and try again.
   You are always in control.
 
-- **DSM** is the machine behind the scenes. It gives the agent a memory across
-  sessions, a way to organize your project, and rules for how to communicate with
-  you. When you start a session, the agent knows where you left off, what
+- **DSM** is the infrastructure. It gives the agent a memory across sessions, a
+  way to organize your project, and rules for how to communicate with you. When you start a session, the agent knows where you left off, what
   decisions were made, and what comes next.
 
 - **The agent** follows the rules, reads your files, builds context, and creates
-  deliverables step by step. Over time, it becomes an extension of your own
-  knowledge: the more you use it, the more both of you learn.
+  deliverables step by step. Over time, it builds context about your project,
+  your preferences, and your decisions.
 
 **A "session" is not a chat.** In a browser AI chat, you type, it responds, and
 the conversation ends. A DSM session is a focused work period with a specific
@@ -128,8 +126,8 @@ repository. This pattern:
 
 ## 4. Project Types
 
-Independently from how your project connects to the ecosystem, DSM adapts to
-**what you are building**. The agent detects this automatically from your folder
+Regardless of how your project connects to the ecosystem, DSM adapts to
+what you are building. The agent detects this automatically from your folder
 structure.
 
 ### Data Science (DSM 1.0)
@@ -179,21 +177,20 @@ repositories, professional portfolios, knowledge bases, technical writing.
 3. The agent sets up the project structure, identifies what kind of project it is,
    and asks what you want to work on
 
-That is it. The agent handles the rest: creating folders, loading context, and
-guiding you through your first session step by step.
+The agent handles the rest: creating folders, loading context, and guiding you
+through your first session step by step.
 
 ### What Happens During `/dsm-go`
 
 The agent runs through a checklist:
-- **Identifies your project type** (data science, application, hybrid, documentation)
-- **Creates a session branch** to isolate your work (reversible if needed)
-- **Checks for pending items** from previous sessions or from Central
-- **Loads memory** from past sessions so context is preserved
-- **Asks what you want to work on** and recommends a configuration
+- Identifies your project type (data science, application, hybrid, documentation)
+- Creates a session branch to isolate your work (reversible if needed)
+- Checks for pending items from previous sessions or from Central
+- Loads memory from past sessions so context is preserved
+- Asks what you want to work on and recommends a configuration
 
-From that point, you collaborate: the agent proposes, you review, you decide. Every
-artifact goes through approval before it is created. Nothing happens without your
-explicit agreement.
+From there, the agent proposes and you review. Every artifact goes through approval
+before it is created.
 
 ### When the Session Ends
 
@@ -209,8 +206,8 @@ Next session, `/dsm-go` picks up exactly where you left off.
 
 ## 6. How DSM Evolves
 
-DSM is a living methodology. It improves through a **feedback loop** between
-Central and every project in the ecosystem.
+DSM changes over time. It improves through a feedback loop between Central and
+every project in the ecosystem.
 
 ### The Feedback Cycle
 
@@ -253,10 +250,10 @@ agent loads what is relevant. This map helps if you want to explore.
 | **DSM_6.0** | AI collaboration principles | Understanding the philosophy behind DSM |
 | **DSM_6.1** | Systems prompt engineering and AI product architecture | Understanding DSM as an instruction system |
 
-**Key insight:** DSM_0.2 is the operational backbone. It defines how sessions work,
-how the agent communicates, and how safety protocols operate. The agent loads it via
-the `@` reference in your project's `.claude/CLAUDE.md`. You benefit from it
-without reading it.
+DSM_0.2 is the operational backbone. It defines how sessions work, how the agent
+communicates, and how safety protocols operate. The agent loads it via the `@`
+reference in your project's `.claude/CLAUDE.md`. You benefit from it without
+reading it.
 
 ---
 

@@ -181,7 +181,7 @@ After branch setup, clean up stale refs from prior sessions:
    fi
    ```
    If the transcript has no `**Started:**` line (corrupted or empty), skip archiving. Report the archived filename in the session report.
-5.7. **STAA reminder:** If a transcript was archived in Step 5.5, check whether the previous session's wrap-up included a STAA recommendation. If the archived transcript's final entries contain "STAA recommended: yes", remind the user: "Previous session recommended STAA analysis. Consider running `/dsm-staa` to analyze the archived transcript." If no transcript was archived, or if the previous session recommended "STAA: no", skip this step silently.
+5.7. **STAA reminder:** If a transcript was archived in Step 5.5, check whether the previous session's wrap-up included a STAA recommendation. If the archived transcript's final entries contain "STAA recommended: yes", remind the user: "Previous session recommended STAA analysis. Run `/dsm-staa` in a separate Claude Code conversation (do not wrap in `/dsm-go` or `/dsm-parallel-session-go`)." If no transcript was archived, or if the previous session recommended "STAA: no", skip this step silently.
 5.8. **Incomplete wrap-up recovery:** Detect whether the previous session ended without a full wrap-up by comparing MEMORY.md's "Latest Session" number against the current branch session number (extracted from the branch name, e.g., `session-139/...` → 139). If the branch number > MEMORY number, the previous session had an incomplete wrap-up.
    **If detected:**
    1. Inform the user: "Session {N} ended without full wrap-up. Archived transcript available at `.claude/transcripts/{archived-filename}`."
