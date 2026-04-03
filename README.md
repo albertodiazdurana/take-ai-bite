@@ -101,8 +101,7 @@ See the full timeline of 84+ features → [FEATURES.md](FEATURES.md)
 
 ## Links
 
-- **Website:** [takeaibite.de](https://takeaibite.de)
-- **Blog:** [blog.take-ai-bite.com](https://blog.take-ai-bite.com)
+- **Website:** [take-ai-bite.com](https://take-ai-bite.com)
 - **Author:** [Alberto Diaz Durana](https://www.linkedin.com/in/albertodiazdurana/)
 
 ## License
