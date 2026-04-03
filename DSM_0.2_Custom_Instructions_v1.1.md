@@ -504,7 +504,7 @@ The `@` reference imports protocols as background context, but agents may deprio
 
 | Protocol | Reinforce When | Key Rule to Restate |
 |----------|---------------|---------------------|
-| Notebook Collaboration Protocol | DSM 1.0 or Hybrid projects | "Generate ONE cell at a time, wait for output" |
+| Notebook Collaboration Protocol | DSM 1.0 or Hybrid projects | "User copies each cell; generate copyable content; ONE cell at a time, wait for output" |
 | App Development Protocol | DSM 4.0 projects | "Guide step by step, user approves via permission window" |
 | Pre-Generation Brief Protocol | All projects | "Three-gate model: concept (explain) → implementation (diff review) → run (when applicable); each gate = explicit stop" |
 | Session Transcript Protocol | All projects | "Append thinking to .claude/session-transcript.md BEFORE acting; output AFTER; conversation text = results only; use Session Transcript Delimiter Format: `<------------Start Thinking / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`" |
@@ -600,6 +600,8 @@ Use "," instead of "—" for connecting phrases in any language.
 
 ```markdown
 ### Notebook Collaboration Protocol (reinforces inherited protocol)
+- Each cell is copied and pasted by the user
+- Generate the content of each cell so that it can be copied with a click
 - Generate ONE cell at a time, wait for user to run and share output
 - Number each cell with a comment (e.g., `# Cell 1`)
 - "Continue" = generate next cell; "Generate all cells" = explicit batch override
