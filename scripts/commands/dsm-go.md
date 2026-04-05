@@ -53,9 +53,22 @@ every session operates on a Level 2 session branch, never directly on main.
 
 ### 0a. Determine session number
 
-Read MEMORY.md (from auto memory context) and extract the session number from
-the "Latest Session" line. The new session number is the previous number + 1.
-If MEMORY.md does not exist or has no session number, use 1.
+Determine the new session number using **two sources** and taking the higher value:
+
+1. **Archive count:** Count files in `.claude/transcripts/*.md`. If the directory
+   does not exist, archive count is 0.
+   ```bash
+   ARCHIVE_COUNT=$(ls .claude/transcripts/*.md 2>/dev/null | wc -l)
+   ```
+2. **MEMORY.md:** Extract the session number from the "Latest Session" line in
+   MEMORY.md (from auto memory context). If MEMORY.md does not exist or has no
+   session number, memory session number is 0.
+
+**Formula:** `N = max(ARCHIVE_COUNT, MEMORY_SESSION_NUMBER) + 1`
+
+This handles both cases: projects with many archived transcripts but stale
+MEMORY.md (spokes with incomplete wrap-ups), and projects with few/no archives
+but high session numbers (DSM Central, long-running projects).
 
 ### 0b. Check for open branches from previous sessions
 
@@ -114,6 +127,16 @@ After branch setup, clean up stale refs from prior sessions:
 
 1. **Read MEMORY.md:** Find and load this project's MEMORY.md from the auto memory directory to restore session context. **If MEMORY.md does not exist or fails to load**, continue to Step 2 but note that the agent is operating without prior session context, which increases the risk of applying generic rules to a project with specific overrides.
 1.5. **Read reasoning lessons:** If `.claude/reasoning-lessons.md` exists, read it to prime the session with accumulated reasoning patterns. This is a lightweight file (under 50 lines). Report any lessons that are particularly relevant to the current project. If the file does not exist, skip this step silently.
+1.7. **Fix `@` reference (critical, mandatory):** Check `.claude/CLAUDE.md` for a valid `@` line referencing `DSM_0.2_Custom_Instructions_v1.1.md`. If missing, stale, or invalid (markdown link, wrong path), **fix it immediately**:
+   1. Resolve dsm-central from `.claude/dsm-ecosystem.md` or common locations (`~/dsm-agentic-ai-data-science-methodology/`)
+   2. Verify `{dsm-central}/DSM_0.2_Custom_Instructions_v1.1.md` exists
+   3. Insert or replace the `@` line in CLAUDE.md. If replacing an invalid line (e.g., `[@..](D:\...)`), remove the old line and insert the correct `@` reference at the top
+   4. Report: "Fixed `@` reference: `@{path}`"
+   - If dsm-central cannot be resolved: **halt session start**. Report: "Cannot resolve DSM_0.2 path. No `.claude/dsm-ecosystem.md` and dsm-central not found at common locations. Create the ecosystem file manually or run `/dsm-align` from a project where it works." Do not proceed to step 2 with a broken `@` reference.
+1.8. **Ensure alignment (critical, auto-run):** Read `.claude/last-align.txt` if it exists.
+   - **If missing or `result: critical`:** Report the issue, then **auto-run `/dsm-align`** before proceeding. Do not ask permission. After `/dsm-align` completes, re-read the updated marker and CLAUDE.md, then continue to step 2 with the fixed state.
+   - **If `dsm-version` differs from current DSM version:** Report: "Alignment was run against vX.Y.Z, current DSM is vA.B.C." Then **auto-run `/dsm-align`** to update the reinforcement block and marker.
+   - **If present, version matches, and result is `pass` or `warnings`:** Pass silently.
 2. **DSM_0.2 session-start checks (act, not just report):** Read the `@`-referenced DSM_0.2 file in `.claude/CLAUDE.md` for current protocols, then **perform** each session-start action **in the order listed** (each sub-step may depend on results from prior sub-steps):
    - **2a. Project type detection (MUST complete first; gates 2b and 2c):** Identify and state the project type. Read the project CLAUDE.md to determine governance boundaries. For External Contribution projects, note that governance artifacts route to DSM Central, not the repo root.
    - **2a.5. Ecosystem Path Registry:** Read `.claude/dsm-ecosystem.md` if it exists. Parse the Paths table and cache each Name -> Path mapping for the session. For each entry, verify the path exists on the filesystem:
@@ -121,6 +144,7 @@ After branch setup, clean up stale refs from prior sessions:
      - If the path does not exist: warn "Ecosystem path '{name}' points to '{path}' which does not exist. Cross-repo operations using this path will be skipped."
      If the file does not exist, present as an **action item** for all project types: "Missing `.claude/dsm-ecosystem.md`. Run `/dsm-align` to create it with required ecosystem pointers (`dsm-central`, `portfolio`)." Use fallback resolution (dsm-central from `@` reference) for the current session but flag the gap. Continue to 2a.7.
    - **2a.7. CLAUDE.md content validation (DSM_0.2 §17.2):** Cross-reference project-specific CLAUDE.md sections against the project type from 2a. Flag sections that reference workflows the project does not use (e.g., Notebook Protocol in a Documentation project). Skip insurance sections (Destructive Command Protocol, Secret Exposure Prevention, Plan Mode, Branching Strategy). Report mismatches as observations: "CLAUDE.md contains [section] which is not typical for a [project type] project. Remove to save context budget?" Do not auto-remove.
+   - **2a.8. CLAUDE.md section completeness (Module A §23):** Check whether CLAUDE.md contains all 4 required sections (DSM_0.2 Alignment, participation pattern, project type, project specific). If all present, pass silently. If sections are missing, report which ones and suggest completing them before implementation. This is a hard gate: no implementation work until all 4 sections exist. Existing complete projects pass silently.
    - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). For spoke projects, if `_inbox/` is missing or dsm-docs/ structure is incomplete, suggest running `/dsm-align`. **Inbox location by project type:**
      - **DSM hub (DSM Central):** `_inbox/` at repo root
      - **DSM spoke:** `_inbox/` at repo root
@@ -133,8 +157,11 @@ After branch setup, clean up stale refs from prior sessions:
      1. Read CHANGELOG entries between the old and new versions
      2. Extract lines matching `**Spoke action:**`
      3. Surface actions to user: "DSM updated from vX.Y.Z to vA.B.C. Spoke actions required: [list]"
-     4. For `/dsm-align` actions, offer to run immediately
-     5. For review actions, note which sections to review
+     4. Auto-execute by annotation type:
+        - `Run /dsm-align`: Ask "Template changed. Run /dsm-align to update reinforcement block? (y/n)". On confirmation, execute `/dsm-align`.
+        - `Review [section]`: Surface as action item, do not auto-execute.
+        - `Update [file]`: Surface as action item, do not auto-execute.
+     5. If user declines auto-execution, note as deferred action item for later in the session
      If no spoke actions found, report the version change without action prompts.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
@@ -212,7 +239,22 @@ After branch setup, clean up stale refs from prior sessions:
    EOF
    ```
    This file is the persistent reasoning log per the Session Transcript Protocol in DSM_0.2. The user keeps it open in VS Code to monitor agent thinking in real time.
-   **Behavioral activation:** From this point forward, follow the Session Transcript Protocol (DSM_0.2): append thinking to `.claude/session-transcript.md` as the **first tool call** of every turn, before any other tool calls or file edits. Append output summary as the **last tool call** after completing work. Conversation text is for results, summaries, and questions only, never for reasoning. This is not a checklist item; it is a behavioral mode that remains active for the entire session.
+
+   **Behavioral activation (mandatory, immediate):** From this point forward,
+   follow the Session Transcript Protocol (DSM_0.2): append thinking to
+   `.claude/session-transcript.md` as the **first tool call** of every turn,
+   before any other tool calls or file edits. Append output summary as the
+   **last tool call** after completing work. Conversation text is for results,
+   summaries, and questions only, never for reasoning. This is not a checklist
+   item; it is a behavioral mode that remains active for the entire session.
+
+   **This activation applies to /dsm-go's own remaining steps (7, 8, 9, 10).**
+   Immediately after creating the transcript header, append a thinking entry
+   summarizing the session-start checks completed so far (steps 0-6: session
+   number determined, branch verified, inbox checked, version checked, transcript
+   archived, baseline saved). Then continue with step 7. This ensures the
+   transcript is never empty after /dsm-go completes.
+
 7. **Recent history:** Run `git log --oneline -5` to show recent commits
 8. **Report:** Summarize in this format:
    - Last session: [number, date, description from MEMORY.md]
@@ -220,7 +262,6 @@ After branch setup, clean up stale refs from prior sessions:
    - Uncommitted changes: [yes/no, brief list if any]
    - Baseline saved: [yes/path]
    - Suggested work items: [pending items from checkpoint (Step 3.5) and MEMORY.md, presented as actionable suggestions ordered by priority]
-   - Session Transcript Protocol is now active. All reasoning goes to `.claude/session-transcript.md`.
 9. **Ask:** "What would you like to work on?" (If suggested work items exist, present them as starting options rather than asking open-ended.)
 10. **Configuration recommendation:** After the user answers Step 9 (or immediately for continuation sessions where scope is known from memory/checkpoint), display a configuration recommendation based on the planned work and `~/.claude/claude-subscription.md`. Format:
     ```
