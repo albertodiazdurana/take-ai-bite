@@ -23,6 +23,9 @@ Before starting alignment, check if git is initialized:
    - `dsm-docs/`, markdown-only, no `notebooks/` or `src/` → Documentation (DSM 5.0)
    - `contributions-docs/{project}/` in DSM Central → External Contribution (DSM_3 Section 6.6)
    State the detected type.
+   **Implementation note:** Use `test -d` for directory existence checks, not `ls -d` (which returns non-zero when paths don't exist, cancelling parallel tool calls).
+
+   **Hub fast-path:** If the project is DSM Central (has `scripts/commands/` directory), skip steps 2-6 and 8c. These steps check spoke scaffold structure and validate CLAUDE.md paths against the filesystem, both of which are redundant on the hub that defines the templates. Run only steps 1, 7, 7b, 8, 8b, 9, 10, 11, 12, 13.
 
 2. **Check and fix `_inbox/` at project root:**
    - If `dsm-docs/backlog/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox (`~/dsm-agentic-ai-data-science-methodology/_inbox/{project-name}.md`).
@@ -134,6 +137,9 @@ Before starting alignment, check if git is initialized:
    - Skip paths inside fenced code blocks (``` or ~~~)
    - Skip DSM document references (e.g., `DSM_0.2 §17`)
    - Skip paths that are clearly template placeholders (contain `{` or `}`)
+   - Skip strings starting with `/` followed by a lowercase letter (slash commands like `/dsm-go`)
+   - Skip strings containing `*` (glob patterns like `*.md`, `dsm-docs/blog/*.md`)
+   - Skip strings containing spaces (command invocations like `python scripts/...`, not file paths)
    - For each candidate path, check if it exists relative to the project root
    - Report stale paths as warnings: "CLAUDE.md references `{path}` which does not exist. Update or remove?"
    - Include the surrounding line for context so the user can decide
