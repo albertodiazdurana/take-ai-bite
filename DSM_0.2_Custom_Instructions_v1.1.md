@@ -254,6 +254,29 @@ Gate 3 does not apply to artifacts that are only created, not executed
 - Concept approval (Gate 1) does NOT grant implementation approval (Gate 2);
   implementation approval does NOT grant run approval (Gate 3)
 
+### 8.5. Pre-Generation Reasoning Structure
+
+Before generating any artifact, apply Critical Thinking (DSM_6.0 §1.4.2) by
+answering three questions in the session transcript thinking block:
+
+1. **What** — what is this generation? (type, structure, role in the plan)
+2. **Why** — why is it needed? (what requirement or goal it serves)
+3. **How** — how will it be done? (approach, constraints, applicable rules)
+
+Present what/why/how to the user as part of Gate 1. Wait for approval before
+generating.
+
+**Evidence (on-demand):** After presenting what/why/how, offer: "Should I
+display the facts and metrics to explain this approach?" The user accepts or
+skips. This keeps the default flow lean while making quantitative depth
+available on demand for decisions that warrant it (architecture choices,
+hyperparameter selection, algorithm comparisons).
+
+**Behavioral trigger:** This reasoning structure activates within Gate 1 of
+every non-trivial artifact. It structures the thinking, not the gate itself.
+The what/why/how is written in the transcript thinking block, making reasoning
+visible and auditable.
+
 **Design decision documentation:** When implementing code that involves design choices (alternative approaches, external concepts, trade-offs), document the decision rationale before or alongside the implementation. For experiments, follow the Experiment Execution Protocol below. Maintain a citations log for external benchmarks, APIs, or research referenced in the code. See DSM_0.1 Citation Standards for format and placement.
 
 **Anti-Patterns:**
@@ -504,7 +527,7 @@ The `@` reference imports protocols as background context, but agents may deprio
 
 | Protocol | Reinforce When | Key Rule to Restate |
 |----------|---------------|---------------------|
-| Notebook Collaboration Protocol | DSM 1.0 or Hybrid projects | "User copies each cell; generate copyable content; ONE cell at a time, wait for output" |
+| Notebook Collaboration Protocol | DSM 1.0 or Hybrid projects | "User copies each cell; output ONE cell at a time as a fenced code block; wait for output" |
 | App Development Protocol | DSM 4.0 projects | "Guide step by step, user approves via permission window" |
 | Pre-Generation Brief Protocol | All projects | "Three-gate model: concept (explain) → implementation (diff review) → run (when applicable); each gate = explicit stop" |
 | Session Transcript Protocol | All projects | "Append thinking to .claude/session-transcript.md BEFORE acting; output AFTER; conversation text = results only; use Session Transcript Delimiter Format: `<------------Start Thinking / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`" |
@@ -547,14 +570,18 @@ and updated automatically. Project-specific content lives outside the delimiters
 @{path-to}/DSM_0.2_Custom_Instructions_v1.1.md
 
 <!-- BEGIN DSM_0.2 ALIGNMENT - do not edit manually, managed by /dsm-align -->
+## 1. DSM_0.2 Alignment (managed by /dsm-align)
 [template-generated content, varies by project type]
 <!-- END DSM_0.2 ALIGNMENT -->
 
-# Project: [Name]
-Domain: [domain]
+## 2. Participation Pattern
+[spoke/hub/standalone/contributor/private-specific instructions]
 
-## Project-Specific Instructions
-[custom content, overrides, domain config]
+## 3. Project Type
+[notebook/app/documentation-specific instructions]
+
+## 4. Project Specific
+[project structure, objectives, tech requirements, domain constraints]
 ```
 
 **Delimiter rules:**
@@ -567,7 +594,7 @@ Domain: [domain]
 **Base template (all project types):**
 
 ```markdown
-## DSM Alignment (managed by /dsm-align)
+## 1. DSM_0.2 Alignment (managed by /dsm-align)
 
 **Project type:** [detected type] ([DSM version])
 **Participation pattern:** [detected pattern]
@@ -594,6 +621,31 @@ Domain: [domain]
 
 ### Punctuation
 Use "," instead of "—" for connecting phrases in any language.
+
+### Code Output Standards (reinforces Earn Your Assertions)
+- Show actual values: shapes, metrics, counts, paths
+- No generic confirmations: avoid "Done!", "Success!", "Data loaded successfully!"
+- Let results speak for themselves
+
+### Tool Output Restraint (reinforces Take a Bite)
+- Generate only what you can meaningfully process in the next step
+- Comprehensive tool reports are reference material, not the analysis itself
+- Run tools because the output serves the task, not because the tool is available
+
+### Working Style (reinforces Take a Bite, Critical Thinking)
+- Confirm understanding before proceeding
+- Be concise in answers
+- Do not generate files before providing description and receiving approval
+
+### Plan Mode for Significant Changes (reinforces Earn Your Assertions)
+- Before implementing significant features: explore codebase, identify patterns, present plan
+- Do not write or edit files until the plan is approved by the user
+- This is a read-only exploration phase, not an implementation phase
+
+### Session Wrap-Up (reinforces Know Your Context)
+- When the user says "wrap up" or the session ends, use `/dsm-wrap-up`
+- At minimum: commit pending changes, push to remote, update MEMORY.md
+- Create a handoff document if complex work remains pending
 ```
 
 **DSM 1.0 (Data Science) addition:**
@@ -601,10 +653,12 @@ Use "," instead of "—" for connecting phrases in any language.
 ```markdown
 ### Notebook Collaboration Protocol (reinforces inherited protocol)
 - Each cell is copied and pasted by the user
-- Generate the content of each cell so that it can be copied with a click
-- Generate ONE cell at a time, wait for user to run and share output
+- Output each cell as a fenced code block in conversation text (not via NotebookEdit)
+- Output ONE cell at a time, wait for user to run and share output
 - Number each cell with a comment (e.g., `# Cell 1`)
-- "Continue" = generate next cell; "Generate all cells" = explicit batch override
+- "Continue" = output next cell; "Output all cells" = explicit batch override
+- Cell pre-flight: before each cell, check phase/section (new or continuation?),
+  if new phase output markdown header first, then identify cell type (markdown/code)
 ```
 
 **DSM 4.0 (Application) addition:**
@@ -642,7 +696,7 @@ type detected by §1:
 
 | Project Type | Sections that indicate drift if present |
 |-------------|----------------------------------------|
-| Documentation (DSM 5.0) | Notebook Development Protocol, App Development Protocol, Code Output Standards (notebook-specific) |
+| Documentation (DSM 5.0) | Notebook Development Protocol, App Development Protocol |
 | Data Science (DSM 1.0) | App Development Protocol |
 | Application (DSM 4.0) | Notebook Development Protocol |
 
@@ -672,6 +726,44 @@ The user decides whether to remove, keep (with justification), or defer.
 - Relevance scoring based on invocation frequency
 - Automated addition of missing sections based on observed patterns
 - Dedicated `/dsm-validate-config` command
+
+### 17.3. Feedback-to-CLAUDE.md Escalation Protocol
+
+When the user corrects agent behavior and the correction contradicts an
+existing CLAUDE.md instruction, saving the correction to feedback memory
+alone is insufficient. CLAUDE.md instructions override memory, so the
+incorrect behavior resurfaces in future sessions.
+
+**Behavioral trigger:** The agent receives user feedback (explicit correction,
+"don't do X", "stop doing Y") and detects that the feedback contradicts a
+specific instruction in the project-specific section of `.claude/CLAUDE.md`
+(content outside the alignment delimiters).
+
+**Escalation steps:**
+
+1. **Save feedback to memory** (current behavior, unchanged)
+2. **Scan CLAUDE.md for conflict:** Check project-specific instructions for
+   lines that directly contradict the feedback. A contradiction means the
+   CLAUDE.md instruction would cause the behavior the user just corrected.
+3. **Propose edit:** "Your feedback contradicts CLAUDE.md: `{current instruction}`.
+   Update to: `{proposed correction}`?"
+4. **If approved:** Edit CLAUDE.md via the permission window (Gate 2 applies).
+   The edit targets only the conflicting line or section.
+5. **If rejected:** Note the explicit decision in the feedback memory entry:
+   "User declined CLAUDE.md update despite contradiction. Follow memory
+   guidance over CLAUDE.md instruction for this specific behavior."
+
+**When NOT to escalate:**
+- Feedback adds nuance without contradicting (e.g., "also consider X" does
+  not contradict "do Y")
+- Feedback is about a one-time preference, not a persistent rule
+- The conflicting instruction is inside the alignment delimiters (managed
+  by `/dsm-align`, not manual edits)
+- No matching CLAUDE.md instruction exists (feedback is net-new guidance)
+
+**Detection guidance:** The agent does not need to perform an exhaustive scan
+of CLAUDE.md on every feedback. The trigger is recognition of a conflict
+during normal feedback processing, not a separate scanning pass.
 
 ---
 
@@ -1012,6 +1104,7 @@ All module files are in the same directory as this core file.
 | Session Configuration Recommendation | Session start, mid-session task shift | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Responsible Collaboration Timer | Session start, cumulative time exceeds threshold | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | GitHub Issue Intake Protocol | Session-start issue check, external issue triage | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| CLAUDE.md Section Completeness Gate | New project setup, CLAUDE.md missing sections | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Composition Challenge Protocol | Producing a collection of 2+ discrete items | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Edit Explanation Stop Protocol | Multiple distinct edits to a single file | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Enabling File Content Protocol | Working with backlog items, checkpoints, plans | [B](DSM_0.2.B_Artifact_Creation.md) |
