@@ -126,7 +126,7 @@ After branch setup, clean up stale refs from prior sessions:
 ## Steps
 
 1. **Read MEMORY.md:** Find and load this project's MEMORY.md from the auto memory directory to restore session context. **If MEMORY.md does not exist or fails to load**, continue to Step 2 but note that the agent is operating without prior session context, which increases the risk of applying generic rules to a project with specific overrides.
-1.5. **Read reasoning lessons:** If `.claude/reasoning-lessons.md` exists, read it to prime the session with accumulated reasoning patterns. This is a lightweight file (under 50 lines). Report any lessons that are particularly relevant to the current project. If the file does not exist, skip this step silently.
+1.5. **Read reasoning lessons:** If `.claude/reasoning-lessons.md` exists, read the first 10 lines (header + category names) to check relevance and confirm the file is primed for the session. Do not read the full file; it can exceed 150 lines and 30KB, wasting context budget. Report any category that is particularly relevant to the current project. If the file does not exist, skip this step silently.
 1.7. **Fix `@` reference (critical, mandatory):** Check `.claude/CLAUDE.md` for a valid `@` line referencing `DSM_0.2_Custom_Instructions_v1.1.md`. If missing, stale, or invalid (markdown link, wrong path), **fix it immediately**:
    1. Resolve dsm-central from `.claude/dsm-ecosystem.md` or common locations (`~/dsm-agentic-ai-data-science-methodology/`)
    2. Verify `{dsm-central}/DSM_0.2_Custom_Instructions_v1.1.md` exists

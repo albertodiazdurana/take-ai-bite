@@ -519,6 +519,8 @@ transcript, pre-generation briefs, inbox checks, project type detection). A
 missing or stale `@` reference silently disables all inherited protocols.
 Run `/dsm-align` to validate the reference exists and points to the current path.
 
+**Scaffolding specification:** The canonical DSM project scaffold (9 `dsm-docs/` folders, `_inbox/`, `.gitattributes`, CLAUDE.md with `@` reference) is defined in DSM_0.1 Section 10 (Canonical Spoke Folder Names) and DSM_3.0.E Section 6.7 (Project Scaffolding). `/dsm-go` Step 0.5 checks scaffold completeness and auto-invokes `/dsm-align` when incomplete.
+
 **IDE Permission Mode:** When using Claude Code in VS Code, set `"claudeCode.initialPermissionMode": "default"` to require explicit approval for file writes. See DSM 4.0 Section 11 (GitHub Repository Setup Checklist) for details.
 
 **WARNING: Protocol Reinforcement Required**
@@ -644,6 +646,7 @@ Use "," instead of "—" for connecting phrases in any language.
 
 ### Session Wrap-Up (reinforces Know Your Context)
 - When the user says "wrap up" or the session ends, use `/dsm-wrap-up`
+- Before wrap-up, cross-reference sprint plan if one exists (verify all deliverables accounted for)
 - At minimum: commit pending changes, push to remote, update MEMORY.md
 - Create a handoff document if complex work remains pending
 ```
@@ -659,6 +662,8 @@ Use "," instead of "—" for connecting phrases in any language.
 - "Continue" = output next cell; "Output all cells" = explicit batch override
 - Cell pre-flight: before each cell, check phase/section (new or continuation?),
   if new phase output markdown header first, then identify cell type (markdown/code)
+- Figure validation: cells that generate plots must save to `outputs/figures/`;
+  agent reads the saved image via Read tool before proceeding to next cell
 ```
 
 **DSM 4.0 (Application) addition:**
@@ -1105,6 +1110,7 @@ All module files are in the same directory as this core file.
 | Responsible Collaboration Timer | Session start, cumulative time exceeds threshold | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | GitHub Issue Intake Protocol | Session-start issue check, external issue triage | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | CLAUDE.md Section Completeness Gate | New project setup, CLAUDE.md missing sections | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Sprint Plan Cross-Reference Before Completion | Work block done, sprint wrap-up, completion declaration | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Composition Challenge Protocol | Producing a collection of 2+ discrete items | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Edit Explanation Stop Protocol | Multiple distinct edits to a single file | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Enabling File Content Protocol | Working with backlog items, checkpoints, plans | [B](DSM_0.2.B_Artifact_Creation.md) |

@@ -37,6 +37,8 @@ protocol listed in the dispatch table is needed.
 20. [Session-Start GitHub Issue Check](#20-session-start-github-issue-check)
 21. [Context Budget Protocol](#21-context-budget-protocol)
 22. [Two-Pass Reading Strategy for Long Structured Files](#22-two-pass-reading-strategy-for-long-structured-files)
+23. [CLAUDE.md Section Completeness Gate for New Projects](#23-claudemd-section-completeness-gate-for-new-projects)
+24. [Sprint Plan Cross-Reference Before Completion](#24-sprint-plan-cross-reference-before-completion)
 
 ---
 
@@ -112,17 +114,42 @@ the notification targets and format.
 
 **Notification targets by project type:**
 
-| Project type | Notify portfolio? | Notify DSM Central? |
-|-------------|:-:|:-:|
-| DSM Central | Yes | N/A (is DSM Central) |
-| Spoke project | Yes | Yes |
-| External contribution | Yes | Yes |
+| Project type | Notify portfolio? | Notify DSM Central? | Notify blog-poster? |
+|-------------|:-:|:-:|:-:|
+| DSM Central | Yes | N/A (is DSM Central) | On new F-entries |
+| Spoke project | Yes | Yes | On new F-entries |
+| External contribution | Yes | Yes | No |
 
 **Portfolio target:** `{portfolio-path}/_inbox/{this-project-name}.md` (resolved from Ecosystem Path Registry; logical name: `portfolio`)
 
 **DSM Central target:** `{dsm-central-path}/_inbox/{this-project-name}.md`
 
-**Entry format (same for both targets):**
+**Blog-poster target:** `{blog-poster-path}/_inbox/{this-project-name}.md` (resolved from Ecosystem Path Registry; logical name: `blog-poster`)
+
+**Blog-poster notification trigger:** Only when `FEATURES.md` receives new F-entries (not on README changes, formatting, or non-feature updates). The entry tells blog-poster to: (1) update the feature blog with the new capability, and (2) write and post a dedicated blog about the new feature.
+
+**Blog-poster entry format:**
+```
+### [YYYY-MM-DD] New feature in {project name}: {feature short title}
+
+**Type:** Action Item
+**Priority:** Medium
+**Source:** {project name}
+
+FEATURES.md was updated with new user-facing capabilities. Actions:
+1. Update the feature blog to include the new F-entries
+2. Write and post a dedicated blog about the new feature(s)
+
+**New F-entries:**
+[List each new F-entry exactly as it appears in FEATURES.md]
+
+**Context:**
+[One-sentence description of what the feature does and why it matters]
+
+**Source file:** `~/{project-path}/FEATURES.md`
+```
+
+**Entry format for README/FEATURES notifications (portfolio and DSM Central targets):**
 ```
 ### [YYYY-MM-DD] README updated in {project name}
 
@@ -1418,7 +1445,10 @@ At session start in spoke projects, compare the DSM version in the header above 
 2. Check the DSM CHANGELOG for changes between those versions
 3. Extract any `**Spoke action:**` annotations from new CHANGELOG entries
 4. Surface spoke actions to the user, grouped by type
-5. For actionable items (e.g., "Run `/dsm-align`"), offer to execute immediately
+5. Execute spoke actions based on annotation type:
+   - `Run /dsm-align`: Ask user to confirm, then execute `/dsm-align` to regenerate the alignment section. This is safe because `/dsm-align` only modifies content between the managed delimiters.
+   - `Review [section]`: Surface as an action item for the user. Do not auto-execute; the user decides whether to review now or defer.
+   - `Update [file]`: Surface as an action item. Do not auto-execute; the update may require judgment.
 6. Apply any updated protocols for this session
 
 If no previous handoff exists (first session), record the current DSM version for future reference.
@@ -1696,3 +1726,164 @@ the two-pass strategy provides the method for identifying which sections to targ
 **Does not apply to:** Code files (which have better tooling: Grep, Glob,
 language-aware search), files under 200 lines (overhead exceeds benefit),
 or files the agent has already read in the current session.
+
+---
+
+## 23. CLAUDE.md Section Completeness Gate for New Projects
+
+> **Origin:** BACKLOG-307. Ensures every project CLAUDE.md is complete before
+> implementation begins.
+
+Every project CLAUDE.md must contain four sections before implementation work
+starts. This is a hard gate: the agent does not proceed to implementation
+until all sections are present and approved.
+
+### 23.1. Required CLAUDE.md Sections
+
+| # | Section | Content | When added |
+|---|---------|---------|------------|
+| 1 | **DSM_0.2 Alignment** | Managed by `/dsm-align` (existing) | At first `/dsm-go` |
+| 2 | **Participation pattern** | Instructions specific to participation pattern (spoke, hub, standalone, contributor, private) | After initial idea is framed and preliminary plan exists |
+| 3 | **Project type** | Instructions specific to project type (notebook, hybrid, documentation, app) | After preliminary plan exists (independent from Section 2) |
+| 4 | **Project specific** | Project structure, objectives, tech requirements, domain constraints | After research grounds the plan (`dsm-docs/research/`) |
+
+Sections 2-4 each require explicit user approval before being written.
+
+### 23.2. Completeness Check Behavior
+
+**At `/dsm-go` (step 2a.8):** After content validation (step 2a.7), check
+whether all 4 sections are present in CLAUDE.md.
+
+- **All 4 present:** Pass silently. No action needed.
+- **Section 1 missing:** This indicates `/dsm-align` was not run. Suggest
+  running it before continuing.
+- **Sections 2-4 missing (new or incomplete project):** Report which sections
+  are missing and suggest completing them: "CLAUDE.md is missing sections:
+  [list]. Complete these before starting implementation. Next: [suggest next
+  section to add based on project state]."
+
+**Detection heuristic:** The agent checks for numbered section headings in
+CLAUDE.md. Each section must use an explicit `## N.` heading:
+
+- Section 1: `## 1. DSM_0.2 Alignment` (inside alignment delimiters, managed by `/dsm-align`)
+- Section 2: `## 2. Participation Pattern` (outside delimiters, user-managed)
+- Section 3: `## 3. Project Type` (outside delimiters, user-managed)
+- Section 4: `## 4. Project Specific` (outside delimiters, user-managed)
+
+**Important:** Content inside the alignment delimiters (`<!-- BEGIN/END
+DSM_0.2 ALIGNMENT -->`) only counts for Section 1. Participation pattern
+and project type mentions in the alignment block do not satisfy Sections
+2 and 3. The numbered headings make detection unambiguous and the structure
+readable for both agents and humans.
+
+### 23.3. Hard Gate Enforcement
+
+The completeness gate is enforced at the boundary between setup and
+implementation. The agent must not begin implementation work (writing code,
+creating deliverables, running experiments) while sections are missing.
+
+**What counts as implementation:** Creating code files, writing notebooks,
+building application features, running experiments. Research, planning, and
+CLAUDE.md completion are not implementation.
+
+**Existing projects:** Projects with a complete CLAUDE.md (all 4 sections
+present) pass the gate silently at every session start. The gate only
+activates when sections are missing.
+
+**Empty projects or new folders:** Only accept `/dsm-go` as the first command.
+Running other DSM commands on an unscaffolded project could interfere with
+proper initialization.
+
+### 23.4. Section Completion Workflow
+
+After `/dsm-go` completes and reports missing sections, the agent guides the
+user through completion:
+
+1. List remaining sections with their prerequisites
+2. Suggest the next section to add based on available context (e.g., if a
+   preliminary plan exists in `dsm-docs/research/`, sections 2 and 3 are
+   ready to draft)
+3. After each section is written and approved, report remaining sections
+4. When all 4 are present, confirm: "CLAUDE.md complete. Ready for
+   implementation."
+
+Each section follows the Pre-Generation Brief Protocol (Gate 1 concept,
+Gate 2 implementation review).
+
+---
+
+## 24. Sprint Plan Cross-Reference Before Completion
+
+> **Origin:** BACKLOG-312. Prevents premature completion declarations by
+> requiring the agent to verify deliverables against the sprint plan.
+
+When a project has an active sprint plan, the agent must cross-reference it
+before suggesting that a work block or sprint is complete. Relying on
+checkpoints, memory, or partial task lists leads to missed deliverables,
+unmet gates, and incomplete boundary checklists (observed in spoke project
+sessions where the agent declared completion based on a checkpoint's
+"What Remains" list while SHOULD deliverables and experiment gates were
+still open).
+
+### 24.1. Trigger Conditions
+
+This protocol activates when **both** conditions are true:
+
+1. The project has an active sprint plan (a file in `dsm-docs/plans/` with
+   sprint deliverables, or an equivalent planning document)
+2. The agent is about to suggest one of:
+   - "Ready to wrap up" or equivalent session-end language
+   - "Sprint complete" or "all deliverables done"
+   - Moving to the next sprint or phase
+
+### 24.2. Cross-Reference Procedure
+
+When triggered, the agent must:
+
+1. **Read the sprint plan file** in full (not from memory or checkpoint
+   summaries)
+2. **Classify each deliverable** using MoSCoW priority from the plan:
+
+   | Classification | Meaning | Action |
+   |---------------|---------|--------|
+   | Done | Deliverable complete with evidence (commit, file, output) | Note evidence reference |
+   | Deferred | Explicitly moved to a future sprint with reason | Note the reason |
+   | Incomplete | Work remains, not yet deferred | List remaining work |
+   | Failed gate | Threshold or success criterion not met | Report actual vs target values |
+
+3. **Present the cross-reference** to the user as a summary table before
+   proceeding
+
+### 24.3. Completion Gate
+
+The agent must not suggest wrap-up or sprint completion if any of the
+following are true:
+
+- A **MUST** deliverable is classified as Incomplete or Failed gate
+- A **SHOULD** deliverable is classified as Incomplete without explicit
+  user acknowledgment
+- The sprint boundary checklist (§11) has unchecked items
+
+The user may override the gate by explicitly acknowledging incomplete items:
+"Defer X to next sprint" or "Accept Y as-is." The agent records the
+override in the session transcript.
+
+### 24.4. What Counts as Evidence
+
+- **Code deliverable:** Commit hash or file path
+- **Documentation:** File exists at expected path
+- **Experiment gate:** Metric value vs threshold (e.g., "89.27% < 90% target")
+- **Process deliverable:** Artifact exists (checkpoint, feedback file, blog entry)
+
+Do not count "discussed" or "planned" as evidence of completion.
+
+**Anti-Patterns:**
+
+**DO NOT:**
+- Rely on checkpoint "What Remains" lists as the source of truth; checkpoints
+  are snapshots, the sprint plan is the contract
+- Skip SHOULD deliverables when cross-referencing; they are commitments with
+  flexibility, not optional items
+- Declare a gate passed when the metric is below threshold, regardless of
+  how close it is
+- Cross-reference from memory; always re-read the plan file

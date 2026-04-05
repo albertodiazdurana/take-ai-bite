@@ -179,11 +179,11 @@ completed backlog items, which are not part of the active methodology surface.
 
 When working on Jupyter notebook cells:
 
-1. **Agent generates one cell** -- via NotebookEdit tool or as code block in conversation
-2. **User runs the cell** -- executes in notebook, observes output
+1. **Agent outputs one cell** -- as a fenced code block in conversation text for the user to copy-paste
+2. **User runs the cell** -- pastes into notebook, executes, observes output
 3. **User shares output back** -- copies cell output into conversation
 4. **Agent reads and validates output** -- checks for expected results, data shapes, errors
-5. **Agent generates next cell** -- only after validating previous output
+5. **Agent outputs next cell** -- only after validating previous output
 
 **Cell delivery method:**
 - Present cells as markdown code blocks in conversation (with copy button), not via
@@ -193,15 +193,16 @@ When working on Jupyter notebook cells:
 - Exception: NotebookEdit is acceptable when the user explicitly requests it or when
   editing an existing cell in place.
 
-**Cell generation rules:**
-- Generate ONE cell at a time (unless first cell is markdown-only, then up to TWO)
+**Cell output rules:**
+- Output ONE cell at a time as a fenced code block in conversation text (unless first cell is markdown-only, then up to TWO)
 - Number cells with comments (`# Cell 1`, `# Cell 2`) for reference
 - Use `print()` for DataFrame output (e.g., `print(df.head(3))` instead of bare
   `df.head(3)`). Bare expressions produce rich HTML in Jupyter that is not
   copy/paste friendly when the user needs to share output back in conversation.
-- Wait for execution output before generating next cell
-- "Continue" or "yes" = generate next cell
-- "Generate all cells" = explicit batch override (user must request)
+- Wait for execution output before outputting next cell
+- "Continue" or "yes" = output next cell
+- "Output all cells" = explicit batch override (user must request)
+- The agent does not write to .ipynb unless the user explicitly asks for direct notebook writes
 - **Every cell must produce output** that validates its correctness. A cell that
   runs without error but produces no output cannot be validated until a later cell
   reveals a problem. Include at least one `print()` statement per cell:
@@ -215,14 +216,66 @@ When working on Jupyter notebook cells:
 generation skips this validation loop and prevents iterative adaptation based on actual
 data shapes, distributions, and errors.
 
+### 4.1. Notebook Cell Pre-Flight Check
+
+In addition to the universal what/why/how reasoning (DSM_0.2 §8.5), notebook
+cell generation adds a structural pre-flight before each cell:
+
+```
+Pre-flight for Cell N:
+- Phase/section: [new or continuation?]
+- If new phase: markdown header cell first (use two-cell allowance)
+- Cell type: [markdown / code]
+```
+
+**Behavioral trigger:** Before outputting any notebook cell, the agent writes
+the pre-flight in the session transcript thinking block. This prevents
+structural skips (e.g., jumping to code at a phase transition without the
+required markdown header cell).
+
+### 4.2. Figure Validation After Cell Execution
+
+When a cell generates figures (plots, charts, visualizations), the agent must
+see the output before proceeding. Metrics alone miss visual anomalies
+(unexpected curves, mislabeled axes, color issues, rendering artifacts).
+
+**Protocol:**
+
+1. **Cell code saves figures to disk:** Include `plt.savefig('outputs/figures/{descriptive_name}.png')`
+   (or equivalent) in every cell that produces a plot. Print the save path.
+2. **User runs the cell:** Executes and shares text output as usual.
+3. **Agent reads the saved figure:** Use the Read tool on the saved image path
+   to visually inspect the output.
+4. **Agent validates before proceeding:** Check that the figure matches
+   expectations (correct axes, labels, data range, visual patterns). Report
+   observations. Only then output the next cell.
+
+**Why save-then-read:** Notebook outputs (base64-encoded images in `.ipynb`
+JSON) are not reliably readable by the agent. Saving to a file path and using
+the Read tool on the image is the reliable multimodal path. The
+`outputs/figures/` convention also creates a persistent artifact trail.
+
+**When this applies:**
+- Any cell that calls `plt.show()`, `fig.show()`, `sns.heatmap()`, or
+  equivalent plotting functions
+- Cells that generate diagnostic plots (confusion matrices, loss curves,
+  feature importance charts)
+
+**When this does NOT apply:**
+- Cells that produce only text/numeric output
+- Cells where the user explicitly shares a screenshot of the figure
+
 **Anti-Patterns:**
 
 **DO NOT:**
-- Generate multiple cells at once without waiting for output between each
-- Skip output validation before generating the next cell
+- Output multiple cells at once without waiting for output between each
+- Skip output validation before outputting the next cell
 - Assume cell output matches expectations without checking actual values
-- Generate "all remaining cells" unless the user explicitly requests batch override with "Generate all cells"
-- Generate cells without output validation; silent cells defer error detection and break the incremental feedback loop
+- Output "all remaining cells" unless the user explicitly requests batch override with "Output all cells"
+- Output cells without output validation; silent cells defer error detection and break the incremental feedback loop
+- Write directly to .ipynb via NotebookEdit unless the user explicitly requests it
+- Generate plot code without a `savefig()` call; the agent cannot validate figures it cannot see
+- Proceed past a figure-generating cell without reading the saved image
 
 ---
 
