@@ -77,13 +77,18 @@ Before starting alignment, check if git is initialized:
    f. Do NOT push entries that lack structure (no problem statement, no score).
    g. Report pushed count in the report.
 
-7. **Validate CLAUDE.md `@` reference:**
+7. **Validate and fix CLAUDE.md `@` reference:**
    - Read `.claude/CLAUDE.md` (if it exists)
    - Check for an `@` line referencing `DSM_0.2_Custom_Instructions_v1.1.md`
-   - If missing: **report as critical warning**: "No `@` reference to DSM_0.2 found in CLAUDE.md. Without it, all inherited DSM protocols are silently disabled."
-   - If present but the path does not resolve to an existing file: **report as critical warning**: "Stale `@` reference, DSM_0.2 path does not exist: [path]"
-   - If valid: report "CLAUDE.md `@` reference OK"
-   - Do NOT auto-fix; report for user action (path depends on local filesystem layout)
+   - **Resolution:** If the `@` reference is missing, stale, or invalid (markdown link, wrong path), resolve the correct path:
+     1. Check `.claude/dsm-ecosystem.md` for a `dsm-central` entry
+     2. If not available, search common locations: `~/dsm-agentic-ai-data-science-methodology/`
+     3. Verify `{dsm-central}/DSM_0.2_Custom_Instructions_v1.1.md` exists
+   - **Auto-fix behavior:**
+     - If missing entirely: insert `@{dsm-central}/DSM_0.2_Custom_Instructions_v1.1.md` as the first line of CLAUDE.md. Report: "Added `@` reference to DSM_0.2."
+     - If present but invalid (markdown link like `[@..](path)`, stale path, Windows path on Linux): replace the invalid line with the correct `@` reference. Report: "Fixed `@` reference to DSM_0.2 (was: `{old line}`)."
+     - If valid: report "CLAUDE.md `@` reference OK"
+   - If dsm-central cannot be resolved at all: **report as critical warning** and skip alignment (step 7b)
 
 7b. **Check CLAUDE.md alignment section:**
    Requires: Step 7 found a valid `@` reference. If Step 7 reported missing or stale `@`, skip this step.
@@ -91,7 +96,8 @@ Before starting alignment, check if git is initialized:
    - **If delimiters are missing (first run / migration):**
      a. Detect project type from Step 1
      b. Read the CLAUDE.md Alignment Template System section in DSM_0.2 (follow the `@` reference to find it)
-     c. Generate the aligned section from the base template + project-type-specific additions
+     c. Generate the aligned section from the base template + project-type-specific additions.
+        **Critical:** Copy the template text EXACTLY as written in DSM_0.2 §17.1, including the numbered heading `## 1. DSM_0.2 Alignment (managed by /dsm-align)`. Do not paraphrase, shorten, or renumber headings.
      d. Identify where project-specific content starts in the current CLAUDE.md (first heading after the `@` reference line, or end of file)
      e. Insert the delimiters and aligned content between the `@` reference and the project-specific content
      f. Report: "CLAUDE.md alignment section added. [N] lines of managed content inserted."
@@ -112,6 +118,27 @@ Before starting alignment, check if git is initialized:
    - Report mismatches as warnings: "CLAUDE.md contains [section] not typical for [project type]. Consider removing to save context budget."
    - Do not auto-remove; the user decides.
 
+8b. **CLAUDE.md redundancy scan:**
+   - Read the project-specific content of `.claude/CLAUDE.md` (content OUTSIDE the alignment delimiters)
+   - For each project-specific section (identified by `##` or `###` headings):
+     a. Compare its content against DSM_0.2 core sections (§5-25, loaded via `@` reference). Look for near-verbatim matches (3+ consecutive lines that match a DSM_0.2 section).
+     b. Compare against the alignment template content (inside the delimiters). Look for sections that duplicate what the template already provides.
+   - Report redundancies as warnings: "Section `[name]` appears redundant with DSM_0.2 §[N] ([section name]). The @ reference already loads this. Remove to save context budget?"
+   - Skip insurance sections (Destructive Command Protocol, Secret Exposure Prevention, Branching Strategy) even if they duplicate DSM_0.2, these are intentional reinforcement.
+   - Do NOT auto-remove; the user decides.
+   - This scan catches: verbatim copies of DSM_0.2 protocols, project-specific sections made redundant by template promotions, and accumulated instructions that duplicate always-loaded content.
+
+8c. **Validate CLAUDE.md path references:**
+   - Read the project-specific content of `.claude/CLAUDE.md` (content OUTSIDE the `<!-- BEGIN/END DSM_0.2 ALIGNMENT -->` delimiters)
+   - Extract all backtick-quoted strings that look like file or folder paths (contain `/`, do not contain `://`)
+   - Skip paths inside fenced code blocks (``` or ~~~)
+   - Skip DSM document references (e.g., `DSM_0.2 §17`)
+   - Skip paths that are clearly template placeholders (contain `{` or `}`)
+   - For each candidate path, check if it exists relative to the project root
+   - Report stale paths as warnings: "CLAUDE.md references `{path}` which does not exist. Update or remove?"
+   - Include the surrounding line for context so the user can decide
+   - Do NOT auto-fix; paths may be intentional examples or refer to external locations
+
 9. **Check `.gitattributes`:**
    - If `.gitattributes` does not exist at project root: create it with the template below.
    - If it exists: check that it contains `* text=auto eol=lf`. If missing, **report as warning**: "`.gitattributes` exists but does not enforce LF line endings. CRLF can break the Edit tool on WSL."
@@ -119,7 +146,7 @@ Before starting alignment, check if git is initialized:
 
 10. **Check .claude/ files:**
    - If `.claude/session-transcript.md` does not exist: create it (empty file).
-   - If `.claude/dsm-ecosystem.md` does not exist: create it from the Ecosystem Pointers Template below. Resolve `dsm-central` path from the `@` reference in `.claude/CLAUDE.md`. Leave `portfolio` path as a placeholder for the user to fill in. Report: "Created `.claude/dsm-ecosystem.md` with ecosystem pointers. Update the `portfolio` path."
+   - If `.claude/dsm-ecosystem.md` does not exist: create it from the Ecosystem Pointers Template below. Resolve `dsm-central` path from the `@` reference in `.claude/CLAUDE.md`. Then read DSM Central's ecosystem registry (`{dsm-central}/.claude/dsm-ecosystem.md`) and copy the `portfolio` path from it. If DSM Central's registry does not exist or has no portfolio entry, leave as placeholder. Report: "Created `.claude/dsm-ecosystem.md` with ecosystem pointers."
 
 11. **Check command file drift (DSM Central only):**
    - Skip this step if the project is not DSM Central (no `scripts/commands/` directory).
@@ -142,24 +169,25 @@ Before starting alignment, check if git is initialized:
    - Warnings: [feedback file violations, consumed handoffs, or "none"]
    - CLAUDE.md alignment: [OK | Added (N lines) | Drift detected (N lines differ) | Skipped (no @ reference)]
    - CLAUDE.md content: [OK | N mismatches found (list sections)]
+   - CLAUDE.md redundancy: [OK | N redundant section(s) found (list)]
+   - CLAUDE.md paths: [OK | N stale path(s) found (list)]
    - .gitattributes: [OK | Created | Warning: missing LF enforcement]
    - Command sync: [OK: N | Drifted: N | Missing: N, or "N/A (not DSM Central)"]
    - Feedback pushed: [count of entries pushed to DSM Central, or "none pending"]
    ```
 
-13. **Persist report:** Write the alignment report to `dsm-docs/decisions/YYYY-MM-DD_sN_align-report.md`
-   so it survives session end. The file uses this header:
-   ```markdown
-   # Alignment Report — Session N
-
-   **Date:** YYYY-MM-DD
-   **Project:** [project name]
-   **Project type:** [detected type]
-
-   ---
+13. **Write status marker:** Write `.claude/last-align.txt` (gitignored, local state) with the alignment result. This replaces the previous persist-to-decisions approach; the full report is shown in conversation text and does not need a durable file.
    ```
-   Followed by the full report from Step 11. This step is silent (no user approval
-   needed); the file is a mechanical record of the alignment check.
+   # Last /dsm-align run
+   date: YYYY-MM-DD
+   dsm-version: vX.Y.Z
+   result: pass | warnings | critical
+   warnings: N
+   critical: N
+   ```
+   - `result` is `pass` if no warnings or critical issues, `warnings` if only warnings, `critical` if any critical issues were found
+   - `dsm-version` is read from DSM Central's CHANGELOG or DSM_0.0 header (the version at the time of alignment)
+   - `/dsm-go` reads this marker to detect stale alignment (version mismatch or missing marker)
 
 ## Templates
 
@@ -308,7 +336,7 @@ This file is gitignored and instance-specific.
 | Name | Path | Description | Mirror |
 |------|------|-------------|--------|
 | dsm-central | {resolved from @ reference} | Hub repository | - |
-| portfolio | {UPDATE THIS PATH} | Portfolio project | - |
+| portfolio | {resolved from dsm-central registry, or UPDATE THIS PATH} | Portfolio project | - |
 ```
 
 ## Notes
