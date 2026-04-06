@@ -157,20 +157,24 @@ Before starting alignment, check if git is initialized:
 11. **Check command file drift (DSM Central only):**
    - Skip this step if the project is not DSM Central (no `scripts/commands/` directory).
    - For each `.md` file in `scripts/commands/`:
-     - Compare against `~/.claude/commands/{same filename}` using `diff -q`
-     - If identical: count as OK
-     - If different: **report as warning**: "Command {name} has drifted from tracked source. Review and resolve: update tracked source or run `scripts/sync-commands.sh --deploy`."
-     - If runtime copy missing: **report as warning**: "Command {name} exists in tracked source but not in ~/.claude/commands/. Run `scripts/sync-commands.sh --deploy` to install."
+     - Determine the expected runtime location: check both `~/.claude/commands/{filename}` (user-level) and `.claude/commands/{filename}` (project-level). A command is deployed if it exists in **either** location.
+     - Compare the tracked source against each existing runtime copy using `diff -q`
+     - If identical in at least one location: count as OK
+     - If different in all locations where it exists: **report as warning**: "Command {name} has drifted from tracked source. Review and resolve: update tracked source or run `scripts/sync-commands.sh --deploy`."
+     - If runtime copy missing from both locations: **report as warning**: "Command {name} exists in tracked source but not deployed. Run `scripts/sync-commands.sh --deploy` to install."
    - Report drift summary in the report.
    - Reference: BACKLOG-130 (Command File Version Tracking)
 
-12. **Report** results in this format:
+12. **Report** results in this format. The report header indicates whether changes were applied:
+   - **Post-change report** (when any fixes were applied: folders created, `@` reference fixed, alignment section regenerated, files created): header reads `/dsm-align post-change report:` and all items reflect the **completed state**, not the pre-change assessment.
+   - **Check-only report** (when no changes were needed, all items already correct): header reads `/dsm-align check-only report:`
+
    ```
-   /dsm-align report:
+   /dsm-align [post-change|check-only] report:
    - Project type: [detected type]
-   - Created: [list of folders and files created]
+   - Created: [list of folders and files created, or "none"]
    - Already correct: [count of items that needed no changes]
-   - Fixed: [list of repairs made]
+   - Fixed: [list of repairs made, or "none"]
    - Collisions: [list of naming conflicts for user to resolve, or "none"]
    - Warnings: [feedback file violations, consumed handoffs, or "none"]
    - CLAUDE.md alignment: [OK | Added (N lines) | Drift detected (N lines differ) | Skipped (no @ reference)]
@@ -181,6 +185,21 @@ Before starting alignment, check if git is initialized:
    - Command sync: [OK: N | Drifted: N | Missing: N, or "N/A (not DSM Central)"]
    - Feedback pushed: [count of entries pushed to DSM Central, or "none pending"]
    ```
+
+12b. **Write inbox notification (post-change only):** If the report is a post-change report (any fixes were applied), write an entry to the project's own `_inbox/` summarizing what was updated. Skip this step if no changes were applied (check-only run).
+   - Target: `_inbox/{YYYY-MM-DD}_dsm-align-update.md`
+   - Format:
+     ```markdown
+     ### [YYYY-MM-DD] /dsm-align: alignment updated
+
+     **Type:** Notification
+     **Priority:** Low
+     **Source:** /dsm-align
+
+     Changes applied:
+     - [List each fix from the "Created" and "Fixed" lines of the report]
+     ```
+   - If `_inbox/` does not exist (External Contribution projects), skip this step silently.
 
 13. **Write status marker:** Write `.claude/last-align.txt` (gitignored, local state) with the alignment result. This replaces the previous persist-to-decisions approach; the full report is shown in conversation text and does not need a durable file.
    ```

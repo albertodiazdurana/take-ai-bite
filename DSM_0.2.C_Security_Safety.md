@@ -17,6 +17,7 @@ dispatch table is needed.
 2. [Destructive Action Protocol](#2-destructive-action-protocol)
 3. [Untrusted Input Protocol](#3-untrusted-input-protocol)
 4. [Query Sanitization](#4-query-sanitization)
+5. [Sensitive Data Protection in Tracked Files](#5-sensitive-data-protection-in-tracked-files)
 
 ---
 
@@ -41,6 +42,10 @@ safest interception point.
 
 **Override:** The user can override by naming the specific file and confirming it
 is safe. A blanket "stage everything" does not override this check.
+
+**Content-level protection:** This section checks filenames at staging time. For
+content-level protection (secrets, PII, and other sensitive data written into
+tracked files), see §5 (Sensitive Data Protection in Tracked Files).
 
 **Spoke projects:** This protocol applies to all DSM projects via the `@` reference.
 Spoke projects may extend the pattern list in their project CLAUDE.md but must not
@@ -249,3 +254,119 @@ specific results) is far lower than the cost of leaked credentials or private da
 - Include private data from CSV files, databases, or configuration in API calls
   to external services
 - Assume that web search queries are ephemeral; search providers log queries
+
+---
+
+## 5. Sensitive Data Protection in Tracked Files
+
+Secrets are only one category of sensitive data. AI-assisted development handles
+data across multiple sensitivity levels, and the agent must apply appropriate
+protection at write-time, before content reaches git. This protocol complements
+§1 (filename check at staging) by addressing content-level protection.
+
+References: [OpenSSF Security-Focused Guide for AI Code Assistant Instructions](https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions.html),
+[NIST SP 1800-39 Data Classification Practices](https://www.nccoe.nist.gov/data-classification),
+[OWASP GenAI Data Security 2026](https://genai.owasp.org/resource/owasp-genai-data-security-risks-mitigations-2026/).
+
+### 5.1. Data Sensitivity Classification
+
+Before writing content to a tracked file, classify the data by sensitivity level:
+
+| Level | Examples | Handling rule |
+|-------|----------|---------------|
+| Public | Open-source code, published methodology docs | No restrictions |
+| Internal | Project architecture, internal IDs, file paths | Do not expose in web queries, logs, or external-facing artifacts |
+| Confidential | API keys, tokens, passwords, database credentials | Never in plaintext; use env var references (`$ENV_VAR`) or vault placeholders (`{API_KEY}`) |
+| Restricted | PII (names, addresses, financial data), health data, GDPR-scoped personal data | Anonymize or pseudonymize before inclusion; see §5.4 |
+
+The classification applies to all DSM project types. Data science projects
+commonly handle Restricted data (datasets with PII); private projects
+(BL-162 pattern) are Restricted by default.
+
+### 5.2. Write-Time Prevention Rules
+
+The agent must apply these rules before writing any content to a tracked file:
+
+1. **Secrets:** Never write API keys, tokens, passwords, or credentials in
+   plaintext. Use environment variable references (`$API_KEY`,
+   `os.environ["API_KEY"]`) or placeholder syntax (`{API_KEY}`)
+2. **PII:** Never write personally identifiable information (names, email
+   addresses, phone numbers, financial account numbers) in plaintext. Redact
+   or anonymize before inclusion
+3. **Internal paths:** Do not write absolute filesystem paths that reveal
+   user identity or system structure (e.g., `/home/username/project/`). Use
+   relative paths or placeholders
+4. **Error output:** When documenting errors or stack traces, strip sensitive
+   data (credentials, PII, internal paths) before writing to files
+5. **Compliance context:** For projects subject to GDPR, HIPAA, or PCI-DSS,
+   apply the stricter standard when classification is ambiguous
+
+### 5.3. Research File Protection Rules
+
+Research files (`dsm-docs/research/`) are high-risk: they synthesize external
+data that may contain secrets or PII from API responses, web scrapes, or
+datasets.
+
+- **API responses:** Reference API keys by environment variable name, never
+  by value. Document the API endpoint and response structure, not the
+  authentication credential
+- **Web content:** When capturing web research findings, strip personal data
+  from quoted content unless the person is a public figure in a professional
+  context (e.g., an author cited for their published work)
+- **External datasets:** When referencing data from external sources, use
+  anonymized examples. Never copy real PII into research files, even as
+  "examples"
+
+### 5.4. PII Handling for Data Science Projects
+
+When a DSM project works with datasets containing personal data:
+
+- **Anonymization** (irreversible): preferred when the original identity is
+  not needed. GDPR does not apply to truly anonymized data
+- **Pseudonymization** (reversible): acceptable when re-identification is
+  needed for the task. GDPR still applies, but pseudonymization is a
+  recognized safeguard
+- **Three conditions for correct implementation:** irreversibility (for
+  anonymization), consistency (same fields treated identically across all
+  outputs), coverage (no unprotected PII in any file)
+- **Techniques:** masking, generalization, noise addition, aggregation.
+  Pseudonyms must not derive from the underlying data itself
+
+The agent must not write raw PII from datasets into notebooks, research files,
+or documentation. Use anonymized samples or synthetic data for examples.
+
+### 5.5. Pre-Commit Tooling Recommendation
+
+Write-time rules (above) are the first defense layer. Pre-commit scanning is
+the second layer, catching secrets that bypass agent awareness:
+
+- **Recommended tool:** [Gitleaks](https://github.com/gitleaks/gitleaks)
+  (MIT, Go, ~25,700 stars). Fast, configurable via TOML rules, well-suited
+  for pre-commit hooks
+- **Setup:** `pre-commit` framework with Gitleaks hook, or direct
+  `.git/hooks/pre-commit` script
+- **Baseline mode:** For existing repos, run a full scan first, acknowledge
+  known findings, then alert only on new secrets going forward
+- **Server-side:** GitHub push protection provides a third layer for
+  repositories with it enabled
+
+This is a recommendation, not a requirement. Projects that handle Confidential
+or Restricted data should strongly consider adopting pre-commit scanning.
+
+### 5.6. Sensitive Data Protection Anti-Patterns
+
+**DO NOT:**
+- Write API keys, tokens, or passwords in plaintext into any tracked file,
+  even temporarily ("I'll remove it later" is not a safeguard; git history
+  preserves it)
+- Copy real PII from datasets into research files, notebooks, or
+  documentation as "examples"
+- Include absolute filesystem paths in committed files; they reveal user
+  identity and system structure
+- Assume that `.gitignore` protects sensitive files already committed; once
+  in git history, removal requires `git filter-repo` or equivalent
+- Log sensitive data in error output captured to tracked files; strip
+  credentials and PII before writing
+- Treat pre-commit hooks as a substitute for write-time prevention; hooks
+  can be bypassed with `--no-verify`, and the agent should never suggest
+  bypassing them

@@ -228,6 +228,11 @@ After branch setup, clean up stale refs from prior sessions:
       e. Present as a checklist: "Missing wrap-up actions from Session {N}: [ ] Merge session branch to main [ ] Push to remote [ ] Push feedback to spokes [ ] Review contributor profile"
    **If not detected (MEMORY is current):** Skip silently.
    **If no archived transcript exists:** Warn "Incomplete wrap-up detected but no archived transcript found. MEMORY update must be done manually." Still show action suggestions.
+5.9. **Wrap-up type guidance:** Read `.claude/last-wrap-up.txt` if it exists. Extract the `type` field.
+   - **If `type: light`:** The previous session ended with a light wrap-up, signaling continuation. Prompt the user: "Last session ended with a light wrap-up (continuation expected). Switch to `/dsm-light-go` for a faster resume? (y = switch to light-go, n = continue with full go)". If the user accepts, stop `/dsm-go` and invoke `/dsm-light-go` instead. If the user declines, continue with full `/dsm-go`.
+   - **If `type: quick`:** Note in the session report: "Previous session used quick wrap-up (no feedback push). Check `dsm-docs/feedback-to-dsm/` for unpushed entries."
+   - **If `type: full`:** No action needed. Continue normally.
+   - **If the file does not exist:** No action (step 5.8 handles incomplete wrap-up detection).
 6. **Reset session transcript:** Overwrite `.claude/session-transcript.md` with a fresh session header (the file persists across sessions; do not delete and recreate it). Write exactly this content, replacing N, timestamp, and project name:
    ```bash
    cat > .claude/session-transcript.md << EOF

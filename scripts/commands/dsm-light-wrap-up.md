@@ -36,6 +36,12 @@ This command is only valid when the session will continue with `/dsm-light-go` n
      ```
 5. **Baseline mode marker:** Append `mode: light` to `.claude/session-baseline.txt` so that `/dsm-light-go` can verify the chain.
 6. **Checkpoint commit + push:** Stage the checkpoint and baseline, commit ("Session N (light): checkpoint"), and push. This is a separate commit so the checkpoint accurately records step 3's commit hash.
+7. **Write wrap-up type marker:** Write `.claude/last-wrap-up.txt` with the session number, date, and wrap-up type. This marker is read by `/dsm-go` and `/dsm-light-go` at next session start to guide the user toward the appropriate startup command.
+    ```
+    session: N
+    date: YYYY-MM-DD
+    type: light
+    ```
 
 ## Notes
 
@@ -49,4 +55,5 @@ This command is only valid when the session will continue with `/dsm-light-go` n
 - No co-author lines in commits
 - If $ARGUMENTS is provided, use it as the session description in MEMORY.md
 - All steps run autonomously; do not pause for confirmation between steps
+- **Thinking-before-acting is mandatory during wrap-up.** Time pressure at session end is the highest-risk moment for skipping reasoning; append thinking to the transcript before each wrap-up step, not after
 - Follow .claude/CLAUDE.md conventions for this project

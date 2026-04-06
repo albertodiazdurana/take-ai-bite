@@ -118,6 +118,12 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    c. If merge succeeds: report "Merged mirror sync PR #{number} on {repo}"
    d. If merge fails or `gh` unavailable: warn "Open mirror sync PR on {repo}: #{number} ({title}). Merge manually."
    e. If no open sync PRs exist, skip silently.
+12. **Write wrap-up type marker:** Write `.claude/last-wrap-up.txt` with the session number, date, and wrap-up type. This marker is read by `/dsm-go` and `/dsm-light-go` at next session start to guide the user toward the appropriate startup command.
+    ```
+    session: N
+    date: YYYY-MM-DD
+    type: full
+    ```
 
 ## Notes
 

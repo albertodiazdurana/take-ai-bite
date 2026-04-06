@@ -462,9 +462,10 @@ Pre-Generation Brief, Sprint Cadence, Session Transcript) implement the principl
 defined in `DSM_6.0_AI_Collaboration_Principles_v1.0.md`. That document provides the
 foundational reasoning; this document provides the operational protocols.
 
-When evaluating whether a delivery is the right size, apply the core test from
-DSM 6.0: can the reviewer engage with it and respond with substance? See
-`TAKE_A_BITE.md` for the short version.
+When evaluating whether a delivery is the right size, apply the three-question
+test from DSM 6.0 §1.1 before presenting output: (1) can the reviewer read it,
+(2) can they form an opinion, (3) can they redirect if needed? If the answer to
+any question is no, split the delivery. See `TAKE_A_BITE.md` for the short version.
 
 ---
 
@@ -627,6 +628,7 @@ Use "," instead of "—" for connecting phrases in any language.
 ### Code Output Standards (reinforces Earn Your Assertions)
 - Show actual values: shapes, metrics, counts, paths
 - No generic confirmations: avoid "Done!", "Success!", "Data loaded successfully!"
+- When uncertain, state the uncertainty; do not guess or fabricate
 - Let results speak for themselves
 
 ### Tool Output Restraint (reinforces Take a Bite)

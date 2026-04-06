@@ -7,6 +7,7 @@ Session Transcript Analysis Agent (STAA). Analyze a previous session transcript 
 1. **List available transcripts:** List files in `.claude/transcripts/` sorted chronologically. Display each filename with the session number and date extracted from the file header.
 2. **Select transcript:** If $ARGUMENTS specifies a transcript (filename, session number, or "latest"), use that. Otherwise, default to the most recent transcript.
 3. **Read the transcript:** Read the selected transcript file in full.
+   **Delimiter-based parsing:** Transcripts use typed delimiters (`<------------Start Thinking / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`) to mark block boundaries. Use these to segment the transcript into typed, timestamped blocks before analysis.
 4. **Analyze for reasoning patterns:** Examine the transcript systematically for:
    - **Decision heuristics:** How were choices made between alternatives? What worked, what didn't?
    - **Course corrections:** Where did reasoning start in one direction then pivot? What triggered the pivot?

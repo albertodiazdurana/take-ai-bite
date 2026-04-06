@@ -2,18 +2,29 @@ Resume a DSM session in lightweight mode. Minimal context loading for continuati
 
 ## Safety Gate
 
-Before proceeding, check `.claude/session-baseline.txt` for `mode: light`.
+Before proceeding, check `.claude/last-wrap-up.txt` for the previous session's wrap-up type.
 
-**If the marker is present:** proceed normally.
+**If `type: light`:** proceed normally (expected continuation).
 
-**If the marker is absent or the file does not exist**, check for a fallback:
-1. Run `ls -t dsm-docs/checkpoints/*lightweight*.md 2>/dev/null | head -1`
-2. If a lightweight checkpoint exists from the expected previous session number:
-   - Warn: "mode: light marker missing, but lightweight checkpoint found. Proceeding with lightweight start."
-   - Proceed with the lightweight flow (the checkpoint provides the context).
-3. If no lightweight checkpoint exists either:
-   - Warn: "Previous session ended with a full wrap-up. Lightweight start is only valid after a lightweight wrap-up. Falling back to full `/dsm-go`."
-   - Stop and run `/dsm-go` instead.
+**If `type: full` or `type: quick`:** Warn: "Last session ended with a [full/quick] wrap-up. `/dsm-light-go` skips inbox, version, and branch checks that matter for a fresh start. Switch to `/dsm-go`? (y = switch to full go, n = continue with light-go)". If the user accepts, stop and invoke `/dsm-go` instead. If the user declines, proceed with `/dsm-light-go`. If `type: quick`, also note: "Previous session skipped feedback push. Check `dsm-docs/feedback-to-dsm/` for unpushed entries."
+
+**If the file does not exist (no wrap-up marker):** Warn: "No wrap-up marker found from previous session. There may be uncommitted changes or unpushed work. Switch to `/dsm-go` for full recovery? (y = switch to full go, n = continue with light-go)". If the user accepts, stop and invoke `/dsm-go` instead.
+
+**Legacy fallback:** If `.claude/last-wrap-up.txt` does not exist but `.claude/session-baseline.txt` contains `mode: light`, treat as `type: light` and proceed normally. This handles sessions that ran before the wrap-up type marker was introduced.
+
+## Scaffold Pre-Check
+
+Before proceeding with the lightweight flow, verify the project has a minimal
+DSM scaffold. Count canonical `dsm-docs/` subdirectories (`blog`, `checkpoints`,
+`decisions`, `feedback-to-dsm`, `guides`, `handoffs`, `plans`, `research`, `inbox`).
+
+**If fewer than 5 of 9 exist:**
+- Warn: "Project scaffold incomplete ({N}/9 dsm-docs/ folders). Lightweight
+  start cannot operate on an unscaffolded project. Options: (a) run `/dsm-align`
+  to scaffold, then retry `/dsm-light-go`, or (b) fall back to full `/dsm-go`."
+- Stop and wait for user decision.
+
+**If 5+ exist:** Continue to Git Awareness.
 
 ## Git Awareness
 
@@ -32,6 +43,13 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    - **If on a session branch (matches `session-*`):** Proceed normally. Report: "Continuing on session branch `{branch-name}`."
    - **If on a task branch (matches `bl-*`, `sprint-*`, `parallel/*`):** Proceed normally. Report: "Continuing on task branch `{branch-name}`."
    - **If on main/master:** Warn: "Currently on main, but lightweight sessions should continue an existing session branch. Either: (a) switch to the open session branch, or (b) fall back to full `/dsm-go` to create a new one." Check for open session branches (`git branch --list 'session-*'`) and offer to switch. If no session branch exists, fall back to `/dsm-go`.
+1.6. **Stale branch cleanup:** After branch verification, clean up stale refs:
+   1. Run `git fetch --prune` silently to remove stale remote tracking refs.
+   2. Run `git branch --merged main | grep -v '^\*\|main\|session-'` to find
+      stale local branches merged into main.
+   3. If found, report: "Found N stale local branches merged into main: [list].
+      Delete them? (y/n)". Delete on approval, skip on rejection.
+   4. If none found, skip silently.
 2. **Read latest checkpoint:** Run `ls -t dsm-docs/checkpoints/*.md 2>/dev/null | head -1` to find the most recent checkpoint. Read it in full. This provides the task context.
    **After reading, move the checkpoint to `done/`:**
    1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' dsm-docs/checkpoints/{filename}`
@@ -70,7 +88,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
     ```
     If the subscription file does not exist or scope is not yet known, skip this step.
 8. **Continue:** If $ARGUMENTS is provided, start on that topic directly. Otherwise, summarize the last session's activity (from checkpoint) and suggest the next step based on pending work. Frame it so the user can respond with Y/N or "proceed" rather than an open-ended question. Example: "Last session completed X. Next up: Y. Proceed?"
-9. **Behavioral activation:** From this point forward, follow the Session Transcript Protocol (DSM_0.2): append thinking to `.claude/session-transcript.md` as the **first tool call** of every turn, before any other tool calls or file edits. Append output summary as the **last tool call** after completing work. Conversation text is for results, summaries, and questions only, never for reasoning. This is not a checklist item; it is a behavioral mode that remains active for the entire session.
+9. **Behavioral activation (mandatory, not deferred):** From this point forward, follow the Session Transcript Protocol (DSM_0.2): append thinking to `.claude/session-transcript.md` as the **first tool call** of every turn, before any other tool calls or file edits. Append output summary as the **last tool call** after completing work. Conversation text is for results, summaries, and questions only, never for reasoning. This is not a checklist item; it is a behavioral mode that remains active for the entire session. **Lightweight mode reduces context loading, not reasoning documentation.** The thinking-before-acting step is the primary error prevention mechanism; skipping it in lightweight mode has caused cascading failures in spoke projects.
 
 ## Notes
 

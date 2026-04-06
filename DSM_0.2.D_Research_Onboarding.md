@@ -372,6 +372,12 @@ research backing. The agent validates assumptions, fills gaps with cited researc
 then produces a concrete plan the user can approve. No implementation begins until
 the plan is approved.
 
+**CLAUDE.md completeness requirement:** Before starting implementation, the
+project CLAUDE.md must have all 4 required sections (DSM_0.2 Alignment,
+participation pattern, project type, project specific). See Module A §23 for
+the completeness gate. The agent guides the user through completing missing
+sections as part of the research-to-plan pipeline above.
+
 **Plan abstraction calibration:** Plan at the level of abstraction that matches
 current certainty. For phases where key information is not yet available (e.g.,
 preprocessing details before EDA reveals data characteristics), define objectives
