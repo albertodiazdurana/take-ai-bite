@@ -26,6 +26,7 @@ protocol listed in the dispatch table is needed.
 9. [Continuous Learning Protocol](#9-continuous-learning-protocol)
 10. [Artifact Lifecycle Management](#10-artifact-lifecycle-management)
 11. [Sprint Cadence and Feedback Boundaries](#11-sprint-cadence-and-feedback-boundaries)
+    - 11.1. [Sprint Retrospective Intelligence Protocol](#111-sprint-retrospective-intelligence-protocol)
 12. [Session Delivery Budget](#12-session-delivery-budget)
 13. [Mechanical vs Decision Edits](#13-mechanical-vs-decision-edits)
 14. [Session Configuration Recommendation](#14-session-configuration-recommendation)
@@ -1035,7 +1036,7 @@ Move superseded checkpoints to `dsm-docs/checkpoints/done/`. Add
 Prefer shorter sprints with feedback at each boundary over long monolithic sprints:
 
 - Each sprint should deliver a testable, demonstrable increment
-- **Sprint boundary checklist:** checkpoint document, feedback files updated, decision log updated, blog journal entry, README updated, technical progress report updated, superseded checkpoints moved to done/ (see Artifact Lifecycle Management), hub/portfolio notified (see below), alignment review, epoch plan check (see below), next steps summary (3-5 sentences connecting to next sprint)
+- **Sprint boundary checklist:** checkpoint document, feedback files updated, decision log updated, blog journal entry, README updated, technical progress report updated, superseded checkpoints moved to done/ (see Artifact Lifecycle Management), hub/portfolio notified (see below), alignment review, sprint retrospective intelligence (see §11.1 below), epoch plan check (see below), next steps summary (3-5 sentences connecting to next sprint)
 - **Epoch plan check:** If this sprint completes an epoch (or is the last sprint
   before an epoch boundary), verify: (1) the epoch plan reflects actual outcomes,
   (2) remaining epoch goals are flagged as carried over or dropped, (3) the next
@@ -1050,6 +1051,90 @@ Prefer shorter sprints with feedback at each boundary over long monolithic sprin
   5. Next sprint scope for confirmation
   The user confirms before the next sprint begins. This ensures the plan
   remains a collaboration artifact, not just documentation.
+
+### 11.1. Sprint Retrospective Intelligence Protocol
+
+**Trigger:** Sprint boundary, after alignment review completes, before
+notifications. Operationalizes DSM_6.0 §1.9 (Think Ahead): the agent
+synthesizes operational experience into strategic learning, not just counts
+but content and patterns.
+
+**Data sources** (read during analysis):
+
+| Source | What to extract |
+|--------|----------------|
+| `dsm-docs/plans/done/` | BLs completed this sprint: problem statements, origins, clusters |
+| `dsm-docs/feedback-to-dsm/done/` | Processed feedback: themes, source projects, conversion to BLs |
+| `.claude/reasoning-lessons.md` | Lessons added this sprint, lessons archived as codified |
+| `CHANGELOG.md` | Version entries, spoke action annotations |
+| `FEATURES.md` | User-facing capabilities added |
+| `git log` | Commits across the sprint (use date range from sprint plan) |
+| `_inbox/done/` | Cross-spoke communication processed this sprint |
+
+**Analysis dimensions:**
+
+| Dimension | Question | How to answer |
+|-----------|----------|---------------|
+| **Themes** | What categories dominated this sprint? | Group done/ BLs by problem type (protocol, template, tooling, documentation). Report dominant category and percentage. |
+| **Principles** | Which DSM_6.0 principles drove the work? | Trace BL origin fields to §1.x principles. Report which principles had BLs, which had none. |
+| **Evolution** | Which DSM chapters and protocols changed? | Count modified DSM files from git diff. List CHANGELOG entries with spoke actions. |
+| **Collaboration** | What was the cross-spoke feedback flow? | Count inbox entries received vs BLs created from them. Report feedback conversion rate. |
+| **Learning** | Did reasoning lessons become protocols? | Cross-reference archived lessons (tagged "codified") against DSM_0.2 changes. Report promotion count. |
+| **Maturity** | Are self-improvement patterns emerging? | Check: BL self-generation ratio (BLs created by the methodology about itself vs external requests), dependency clusters in active BLs, ecosystem registry growth. |
+
+**Output format:** Present to the user as a structured report within the sprint
+boundary review. The agent surfaces evidence-based observations, the human
+makes strategic decisions about next sprint priorities.
+
+```
+## Sprint N Retrospective Intelligence
+
+### Theme Analysis
+- [N] BLs completed: [cluster summary with counts per category]
+- Dominant category: [category] ([N]/[total], [%])
+
+### Principle Alignment
+- Work driven by: [list principles with BL counts]
+- Underserved principles: [any §1.x with no BLs this sprint]
+
+### Protocol Evolution
+- [N] DSM files modified, [N] version bumps
+- Spoke-affecting changes: [count] ([CHANGELOG refs])
+
+### Feedback Pipeline
+- Received: [N] entries from [N] spoke(s)
+- Converted to BLs: [N] ([%] conversion rate)
+- Unactioned: [N] ([topic summary])
+
+### Learning Loop
+- Reasoning lessons added: [N], archived as codified: [N]
+- Lessons promoted to protocol: [N] ([specific refs])
+
+### Maturity Signals
+- BL self-generation ratio: [N internal]/[N external] ([%] self-generated)
+- [Other observations: ecosystem growth, dependency patterns]
+
+### Strategic Implications
+- [2-3 evidence-based recommendations for next sprint priorities]
+- [Flag any principle consistently underserved across sprints]
+```
+
+**Scope boundaries:**
+- The agent collects and presents evidence. It does not make strategic decisions
+  (e.g., "drop this principle" or "pivot the roadmap"). Strategic implications
+  are recommendations, not directives.
+- For the first sprint in a project, the report has no comparison baseline.
+  Present absolute numbers only, note "baseline sprint, no trend data."
+- If a sprint has fewer than 3 BLs completed, the theme analysis may not be
+  meaningful. Note this rather than forcing a cluster interpretation.
+- Projects without sprints (portfolio, notebook-only) do not trigger this
+  protocol. It fires only when the sprint boundary checklist is active.
+
+**Anti-pattern:** Do not reduce this analysis to counts alone. "5 BLs completed"
+is a count. "3 of 5 BLs addressed template gaps traced to spoke feedback,
+suggesting the §17.1 template is the primary improvement vector this sprint"
+is analysis. The value of this protocol is the synthesis, not the arithmetic.
+
 - **Hub/portfolio notification:** At sprint wrap-up in spoke projects, send a
   sprint completion notification to DSM Central and portfolio via `_inbox/`:
   ```
