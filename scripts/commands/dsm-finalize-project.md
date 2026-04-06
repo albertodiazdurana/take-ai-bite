@@ -20,7 +20,27 @@ Classify the project to determine which checklist sections are required:
    - **Small (1-3 sessions):** Sections D, E, G, H, I required; B, C optional
    - **Medium (4-10 sessions):** Sections A, B, D, E, G, H, I required; C, F optional
    - **Large (10+ sessions):** All sections required
-3. Report: "This is a [size] project ([N] sessions). Required sections: [list]. Optional: [list]."
+3. Report using full section names so the user understands each step without cross-referencing:
+   ```
+   Project Finalization: [project-name]
+   Size: [Small/Medium/Large] ([N] sessions)
+
+   Required:
+   - A. Knowledge Extraction
+   - B. Retrospective
+   - D. Documentation Closure
+   - E. Backlog Cleanup
+   - G. Profile and Registry
+   - H. Archive
+   - I. Environment and Data Cleanup
+
+   Optional:
+   - C. Communication
+   - F. Vocabulary Transfer
+
+   Full protocol details: DSM_3.0.F_Project_Finalization.md §2-3
+   ```
+   Adjust the list based on project size (see scaling table above). Omit the Optional block if no sections are optional for the detected size.
 4. Ask the user: "Include optional sections? (y/n/pick)"
 
 ## Steps

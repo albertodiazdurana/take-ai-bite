@@ -18,17 +18,26 @@ Walk through each step, showing the user what to do and waiting for confirmation
 - Follow Keep a Changelog format with Added/Changed/Deprecated/Removed/Fixed sections
 - Reference BACKLOG-### numbers for implemented items
 
-### Step 3: Update README.md
-- Update "Current Version" in Version Information section
-- Add "Recent Changes" entry for the new version
-- Shift previous entries down
+### Step 2b: Update FEATURES.md (if applicable)
+- For each new CHANGELOG entry, assess: **Is this a user-facing capability?**
+  - New protocol or feature → Yes (add F-entry)
+  - New command or skill → Yes (add F-entry)
+  - Template or format change with user-visible impact → Yes
+  - Internal refactor, rename, audit → No (skip)
+  - Bug fix with user-visible impact → Judgment call
+- If yes, add entry to `FEATURES.md`:
+  - Format: `- **F-NNN (YYYY-MM-DD) Short title** — One-sentence benefit-focused description.`
+  - Assign next F-number (increment from current highest)
+  - Add entry at the top of the current month section (create month section if needed)
+  - Update the "Current count" in the FEATURES.md header
+- New F-entries trigger blog-poster notification at wrap-up (DSM_0.2.A §2)
 
-### Step 4: Update DSM_0
+### Step 3: Update DSM_0
 - Update version number and date in the header
 - Update line counts if significant additions were made
 - Update document descriptions if new sections were added
 
-### Step 5: Commit and Tag
+### Step 4: Commit and Tag
 - Stage changed files (CHANGELOG, README, DSM_0, plus any methodology changes)
 - Commit with descriptive message (no co-author line)
 - Create git tag: `git tag vX.Y.Z`

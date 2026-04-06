@@ -1217,6 +1217,10 @@ default profiles.
 **Subagent guidance:** For research reading and codebase exploration, recommend
 Sonnet subagents when the user's plan has a separate Sonnet pool (e.g., Max plan).
 
+**Environmental awareness (DSM_6.0 §2.3):** Prefer the sufficient configuration
+over the maximal one. If Efficient handles the task, do not recommend Standard.
+Unnecessary model capacity is a resource cost without behavioral benefit.
+
 **Known issue:** Setting effort to "max" via `settings.json` may be silently
 downgraded if the user interacts with the `/model` UI during a session
 (claude-code#30726). For reliable configuration, use CLI flags or environment

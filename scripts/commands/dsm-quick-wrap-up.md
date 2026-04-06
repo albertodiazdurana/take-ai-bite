@@ -65,6 +65,12 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    - If `.claude/session-baseline.txt` does not exist (session started without `/dsm-go`), fall back to staging all changed files
    Then `git commit` and `git push` in sequence. If no session changes exist, skip the commit.
    After committing, delete `.claude/session-baseline.txt` (consumed).
+8. **Write wrap-up type marker:** Write `.claude/last-wrap-up.txt` with the session number, date, and wrap-up type. This marker is read by `/dsm-go` and `/dsm-light-go` at next session start to guide the user toward the appropriate startup command.
+    ```
+    session: N
+    date: YYYY-MM-DD
+    type: quick
+    ```
 
 ## Notes
 
