@@ -211,7 +211,7 @@ Before starting alignment, check if git is initialized:
    critical: N
    ```
    - `result` is `pass` if no warnings or critical issues, `warnings` if only warnings, `critical` if any critical issues were found
-   - `dsm-version` is read from DSM Central's CHANGELOG or DSM_0.0 header (the version at the time of alignment)
+   - `dsm-version`: resolve the `dsm-central` path from `.claude/dsm-ecosystem.md` (or from the `@` reference in CLAUDE.md), then read `{dsm-central}/CHANGELOG.md` and extract the version from the latest `## [vX.Y.Z]` heading. CHANGELOG is the source of truth for version numbers; do not guess or use other files
    - `/dsm-go` reads this marker to detect stale alignment (version mismatch or missing marker)
 
 ## Templates

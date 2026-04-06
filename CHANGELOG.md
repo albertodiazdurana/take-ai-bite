@@ -5,6 +5,109 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.5] - 2026-04-06
+
+### Added - Template Reinforcement and Sprint Intelligence (BL-315, BL-310)
+
+- §17.1 template: new "Cross-Repo Write Safety" reinforcement section (BL-315,
+  operationalizes Module C §2 Destructive Action Protocol for spoke agents)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block
+- §17.1 template: "Read the relevant source before answering questions about it;
+  do not answer from partial knowledge" added to Code Output Standards (BL-315,
+  operationalizes DSM_6.0 §1.3 Earn Your Assertions)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block
+- Module A §11.1: Sprint Retrospective Intelligence Protocol (BL-310 Phase 4).
+  Data-driven analysis at sprint boundaries across 6 dimensions: Themes,
+  Principles, Evolution, Collaboration, Learning, Maturity. Operationalizes
+  DSM_6.0 §1.9 Think Ahead.
+
+### Fixed
+
+- `/dsm-align` step 13: explicit CHANGELOG version resolution path for spoke
+  agents. Was ambiguous "CHANGELOG or DSM_0.0", now specifies: resolve
+  dsm-central path, read CHANGELOG.md, extract from latest heading. Prevents
+  version hallucination on spoke projects.
+
+## [1.4.4] - 2026-04-06
+
+### Added - Principle Operationalization and Session Lifecycle (BL-310, BL-313, BL-314)
+
+- §17.1 template: "When uncertain, state the uncertainty; do not guess or fabricate"
+  added to Code Output Standards (BL-310, operationalizes DSM_6.0 §1.3)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block
+- DSM_0.2 §15: three-question delivery test made explicit (read/opinion/redirect)
+  (BL-310, operationalizes DSM_6.0 §1.1)
+  **Spoke action:** Review §15 for behavioral changes
+- Module A §14: environmental awareness guidance (sufficient over maximal config)
+  (BL-310, operationalizes DSM_6.0 §2.3)
+- `/dsm-align` step 12: post-change vs check-only report distinction (BL-313)
+  **Spoke action:** Run `sync-commands.sh --deploy`
+- `/dsm-align` step 12b: inbox notification to project `_inbox/` when changes
+  are applied (BL-313)
+- `/dsm-align` step 11: checks both user-level and project-level command
+  directories for drift (BL-313)
+- Wrap-up type marker (`.claude/last-wrap-up.txt`) written by all wrap-up
+  variants, read by `/dsm-go` and `/dsm-light-go` to guide startup command
+  selection (BL-314)
+
+### Changed - Session Start/End Guidance (BL-314)
+
+- `/dsm-go` step 5.9: detects light wrap-up and suggests `/dsm-light-go`
+- `/dsm-light-go` Safety Gate: detects non-light wrap-up and suggests `/dsm-go`
+- Two guidance rules: light-go after non-light warns, full-go after light suggests switch
+
+## [1.4.3] - 2026-04-05
+
+### Added - Protocol Improvements from Spoke Feedback (BL-309, BL-312)
+
+- Module A §24: Sprint Plan Cross-Reference Before Completion (BL-312)
+  Agents must read and cross-reference the sprint plan before suggesting
+  wrap-up. Prevents premature completion declarations.
+  **Spoke action:** Review Module A §24 for behavioral changes
+- Module B §4.2: Figure Validation After Cell Execution (BL-309)
+  Cells that generate plots must save to `outputs/figures/`; agent reads
+  the saved image via Read tool before proceeding.
+  **Spoke action:** Review Module B §4.2 for behavioral changes
+- §17.1 base template: sprint plan cross-reference line in Session Wrap-Up,
+  figure validation line in Notebook Collaboration Protocol
+  **Spoke action:** Run `/dsm-align` to update reinforcement block
+- DSM_0.2 §17: scaffolding specification cross-reference (DSM_0.1 §10,
+  DSM_3.0.E §6.7) (BL-290)
+
+### Changed - Session-Start Efficiency (BL-311)
+
+- `/dsm-align`: hub fast-path skips spoke-specific checks on DSM Central,
+  improved path filter (excludes slash commands, globs, command invocations),
+  `test -d` note for safe existence checks
+  **Spoke action:** Run `sync-commands.sh --deploy` to update commands
+- `/dsm-go` step 1.5: bounded reasoning lessons read (first 10 lines only)
+  **Spoke action:** Run `sync-commands.sh --deploy` to update commands
+
+## [1.4.2] - 2026-04-05
+
+### Added - DSM_6.0 Principle Operationalization (BL-310)
+
+- §17.1 base template: 5 new sections promoted from DSM Central CLAUDE.md
+  - Code Output Standards (reinforces Earn Your Assertions §1.3)
+  - Tool Output Restraint (reinforces Take a Bite §1.1)
+  - Working Style (reinforces Take a Bite + Critical Thinking §1.4)
+  - Plan Mode for Significant Changes (reinforces Earn Your Assertions §1.3)
+  - Session Wrap-Up (reinforces Know Your Context §1.5)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block
+- `/dsm-align` step 8b: CLAUDE.md redundancy scan against DSM_0.2 core and template
+  **Spoke action:** Run `sync-commands.sh --deploy` to update /dsm-align command
+- Phase 1 audit: 62 behavioral expectations mapped across 9 DSM_6.0 principles (31% gap rate)
+- Phase 2 pipeline audit: CLAUDE.md generation chain mapped with 3 leakage points identified
+
+### Changed - DSM_0.2 §17.2 Content Validation
+
+- Removed "Code Output Standards (notebook-specific)" from Documentation project drift indicators (now universal in template)
+
+### Fixed
+
+- `/dsm-align` step 7b.c: enforce literal template copy to prevent heading paraphrase (generated "## DSM Alignment" instead of "## 1. DSM_0.2 Alignment")
+  **Spoke action:** Run `sync-commands.sh --deploy` to update /dsm-align command
+
 ## [1.4.1] - 2026-04-01
 
 ### Added - CLAUDE.md Content Validation Protocol (BL-294)

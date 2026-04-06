@@ -6,9 +6,18 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-001 is the first, newest entries
 appear at the top).
 
-**Current count:** 84 features across 11 capability domains.
+**Current count:** 90 features across 11 capability domains.
 
 ---
+
+## April 2026
+
+- **F-090 (2026-04-06) Sprint Retrospective Intelligence at sprint boundaries** — At sprint boundaries the agent synthesizes operational data across 6 dimensions (themes, principles, evolution, collaboration, learning, maturity), turning mechanical counts into strategic analysis that informs the next sprint.
+- **F-089 (2026-04-06) Cross-repo write safety in alignment template** — Spoke agents now see an explicit reinforcement that cross-repo writes require user confirmation, closing a gap where the rule existed in Module C but was invisible to spoke agents through the template.
+- **F-088 (2026-04-06) Wrap-up type marker for session-start guidance** — Each wrap-up variant records its type (full/light/quick). The next session detects mismatches and suggests the appropriate startup command, preventing wasted overhead or skipped checks.
+- **F-087 (2026-04-06) Factual accuracy in Code Output Standards** — The alignment template now instructs agents to state uncertainty rather than guess or fabricate, operationalizing DSM_6.0's Earn Your Assertions principle across all spoke projects.
+- **F-086 (2026-04-05) Sprint plan cross-reference before completion** — Before suggesting wrap-up, the agent re-reads the sprint plan and checks each deliverable against actual evidence. No more "sprint complete" when experiment gates are unmet or SHOULD items are still open.
+- **F-085 (2026-04-05) Figure validation in notebook collaboration** — Cells that generate plots now save figures to disk so the agent can read the image back. The agent actually sees what it drew before moving on.
 
 ## March 2026
 

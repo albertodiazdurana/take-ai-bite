@@ -629,6 +629,7 @@ Use "," instead of "—" for connecting phrases in any language.
 - Show actual values: shapes, metrics, counts, paths
 - No generic confirmations: avoid "Done!", "Success!", "Data loaded successfully!"
 - When uncertain, state the uncertainty; do not guess or fabricate
+- Read the relevant source (file, definition, documentation) before answering questions about it; do not answer from partial knowledge
 - Let results speak for themselves
 
 ### Tool Output Restraint (reinforces Take a Bite)
@@ -640,6 +641,11 @@ Use "," instead of "—" for connecting phrases in any language.
 - Confirm understanding before proceeding
 - Be concise in answers
 - Do not generate files before providing description and receiving approval
+
+### Cross-Repo Write Safety (reinforces Destructive Action Protocol)
+- First write to any path outside this repository in a session requires explicit user confirmation
+- Present the content and target path before writing; do not write cross-repo silently
+- Subsequent writes to the same cross-repo target in the same session do not need re-confirmation
 
 ### Plan Mode for Significant Changes (reinforces Earn Your Assertions)
 - Before implementing significant features: explore codebase, identify patterns, present plan
@@ -1106,6 +1112,7 @@ All module files are in the same directory as this core file.
 | Continuous Learning Protocol | Session start/end, external knowledge integration | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Artifact Lifecycle Management | Transcript retirement, checkpoint supersession | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Sprint Cadence and Feedback Boundaries | Sprint planning, boundary checklists | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Sprint Retrospective Intelligence | Sprint boundary, after alignment review | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Session Delivery Budget | Estimating session work volume, mid-session check | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Mechanical vs Decision Edits | Multiple edits to stage, distinguishing edit types | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Session Configuration Recommendation | Session start, mid-session task shift | [A](DSM_0.2.A_Session_Lifecycle.md) |
