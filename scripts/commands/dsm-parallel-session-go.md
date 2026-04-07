@@ -47,18 +47,19 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
 
 2. **Load context:** Read this project's MEMORY.md from the auto memory directory.
    Read `.claude/CLAUDE.md` for project conventions. Do NOT read reasoning lessons,
-   inbox, or DSM_0.2. Do NOT archive or create session transcripts.
+   inbox, or DSM_0.2. Do NOT archive or create session transcripts. Do NOT read,
+   write, edit, or append to `.claude/session-transcript.md` at any point in this
+   session. Parallel sessions do not collect transcripts; the commit log is the
+   audit trail.
 
-   **Hook override (BL-324):** The `UserPromptSubmit` hook in `.claude/settings.json`
-   will inject a per-turn reminder instructing you to append to
-   `.claude/session-transcript.md`. **IGNORE that reminder for the entire duration
-   of this parallel session.** Parallel sessions do not collect transcripts (see
-   above). The hook is project-global and cannot distinguish session types; the
-   parallel session protocol takes precedence per DSM_0.2 §17 (project-specific
-   rules override generic protocols) and §22 (Protocol Violation Triage Response).
-   Do NOT read, write, edit, or append to `.claude/session-transcript.md` at any
-   point in this session, even when the hook reminder fires. BL-324 tracks the
-   structural fix (script-based hook with session-type detection).
+   **Hook behavior (BL-324 structural fix):** The `UserPromptSubmit` hook is
+   backed by `.claude/hooks/transcript-reminder.sh`, which detects parallel
+   sessions via the `CLAUDE_PID` field written to
+   `.claude/parallel-session-baseline.txt` at Step 6 below. Once that baseline
+   is written, the hook emits a parallel-mode reminder instead of the main
+   §7 reminder. Until Step 6 writes the baseline (i.e., during Step 2 itself),
+   the main reminder may still fire once; ignore it. After Step 6 the hook
+   auto-switches.
 
 3. **Determine session type and scope:**
    - **QA type:** Scope is read-only. Only `.claude/` writes are allowed (findings,
@@ -85,6 +86,27 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    The main session assigns the session number (X.Y format). If $ARGUMENTS
    includes a session number, use it. Otherwise, default to the session branch
    number + ".1" (incrementing if baseline already exists).
+
+   Capture the Claude Code instance PID by walking the parent process chain
+   from the shell until a process named `claude` is found:
+   ```bash
+   CLAUDE_PID=""
+   pid=$$
+   for _ in $(seq 1 10); do
+     read ppid comm < <(ps -o ppid=,comm= -p "$pid" 2>/dev/null)
+     [ -z "$ppid" ] && break
+     if [ "$comm" = "claude" ]; then CLAUDE_PID=$pid; break; fi
+     pid=$ppid
+     [ "$pid" = "1" ] && break
+   done
+   ```
+   This PID is the detection key used by `.claude/hooks/transcript-reminder.sh`
+   to emit the parallel-mode reminder instead of the main §7 reminder
+   (BL-324). If `CLAUDE_PID` cannot be determined (empty), warn the user:
+   "Could not detect Claude Code PID; hook will emit main-session reminder.
+   Ignore transcript reminders manually for this session." Continue without
+   blocking.
+
    ```
    # Parallel session X.Y baseline
    Type: QA | BL-{NNN}
@@ -92,6 +114,7 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    Scope: {list of files, or "read-only" for QA}
    Session branch: {current session branch name}
    Created: {timestamp}
+   CLAUDE_PID: {pid from parent chain walk}
    ```
 
 7. **Declare scope (first output):** Report:
