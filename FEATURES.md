@@ -6,12 +6,15 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-001 is the first, newest entries
 appear at the top).
 
-**Current count:** 90 features across 11 capability domains.
+**Current count:** 93 features across 11 capability domains.
 
 ---
 
 ## April 2026
 
+- **F-093 (2026-04-07) Python virtual environment protocol** — Projects with Python code now require `.venv` creation and activation before any `pip install`. Closes a gap where agents could pollute system Python with project dependencies, hiding version conflicts and breaking reproducibility across machines.
+- **F-092 (2026-04-07) Runtime register context for register-sensitive skills** — Skills like humanizer that depend on audience and formality assumptions now receive an explicit runtime context block (audience, formality, domain, constraints) before invocation. Closes a gap where the humanizer rewrote an academic deliverable into informal register because nothing told it the target reader.
+- **F-091 (2026-04-07) Planning pipeline gate in alignment template** — Spoke agents now see an explicit reinforcement that only `dsm-docs/plans/` items are actionable; material in `_reference/`, `docs/`, README, or sprint plan drafts is input to the planning pipeline, not a substitute for it. Closes a gap where agents conflated "understanding scope" with "adopting the plan."
 - **F-090 (2026-04-06) Sprint Retrospective Intelligence at sprint boundaries** — At sprint boundaries the agent synthesizes operational data across 6 dimensions (themes, principles, evolution, collaboration, learning, maturity), turning mechanical counts into strategic analysis that informs the next sprint.
 - **F-089 (2026-04-06) Cross-repo write safety in alignment template** — Spoke agents now see an explicit reinforcement that cross-repo writes require user confirmation, closing a gap where the rule existed in Module C but was invisible to spoke agents through the template.
 - **F-088 (2026-04-06) Wrap-up type marker for session-start guidance** — Each wrap-up variant records its type (full/light/quick). The next session detects mismatches and suggests the appropriate startup command, preventing wasted overhead or skipped checks.

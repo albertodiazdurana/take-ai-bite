@@ -622,6 +622,11 @@ and updated automatically. Project-specific content lives outside the delimiters
 - After processing an inbox entry, move it to `_inbox/done/`
 - Do not mark entries as "Status: Processed" while keeping them in place
 
+### Actionable Work Items (reinforces DSM_3 planning pipeline)
+- Only items in `dsm-docs/plans/` (and legacy `plan/backlog/`) are actionable work items.
+- Material found elsewhere (`_reference/`, `docs/`, README, inbox, sprint plan drafts) is INPUT to the planning pipeline, not a substitute for it.
+- Before suggesting implementation of anything that looks like a plan, verify that a formal BL exists in `dsm-docs/plans/`. If not, route through research → formalize → plan first.
+
 ### Punctuation
 Use "," instead of "—" for connecting phrases in any language.
 
@@ -1045,6 +1050,36 @@ protocols take precedence**. The agent must follow DSM governance even when
 a skill instructs otherwise. This is the same precedence model as
 project-specific CLAUDE.md overriding generic DSM_0.2 protocols (§17).
 
+### 23.4. Runtime Register Context Convention
+
+§23.1-23.3 cover skills at install time. Some skills are also
+**register-sensitive at runtime**: their output depends on assumptions about
+audience, formality, or domain that the skill itself cannot infer from the
+artifact alone. Without explicit context, a register-sensitive skill may
+rewrite an academic deliverable into informal prose, or vice versa.
+
+**Behavioral trigger:** Before invoking a register-sensitive skill on any
+artifact, the agent must prepend a runtime context block describing the
+target register. The block uses this format:
+
+```
+**Runtime context (per DSM_0.2 §23.4):**
+- Audience: [target reader, e.g., "academic reviewers", "general public"]
+- Formality: [formal | semi-formal | informal]
+- Domain: [e.g., "research methodology", "blog post", "internal docs"]
+- Constraints: [optional, e.g., "preserve technical terms", "no rephrasing of headings"]
+```
+
+**Skill registry annotation:** The skills registry table (§23.1) gains a
+`Register-sensitive` column with values `yes` / `no` / `partial`. Skills
+marked `yes` MUST receive a runtime context block on every invocation.
+Skills marked `partial` SHOULD receive one when the artifact's audience
+differs from the project's default register.
+
+**Origin:** german-adversarial-prompting S8 incident, where the humanizer
+skill rewrote an academic deliverable into informal register because no
+mechanism existed to communicate target audience at runtime.
+
 ---
 
 ## 24. References
@@ -1137,6 +1172,7 @@ All module files are in the same directory as this core file.
 | Step 0: Situational Assessment | New project onboarding, external contributions | [D](DSM_0.2.D_Research_Onboarding.md) |
 | Phase 0.5: Research and Grounding | Novel domain, model selection, unfamiliar problem | [D](DSM_0.2.D_Research_Onboarding.md) |
 | Environment Preflight Protocol | Project with native toolchains, system dependencies | [D](DSM_0.2.D_Research_Onboarding.md) |
+| Python Virtual Environment Protocol | Project with notebooks/, src/, scripts/, requirements*.txt, pyproject.toml | [D](DSM_0.2.D_Research_Onboarding.md) |
 | First Session Prompt for New Projects | New spoke project scaffolded | [D](DSM_0.2.D_Research_Onboarding.md) |
 | Phase-to-DSM-Section Mapping | Sprint planning, phase type identification | [D](DSM_0.2.D_Research_Onboarding.md) |
 | Command File Version Tracking | Modifying DSM command files | [D](DSM_0.2.D_Research_Onboarding.md) |

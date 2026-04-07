@@ -307,7 +307,7 @@ This protocol resolves all blockers in one pass at project onboarding.
 **Applicability:**
 - **Required for:** Projects with native binaries, compiled dependencies, or
   system-level runtime requirements
-- **Optional for:** Pure Python projects (covered by Section 2.1)
+- **Optional for:** Pure Python projects (covered by §5.1 Python Virtual Environment Protocol below)
 - **Skip for:** Documentation-only projects
 
 **Preflight checklist (run once at project onboarding):**
@@ -335,6 +335,55 @@ dependencies upfront.
 - Assume the development environment is complete because the project
   README does not mention system dependencies; many projects assume
   a standard development setup
+
+### 5.1. Python Virtual Environment Protocol
+
+Projects with Python code dependencies must run in an isolated virtual
+environment. Installing packages into the system Python (or a globally
+shared interpreter) pollutes the host, hides version conflicts, and
+breaks reproducibility across machines.
+
+**Applicability:**
+- **Required for:** Any project containing `notebooks/`, `src/`, `scripts/`,
+  `requirements*.txt`, `pyproject.toml`, `setup.py`, or `Pipfile`
+- **Skip for:** Documentation-only projects with no Python code
+
+**Behavioral trigger:** Activates at session start (`/dsm-go` Step 0.5
+scaffold check) and before any `pip install` operation.
+
+**Protocol steps:**
+
+1. **Check for existing venv:** Look for `.venv/`, `venv/`, or `env/` at
+   the project root
+2. **If none exists and the project has any Python indicator above:**
+   - Create one: `python3 -m venv .venv`
+   - Activate it: `source .venv/bin/activate` (Linux/macOS) or
+     `.venv\Scripts\activate` (Windows)
+   - Verify activation: `which python` should point inside `.venv/`
+3. **Before any `pip install`:** Verify the active interpreter is inside
+   the venv. If not, halt and report; do not install into system Python
+4. **Add `.venv/` to `.gitignore`** if not already present (also `venv/`,
+   `env/` for safety)
+5. **Document the venv in the project README** if it does not already
+   mention environment setup
+
+**Anti-Patterns:**
+
+**DO NOT:**
+- Run `pip install` against system Python "just this once"; it pollutes
+  the host and creates hidden version conflicts
+- Use `sudo pip install` to bypass permission errors; this is the strongest
+  signal that you are not in a venv and should fix that instead
+- Skip venv creation because the project "only has one dependency"; the
+  cost of creating a venv is seconds, the cost of resolving a polluted
+  system Python is hours
+- Assume an existing venv is up to date; if `requirements*.txt` has
+  changed since last activation, run `pip install -r requirements.txt`
+  inside the venv before working
+
+**Origin:** german-adversarial-prompting S7 incident, where the agent
+attempted to install packages using system Python instead of creating a
+virtual environment first.
 
 ---
 
