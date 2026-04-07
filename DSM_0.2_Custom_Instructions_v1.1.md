@@ -198,6 +198,82 @@ tool calls or file edits.
 - Use Edit with `old_string` matching earlier content to insert entries mid-file; this causes out-of-order timestamps (observed in prior sessions). Use the mandatory append technique above
 - Use reasoning delimiters in conversation text; VS Code collapses them after streaming
 
+**Per-Turn Transcript Append Enforcement Mechanism:**
+
+Static rules and operator discipline are insufficient to keep this protocol
+active across long sessions; in S171 the agent skipped appends for 7
+consecutive turns despite both §7 and `/dsm-go` step 6 telling it not to.
+The reliable enforcement layer is a `UserPromptSubmit` hook in
+`.claude/settings.json` that injects a per-turn reminder. Two hooks form a
+complementary pair: the `UserPromptSubmit` hook enforces *occurrence* (an
+append must happen this turn), and `validate-transcript-edit.sh` (PreToolUse
+on Edit) enforces *shape* (anchor, append-only, delimiter). Neither IDE
+monitoring nor session-start "behavioral activation" is the enforcement
+mechanism; both are user-facing affordances that document intent without
+requiring it. The hook is the mechanism.
+
+**Turn-Boundary Transcript Append Self-Check:**
+
+At the start of every turn, before composing a response, the agent must
+ask: "Was my first tool call this turn an append to
+`.claude/session-transcript.md`?" If the answer is no and the turn requires
+any tool calls at all, the protocol has been violated. The check is binary;
+no "I planned to" or "the next call would have been" answers count. The
+only exception is turns with zero tool calls (pure conversational
+acknowledgment), which are explicitly allowed by the "When to skip thinking"
+rule above.
+
+**[RETROACTIVE] Transcript Append Self-Detection Rule:**
+
+If the agent detects mid-turn or at the start of a later turn that it
+missed an earlier append, it must:
+
+1. Append a recovery entry to the transcript labeled
+   `<------------Start Thinking [RETROACTIVE] / HH:MM------------>` where
+   HH:MM is the *current* time, not a fabricated earlier time.
+2. State which turn(s) were missed and a brief reconstruction of the
+   reasoning that would have been recorded.
+3. Note the gap explicitly; never edit history or insert mid-file to make
+   it look like the appends happened on time.
+
+Retroactive entries are evidence the protocol failed and recovered, not a
+workaround that makes the failure invisible.
+
+**Process Narration for Reasoning Efficiency Analysis:**
+
+Thinking blocks should narrate reasoning *as it unfolds*, not present a
+post-hoc clean summary of the decision. Include considered-and-rejected
+paths, points of doubt, loops where the same fact is re-verified, and
+course corrections. Write "I considered X, rejected it because Y, then
+reconsidered because Z" instead of collapsing to "decided on Z".
+
+The motivation is reasoning-efficiency analysis. The model's native
+extended thinking already contains loops, second-guessing, anchoring
+drift, and redundant re-verification. The collapsed extended-thinking
+view in the chat UI exposes those patterns to the user, but is
+turn-scoped and not archived. If the transcript thinking block is a
+clean summary, it hides exactly the inefficiency signals the user needs
+to identify and fix. Clean summaries make the reasoning look tidier
+than it was.
+
+A useful thinking block records:
+
+- What the agent considered and why each option was weighed
+- Where the agent doubted, looped, or reversed itself
+- Which steps were redundant in hindsight (re-reading a file already
+  read, re-checking a fact already checked)
+- The final decision and the reason it won
+
+Brevity is not the goal. Auditability is. A thinking block that is
+longer than the action it precedes is acceptable when the reasoning
+warranted it; a thinking block that hides three rounds of self-doubt
+behind a single confident sentence is a defect.
+
+This rule does not apply to trivial turns (single-fact answers, simple
+acknowledgments) where the "When to skip thinking" rule above already
+permits omission. It applies to every turn that warrants a thinking
+block at all.
+
 ---
 
 ## 8. Pre-Generation Brief Protocol
@@ -613,6 +689,20 @@ and updated automatically. Project-specific content lives outside the delimiters
 - HH:MM is 24-hour local time when the block begins; no end delimiter needed
 - Append technique: read last 3 lines, use last non-empty line as anchor.
   NEVER match earlier content for mid-file insertion.
+- Per-turn enforcement: a `UserPromptSubmit` hook in `.claude/settings.json`
+  injects a reminder every turn. The hook enforces *occurrence*; the
+  existing `validate-transcript-edit.sh` PreToolUse hook enforces *shape*.
+  IDE monitoring and session-start behavioral activation are user
+  affordances, not enforcement. The hook is the mechanism.
+- Turn-boundary self-check: if your first tool call this turn was not a
+  transcript append and the turn requires any tool calls, the protocol was
+  violated. Recover by appending a `[RETROACTIVE]` entry with the current
+  HH:MM (never backdate) and a note explaining the gap; do not edit history.
+- Process narration: thinking blocks narrate reasoning as it unfolds,
+  including considered-and-rejected paths, doubts, loops, and reversals.
+  Clean post-hoc summaries hide inefficiency signals that are the primary
+  input to reasoning-efficiency analysis. Brevity is not the goal,
+  auditability is.
 
 ### Pre-Generation Brief Protocol (reinforces inherited protocol)
 - Three-gate model: concept (explain) → implementation (diff review) → run (when applicable)
