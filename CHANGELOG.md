@@ -5,6 +5,50 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.8] - 2026-04-07
+
+### Added - Python Virtual Environment Protocol (BL-284)
+
+- DSM_0.2 Module D §5.1: Python Virtual Environment Protocol. Required for
+  any project containing `notebooks/`, `src/`, `scripts/`, `requirements*.txt`,
+  `pyproject.toml`, `setup.py`, or `Pipfile`. Defines venv check, creation,
+  activation, and pre-install verification steps. Closes a gap where the
+  agent attempted to install packages into system Python.
+- DSM_0.2 §25.2 dispatch table: new entry for the protocol.
+- DSM_0.2.D §5 Applicability: fixed stale "Section 2.1" reference; now points
+  to §5.1.
+  **Spoke action:** Review §5.1 for behavioral changes; ensure existing
+  Python projects have `.venv/` in `.gitignore`
+
+## [1.4.7] - 2026-04-07
+
+### Added - Skill Governance Runtime Register Context (BL-287)
+
+- DSM_0.2 §23.4: Runtime Register Context Convention. Register-sensitive
+  skills (e.g., humanizer) MUST receive a runtime context block describing
+  audience, formality, domain, and constraints before invocation. Closes a
+  gap where §23 covered install-time conflict detection but not runtime
+  context.
+- Skills registry template gains a `Register-sensitive` column (yes/no/partial).
+- Humanizer skill registry entry annotated with the german-adversarial-prompting
+  S8 incident and marked register-sensitive: yes.
+  **Spoke action:** Review §23.4 for behavioral changes; update local
+  skills-registry.md with Register-sensitive column
+
+## [1.4.6] - 2026-04-07
+
+### Added - Planning Pipeline Gate for Spoke Agents (BL-316)
+
+- §17.1 template: new "Actionable Work Items" reinforcement section. Only
+  items in `dsm-docs/plans/` (and legacy `plan/backlog/`) are actionable
+  work items; material elsewhere (`_reference/`, `docs/`, README, inbox,
+  sprint plan drafts) is INPUT to the planning pipeline, not a substitute
+  for it. Operationalizes DSM_3 planning pipeline at the spoke behavioral
+  surface. Origin: utility_conversational_ai S1 MO-1 (agent treated
+  `_reference/sprint-plan.md` as actionable, skipping research → formalize
+  → plan).
+  **Spoke action:** Run `/dsm-align` to update reinforcement block
+
 ## [1.4.5] - 2026-04-06
 
 ### Added - Template Reinforcement and Sprint Intelligence (BL-315, BL-310)
