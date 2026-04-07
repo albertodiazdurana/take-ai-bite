@@ -49,6 +49,17 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    Read `.claude/CLAUDE.md` for project conventions. Do NOT read reasoning lessons,
    inbox, or DSM_0.2. Do NOT archive or create session transcripts.
 
+   **Hook override (BL-324):** The `UserPromptSubmit` hook in `.claude/settings.json`
+   will inject a per-turn reminder instructing you to append to
+   `.claude/session-transcript.md`. **IGNORE that reminder for the entire duration
+   of this parallel session.** Parallel sessions do not collect transcripts (see
+   above). The hook is project-global and cannot distinguish session types; the
+   parallel session protocol takes precedence per DSM_0.2 §17 (project-specific
+   rules override generic protocols) and §22 (Protocol Violation Triage Response).
+   Do NOT read, write, edit, or append to `.claude/session-transcript.md` at any
+   point in this session, even when the hook reminder fires. BL-324 tracks the
+   structural fix (script-based hook with session-type detection).
+
 3. **Determine session type and scope:**
    - **QA type:** Scope is read-only. Only `.claude/` writes are allowed (findings,
      notes, analysis output).
