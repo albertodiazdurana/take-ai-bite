@@ -5,6 +5,80 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.9] - 2026-04-07
+
+### Added - Per-Turn Transcript Enforcement and Process Narration (BL-318 Layer 2)
+
+- DSM_0.2 §7: new "Per-Turn Transcript Append Enforcement Mechanism"
+  subsection. Documents the `UserPromptSubmit` hook in
+  `.claude/settings.json` as the enforcement layer for the Session
+  Transcript Protocol. The hook fires every turn and enforces *occurrence*;
+  the existing `validate-transcript-edit.sh` PreToolUse hook enforces
+  *shape*. IDE monitoring and session-start behavioral activation are
+  reframed as user affordances, not enforcement. Closes the failure mode
+  observed in S171 (7 consecutive turns without transcript appends despite
+  §7 + /dsm-go step 6).
+  **Spoke action:** Review §7 for the new Per-Turn Transcript Append
+  Enforcement Mechanism subsection.
+- DSM_0.2 §7: new "Turn-Boundary Transcript Append Self-Check" subsection.
+  Binary check the agent must run at the start of every turn ("was my
+  first tool call this turn an append?"). Explicit exemption for turns
+  with zero tool calls.
+  **Spoke action:** Review §7 for the new Turn-Boundary Transcript Append
+  Self-Check subsection.
+- DSM_0.2 §7: new "[RETROACTIVE] Transcript Append Self-Detection Rule"
+  subsection. Recovery format for missed appends, using current HH:MM
+  (never backdate) and an explicit gap note. Recovery entries are evidence
+  the protocol failed and recovered, not a workaround that hides the
+  failure.
+  **Spoke action:** Review §7 for the new [RETROACTIVE] Transcript Append
+  Self-Detection Rule subsection.
+- DSM_0.2 §7: new "Process Narration for Reasoning Efficiency Analysis"
+  subsection. Thinking blocks must narrate reasoning as it unfolds (loops,
+  doubts, reversals, considered-and-rejected paths) instead of presenting
+  clean post-hoc summaries. Motivation: extended-thinking inefficiency
+  patterns are the primary signal for reasoning-efficiency analysis, and
+  clean summaries hide them. Origin: S172 user observation that the
+  collapsed extended-thinking view contains loops the curated transcript
+  does not.
+  **Spoke action:** Review §7 for the new Process Narration for Reasoning
+  Efficiency Analysis subsection.
+- §17.1 base template Session Transcript reinforcement block: two new
+  bullets propagating per-turn enforcement, turn-boundary self-check,
+  and process narration to all spokes.
+  **Spoke action:** Run `/dsm-align` to update the §17.1 reinforcement
+  block.
+- `.claude/settings.json` UserPromptSubmit hook reminder string tightened:
+  now specifies the 4-step sequence (anchor read → thinking append → work
+  → output append) and explicitly permits the anchor-read tool call as the
+  only pre-append call. Closes ambiguity in the previous "FIRST tool call"
+  wording, which was self-contradictory because the append literally
+  requires reading the anchor first.
+  **Spoke action:** Spoke `.claude/settings.json` does not yet receive the
+  hook automatically; BL-319 tracks scaffold delivery.
+
+### Changed - CHANGELOG Convention (Spawned BLs and Inline Spoke Actions)
+
+- `.claude/CLAUDE.md` Version Update Workflow step 2: new sub-bullets
+  documenting two CHANGELOG conventions surfaced during BL-318 review.
+  Inline `**Spoke action:**` lines per affected bullet (instead of trailing
+  footers) to preserve bullet→action mapping. New `### Spawned` subsection
+  for BLs created by a version's work, listing only newly-spawned BLs (not
+  pre-existing open ones), to document the causal link between a version
+  and its descendants without duplicating the active backlog. Both
+  conventions are applied retroactively to this v1.4.9 entry.
+
+### Spawned
+
+- BL-319 (Medium): Scaffold Delivery for Per-Turn Transcript Hook —
+  install the hook into spoke `.claude/settings.json` via `/dsm-align`.
+- BL-320 (Medium): Audit §7-Style Protocols for Require/Validate Gaps —
+  inventory other DSM_0.2 protocols with the same "doc rule, no
+  enforcement" shape and rank by blast radius.
+- BL-321 (Medium): Streamline DSM Version Update Workflow — single-gate
+  reviews, derived FEATURES.md and feature-trail rows, CHANGELOG template,
+  trust the skill instead of pre-staging.
+
 ## [1.4.8] - 2026-04-07
 
 ### Added - Python Virtual Environment Protocol (BL-284)
