@@ -12,6 +12,23 @@ Before proceeding, check `.claude/last-wrap-up.txt` for the previous session's w
 
 **Legacy fallback:** If `.claude/last-wrap-up.txt` does not exist but `.claude/session-baseline.txt` contains `mode: light`, treat as `type: light` and proceed normally. This handles sessions that ran before the wrap-up type marker was introduced.
 
+## Branch Cadence Gate (Origin: BACKLOG-326)
+
+Light resume is for **same-day continuation only**. If the open session branch was created on a prior calendar day, refuse to resume and direct the user to full `/dsm-go`.
+
+**Check (after Safety Gate, before Scaffold Pre-Check):**
+
+1. Run `git branch --show-current` and parse the date segment from the branch name if it matches `session-N/YYYY-MM-DD`. For task branches (`bl-*`, `sprint-*`, `parallel/*`), skip this check and continue to Scaffold Pre-Check (task branches may span days).
+2. Compare against today's date (`date +%Y-%m-%d`).
+3. **If dates match:** Continue to Scaffold Pre-Check normally.
+4. **If the branch date is earlier than today:** STOP and warn:
+   > "Session branch `{branch-name}` was created on {branch-date}, today is {today}. `/dsm-light-go` is for same-day continuation only. This branch should have been closed yesterday with full `/dsm-wrap-up`. Options: (a) run `/dsm-wrap-up` now to merge this branch to main and close it cleanly, then start a fresh session with `/dsm-go`, or (b) if the work on this branch is urgent and you accept the branch hygiene debt, run `/dsm-go` instead to force a fresh session-start flow with full checks."
+5. Do not proceed with lightweight flow. The user's next invocation must be `/dsm-wrap-up` or `/dsm-go`.
+
+**Fallback when branch name has no parseable date:** Parse the ISO timestamp from `.claude/session-baseline.txt` (`# Session baseline - {timestamp}`) and compare its date to today. If neither source yields a usable date, warn "Cannot determine session branch age, proceeding as same-day" and continue.
+
+**Why a hard gate:** The efficientnet project ran 7 consecutive lightweight cycles on one session branch without any full wrap-up because nothing enforced the cadence. A soft warning would not have caught it. See BACKLOG-326 for the full failure mode.
+
 ## Scaffold Pre-Check
 
 Before proceeding with the lightweight flow, verify the project has a minimal

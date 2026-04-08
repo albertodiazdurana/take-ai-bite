@@ -214,14 +214,38 @@ requiring it. The hook is the mechanism.
 
 **Turn-Boundary Transcript Append Self-Check:**
 
-At the start of every turn, before composing a response, the agent must
-ask: "Was my first tool call this turn an append to
-`.claude/session-transcript.md`?" If the answer is no and the turn requires
-any tool calls at all, the protocol has been violated. The check is binary;
-no "I planned to" or "the next call would have been" answers count. The
-only exception is turns with zero tool calls (pure conversational
-acknowledgment), which are explicitly allowed by the "When to skip thinking"
-rule above.
+Every turn begins with a transcript append. Every turn. At the start of
+every turn, before composing a response, the agent must ask: "Was my
+first tool call this turn an append to `.claude/session-transcript.md`?"
+If the answer is no, the protocol has been violated. The check is binary;
+no "I planned to" or "the next call would have been" answers count.
+
+This rule applies to turns that produce reasoning, recommendations, or
+decisions **without touching any files**. Pure-reasoning turns are
+explicitly covered: a turn whose response is a multi-paragraph decision
+analysis, trade-off comparison, or recommendation requires the same
+first-tool-call transcript append as a turn that edits code. The
+pure-reasoning-turn failure mode is the most damaging variant because
+pure-reasoning turns contain the highest-value thinking (decision
+rationale, considered-and-rejected paths, risk framing) and losing that
+content inverts the transcript's stated purpose as a reasoning log.
+
+**Example of the pure-reasoning-turn failure mode:** a turn in which the
+user asks "which of these two options should we pick?" and the agent
+responds with a multi-paragraph comparison (five-question gate
+evaluation, Option A vs Option B analysis, recommendation, proposed
+next steps) as a pure-text response with zero tool calls. This is a
+protocol violation. The agent must append thinking to the transcript as
+the first tool call of that turn, even though the turn would otherwise
+have none. The transcript append is the one required tool call.
+
+**The only exemption is content-trivial turns:** one-word
+acknowledgments ("Understood", "OK"), single-fact confirmations ("Yes",
+"No"), and responses with no new reasoning. The exemption is content-
+based, not tool-call-count-based. A turn that produces substantive new
+reasoning of any length is never content-trivial, regardless of whether
+it touches files. If there is new reasoning, there is a transcript
+append.
 
 **[RETROACTIVE] Transcript Append Self-Detection Rule:**
 
@@ -365,6 +389,27 @@ visible and auditable.
 - Execute scripts or tests without Gate 3 approval; the user must know what will run before it runs
 - Skip Gate 2 for "small" changes; the user reviews all implementation via the diff window
 - Treat prior discussion of findings or decisions as a substitute for Gate 1; a brief about *what to do* (decisions from EDA) is not a brief about *how to do it* (implementation approach for the next artifact). Gate 1 requires an explicit explanation of the specific artifact about to be generated, even when high-level decisions have already been agreed on
+
+### 8.6. Skill Self-Reference Protocol
+
+Before claiming any behavior of a DSM skill (commands like `/dsm-go`,
+`/dsm-wrap-up`, `/dsm-align`, `/dsm-finalize-project`, etc.), read the
+skill file in `scripts/commands/{skill-name}.md` (or
+`~/.claude/commands/{skill-name}.md` for the deployed copy). Do not
+answer "does skill X do Y?" from memory, inference, or prior sessions.
+The skill file is the only authoritative source; its step list changes
+across versions.
+
+This applies equally to user-invoked skills, sub-skills invoked by other
+skills, and behavior the agent considers when suggesting wrap-up,
+finalization, or alignment actions. The same read-before-answer rule
+that applies to source code applies to skill prompt files; the skill
+file *is* the source.
+
+**Origin:** efficientnet S8 incident, where the agent claimed
+`/dsm-wrap-up` handles portfolio notification when the checklist
+actually lives in `/dsm-finalize-project` Section G.3. The claim was
+made without reading either file.
 
 ---
 
@@ -694,10 +739,15 @@ and updated automatically. Project-specific content lives outside the delimiters
   existing `validate-transcript-edit.sh` PreToolUse hook enforces *shape*.
   IDE monitoring and session-start behavioral activation are user
   affordances, not enforcement. The hook is the mechanism.
-- Turn-boundary self-check: if your first tool call this turn was not a
-  transcript append and the turn requires any tool calls, the protocol was
-  violated. Recover by appending a `[RETROACTIVE]` entry with the current
-  HH:MM (never backdate) and a note explaining the gap; do not edit history.
+- Turn-boundary self-check: every turn begins with a transcript append. If
+  your first tool call this turn was not a transcript append, the protocol
+  was violated. This includes pure-reasoning turns (decision analysis,
+  recommendation, trade-off comparison) that would otherwise touch no files,
+  the transcript append is the one required tool call. The only exemption
+  is content-trivial turns (one-word acknowledgments, single-fact
+  confirmations with no new reasoning). Recover by appending a
+  `[RETROACTIVE]` entry with the current HH:MM (never backdate) and a note
+  explaining the gap; do not edit history.
 - Process narration: thinking blocks narrate reasoning as it unfolds,
   including considered-and-rejected paths, doubts, loops, and reversals.
   Clean post-hoc summaries hide inefficiency signals that are the primary
@@ -707,6 +757,8 @@ and updated automatically. Project-specific content lives outside the delimiters
 ### Pre-Generation Brief Protocol (reinforces inherited protocol)
 - Three-gate model: concept (explain) → implementation (diff review) → run (when applicable)
 - Each gate requires explicit user approval; gates are independent
+- What/why/how thinking block: before Gate 1, answer what the artifact is, why it is needed, and how it will be built, in the session transcript thinking block
+- Skill self-reference: before claiming any behavior of a DSM skill (`/dsm-go`, `/dsm-wrap-up`, `/dsm-align`, etc.), read `scripts/commands/{skill-name}.md` or `~/.claude/commands/{skill-name}.md`. Do not answer "does skill X do Y?" from memory.
 
 ### Inbox Lifecycle (reinforces inherited protocol)
 - After processing an inbox entry, move it to `_inbox/done/`

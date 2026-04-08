@@ -153,6 +153,9 @@ Before starting alignment, check if git is initialized:
 10. **Check .claude/ files:**
    - If `.claude/session-transcript.md` does not exist: create it (empty file).
    - If `.claude/dsm-ecosystem.md` does not exist: create it from the Ecosystem Pointers Template below. Resolve `dsm-central` path from the `@` reference in `.claude/CLAUDE.md`. Then read DSM Central's ecosystem registry (`{dsm-central}/.claude/dsm-ecosystem.md`) and copy the `portfolio` path from it. If DSM Central's registry does not exist or has no portfolio entry, leave as placeholder. Report: "Created `.claude/dsm-ecosystem.md` with ecosystem pointers."
+   - If `.claude/reasoning-lessons.md` does not exist: create it from the Reasoning Lessons Template below. Report: "Created `.claude/reasoning-lessons.md` (empty scaffold for per-session lessons)."
+   - If `.claude/reasoning-lessons.md` exists but is empty (zero bytes) or missing the `# Reasoning Lessons` header on line 1: prepend the template header without touching any existing content below. Report: "Added missing header to `.claude/reasoning-lessons.md`."
+   - Otherwise leave the file untouched.
 
 11. **Check command file drift (DSM Central only):**
    - Skip this step if the project is not DSM Central (no `scripts/commands/` directory).
@@ -186,19 +189,77 @@ Before starting alignment, check if git is initialized:
    - Feedback pushed: [count of entries pushed to DSM Central, or "none pending"]
    ```
 
-12b. **Write inbox notification (post-change only):** If the report is a post-change report (any fixes were applied), write an entry to the project's own `_inbox/` summarizing what was updated. Skip this step if no changes were applied (check-only run).
+12a. **Write persistent alignment report:** After printing the report to conversation, write the full report to `.claude/last-align-report.md` (gitignored, overwritten each run). This is the durable audit record so the user, or a future session, can read what the last alignment found without re-running the skill.
+
+   The persistent file contains a header block followed by the verbatim step-12 report and explicit detail subsections:
+
+   ```markdown
+   # /dsm-align persistent report
+
+   **Timestamp:** {ISO 8601 with timezone}
+   **DSM version:** vX.Y.Z (from {dsm-central}/CHANGELOG.md latest heading)
+   **Run mode:** post-change | check-only
+   **Project:** {project name}
+   **Project type:** {detected type}
+
+   ---
+
+   ## Report
+
+   {verbatim copy of the step-12 report block printed to conversation}
+
+   ## Warnings (full text)
+
+   {For each warning surfaced during the run, the full warning text as it would have appeared in conversation. If none, write "None."}
+
+   1. {warning 1 full text}
+   2. {warning 2 full text}
+   ...
+
+   ## Collisions (full text)
+
+   {For each collision, the full collision text. If none, write "None."}
+
+   ## Already correct
+
+   {Bulleted list of items that were checked and needed no action: folders present, template files present, `@` reference valid, alignment section in sync, .gitattributes correct, etc. This is the "what was checked" view so the user knows the run did not silently skip checks.}
+
+   ## Steps skipped
+
+   {Bulleted list of steps that were not executed and the reason. Examples:
+   - Step 11 skipped: not DSM Central
+   - Steps 2-6, 8c skipped: hub fast-path (DSM Central)
+   - Step 7b skipped: no valid @ reference (Step 7 reported missing)}
+   ```
+
+   - Write on **every** run, both post-change and check-only. Idempotence: if nothing changed between runs, the report content (excluding the timestamp line) is identical.
+   - The file is gitignored via the existing `.claude/` rule; no `.gitignore` change required.
+   - This step is mandatory; it must not be skipped even when the conversation report is short.
+
+12b. **Write inbox notification (post-change OR check-only with warnings):** Write an entry to the project's own `_inbox/` summarizing the alignment outcome. Trigger conditions:
+   - **Post-change run** (any fixes were applied), OR
+   - **Check-only run** with warnings or collisions present
+
+   Skip only when the run was check-only AND no warnings AND no collisions (the truly clean case).
    - Target: `_inbox/{YYYY-MM-DD}_dsm-align-update.md`
    - Format:
      ```markdown
-     ### [YYYY-MM-DD] /dsm-align: alignment updated
+     ### [YYYY-MM-DD] /dsm-align: {alignment updated | warnings present}
 
      **Type:** Notification
-     **Priority:** Low
+     **Priority:** {Low for post-change, Medium if warnings/collisions present}
      **Source:** /dsm-align
 
-     Changes applied:
-     - [List each fix from the "Created" and "Fixed" lines of the report]
+     Run mode: {post-change | check-only}
+     Full report: `.claude/last-align-report.md`
+
+     Summary:
+     - Created: [...]
+     - Fixed: [...]
+     - Warnings: [count] (see persistent report for full text)
+     - Collisions: [count] (see persistent report for full text)
      ```
+   - The notification references `.claude/last-align-report.md` rather than duplicating its contents; the persistent file is the source of truth for what was found.
    - If `_inbox/` does not exist (External Contribution projects), skip this step silently.
 
 13. **Write status marker:** Write `.claude/last-align.txt` (gitignored, local state) with the alignment result. This replaces the previous persist-to-decisions approach; the full report is shown in conversation text and does not need a durable file.
@@ -346,6 +407,18 @@ Reference: DSM_0.2 Module D (Phase 0.5: Research and Grounding).
 1. Create during research phase with standard header (Purpose, Target Outcome, Status)
 2. Integrate findings into sprint plan or deliverables
 3. Move to `done/` with Status: Done and Date Completed
+```
+
+### Reasoning Lessons Template (`.claude/reasoning-lessons.md`)
+
+```markdown
+# Reasoning Lessons
+
+Per-session lessons extracted from session transcripts. Appended by
+the wrap-up skill at each session end. See DSM_0.2 Module A Reasoning
+Lessons Protocol for the extraction rules.
+
+Categories: [pattern], [ecosystem], [infrastructure], [skill], [methodology]
 ```
 
 ### Ecosystem Pointers Template (`.claude/dsm-ecosystem.md`)

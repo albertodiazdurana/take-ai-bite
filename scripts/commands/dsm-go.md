@@ -35,14 +35,15 @@ before any session-start protocol can run correctly.
    `blog`, `checkpoints`, `decisions`, `feedback-to-dsm`, `guides`, `handoffs`,
    `plans`, `research`, `inbox`
 2. Also check for `_inbox/` at project root
-3. **If fewer than 5 of 9 `dsm-docs/` subdirectories exist, or `_inbox/` is missing:**
+2a. Also check for `.claude/reasoning-lessons.md`
+3. **If fewer than 5 of 9 `dsm-docs/` subdirectories exist, or `_inbox/` is missing, or `.claude/reasoning-lessons.md` is missing:**
    - Warn: "Project scaffold incomplete ({N}/9 dsm-docs/ folders found). Running
      `/dsm-align` to create base scaffold before continuing."
    - Invoke `/dsm-align` to create the base scaffold (folders, README templates,
      CLAUDE.md @ reference). The project-type-specific CLAUDE.md alignment section
      is deferred until project type detection completes.
    - After `/dsm-align` completes, continue to Step 0.
-4. **If scaffold is complete (5+ folders and `_inbox/` exists):** Continue to Step 0.
+4. **If scaffold is complete (5+ folders, `_inbox/` exists, and `.claude/reasoning-lessons.md` exists):** Continue to Step 0.
 
 ## Step 0: Session Branch Setup
 
