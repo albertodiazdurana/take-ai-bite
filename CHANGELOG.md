@@ -5,6 +5,32 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.10] - 2026-04-09
+
+### Added - Persistent /dsm-align Report and Skill Self-Reference Protocol (S176+S177 batch)
+
+- DSM_0.2 §8.6: new Skill Self-Reference Protocol requires reading the skill prompt file before claiming any skill behavior. Origin: efficientnet S8 false-claim incident about `/dsm-wrap-up` portfolio handling. (BL-327)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block.
+- DSM_0.2 §17.1 base template Pre-Generation Brief block: new bullet for the what/why/how thinking-block rule before Gate 1, propagated from §8.5 to make spokes inherit it explicitly. (BL-325)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block.
+- DSM_0.2 §17.1 base template Pre-Generation Brief block: new bullet for skill self-reference rule (mirrors §8.6). (BL-327)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block.
+
+### Changed - Skill behavior
+
+- `scripts/commands/dsm-align.md` step 12a: new persistent alignment report written to `.claude/last-align-report.md` on every run (post-change and check-only) with explicit warning/collision text, already-correct items, and skipped-step reasons. Step 12b modified to fire on check-only runs when warnings exist and to reference the persistent file instead of duplicating contents. (BL-329)
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+- `scripts/commands/dsm-align.md` step 10: new scaffold for `.claude/reasoning-lessons.md` with a standard header template; `scripts/commands/dsm-go.md` Step 0.5 now includes the file in scaffold completeness so a missing file auto-triggers `/dsm-align`. Prevents the efficientnet failure mode of 11 sessions without the lessons file. (BL-328)
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+- `scripts/commands/dsm-light-wrap-up.md` and `scripts/commands/dsm-light-go.md`: new Cadence Gate refusing to operate on a session branch whose date ≠ today (Option D, hard cadence rule). Catches the efficientnet 7-session failure mode where light cycles ran across multiple days on a stale session branch. Task branches (`bl-*`, `sprint-*`, `parallel/*`) exempt. (BL-326, S176)
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+- DSM_0.2 §7 Turn-Boundary Transcript Append Self-Check: rewritten positively ("Every turn begins with a transcript append"); tool-call-count condition removed; pure-reasoning-turn failure mode example added; exemption replaced with content-based criterion (content-trivial turns only). §17.1 template bullet mirrored. (BL-330, S176)
+  **Spoke action:** Run `/dsm-align` to update reinforcement block.
+
+### Spawned
+
+None this version.
+
 ## [1.4.9] - 2026-04-07
 
 ### Added - Per-Turn Transcript Enforcement and Process Narration (BL-318 Layer 2)
