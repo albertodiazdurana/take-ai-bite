@@ -25,7 +25,7 @@ Before starting alignment, check if git is initialized:
    State the detected type.
    **Implementation note:** Use `test -d` for directory existence checks, not `ls -d` (which returns non-zero when paths don't exist, cancelling parallel tool calls).
 
-   **Hub fast-path:** If the project is DSM Central (has `scripts/commands/` directory), skip steps 2-6 and 8c. These steps check spoke scaffold structure and validate CLAUDE.md paths against the filesystem, both of which are redundant on the hub that defines the templates. Run only steps 1, 7, 7b, 8, 8b, 9, 10, 11, 12, 13.
+   **Hub fast-path:** If the project is DSM Central (has `scripts/commands/` directory), skip steps 2-6 and 8c. These steps check spoke scaffold structure and validate CLAUDE.md paths against the filesystem, both of which are redundant on the hub that defines the templates. Run only steps 1, 7, 7b, 8, 8b, 9, 10, 10b, 11, 12, 13. Step 10b is mandatory on the hub because hub-self-installs the BL-319 hooks (transcript-reminder + validate-transcript-edit) and applies `chmod +x`. Omitting 10b on hub fast-path was the S180 root cause of a full session of zero transcript appends in DSM Central, the hooks were present on disk but not executable, so Claude Code's hook subsystem silently dropped the per-turn reminder injection.
 
 2. **Check and fix `_inbox/` at project root:**
    - If `dsm-docs/backlog/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox (`~/dsm-agentic-ai-data-science-methodology/_inbox/{project-name}.md`).
@@ -172,7 +172,7 @@ Before starting alignment, check if git is initialized:
       - Compute destination: `./.claude/hooks/{basename}`
       - Create `./.claude/hooks/` if missing
       - If destination missing OR byte-differs from source: copy with `cp`, then `chmod +x`
-      - If destination exists and is byte-identical: skip silently
+      - If destination exists and is byte-identical: skip the copy but **still apply `chmod +x`** to the destination. Edit/Write tools strip the executable bit when rewriting files, so re-chmod every run is the only reliable way to recover from past stripping. Per S180 root cause: hooks were present and byte-identical to source but not executable, and the OS silently refused to run them.
       - Track counters: `hooks_installed`, `hooks_updated`, `hooks_already_ok`
       - Self-copy guard: if source and destination resolve to the same file (Central running on itself), skip the copy but still count as `already_ok`
 
