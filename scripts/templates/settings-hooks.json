@@ -1,0 +1,26 @@
+{
+  "_comment": "DSM session-transcript hook template. Installed into spoke .claude/settings.json by /dsm-align (BL-319). Single source of truth: the referenced scripts live in .claude/hooks/ of DSM Central and are copied to spoke .claude/hooks/ at alignment time. Do not inline script bodies here; reference by relative path only.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/validate-transcript-edit.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/transcript-reminder.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
