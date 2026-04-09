@@ -6,9 +6,11 @@ Before proceeding, check `.claude/last-wrap-up.txt` for the previous session's w
 
 **If `type: light`:** proceed normally (expected continuation).
 
-**If `type: full` or `type: quick`:** Warn: "Last session ended with a [full/quick] wrap-up. `/dsm-light-go` skips inbox, version, and branch checks that matter for a fresh start. Switch to `/dsm-go`? (y = switch to full go, n = continue with light-go)". If the user accepts, stop and invoke `/dsm-go` instead. If the user declines, proceed with `/dsm-light-go`. If `type: quick`, also note: "Previous session skipped feedback push. Check `dsm-docs/feedback-to-dsm/` for unpushed entries."
+**If `type: full` or `type: quick`:** Warn: "Last session ended with a [full/quick] wrap-up. `/dsm-light-go` skips inbox, version, and branch checks that matter for a fresh start. Switch to `/dsm-go`? (y = switch to full go, n = continue with light-go). **The full /dsm-go flow will run from Step 0, including Step 6 (transcript reset and Session Transcript Protocol activation), before any user task action.**" If the user accepts, stop and invoke `/dsm-go` instead. If the user declines, proceed with `/dsm-light-go`. If `type: quick`, also note: "Previous session skipped feedback push. Check `dsm-docs/feedback-to-dsm/` for unpushed entries."
 
-**If the file does not exist (no wrap-up marker):** Warn: "No wrap-up marker found from previous session. There may be uncommitted changes or unpushed work. Switch to `/dsm-go` for full recovery? (y = switch to full go, n = continue with light-go)". If the user accepts, stop and invoke `/dsm-go` instead.
+**If the file does not exist (no wrap-up marker):** Warn: "No wrap-up marker found from previous session. There may be uncommitted changes or unpushed work. Switch to `/dsm-go` for full recovery? (y = switch to full go, n = continue with light-go). **The full /dsm-go flow will run from Step 0, including Step 6 (transcript reset and Session Transcript Protocol activation), before any user task action.**" If the user accepts, stop and invoke `/dsm-go` instead.
+
+**Switch-flow guarantee (BL-331):** When the user accepts a switch from `/dsm-light-go` to `/dsm-go`, the agent MUST run the full `/dsm-go` flow from Step 0. The Session Transcript Protocol behavioral activation lives in `/dsm-go` Step 6 and must execute before any user task action. Skipping Step 6 (jumping straight into the user's actual task) is the failure mode that caused portfolio S69 to run ~6 turns with zero transcript appends. The unconditional activation rule in DSM_0.2 §7 is the third independent enforcement layer; it activates regardless of whether Step 6 ran, but Step 6 is still the canonical place where transcript reset happens.
 
 **Legacy fallback:** If `.claude/last-wrap-up.txt` does not exist but `.claude/session-baseline.txt` contains `mode: light`, treat as `type: light` and proceed normally. This handles sessions that ran before the wrap-up type marker was introduced.
 
@@ -21,9 +23,13 @@ Light resume is for **same-day continuation only**. If the open session branch w
 1. Run `git branch --show-current` and parse the date segment from the branch name if it matches `session-N/YYYY-MM-DD`. For task branches (`bl-*`, `sprint-*`, `parallel/*`), skip this check and continue to Scaffold Pre-Check (task branches may span days).
 2. Compare against today's date (`date +%Y-%m-%d`).
 3. **If dates match:** Continue to Scaffold Pre-Check normally.
-4. **If the branch date is earlier than today:** STOP and warn:
-   > "Session branch `{branch-name}` was created on {branch-date}, today is {today}. `/dsm-light-go` is for same-day continuation only. This branch should have been closed yesterday with full `/dsm-wrap-up`. Options: (a) run `/dsm-wrap-up` now to merge this branch to main and close it cleanly, then start a fresh session with `/dsm-go`, or (b) if the work on this branch is urgent and you accept the branch hygiene debt, run `/dsm-go` instead to force a fresh session-start flow with full checks."
-5. Do not proceed with lightweight flow. The user's next invocation must be `/dsm-wrap-up` or `/dsm-go`.
+4. **If the branch date is earlier than today:** STOP and prompt interactively (BL-331 sub-item d):
+   > "Session branch `{branch-name}` was created on {branch-date}, today is {today}. `/dsm-light-go` is for same-day continuation only. This branch should have been closed yesterday with full `/dsm-wrap-up`. Run `/dsm-wrap-up` now to close the stale branch cleanly? (y/n)"
+   - **y:** Stop `/dsm-light-go` and invoke `/dsm-wrap-up` directly. After the wrap-up completes, the user can start a fresh session with `/dsm-go`. No further user typing is required between the gate and the wrap-up.
+   - **n:** Stop and let the user decide. Present the alternative: "Run `/dsm-go` instead to force a fresh session-start flow with full checks, or invoke `/dsm-wrap-up` manually when ready." Do not proceed with the lightweight flow.
+
+   This y/n pattern matches the Safety Gate ("Switch to /dsm-go? (y/n)") and `/dsm-go` Step 0d (stale-branch cleanup). The cadence gate is a hard stop, but the recovery action is mechanical (run wrap-up); forcing the user to type the command adds no value and breaks the flow.
+5. Do not proceed with lightweight flow. The user's next invocation must be `/dsm-wrap-up` (auto-invoked on `y`) or `/dsm-go` (manual on `n`).
 
 **Fallback when branch name has no parseable date:** Parse the ISO timestamp from `.claude/session-baseline.txt` (`# Session baseline - {timestamp}`) and compare its date to today. If neither source yields a usable date, warn "Cannot determine session branch age, proceeding as same-day" and continue.
 

@@ -52,6 +52,13 @@ before any session-start protocol can run correctly.
 This step implements the Three-Level Branching Strategy (DSM_0.2) by ensuring
 every session operates on a Level 2 session branch, never directly on main.
 
+**Note (DSM_0.2 §20.8):** Session branch creation at Step 0 covers the
+session-start case. For the **post-merge case** (when an in-session
+`gh pr merge --delete-branch` lands the working copy on main), see DSM_0.2
+§20.8 (Post-Merge Branch Recreation Rule). The chain pattern
+`gh pr merge ... && git checkout -b session-{N}/{YYYY-MM-DD}-{purpose}`
+prevents the silent commit-to-main failure mode.
+
 ### 0a. Determine session number
 
 Determine the new session number using **two sources** and taking the higher value:
@@ -234,7 +241,13 @@ After branch setup, clean up stale refs from prior sessions:
    - **If `type: quick`:** Note in the session report: "Previous session used quick wrap-up (no feedback push). Check `dsm-docs/feedback-to-dsm/` for unpushed entries."
    - **If `type: full`:** No action needed. Continue normally.
    - **If the file does not exist:** No action (step 5.8 handles incomplete wrap-up detection).
-6. **Reset session transcript:** Overwrite `.claude/session-transcript.md` with a fresh session header (the file persists across sessions; do not delete and recreate it). Write exactly this content, replacing N, timestamp, and project name:
+6. **Reset session transcript:** Overwrite `.claude/session-transcript.md` with a fresh session header (the file persists across sessions; do not delete and recreate it).
+
+   **No-skip rule (BL-331):** This step is the canonical activation point for the Session Transcript Protocol. When `/dsm-go` is entered as a deferral from `/dsm-light-go` (the user accepted the safety gate's "switch to /dsm-go?" prompt), Step 6 MUST run before any user task action. Skipping Step 6 to jump straight into the user's task is the failure mode that caused portfolio S69 to run ~6 turns with zero transcript appends. The unconditional activation rule in DSM_0.2 §7 is the third independent enforcement layer, but Step 6 is the canonical reset + activation point and the agent must execute it on every entry to `/dsm-go`, including deferral entries.
+
+   **Heredoc warning (BL-331):** The `cat > ... << EOF` form below uses an unquoted heredoc deliberately so `$(date -Iseconds)` expands. Do NOT change to `<< 'EOF'` (single-quoted); single-quoted heredocs suppress expansion and write the literal `$(date -Iseconds)` string into the transcript instead of the timestamp. Observed in portfolio S69.
+
+   Write exactly this content, replacing N, timestamp, and project name:
    ```bash
    cat > .claude/session-transcript.md << EOF
    # Session N Transcript

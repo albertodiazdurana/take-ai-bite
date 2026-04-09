@@ -5,6 +5,38 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.11] - 2026-04-09
+
+### Added - Light-go Switch-Flow Hardening, Post-Merge Branch Rule, Mirror Sync Personal Content Gate (S178 batch)
+
+- **BACKLOG-331:** Light-go switch-flow recovery and DSM_0.2 §7 hardening (4 sub-items in one BL).
+  - Switch-flow guarantee in `scripts/commands/dsm-light-go.md` Safety Gate handoff text + `scripts/commands/dsm-go.md` Step 6 no-skip rule for deferral entries. Closes the portfolio S69 failure mode (~6 turns with zero transcript appends after `/dsm-light-go` → `/dsm-go` switch dropped Step 6).
+  - **Spoke action:** Run `sync-commands.sh --deploy` to update the runtime copies of `dsm-go` and `dsm-light-go`.
+  - Unconditional activation rule in DSM_0.2 §7 + §17.1 base template + Central `.claude/CLAUDE.md`: "if `.claude/session-transcript.md` exists in the project, the protocol is active". Third independent enforcement layer alongside the per-turn hook (occurrence) and PreToolUse shape validator.
+  - **Spoke action:** Run `/dsm-align` to propagate the unconditional activation bullet to spoke CLAUDE.md alignment blocks.
+  - Heredoc anti-pattern in DSM_0.2 §7 Anti-Patterns + §17.1 + alignment block + inline warning in `dsm-go.md` Step 6: never use single-quoted heredoc (`<< 'EOF'`) when content contains `$(date +%H:%M)` or other shell expansions; capture timestamp into a variable and use unquoted heredoc, or prefer the Edit-tool append path.
+  - **Spoke action:** Run `/dsm-align` to propagate the heredoc anti-pattern bullet to spokes.
+  - Cadence gate interactive y/n prompt in `dsm-light-go.md` Branch Cadence Gate: replaces dead-end "options" output with auto-invocation of `/dsm-wrap-up` on `y`. Matches Safety Gate + `/dsm-go` Step 0d patterns.
+  - **Spoke action:** Run `sync-commands.sh --deploy` for `dsm-light-go`.
+  - Origins: portfolio S69 (transcript drift + cadence gate UX), dsm-blog-poster S17 (heredoc literal + transcript drift evidence).
+
+- **BACKLOG-332:** Post-merge branch recreation rule. New DSM_0.2 §20.8 with the rule (create new branch before any further commit), the chain pattern (`gh pr merge ... && git checkout -b session-N/YYYY-MM-DD-{purpose}`), the soft `-{purpose}` naming convention for follow-on branches in the same calendar session, and the recovery sequence using `git update-ref refs/heads/main refs/remotes/origin/main` (since the harness blocks `git reset --hard`). Reinforced in `dsm-go.md` Step 0 docs and Central `.claude/CLAUDE.md` Branching Strategy block.
+  - **Spoke action:** Review DSM_0.2 §20.8 for the post-merge branch recreation pattern. No template change; behavioral rule only.
+  - Origin: dsm-blog-poster S17 hit this twice (commit landed on main after `gh pr merge --delete-branch`; recovery cost ~5 min and one extra PR per slip).
+
+- **BACKLOG-335 (was BACKLOG-333):** Pre-mirror-sync personal content scanner. New `scripts/check-mirror-sync-content.sh` (executable, ~100 lines) greps a list of files for personal markers (name, PMP credential, LinkedIn URL, freelance/client framing, user-preference phrasing) and exits non-zero on hits. Supports `--confirmed` flag to bypass the gate for legitimate matches (author attribution in README, BL author fields). Wired into `scripts/commands/dsm-wrap-up.md` step 8d Mirror sync, plus the Change Propagation Protocol mirror step and Version Update Workflow step 9 in Central `.claude/CLAUDE.md`. Tested: 0 hits on DSM_0.2 + dsm-go + dsm-wrap-up; 3 legitimate hits on README, 1 on FEATURES, both expected and bypassable.
+  - **Spoke action:** None directly (Central-only safety net). Spokes inherit the wrap-up step text via mirror sync of `dsm-wrap-up.md` and gain the gate the next time they wrap up after `sync-commands.sh --deploy`.
+  - Renumbered from BL-333 because of an in-session collision with a pre-existing untracked `BACKLOG-333_audit-user-facing-docs-voice-and-tab-dsm-framing.md` file.
+
+- **BACKLOG-336 (was BACKLOG-334):** Personal rules allowlist for DSM Central. New `.claude/personal-rules-allowlist.md` (Layer 2, gitignored via `.gitignore` line 72) cataloging the Layer 1 (auto-memory) / Layer 2 (truly gitignored) / Layer 2.5 (tracked but not in mirror impact table: `CLAUDE.md`, `contributor-profile`, `skills-registry`, `hooks/`, `memory/MEMORY.md`, `spoke-backups/`, `LOCAL_CHANGELOG`) / Layer 3 (mirrored methodology) split. Includes legitimate matches list for the BL-335 scanner (README PMP/author/LinkedIn, FEATURES github URL, BL author fields). Companion to BL-335.
+  - **Spoke action:** None (Central-only reference document). Spokes can create their own allowlists if they have personal-rules churn.
+  - Renumbered from BL-334 for collision-pair contiguity.
+  - Implementation discovered that MEMORY.md was wrong about ".claude/ is gitignored". `.gitignore` lists individual files line by line; most `.claude/` files are tracked. MEMORY.md corrected in this wrap-up.
+
+### Spawned
+
+No new spawned BLs from v1.4.11. The version's work consumed the existing BL-331/332 (filed earlier in S178) plus the two new BL-335/336. BL-319 priority bumped Medium → High based on portfolio S69 + blog-poster S17 evidence; existing BL, no spawn.
+
 ## [1.4.10] - 2026-04-09
 
 ### Added - Persistent /dsm-align Report and Skill Self-Reference Protocol (S176+S177 batch)
