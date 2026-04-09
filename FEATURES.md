@@ -6,16 +6,17 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-001 is the first, newest entries
 appear at the top).
 
-**Current count:** 95 features across 11 capability domains.
+**Current count:** 96 features across 11 capability domains.
 
 ---
 
 ## April 2026
 
+- **F-096 (2026-04-09) Per-turn transcript hook delivery to spokes** — `/dsm-align` now installs the per-turn transcript hook and the append-only edit validator into each spoke's `.claude/hooks/` and wires them into `.claude/settings.json`. Before this, DSM_0.2 §7 had the rules on paper and nothing enforcing them. Two sessions on the same day paid the cost: portfolio S69 ran six turns without a single transcript append, and blog-poster S17 produced one entry in the whole session.
 - **F-095 (2026-04-07) Process narration in transcript thinking blocks** — Thinking blocks now narrate reasoning as it unfolds (loops, doubts, reversals, considered-and-rejected paths) instead of presenting clean post-hoc summaries. The user can now see inefficiency patterns in the agent's reasoning that were previously hidden by curated summaries, enabling reasoning-efficiency analysis.
 - **F-094 (2026-04-07) Per-turn transcript append enforcement** — Every turn now triggers a `UserPromptSubmit` hook reminder that forces the agent to append a thinking block to the session transcript before doing any work. Closes the failure mode where the agent silently skipped reasoning logs across multiple consecutive turns despite static doc rules requiring them.
 - **F-093 (2026-04-07) Python virtual environment protocol** — Projects with Python code now require `.venv` creation and activation before any `pip install`. Closes a gap where agents could pollute system Python with project dependencies, hiding version conflicts and breaking reproducibility across machines.
-- **F-092 (2026-04-07) Runtime register context for register-sensitive skills** — Skills like humanizer that depend on audience and formality assumptions now receive an explicit runtime context block (audience, formality, domain, constraints) before invocation. Closes a gap where the humanizer rewrote an academic deliverable into informal register because nothing told it the target reader.
+- **F-092 (2026-04-07) Runtime register context for register-sensitive skills** — Skills that depend on audience and formality assumptions now receive an explicit runtime context block (audience, formality, domain, constraints) before invocation. Closes a gap where the skill rewrote an academic deliverable into informal register because nothing told it the target reader.
 - **F-091 (2026-04-07) Planning pipeline gate in alignment template** — Spoke agents now see an explicit reinforcement that only `dsm-docs/plans/` items are actionable; material in `_reference/`, `docs/`, README, or sprint plan drafts is input to the planning pipeline, not a substitute for it. Closes a gap where agents conflated "understanding scope" with "adopting the plan."
 - **F-090 (2026-04-06) Sprint Retrospective Intelligence at sprint boundaries** — At sprint boundaries the agent synthesizes operational data across 6 dimensions (themes, principles, evolution, collaboration, learning, maturity), turning mechanical counts into strategic analysis that informs the next sprint.
 - **F-089 (2026-04-06) Cross-repo write safety in alignment template** — Spoke agents now see an explicit reinforcement that cross-repo writes require user confirmation, closing a gap where the rule existed in Module C but was invisible to spoke agents through the template.

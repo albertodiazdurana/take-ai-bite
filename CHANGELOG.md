@@ -5,6 +5,28 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.12] - 2026-04-09
+
+### Added - BL-319 Hook Delivery Scaffold + /dsm-go Step 1.8 Hardening (S179 batch)
+
+- **BACKLOG-319 (High):** Scaffold delivery for per-turn transcript hook. Closes the gap between DSM_0.2 §7 per-turn enforcement docs (shipped v1.4.9) and the hook mechanism that enforces them. Evidence: portfolio S69 ran six consecutive turns with zero transcript appends; dsm-blog-poster S17 produced a single entry in the entire session. Both had the same root cause, the hook was absent from `.claude/settings.json` and no committed template or delivery step existed to install one. Implementation (Option C, single source of truth):
+  - NEW `scripts/templates/settings-hooks.json`: minimal JSON fragment with the two hook entries (`UserPromptSubmit` -> `transcript-reminder.sh`, `PreToolUse/Edit` -> `validate-transcript-edit.sh`). Does not inline script bodies; references `.claude/hooks/` by relative path so Central's tracked scripts remain canonical.
+  - NEW `/dsm-align` step 10b: copies hook scripts from `{dsm-central}/.claude/hooks/*.sh` (resolved via the Ecosystem Path Registry) into each project's `.claude/hooks/`, then idempotently merges the template entries into `.claude/settings.json`. Merge matches by `command` field so repeat runs produce zero diff. Preserves all pre-existing permissions, custom hooks, and top-level keys. Runs on DSM Central itself as well as spokes. Smoke-tested on a seeded temp spoke (pre-existing permissions, custom hooks, myCustomKey) before commit; RUN1 installed=2 merged_any=True, RUN2 merged_any=False, all pre-existing content preserved.
+  - NEW `data/experiments/EXP-003-bl-319-hook-delivery/`: pre-registered experiment with 8 success criteria across 3 cohort spokes (take-ai-bite, dsm-data-science-portfolio, dsm-blog-poster — one per DSM project type). `run-check.sh` automates SC1-SC7; SC8 is a manual fire-test in TAB. Execution deferred to next session (requires coordinated `/dsm-align` runs across separate Claude Code windows).
+  - **Spoke action:** Run `/dsm-align` to install the hook scripts and wire `.claude/settings.json`. First run on a cold spoke creates `.claude/dsm-ecosystem.md` in step 10 and installs the hook in step 10b in the same pass.
+  - **Spoke action:** Run `sync-commands.sh --deploy` to pick up the new step 10b in `/dsm-align`.
+
+### Changed
+
+- **`/dsm-go` Step 1.8 wording hardened.** Step 1.8 (auto-run `/dsm-align` on alignment gap) previously attached "Do not ask permission" only to the missing/critical branch; the version-mismatch branch read as narrative "Report: ... Then auto-run" which parses as sequential-conditional. An agent in S179 rationalized a y/n confirmation gate on version mismatch despite the step's intent. Fix: hoist a top-level unconditional rule above both branches ("do not ask, do not prompt y/n, do not defer") and repeat the no-confirmation clause on every auto-run branch. This closes the same ambiguity class BL-331 closed for DSM_0.2 §7.
+  - **Spoke action:** Run `sync-commands.sh --deploy` for `dsm-go`.
+
+### Spawned
+
+- (none — this version's work did not spawn follow-up BLs. BL-320 audit of §7-style protocols already exists and gains one more data point from S179.)
+
+---
+
 ## [1.4.11] - 2026-04-09
 
 ### Added - Light-go Switch-Flow Hardening, Post-Merge Branch Rule, Mirror Sync Personal Content Gate (S178 batch)
