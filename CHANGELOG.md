@@ -5,6 +5,34 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.13] - 2026-04-09
+
+### Fixed - F-094 Functional Gap + .sh Executability Audit + /dsm-go Hardening (S180)
+
+- **Fixes F-094 functional gap (BL-319 follow-up):** F-094 (per-turn transcript append enforcement) shipped in v1.4.9 with the hook scripts and BL-319 v1.4.12 added the delivery mechanism, but the feature was effectively non-functional in real spokes because `.claude/hooks/transcript-reminder.sh` and `.claude/hooks/validate-transcript-edit.sh` were stored in the git index at mode `100644`. `core.fileMode = false` on WSL hid the divergence from `git status`, so the bug was invisible to anyone inspecting the working tree. Every fresh clone of any DSM project got non-executable hooks, and Claude Code's `UserPromptSubmit` and `PreToolUse/Edit` hook subsystems silently dropped the per-turn reminder injection because the OS refused to execute the scripts as configured in `settings.json` (`command: ".claude/hooks/transcript-reminder.sh"`, no `bash` prefix). DSM Central S180 ran 15+ consecutive turns with zero transcript appends despite F-094 supposedly being active. The bug was caught by the user mid-session, root-caused via `git ls-files -s`, and fixed.
+  - Layer 1 fix: `git update-index --chmod=+x .claude/hooks/transcript-reminder.sh .claude/hooks/validate-transcript-edit.sh` to set 100755 in the index explicitly, bypassing `core.fileMode`. Verified end-to-end: `chmod +x` on the working tree restored the hook subsystem within seconds (the next user prompt injected the REMINDER text into context, and `validate-transcript-edit.sh` shape hook fired and blocked a malformed Edit on first attempt).
+  - Layer 2 fix: `scripts/commands/dsm-align.md` hub fast-path step list previously omitted step 10b. BL-319 spec says step 10b "applies to all project types, including DSM Central itself" but the hub fast-path ran only steps 1, 7, 7b, 8, 8b, 9, 10, 11, 12, 13. So even with the index mode fixed, any session that rewrote a hook script via Write/Edit (which do not preserve +x) would silently strip executability and `/dsm-align` would never re-apply it on Central. Hub fast-path now includes step 10b with an inline note explaining the S180 incident.
+  - Layer 2 prevention: step 10b sub-step b previously skipped `chmod +x` when destination was byte-identical to source, leaving spokes vulnerable to the same Edit/Write +x stripping in their own hook copies. Now re-applies `chmod +x` on every run including byte-identical destinations, so spokes self-heal on the next `/dsm-align`.
+  - **Spoke action:** Run `/dsm-align` in each spoke once to absorb the re-chmod-always logic. Spokes that already had stripped `+x` will self-heal automatically. Or wait for the next `/dsm-go`, which now triggers `/dsm-align` unconditionally (see below).
+
+- **Audit `.sh` executability across repo:** After fixing the two hook scripts, audited all tracked `.sh` files via `git ls-files -s '*.sh'` and found 4 more victims of the same `core.fileMode=false` invisible-divergence pattern, all created via `Write` tool which does not preserve `+x`:
+  - `scripts/check-mirror-sync-content.sh` (BL-335 personal-content scanner, would silently fail when called from the Change Propagation Protocol; observed during this session's mirror sync prep)
+  - `scripts/sync-commands.sh` (worked accidentally on this machine because the local working tree had been chmod'd at some past point; every fresh clone got 644)
+  - `scripts/sync-take-ai-bite.sh` (mirror sync helper, same pattern)
+  - `data/experiments/EXP-003-bl-319-hook-delivery/run-check.sh` (SC1-SC7 automated checker, would have silently failed during EXP-003 execution)
+  All four now stored at 100755 in the index. Without this audit, EXP-003 itself would have been the next casualty of the bug it was designed to verify.
+
+- **`/dsm-go` Step 1.8: glue `/dsm-align` to `/dsm-go` unconditionally (BL-319 hardening):** `/dsm-go` Step 1.8 now ALWAYS invokes `/dsm-align` immediately after the `@` reference fix, with no marker checks, no version gates, no confirmation. The previous conditional logic (auto-run only on missing marker / critical result / version mismatch) was brittle and allowed at least four distinct failure modes to persist between sessions: (1) hook scripts at index mode 644 silently broke the per-turn reminder hook because no `chmod +x` was applied between sessions; (2) stale `.claude/last-align.txt` markers caused the version check to falsely pass; (3) Claude Code window cache loaded a pre-v1.4.12 `/dsm-go` that confirmation-gated `/dsm-align` and let the user say "not now"; (4) scaffold drift (missing folders, missing hooks, broken `@` reference, drifted CLAUDE.md alignment block) was not caught until the next manual `/dsm-align`. Unconditional auto-run on every `/dsm-go` collapses all four modes by guaranteeing every session starts from a known-aligned baseline. Cost is bounded (hub fast-path ~5s, full spoke run 10-30s) and the safety value is large. `/dsm-light-go` remains the explicit lightweight escape hatch for context-pressure continuation sessions; the asymmetry is intentional and documented inline.
+  - **Spoke action:** Run `/dsm-go` in each spoke once to absorb the new unconditional Step 1.8 (one-time slowdown of ~10-30s expected, then the spoke is fully aligned and self-healing on every subsequent `/dsm-go`). Existing open Claude Code windows must be restarted to pick up the new deployed `/dsm-go.md`.
+
+### Added - BACKLOG-337 (Spawned)
+
+- **BACKLOG-337 (Medium):** TAB sub-hub spoke creation skill (location-agnostic, two-input). Filed during S180 EXP-003 prep. The experiment's pre-registered cohort included a TAB-downstream test spoke, but no mechanism exists to scaffold one with the correct `dsm-central` pointer to TAB. `/dsm-align` step 7 fallback hardcodes Central, so any fresh directory running `/dsm-go` + auto-`/dsm-align` silently becomes a Central spoke. BL-337 proposes a TAB-side skill (`/dsm-new-spoke`) that runs from inside TAB and guides the user through a two-input dialog (location + name), supporting both greenfield and adopt-existing entry paths. The dropped TAB-downstream cohort case from EXP-003 will be re-run as an EXP-003 follow-up after BL-337 is implemented.
+
+### Spawned
+
+- **BACKLOG-337** (Medium): TAB sub-hub spoke creation skill, location-agnostic, two-input dialog. Spawned by EXP-003 cohort design gap (no mechanism to scaffold a TAB-downstream spoke with correct hub pointer).
+
 ## [1.4.12] - 2026-04-09
 
 ### Added - BL-319 Hook Delivery Scaffold + /dsm-go Step 1.8 Hardening (S179 batch)
