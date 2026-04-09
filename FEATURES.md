@@ -6,15 +6,17 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-001 is the first, newest entries
 appear at the top).
 
-**Current count:** 96 features across 11 capability domains.
+**Current count:** 97 features across 11 capability domains.
 
 ---
 
 ## April 2026
 
+- **F-097 (2026-04-09) Unconditional /dsm-align on every /dsm-go** — `/dsm-go` Step 1.8 now invokes `/dsm-align` on every session start, no marker checks, no version gates, no confirmation. Replaces brittle conditional logic that allowed alignment drift to persist between sessions. Eliminates four distinct failure modes hit during DSM Central S180 (hook scripts at index mode 644, stale marker files, Claude Code window cache, scaffold drift). `/dsm-light-go` remains the explicit lightweight escape hatch for context-pressure continuation sessions.
 - **F-096 (2026-04-09) Per-turn transcript hook delivery to spokes** — `/dsm-align` now installs the per-turn transcript hook and the append-only edit validator into each spoke's `.claude/hooks/` and wires them into `.claude/settings.json`. Before this, DSM_0.2 §7 had the rules on paper and nothing enforcing them. Two sessions on the same day paid the cost: portfolio S69 ran six turns without a single transcript append, and blog-poster S17 produced one entry in the whole session.
 - **F-095 (2026-04-07) Process narration in transcript thinking blocks** — Thinking blocks now narrate reasoning as it unfolds (loops, doubts, reversals, considered-and-rejected paths) instead of presenting clean post-hoc summaries. The user can now see inefficiency patterns in the agent's reasoning that were previously hidden by curated summaries, enabling reasoning-efficiency analysis.
 - **F-094 (2026-04-07) Per-turn transcript append enforcement** — Every turn now triggers a `UserPromptSubmit` hook reminder that forces the agent to append a thinking block to the session transcript before doing any work. Closes the failure mode where the agent silently skipped reasoning logs across multiple consecutive turns despite static doc rules requiring them.
+  - **Functional from:** v1.4.13 (after S180 BL-319 follow-up). The hook scripts were stored in the git index at mode `100644`. `core.fileMode = false` on WSL hid the divergence, so every fresh clone of any DSM project got non-executable hooks and the per-turn reminder hook silently failed end-to-end. Resolved via `git update-index --chmod=+x`, `/dsm-align` hub fast-path step 10b inclusion, and step 10b sub-step b re-applying `chmod +x` on every run including byte-identical destinations. See v1.4.13 CHANGELOG entry for the full root-cause chain.
 - **F-093 (2026-04-07) Python virtual environment protocol** — Projects with Python code now require `.venv` creation and activation before any `pip install`. Closes a gap where agents could pollute system Python with project dependencies, hiding version conflicts and breaking reproducibility across machines.
 - **F-092 (2026-04-07) Runtime register context for register-sensitive skills** — Skills that depend on audience and formality assumptions now receive an explicit runtime context block (audience, formality, domain, constraints) before invocation. Closes a gap where the skill rewrote an academic deliverable into informal register because nothing told it the target reader.
 - **F-091 (2026-04-07) Planning pipeline gate in alignment template** — Spoke agents now see an explicit reinforcement that only `dsm-docs/plans/` items are actionable; material in `_reference/`, `docs/`, README, or sprint plan drafts is input to the planning pipeline, not a substitute for it. Closes a gap where agents conflated "understanding scope" with "adopting the plan."
