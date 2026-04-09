@@ -88,6 +88,32 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
       (branch protection), use the protected-branch sub-protocol from the Version
       Update Workflow (create sync branch, PR, merge). If `mirror: true` entries
       do not exist, skip.
+
+      **Personal content gate (BL-335):** Before copying any file to a mirror
+      repo, run the personal content scanner on the changed methodology file
+      list:
+
+      ```bash
+      scripts/check-mirror-sync-content.sh <changed-methodology-files>
+      ```
+
+      The scanner greps for personal markers (names, credentials, contact
+      info, user-preference phrasing) and exits non-zero on a hit. If it
+      exits non-zero:
+
+      1. Read each reported file:line. Decide whether the match is a leak
+         (personal content that should not propagate) or a legitimate
+         occurrence (author attribution in README, BL author field, content
+         describing methodology features).
+      2. **If leak:** stop the mirror sync. Move the personal content to
+         `.claude/` (gitignored, local) or to auto-memory at
+         `~/.claude/projects/<encoded>/memory/`. Re-run the scanner.
+      3. **If legitimate:** re-run with `--confirmed` to bypass the gate.
+         Document the reason in the commit message or wrap-up report.
+
+      The scanner is a safety net, not a content classifier. The
+      authoritative split rule is in `.claude/personal-rules-allowlist.md`
+      (BL-336) and Layer 1/2/3 model documented in feedback memory.
 8.5. **Humanizer check:** Detect whether any human-facing files were modified this
    session. Extract the baseline commit SHA from `.claude/session-baseline.txt`,
    then run:

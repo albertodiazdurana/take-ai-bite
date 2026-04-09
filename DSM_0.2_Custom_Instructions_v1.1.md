@@ -187,6 +187,16 @@ tool calls or file edits.
 - **Append technique (mandatory):** Every append to the session transcript MUST follow this sequence: (1) read the last 3 lines of the file, (2) use the last non-empty line as the `old_string` anchor, (3) the `new_string` includes that last line PLUS the new content appended after it. **NEVER** search for earlier content to use as an insertion point. The only valid anchor is the current last line of the file. This is not a style preference; mid-file insertions cause out-of-order timestamps, confuse the user reading the transcript in real time, and have been observed in multiple sessions despite existing guidance
 - If a past entry was missed, note the gap in the next entry rather than editing history
 
+**Unconditional activation (BL-331):** If `.claude/session-transcript.md`
+exists in the project, the Session Transcript Protocol is active. No skill
+needs to activate it. The presence of the file is the activation signal.
+This rule is independent of `/dsm-go` Step 6 and does not depend on any
+session-start flow having run successfully. It is the third independent
+enforcement layer alongside the per-turn hook (occurrence) and the
+PreToolUse shape validator. Any session that finds the file present must
+follow the protocol from the first turn, including continuation sessions
+that defer from `/dsm-light-go` to `/dsm-go` mid-flight.
+
 **Anti-Patterns:**
 
 **DO NOT:**
@@ -197,6 +207,15 @@ tool calls or file edits.
 - Edit or rewrite past transcript entries; each entry reflects reasoning at the time it was written
 - Use Edit with `old_string` matching earlier content to insert entries mid-file; this causes out-of-order timestamps (observed in prior sessions). Use the mandatory append technique above
 - Use reasoning delimiters in conversation text; VS Code collapses them after streaming
+- **Use single-quoted heredoc (`<< 'EOF'`) when appending to the transcript via Bash** if the content contains shell expansions like `$(date +%H:%M)`. Single-quoted heredocs suppress expansion and write the literal string `$(date +%H:%M)` into the transcript instead of the timestamp. Observed in portfolio S69. Correct form: capture the timestamp into a variable first and use an unquoted heredoc:
+  ```bash
+  NOW=$(date +%H:%M)
+  cat >> .claude/session-transcript.md << EOF
+  <------------Start Thinking / ${NOW}------------>
+  ...
+  EOF
+  ```
+  The Edit-tool append path (read last 3 lines, anchor on last non-empty line) is preferred and avoids heredoc quoting entirely. Use heredoc only when the Edit path is unavailable.
 
 **Per-Turn Transcript Append Enforcement Mechanism:**
 
@@ -753,6 +772,16 @@ and updated automatically. Project-specific content lives outside the delimiters
   Clean post-hoc summaries hide inefficiency signals that are the primary
   input to reasoning-efficiency analysis. Brevity is not the goal,
   auditability is.
+- Unconditional activation: if `.claude/session-transcript.md` exists in
+  the project, the protocol is active. No skill needs to activate it. The
+  presence of the file is the activation signal. This rule is independent
+  of `/dsm-go` Step 6 and applies to continuation sessions that defer
+  from `/dsm-light-go` to `/dsm-go` mid-flight.
+- Heredoc anti-pattern: when appending to the transcript via Bash, never
+  use single-quoted heredoc (`<< 'EOF'`) if the content contains shell
+  expansions like `$(date +%H:%M)`. Capture the timestamp into a variable
+  first and use unquoted heredoc, or prefer the Edit-tool append path
+  (read last 3 lines, anchor on last non-empty line).
 
 ### Pre-Generation Brief Protocol (reinforces inherited protocol)
 - Three-gate model: concept (explain) → implementation (diff review) → run (when applicable)
@@ -1089,6 +1118,54 @@ branches, all commits land on the session branch and merge to main at wrap-up.
 The Branch Testing Requirement (above) applies to Level 3 → Level 2 merges.
 Before merging a task branch to the session branch, run the minimum verification
 and any BL-specific test plan conditions.
+
+### 20.8. Post-Merge Branch Recreation Rule
+
+After any in-session PR merge that deletes the source branch
+(`gh pr merge --delete-branch`, `git push origin --delete <branch>`, or
+equivalent), the working copy lands on `main` because the branch it was on
+was just deleted. The next `git commit` will silently land on `main`,
+violating the Three-Level Branching Strategy. The agent's mental model
+treats the merge as "the previous unit of work is done" and the next task
+starts on whatever branch the working copy is on, which is `main`.
+
+**Rule:** Before any further edits or commits, create a new session-level
+branch. The cleanest pattern chains both commands in the same shell call:
+
+```bash
+gh pr merge {N} --merge --delete-branch && \
+  git checkout -b session-{N}/{YYYY-MM-DD}-{next-purpose}
+```
+
+The `-{next-purpose}` suffix is a soft naming convention for follow-on
+branches in the same calendar session:
+
+- Initial: `session-N/YYYY-MM-DD`
+- Follow-on after merge: `session-N/YYYY-MM-DD-{purpose}` (e.g.,
+  `session-17/2026-04-09-post7`, `session-17/2026-04-09-bl015`)
+
+It avoids branch name collisions and makes session boundaries clearer in
+`git log`. The convention is not enforced by linter or hook; it is a
+readability convention, not a correctness rule.
+
+**Recovery if a commit lands on main.** Do **not** use `git reset --hard`;
+the harness blocks it without per-call approval. Use this safe sequence:
+
+```bash
+git branch session-{N}/{YYYY-MM-DD}-recovery       # safety net at HEAD
+git update-ref refs/heads/main refs/remotes/origin/main  # rewind main
+git checkout session-{N}/{YYYY-MM-DD}-recovery
+```
+
+Then push the recovery branch and open a follow-up PR. The work is
+preserved on the recovery branch; main is rewound to its remote state
+without touching the working tree.
+
+**Origin:** dsm-blog-poster S17 (2026-04-09) hit this twice. After
+`gh pr merge --delete-branch`, the agent edited a file and committed; the
+commit landed on main. Recovery cost ~5 minutes and one extra PR per slip.
+The failure mode is silent: nothing in the tooling complains when a commit
+lands on main outside a session branch.
 
 ---
 
