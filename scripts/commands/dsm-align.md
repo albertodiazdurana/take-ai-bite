@@ -157,6 +157,59 @@ Before starting alignment, check if git is initialized:
    - If `.claude/reasoning-lessons.md` exists but is empty (zero bytes) or missing the `# Reasoning Lessons` header on line 1: prepend the template header without touching any existing content below. Report: "Added missing header to `.claude/reasoning-lessons.md`."
    - Otherwise leave the file untouched.
 
+10b. **Install session-transcript hooks (BL-319):**
+   Deliver the per-turn transcript append hook and the append-only edit validator to the project's `.claude/hooks/` and wire them into `.claude/settings.json`. Single source of truth: Central's own `.claude/hooks/*.sh` scripts. The hook entries come from `{dsm-central}/scripts/templates/settings-hooks.json`.
+
+   **Applies to all project types, including DSM Central itself** (Central's `.claude/settings.json` is gitignored and must stay aligned with the template it ships).
+
+   Skip only if: (a) `dsm-central` path cannot be resolved (no `.claude/dsm-ecosystem.md` and fallback resolution failed), OR (b) the resolved `dsm-central` path does not contain `.claude/hooks/transcript-reminder.sh` (source missing — warn loudly and skip).
+
+   **Sub-steps:**
+
+   a. **Resolve Central path.** Read `dsm-central` from `.claude/dsm-ecosystem.md`. If the project IS Central, use `.` (the current project root).
+
+   b. **Copy hook scripts.** For each file in `{dsm-central}/.claude/hooks/*.sh`:
+      - Compute destination: `./.claude/hooks/{basename}`
+      - Create `./.claude/hooks/` if missing
+      - If destination missing OR byte-differs from source: copy with `cp`, then `chmod +x`
+      - If destination exists and is byte-identical: skip silently
+      - Track counters: `hooks_installed`, `hooks_updated`, `hooks_already_ok`
+      - Self-copy guard: if source and destination resolve to the same file (Central running on itself), skip the copy but still count as `already_ok`
+
+   c. **Read hooks template.** Read `{dsm-central}/scripts/templates/settings-hooks.json`. Parse as JSON. Extract the `hooks` object.
+
+   d. **Read or create settings.json.** Read `./.claude/settings.json`. If missing, initialize as:
+      ```json
+      { "permissions": { "allow": [], "deny": [] }, "hooks": {} }
+      ```
+      If present but invalid JSON, warn and skip the merge (do not clobber a broken-but-possibly-recoverable file).
+
+   e. **Merge hook entries idempotently.** For each top-level hook event in the template (`PreToolUse`, `UserPromptSubmit`, etc.):
+      - Ensure `settings.hooks[event]` exists as a list
+      - For each entry in `template.hooks[event]`:
+        - Extract the set of `command` values from the entry's `hooks[*].command` field
+        - Scan existing `settings.hooks[event][*].hooks[*].command` for any of those values
+        - If ANY command from the template entry is already present in `settings.hooks[event]`, skip appending this entry (idempotency: match on command, not object equality)
+        - Otherwise, append the entry as-is
+      - Track: `settings_merged` (true if any entry was appended), `settings_already_ok` (true if all template entries were already present)
+      - **Never** remove or modify entries that did not come from the template; preserve user-added hooks, permissions, and all other fields
+
+   f. **Write settings.json.** If merge changed anything, write back pretty-printed (2-space indent). Otherwise leave the file untouched.
+
+   g. **Report in step 12:** add one line under `CLAUDE.md paths`:
+      `Transcript hooks: [hooks_installed installed / hooks_updated updated / hooks_already_ok ok] · settings.json: [merged | already ok | created | skipped: reason]`
+
+   **Implementation note for the agent executing this step:** use Python for JSON manipulation (stdlib only, no jq dependency):
+   ```bash
+   python3 - << 'PY'
+   import json, os, shutil, stat, sys
+   # sub-steps b-f implemented as pure Python
+   PY
+   ```
+   The step is idempotent by construction: the second run sees byte-identical hooks and matched commands, so it reports `already_ok` on everything with zero file writes.
+
+   **Origin:** BL-319. Closes the gap between DSM_0.2 §7 per-turn enforcement docs (shipped v1.4.9) and the hook mechanism that enforces them (previously local-only in each Central instance). Evidence: portfolio S69 and blog-poster S17 both ran with zero transcript appends because the hook was absent.
+
 11. **Check command file drift (DSM Central only):**
    - Skip this step if the project is not DSM Central (no `scripts/commands/` directory).
    - For each `.md` file in `scripts/commands/`:
