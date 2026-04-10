@@ -315,7 +315,21 @@ Before starting alignment, check if git is initialized:
    - The notification references `.claude/last-align-report.md` rather than duplicating its contents; the persistent file is the source of truth for what was found.
    - If `_inbox/` does not exist (External Contribution projects), skip this step silently.
 
-13. **Write status marker:** Write `.claude/last-align.txt` (gitignored, local state) with the alignment result. This replaces the previous persist-to-decisions approach; the full report is shown in conversation text and does not need a durable file.
+13. **Write status marker (with spoke-action surfacing):** Before writing, read the existing `.claude/last-align.txt` to capture the previous `dsm-version` value. Then resolve the current DSM version from `{dsm-central}/CHANGELOG.md` (latest `## [vX.Y.Z]` heading). Compare old vs new version:
+
+   **If versions differ (or no previous marker exists):**
+   1. Read CHANGELOG entries between the old and new versions
+   2. Extract lines matching `**Spoke action:**`
+   3. If spoke actions found, surface to user: "DSM updated from vX.Y.Z to vA.B.C. Spoke actions required: [list]"
+   4. Auto-execute by annotation type:
+      - `Run /dsm-align`: Already running (this is /dsm-align). Report: "Template change applied by this alignment run."
+      - `Review [section]`: Surface as action item for the user.
+      - `Update [file]`: Surface as action item for the user.
+   5. If no spoke actions found, report the version change without action prompts
+
+   **If versions match:** Skip spoke-action surfacing.
+
+   **Then write** `.claude/last-align.txt` (gitignored, local state):
    ```
    # Last /dsm-align run
    date: YYYY-MM-DD
@@ -325,8 +339,9 @@ Before starting alignment, check if git is initialized:
    critical: N
    ```
    - `result` is `pass` if no warnings or critical issues, `warnings` if only warnings, `critical` if any critical issues were found
-   - `dsm-version`: resolve the `dsm-central` path from `.claude/dsm-ecosystem.md` (or from the `@` reference in CLAUDE.md), then read `{dsm-central}/CHANGELOG.md` and extract the version from the latest `## [vX.Y.Z]` heading. CHANGELOG is the source of truth for version numbers; do not guess or use other files
-   - `/dsm-go` reads this marker to detect stale alignment (version mismatch or missing marker)
+   - `dsm-version`: CHANGELOG is the source of truth for version numbers; do not guess or use other files
+
+   **Origin (BL-338):** Previously, spoke-action surfacing lived in `/dsm-go` Step 2c, which read `last-align.txt` after `/dsm-align` Step 13 had already overwritten it. The old version was lost, so 2c always saw "versions match" and never surfaced spoke actions. Moving surfacing into Step 13 (read-before-write) fixes the ordering bug.
 
 ## Templates
 
