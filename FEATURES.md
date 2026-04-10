@@ -6,12 +6,14 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-001 is the first, newest entries
 appear at the top).
 
-**Current count:** 97 features across 11 capability domains.
+**Current count:** 99 features across 11 capability domains.
 
 ---
 
 ## April 2026
 
+- **F-099 (2026-04-10) Minimal troubleshooting boot with /dsm-safe-go** — Zero-dependency, read-only session entry point for diagnosing problems when the normal boot chain is broken. Transcript append is best-effort. No side effects. The escape hatch that makes infrastructure changes safer to ship.
+- **F-098 (2026-04-10) Gate 0 Collaborative Definition Protocol** — New gate in the Pre-Generation Brief that governs the collaborative dialog before any artifact is conceived. Three steps (confirm threads, analyze dependencies, package into units), each requiring explicit confirmation. Ensures the human shapes the work structure, not just approves it.
 - **F-097 (2026-04-09) Unconditional /dsm-align on every /dsm-go** — `/dsm-go` Step 1.8 now invokes `/dsm-align` on every session start, no marker checks, no version gates, no confirmation. Replaces brittle conditional logic that allowed alignment drift to persist between sessions. Eliminates four distinct failure modes hit during DSM Central S180 (hook scripts at index mode 644, stale marker files, Claude Code window cache, scaffold drift). `/dsm-light-go` remains the explicit lightweight escape hatch for context-pressure continuation sessions.
 - **F-096 (2026-04-09) Per-turn transcript hook delivery to spokes** — `/dsm-align` now installs the per-turn transcript hook and the append-only edit validator into each spoke's `.claude/hooks/` and wires them into `.claude/settings.json`. Before this, DSM_0.2 §7 had the rules on paper and nothing enforcing them. Two sessions on the same day paid the cost: portfolio S69 ran six turns without a single transcript append, and blog-poster S17 produced one entry in the whole session.
 - **F-095 (2026-04-07) Process narration in transcript thinking blocks** — Thinking blocks now narrate reasoning as it unfolds (loops, doubts, reversals, considered-and-rejected paths) instead of presenting clean post-hoc summaries. The user can now see inefficiency patterns in the agent's reasoning that were previously hidden by curated summaries, enabling reasoning-efficiency analysis.

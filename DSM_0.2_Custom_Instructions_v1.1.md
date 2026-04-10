@@ -322,8 +322,51 @@ block at all.
 ## 8. Pre-Generation Brief Protocol
 
 Before creating any artifact (code file, test file, documentation, configuration),
-follow the three-gate approval model. Each gate requires explicit user approval
+follow the four-gate approval model. Each gate requires explicit user approval
 before proceeding to the next.
+
+### 8.0. Gate 0: Collaborative Definition
+
+Before presenting any concept (Gate 1), collaboratively define what the work
+is and how it should be structured. Gate 0 governs the dialog phase where work
+is understood, decomposed, and packaged before any artifact is conceived.
+
+**Three steps, each requiring explicit confirmation:**
+
+1. **Confirm threads:** Present the identified work items, topics, or threads
+   extracted from the user's request. Wait for explicit confirmation that the
+   list is complete and correctly framed. Do not proceed until the user agrees
+   on *what* the threads are.
+2. **Analyze dependencies:** Map relationships, ordering constraints, and
+   prerequisites between threads. Present the dependency structure. Wait for
+   explicit confirmation.
+3. **Package:** Propose how to group threads into actionable units (BLs,
+   artifacts, work blocks). Wait for explicit confirmation of the packaging
+   before entering Gate 1 for any unit.
+
+After Gate 0 completes, each packaged unit enters its own Gate 1-2-3 cycle
+independently. Gate 0 produces the map; Gates 1-2-3 execute each point on
+the map.
+
+**When Gate 0 is mandatory:**
+- Work involves multiple threads or topics
+- Scope or dependencies are unclear
+- Planning work (BL definition, sprint planning, architecture decisions)
+- Any work that touches agent infrastructure (skills, hooks, settings, commands)
+
+**When Gate 0 may be skipped:**
+- Single-topic, well-defined work with no ambiguity (e.g., implementing a
+  BL whose scope is already confirmed, fixing a specific bug)
+- Trivial artifacts (`.gitkeep`, minor config)
+
+**Anti-pattern:** Presenting a pre-formed plan and asking for yes/no is not
+Gate 0. Gate 0 requires the human to shape the structure at each step, not
+merely approve a finished proposal.
+
+**Origin:** S182. The step-by-step dialog model for defining BLs 341-344
+(confirm threads → analyze dependencies → package) was improvised at the
+user's request, then recognized as the missing entry point to all
+collaboration.
 
 ### 8.1. Gate 1: Concept Approval
 
@@ -366,11 +409,14 @@ Gate 3 does not apply to artifacts that are only created, not executed
 
 ### 8.4. Gate Scope
 
+- Gate 0 is mandatory when work has multiple threads, unclear scope, or
+  touches agent infrastructure; optional for single-topic, well-defined work
 - Gates 1 and 2 are mandatory for every non-trivial artifact
 - Gate 3 applies only when the artifact will be executed in this session
 - Each artifact gets its own gate cycle; do not batch multiple artifacts
   through gates together
-- Concept approval (Gate 1) does NOT grant implementation approval (Gate 2);
+- Gate 0 approval (collaborative definition) does NOT grant concept approval
+  (Gate 1); concept approval does NOT grant implementation approval (Gate 2);
   implementation approval does NOT grant run approval (Gate 3)
 
 ### 8.5. Pre-Generation Reasoning Structure
@@ -672,7 +718,7 @@ The `@` reference imports protocols as background context, but agents may deprio
 |----------|---------------|---------------------|
 | Notebook Collaboration Protocol | DSM 1.0 or Hybrid projects | "User copies each cell; output ONE cell at a time as a fenced code block; wait for output" |
 | App Development Protocol | DSM 4.0 projects | "Guide step by step, user approves via permission window" |
-| Pre-Generation Brief Protocol | All projects | "Three-gate model: concept (explain) → implementation (diff review) → run (when applicable); each gate = explicit stop" |
+| Pre-Generation Brief Protocol | All projects | "Four-gate model: collaborative definition (confirm threads → dependencies → packaging) → concept (explain) → implementation (diff review) → run (when applicable); each gate = explicit stop" |
 | Session Transcript Protocol | All projects | "Append thinking to .claude/session-transcript.md BEFORE acting; output AFTER; conversation text = results only; use Session Transcript Delimiter Format: `<------------Start Thinking / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`" |
 
 **Example reinforcement in project CLAUDE.md:**
@@ -784,7 +830,7 @@ and updated automatically. Project-specific content lives outside the delimiters
   (read last 3 lines, anchor on last non-empty line).
 
 ### Pre-Generation Brief Protocol (reinforces inherited protocol)
-- Three-gate model: concept (explain) → implementation (diff review) → run (when applicable)
+- Four-gate model: collaborative definition (confirm threads → dependencies → packaging) → concept (explain) → implementation (diff review) → run (when applicable)
 - Each gate requires explicit user approval; gates are independent
 - What/why/how thinking block: before Gate 1, answer what the artifact is, why it is needed, and how it will be built, in the session transcript thinking block
 - Skill self-reference: before claiming any behavior of a DSM skill (`/dsm-go`, `/dsm-wrap-up`, `/dsm-align`, etc.), read `scripts/commands/{skill-name}.md` or `~/.claude/commands/{skill-name}.md`. Do not answer "does skill X do Y?" from memory.

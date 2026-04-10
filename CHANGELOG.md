@@ -5,6 +5,27 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.14] - 2026-04-10
+
+### Added - Gate 0 Collaborative Definition + /dsm-safe-go + /dsm-go Cleanup (S182)
+
+- **BL-341: Gate 0 Collaborative Definition Protocol (DSM_0.2 §8.0).** New gate in the Pre-Generation Brief Protocol that governs the collaborative dialog before any artifact is conceived. Three steps (confirm threads → analyze dependencies → package into units), each requiring explicit confirmation. Mandatory for multi-thread work, unclear scope, or agent infrastructure changes. The three-gate model becomes a four-gate model (§8.0 → §8.1 → §8.2 → §8.3). Updated §8.4 Gate Scope, §17.1 alignment template, and CLAUDE.md reinforcement blocks.
+  - **Spoke action:** Run `/dsm-align` to update PGB reinforcement block ("Three-gate" → "Four-gate").
+
+- **BL-338: /dsm-go redundancy cleanup and 2c version-check fix.** Removed three pure-duplicate steps from `/dsm-go` (1.7, 2a.7, 2b.5, all fully covered by `/dsm-align`). Collapsed four partial duplicates to their unique residuals (0.5, 2a.5, 2b). Fixed the 2c version-check ordering bug by moving spoke-action surfacing into `/dsm-align` Step 13 as a read-before-write operation (the old 2c read `last-align.txt` after Step 13 had already overwritten it). dsm-go.md: 299 → 276 lines.
+  - **Spoke action:** Run `sync-commands.sh --deploy` to update `/dsm-go` and `/dsm-align` command files.
+
+- **BL-340: /dsm-safe-go minimal troubleshooting boot skill.** New zero-dependency, read-only session entry point for diagnosing problems when `/dsm-go`, `/dsm-light-go`, or `/dsm-align` is broken. Transcript append is best-effort (skip if broken). No side effects, no session tracking, no branch operations. Boot hierarchy: `/dsm-safe-go` < `/dsm-light-go` < `/dsm-go`.
+  - **Spoke action:** Run `sync-commands.sh --deploy` to install the new `/dsm-safe-go` command.
+
+### Spawned
+
+- BL-342 (High): Claude Code platform research, "How does Claude Code work?"
+- BL-343 (High): Skill/Hook Collaboration Protocol and Structural Standard
+- BL-344 (Medium): "Read the User's Manual" foundational principle for DSM_6.0
+- BL-345 (Medium): AI Platform Section architecture, "How to Work with Claude"
+- BL-346 (High): "We Need to Talk" foundational principle for DSM_6.0
+
 ## [1.4.13] - 2026-04-09
 
 ### Fixed - F-094 Functional Gap + .sh Executability Audit + /dsm-go Hardening (S180)

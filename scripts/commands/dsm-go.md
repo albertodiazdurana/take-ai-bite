@@ -37,12 +37,9 @@ before any session-start protocol can run correctly.
 2. Also check for `_inbox/` at project root
 2a. Also check for `.claude/reasoning-lessons.md`
 3. **If fewer than 5 of 9 `dsm-docs/` subdirectories exist, or `_inbox/` is missing, or `.claude/reasoning-lessons.md` is missing:**
-   - Warn: "Project scaffold incomplete ({N}/9 dsm-docs/ folders found). Running
-     `/dsm-align` to create base scaffold before continuing."
-   - Invoke `/dsm-align` to create the base scaffold (folders, README templates,
-     CLAUDE.md @ reference). The project-type-specific CLAUDE.md alignment section
-     is deferred until project type detection completes.
-   - After `/dsm-align` completes, continue to Step 0.
+   - Warn: "Project scaffold incomplete ({N}/9 dsm-docs/ folders found).
+     Step 1.8 will run `/dsm-align` to fix this."
+   - Continue to Step 0 (do NOT invoke `/dsm-align` here; Step 1.8 runs it unconditionally).
 4. **If scaffold is complete (5+ folders, `_inbox/` exists, and `.claude/reasoning-lessons.md` exists):** Continue to Step 0.
 
 ## Step 0: Session Branch Setup
@@ -135,12 +132,6 @@ After branch setup, clean up stale refs from prior sessions:
 
 1. **Read MEMORY.md:** Find and load this project's MEMORY.md from the auto memory directory to restore session context. **If MEMORY.md does not exist or fails to load**, continue to Step 2 but note that the agent is operating without prior session context, which increases the risk of applying generic rules to a project with specific overrides.
 1.5. **Read reasoning lessons:** If `.claude/reasoning-lessons.md` exists, read the first 10 lines (header + category names) to check relevance and confirm the file is primed for the session. Do not read the full file; it can exceed 150 lines and 30KB, wasting context budget. Report any category that is particularly relevant to the current project. If the file does not exist, skip this step silently.
-1.7. **Fix `@` reference (critical, mandatory):** Check `.claude/CLAUDE.md` for a valid `@` line referencing `DSM_0.2_Custom_Instructions_v1.1.md`. If missing, stale, or invalid (markdown link, wrong path), **fix it immediately**:
-   1. Resolve dsm-central from `.claude/dsm-ecosystem.md` or common locations (`~/dsm-agentic-ai-data-science-methodology/`)
-   2. Verify `{dsm-central}/DSM_0.2_Custom_Instructions_v1.1.md` exists
-   3. Insert or replace the `@` line in CLAUDE.md. If replacing an invalid line (e.g., `[@..](D:\...)`), remove the old line and insert the correct `@` reference at the top
-   4. Report: "Fixed `@` reference: `@{path}`"
-   - If dsm-central cannot be resolved: **halt session start**. Report: "Cannot resolve DSM_0.2 path. No `.claude/dsm-ecosystem.md` and dsm-central not found at common locations. Create the ecosystem file manually or run `/dsm-align` from a project where it works." Do not proceed to step 2 with a broken `@` reference.
 1.8. **Always run /dsm-align (unconditional, no exceptions):** Invoke `/dsm-align` immediately. Do not check `.claude/last-align.txt`. Do not gate on version mismatch. Do not gate on marker presence. Do not ask the user. Do not present a y/n confirmation gate. Do not defer. The only valid output of this step is `/dsm-align` running to completion, then continuing to step 2 with the fixed state.
 
    **Why unconditional (S180 §22 hardening, BL-319 follow-up):** The previous conditional logic (auto-run only on missing marker / critical result / version mismatch) was brittle and allowed at least four distinct failure modes to persist between sessions: (1) hook scripts at index mode 644 silently broke the per-turn reminder hook because no `chmod +x` was applied between sessions; (2) stale `last-align.txt` markers caused the version check to falsely pass; (3) Claude Code window cache loaded a pre-v1.4.12 `/dsm-go` that confirmation-gated `/dsm-align` and let the user say "not now"; (4) scaffold drift (missing folders, missing hooks, broken `@` reference, drifted CLAUDE.md alignment block) was not caught until the next manual `/dsm-align`. Unconditional auto-run on every `/dsm-go` collapses all four modes by guaranteeing every session starts from a known-aligned baseline. The cost is bounded (`/dsm-align` hub fast-path ~5s, full spoke run 10-30s) and the safety value is large.
@@ -149,31 +140,17 @@ After branch setup, clean up stale refs from prior sessions:
 
    After `/dsm-align` completes, re-read `.claude/last-align.txt` to confirm the marker is current, then continue to step 2 with the fixed state.
 2. **DSM_0.2 session-start checks (act, not just report):** Read the `@`-referenced DSM_0.2 file in `.claude/CLAUDE.md` for current protocols, then **perform** each session-start action **in the order listed** (each sub-step may depend on results from prior sub-steps):
-   - **2a. Project type detection (MUST complete first; gates 2b and 2c):** Identify and state the project type. Read the project CLAUDE.md to determine governance boundaries. For External Contribution projects, note that governance artifacts route to DSM Central, not the repo root.
-   - **2a.5. Ecosystem Path Registry:** Read `.claude/dsm-ecosystem.md` if it exists. Parse the Paths table and cache each Name -> Path mapping for the session. For each entry, verify the path exists on the filesystem:
+   - **2a. Project type detection (MUST complete first; gates 2b):** Identify and state the project type. Read the project CLAUDE.md to determine governance boundaries. For External Contribution projects, note that governance artifacts route to DSM Central, not the repo root.
+   - **2a.5. Ecosystem Path Registry:** Read `.claude/dsm-ecosystem.md` (created by `/dsm-align` in Step 1.8). Parse the Paths table and cache each Name -> Path mapping for the session. For each entry, verify the path exists on the filesystem:
      - If the path exists: note as validated
      - If the path does not exist: warn "Ecosystem path '{name}' points to '{path}' which does not exist. Cross-repo operations using this path will be skipped."
-     If the file does not exist, present as an **action item** for all project types: "Missing `.claude/dsm-ecosystem.md`. Run `/dsm-align` to create it with required ecosystem pointers (`dsm-central`, `portfolio`)." Use fallback resolution (dsm-central from `@` reference) for the current session but flag the gap. Continue to 2a.7.
-   - **2a.7. CLAUDE.md content validation (DSM_0.2 §17.2):** Cross-reference project-specific CLAUDE.md sections against the project type from 2a. Flag sections that reference workflows the project does not use (e.g., Notebook Protocol in a Documentation project). Skip insurance sections (Destructive Command Protocol, Secret Exposure Prevention, Plan Mode, Branching Strategy). Report mismatches as observations: "CLAUDE.md contains [section] which is not typical for a [project type] project. Remove to save context budget?" Do not auto-remove.
    - **2a.8. CLAUDE.md section completeness (Module A §23):** Check whether CLAUDE.md contains all 4 required sections (DSM_0.2 Alignment, participation pattern, project type, project specific). If all present, pass silently. If sections are missing, report which ones and suggest completing them before implementation. This is a hard gate: no implementation work until all 4 sections exist. Existing complete projects pass silently.
-   - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). For spoke projects, if `_inbox/` is missing or dsm-docs/ structure is incomplete, suggest running `/dsm-align`. **Inbox location by project type:**
+   - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). **Inbox location by project type:**
      - **DSM hub (DSM Central):** `_inbox/` at repo root
      - **DSM spoke:** `_inbox/` at repo root
      - **External contribution:** `contributions-docs/{project}/_inbox/` in DSM Central (NOT in the external repo)
      **How to check:** Use `ls` on the inbox directory (not Glob with literal paths, which silently fails for `_inbox/` directories). Exclude `README.md` from results. If `ls` shows no entries besides `README.md`, confirm with a second method (`ls -la`) before concluding the inbox is empty.
      Process any pending inbox entries: when an entry references a source file (Full evidence, Full report), read the referenced file before evaluating; the inbox is a notification, the source file contains the full evidence. Then evaluate impact, propose action (implement, defer, or reject per DSM_3 Section 6.4.3), and ask the user how to proceed. Do not merely list entry titles.
-   - **2b.5. Governance folder check:** First, check if the project uses `docs/` instead of `dsm-docs/`. If `docs/` exists but `dsm-docs/` does not, inform the user: "This project uses `docs/` instead of `dsm-docs/`. Rename to match the current DSM convention? Run `/dsm-align` to migrate." Then verify that all 9 canonical `dsm-docs/` subfolders exist (`blog`, `checkpoints`, `decisions`, `feedback-to-dsm`, `guides`, `handoffs`, `plans`, `research`, `inbox`). If any are missing, suggest: "Missing canonical folders: [list]. Run `/dsm-align` to fix." Do not create folders here; dsm-align handles creation with proper templates.
-   - **2c. Version check:** Compare DSM version against last handoff, note changes.
-     If versions differ:
-     1. Read CHANGELOG entries between the old and new versions
-     2. Extract lines matching `**Spoke action:**`
-     3. Surface actions to user: "DSM updated from vX.Y.Z to vA.B.C. Spoke actions required: [list]"
-     4. Auto-execute by annotation type:
-        - `Run /dsm-align`: Ask "Template changed. Run /dsm-align to update reinforcement block? (y/n)". On confirmation, execute `/dsm-align`.
-        - `Review [section]`: Surface as action item, do not auto-execute.
-        - `Update [file]`: Surface as action item, do not auto-execute.
-     5. If user declines auto-execution, note as deferred action item for later in the session
-     If no spoke actions found, report the version change without action prompts.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
 3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:
