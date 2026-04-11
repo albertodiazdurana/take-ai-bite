@@ -5,6 +5,18 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.17] - 2026-04-12
+
+### Added - DSM_0.2 §7 STAA Exception + Skill Rationale Clarification (S185)
+
+- **BL-351: DSM_0.2 §7 authorized exception for `/dsm-staa` and `dsm-staa.md` recursion rationale clarification.** S185 ran `/dsm-staa` on the archived S184 transcript in a separate Claude Code conversation. The STAA agent quoted its own thinking to the user: "Appending analysis notes to S184 while I'm analyzing S184 would create exactly the kind of infinite recursion the skill is designed to prevent. The transcript I'm about to examine would be corrupted by my own notes about examining it." The STAA agent's final behavior (no transcript write) was correct but the stated rationale was wrong, archived subject and live reasoning log are two different files, and writes to the live log cannot corrupt the archived subject. Three bugs identified: (1) DSM_0.2 §7 unconditional-activation language did not acknowledge `/dsm-staa` as an authorized exception, so every STAA session had to re-derive the resolution from first principles, (2) `scripts/commands/dsm-staa.md` line 30 parenthetical "avoids infinite recursion of analyzing analysis transcripts" was compressed to the point of allowing the wrong (file-corruption) interpretation when the actual concern is meta-recursion of STAA sessions becoming future STAA subjects, (3) the `UserPromptSubmit` per-turn reminder hook fires in STAA sessions with no skill-awareness, forcing every STAA agent to argue against the hook. Bugs 1+2 fixed in this BL; Bug 3 deferred to BL-343 (Skill/Hook Collaboration Protocol). DSM_0.2 §7 gains an "Authorized exception: `/dsm-staa` (BL-351)" paragraph immediately after the BL-331 unconditional-activation paragraph, naming STAA as the sole exception, stating the meta-recursion rationale precisely, naming both files explicitly to prevent the subject-vs-live-log confusion, and forbidding any other skill from suppressing the protocol without an explicit §7 amendment. `scripts/commands/dsm-staa.md` gains a "Two files, do not confuse them" block after the IMPORTANT line (archived subject read-only vs live reasoning log not written for meta-recursion reasons) and a per-turn hook-reminder acknowledgment ("do not argue the hook into silence, acknowledge once, proceed"). Line 30 bullet rewritten to point at the IMPORTANT block instead of re-deriving the rationale.
+  - **Spoke action:** Review DSM_0.2 §7 for behavioral changes. The new authorized-exception paragraph applies immediately via the `@` reference chain; no template regeneration needed.
+  - **Spoke action:** Run `scripts/sync-commands.sh --deploy` to update the deployed `/dsm-staa` skill file with the new "Two files" block. External Contribution spokes pick up the new prose on next session start via the deployed command file.
+
+### Spawned
+
+- BL-352 (Medium): Preemptive Risk Definition required for all BLs. User request in S185 during BL-351 review: formalize "all BLs should include a Risks section" as a template rule. Filed with scope deliberately loose (rule home uncertain, minimal vs structured format undecided, enforcement level unset) and implementation deferred to a future session. First compliant example of the rule itself: BL-352 includes a Risks section covering 7 failure modes. BL-351 was retrofitted with a Risks section on the same branch before merge as a second compliant example.
+
 ## [1.4.16] - 2026-04-11
 
 ### Added - §22 Stop Condition + /dsm-go EC Inbox Resolution (S184)
