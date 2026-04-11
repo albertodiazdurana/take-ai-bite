@@ -145,12 +145,23 @@ After branch setup, clean up stale refs from prior sessions:
      - If the path exists: note as validated
      - If the path does not exist: warn "Ecosystem path '{name}' points to '{path}' which does not exist. Cross-repo operations using this path will be skipped."
    - **2a.8. CLAUDE.md section completeness (Module A §23):** Check whether CLAUDE.md contains all 4 required sections (DSM_0.2 Alignment, participation pattern, project type, project specific). If all present, pass silently. If sections are missing, report which ones and suggest completing them before implementation. This is a hard gate: no implementation work until all 4 sections exist. Existing complete projects pass silently.
-   - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). **Inbox location by project type:**
-     - **DSM hub (DSM Central):** `_inbox/` at repo root
-     - **DSM spoke:** `_inbox/` at repo root
-     - **External contribution:** `contributions-docs/{project}/_inbox/` in DSM Central (NOT in the external repo)
-     **How to check:** Use `ls` on the inbox directory (not Glob with literal paths, which silently fails for `_inbox/` directories). Exclude `README.md` from results. If `ls` shows no entries besides `README.md`, confirm with a second method (`ls -la`) before concluding the inbox is empty.
-     Process any pending inbox entries: when an entry references a source file (Full evidence, Full report), read the referenced file before evaluating; the inbox is a notification, the source file contains the full evidence. Then evaluate impact, propose action (implement, defer, or reject per DSM_3 Section 6.4.3), and ask the user how to proceed. Do not merely list entry titles.
+   - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). **Inbox location and resolution by project type:**
+
+     **DSM hub (DSM Central) / DSM spoke:**
+     - Target: `_inbox/` at repo root
+     - Check: `ls _inbox/` (exclude `README.md` and `done/` from results)
+     - If `ls` shows no entries besides `README.md`, confirm with a second method (`ls -la`) before concluding the inbox is empty (Glob with literal paths silently fails for `_inbox/` directories)
+
+     **External contribution (BL-349):**
+     - Resolution:
+       1. Read `contributions-docs` from the ecosystem registry cached in Step 2a.5
+       2. Derive project name: `basename "$(pwd)"`
+       3. Target: `{contributions-docs}/{project-name}/_inbox/`
+     - Check: `ls {target}/` (exclude `README.md` and `done/` from results). Example: `ls ~/dsm-external-contribution-storage/IronCalc/_inbox/`
+     - The governance inbox is the **only** inbox to check for EC projects. Do NOT also scan `_inbox/` at the external repo root; per BL-348 it should not exist there, and scanning would waste a call and risk the wrong-path failure mode
+     - **Skip condition:** if `contributions-docs` is missing from the ecosystem registry, or the resolved `{target}/` path does not exist on the filesystem, warn "EC governance inbox resolution failed (contributions-docs registry entry missing OR {target} does not exist). Skipping EC inbox check, run `/dsm-align` to scaffold." and continue the session without halting
+
+     **Processing (all project types):** Process any pending inbox entries: when an entry references a source file (Full evidence, Full report), read the referenced file before evaluating; the inbox is a notification, the source file contains the full evidence. Then evaluate impact, propose action (implement, defer, or reject per DSM_3 Section 6.4.3), and ask the user how to proceed. Do not merely list entry titles.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
 3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:

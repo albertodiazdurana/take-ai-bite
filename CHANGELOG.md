@@ -5,6 +5,20 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.16] - 2026-04-11
+
+### Added - §22 Stop Condition + /dsm-go EC Inbox Resolution (S184)
+
+- **BL-350: DSM_0.2 §22 stop-condition amendment for protocol violations.** §22 Protocol Violation Triage Response previously said the three-step response (Fix + Root-cause + Prevent) runs "before continuing other work". In blog-poster S19 that phrasing was soft enough that the agent acknowledged a CLAUDE.md violation mid-paragraph, flagged it as an inline disclaimer, and then continued presenting BL-010 angle rankings built on unread sources. The user had to escalate ("this is unacceptable") to halt the output. §22 now has three additions: (a) a bridging clause on the opening paragraph ("The current output-in-progress counts as other work; see the stop condition below"), (b) a new Stop Condition paragraph with four explicit actions (name the violation, halt without completing, propose corrective action, wait for user confirmation before resuming), and (c) a new Anti-pattern paragraph stating that acknowledging a violation as a footnote while continuing the same output is itself a §22 failure. Cross-reference to DSM_6.0 Earn Your Assertions as the source principle. Origin inline: blog-poster S19 incident. Flat structure preserved, no new subsections, cross-references stable.
+  - **Spoke action:** Review DSM_0.2 §22 for behavioral changes. The stop condition applies immediately on next session start via the `@` reference chain, no template regeneration or command re-deploy needed.
+
+- **BL-349: /dsm-go EC governance inbox check.** `/dsm-go` Step 2b previously *declared* that the External Contribution inbox lives at `contributions-docs/{project}/_inbox/` but gave no resolution or check instructions; the `ls` command and resolution path were both implicit. Result: inbox entries delivered to the EC governance folder (e.g., `~/dsm-external-contribution-storage/IronCalc/_inbox/`) were invisible to `/dsm-go`, the user had to manually point the agent at them each session. Dependency follow-up to BL-348 (S183 EC fast-path for `/dsm-align`). Step 2b now branches by project type with three resolution flows: hub/spoke (unchanged), EC (reads `contributions-docs` from the ecosystem registry cached in Step 2a.5, derives project name from `basename "$(pwd)"`, targets `{contributions-docs}/{project-name}/_inbox/`, checks with `ls`, and explicitly refuses to scan the upstream repo root per BL-348). Skip condition added for missing registry entry or non-existent target (warn and continue, do not halt). The shared processing paragraph (read source files, evaluate, propose) is preserved for all project types.
+  - **Spoke action:** Run `scripts/sync-commands.sh --deploy` to update the deployed `/dsm-go` command file. External Contribution spokes (IronCalc et al.) pick up the new resolution logic automatically on next session start via the deployed command file.
+
+### Spawned
+
+None. Neither BL-349 nor BL-350 produced follow-up BLs this session.
+
 ## [1.4.15] - 2026-04-11
 
 ### Added - External Contribution Alignment Support (S183)

@@ -1251,7 +1251,8 @@ flag titles that fail the test and propose renames.
 
 When the agent discovers that a DSM protocol was not followed, whether in the
 current session or inherited from a prior session, it must execute a three-step
-response before continuing other work:
+response before continuing other work. The current output-in-progress counts
+as other work; see the stop condition below.
 
 1. **Fix:** Address the immediate issue (e.g., renumber a duplicate BL,
    move a misplaced file, correct a stale reference)
@@ -1265,6 +1266,30 @@ response before continuing other work:
 The agent must present all three steps to the user. Skipping steps 2 and 3,
 treating the violation as a one-off cleanup task, is the failure mode this
 protocol prevents.
+
+**Stop condition (current output):** When a §22 violation is detected, the
+current output-in-progress is itself a stop condition. The agent must (a) name
+the violation explicitly, (b) halt the in-progress output without completing
+it, (c) propose corrective action, (d) wait for user confirmation before
+resuming. "Before continuing other work" is not permission to finish the
+current output first; the current output is other work relative to the
+violation, and completing it deepens the failure.
+
+**Anti-pattern:** Acknowledging a violation as a footnote or parenthetical
+("note: I didn't read X earlier, per CLAUDE.md I should have") while continuing
+to present the same output is itself a §22 failure. The acknowledgment must
+break the flow, not decorate it. An inline disclaimer at the bottom of a
+recommendation does not retroactively repair the recommendation.
+
+This stop-condition rule is the operational expression of DSM_6.0's Earn Your
+Assertions principle: claims that rest on unread sources or skipped checks are
+not earned, and presenting them anyway violates the principle even if the gap
+is acknowledged. Origin: blog-poster S19, where the agent detected mid-paragraph
+that it had not read required sources per CLAUDE.md, flagged the gap as an
+inline disclaimer, and then continued presenting BL-010 angle rankings built on
+the unread sources; the user had to escalate ("this is unacceptable") to halt
+the output. The "before continuing other work" phrasing as written permitted
+the failure, which is why this amendment exists.
 
 **Behavioral trigger:** This protocol activates whenever the agent observes:
 - A collision, conflict, or inconsistency caused by a protocol gap
