@@ -27,6 +27,27 @@ Before starting alignment, check if git is initialized:
 
    **Hub fast-path:** If the project is DSM Central (has `scripts/commands/` directory), skip steps 2-6 and 8c. These steps check spoke scaffold structure and validate CLAUDE.md paths against the filesystem, both of which are redundant on the hub that defines the templates. Run only steps 1, 7, 7b, 8, 8b, 9, 10, 10b, 11, 12, 13. Step 10b is mandatory on the hub because hub-self-installs the BL-319 hooks (transcript-reminder + validate-transcript-edit) and applies `chmod +x`. Omitting 10b on hub fast-path was the S180 root cause of a full session of zero transcript appends in DSM Central, the hooks were present on disk but not executable, so Claude Code's hook subsystem silently dropped the per-turn reminder injection.
 
+   **External Contribution (EC) fast-path:** If the project is detected as an External Contribution, skip steps 2-6 (spoke scaffold in the current repo), 8c (path validation against spoke structure), and 11 (command sync). Instead, run steps 1, 7, 7b, 8, 8b, 9, 10, 10b, **EC scaffold step (step 3-EC)**, 12, 12a, 13. The EC scaffold step creates governance folders in the external governance repo, not in the current project.
+
+   **EC detection (two-tier):**
+
+   a. **Subsequent runs (alignment section exists):** Read `.claude/CLAUDE.md` alignment section. If EITHER the `**Project type:**` line OR the `**Participation pattern:**` line contains "External Contribution", use EC fast-path directly. Both fields are checked because EC projects may declare their nature in either field: pure EC layouts use Project type, while layered layouts (project IS an application but DSM PARTICIPATES as EC) use Participation pattern. The convention is not enforced; the detector reads both.
+
+   b. **First run (no alignment section):** Use filesystem signals to propose EC type:
+      - Has upstream project markers at root: `README.md` AND at least one of (`LICENSE*`, `CONTRIBUTING*`, `CODE_OF_CONDUCT*`)
+      - Has `.claude/CLAUDE.md` with an `@` reference to `DSM_0.2_Custom_Instructions_v1.1.md`
+      - Does NOT have `dsm-docs/` at project root
+      - Does NOT have `scripts/commands/` at project root (not DSM Central)
+      If all four conditions are met, propose to the user: "This looks like an External Contribution project (upstream repo with DSM overlay, no dsm-docs/). Confirm? (y/n)". If confirmed, proceed with EC fast-path. If rejected, fall through to standard spoke detection.
+
+   **EC governance folder resolution:**
+   1. Read `.claude/dsm-ecosystem.md` for `contributions-docs` path
+   2. Derive project name from repo directory: `basename "$(pwd)"`
+   3. Governance folder: `{contributions-docs}/{project-name}/`
+   4. If `contributions-docs` is missing from ecosystem registry: warn "Cannot resolve governance folder. Add `contributions-docs` entry to `.claude/dsm-ecosystem.md`." and skip EC scaffold step.
+
+   **Origin:** BL-348 (S183). /dsm-align had no EC code path; governance folders were never audited or scaffolded.
+
 2. **Check and fix `_inbox/` at project root:**
    - If `dsm-docs/backlog/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox (`~/dsm-agentic-ai-data-science-methodology/_inbox/{project-name}.md`).
    - If `_inbox/` does not exist: create it. The canonical location is always `_inbox/` at project root; no other path should be used.
@@ -49,6 +70,46 @@ Before starting alignment, check if git is initialized:
    | `dsm-docs/handoffs/` | Yes | README.md |
    | `dsm-docs/plans/` | Yes | README.md |
    | `dsm-docs/research/` | Yes | README.md |
+
+3-EC. **External Contribution governance scaffold** (EC fast-path only; skip for spokes and hub).
+
+   This step scaffolds the governance folder at `{contributions-docs}/{project-name}/` instead of creating any folders in the external repo. The external repo (upstream) is never touched by this step; DSM artifacts only live in the governance folder.
+
+   **Cross-repo write gate (mandatory):** Before creating any folders, pause and request explicit user confirmation:
+
+   ```
+   External Contribution scaffold for {project-name}
+   Governance folder: {contributions-docs}/{project-name}/
+   Will create (if missing):
+     _inbox/ (with done/ and README.md)
+     dsm-docs/feedback-to-dsm/ (with done/ and README.md)
+     dsm-docs/handoffs/ (with done/ and README.md)
+     dsm-docs/checkpoints/ (with done/ and README.md)
+     dsm-docs/plans/ (with done/ and README.md)
+     dsm-docs/research/ (with done/ and README.md)
+     dsm-docs/decisions/
+     dsm-docs/blog/ (with done/ and journal.md)
+     dsm-docs/guides/
+
+   Proceed? (y/n)
+   ```
+
+   Subsequent runs skip the gate if the governance folder already exists and all subfolders are present (idempotent pass-through, no writes).
+
+   **Scaffold steps (after user confirms):**
+
+   a. If governance folder `{contributions-docs}/{project-name}/` does not exist, create it.
+   b. For each folder in the standard table above (reused from step 3), check and create inside the governance folder with the same done/ and template file rules. Do NOT create these folders in the external repo.
+   c. Report folders created (absolute path prefix = governance folder, not project root).
+
+   **What is NOT done by this step:**
+   - No `dsm-docs/`, `_inbox/`, or `.gitattributes` in the external repo
+   - No git commit in the governance repo (governance is a separate git repo; commits happen manually or via a future wrap-up protocol)
+   - No feedback push (EC feedback lives in the governance folder, not routed back to DSM Central via inbox)
+
+   **Skip conditions:**
+   - `contributions-docs` entry is missing from ecosystem registry → warn and skip (reported in step 12)
+   - User declines the cross-repo write gate → skip with note "User declined EC scaffold. Run /dsm-align again when ready."
 
 4. **Check feedback file compliance:**
    - `dsm-docs/feedback-to-dsm/` should contain per-session files (`YYYY-MM-DD_sN_backlogs.md`, `YYYY-MM-DD_sN_methodology.md`), `technical.md`, `README.md`, and `done/`
@@ -237,9 +298,10 @@ Before starting alignment, check if git is initialized:
    - CLAUDE.md content: [OK | N mismatches found (list sections)]
    - CLAUDE.md redundancy: [OK | N redundant section(s) found (list)]
    - CLAUDE.md paths: [OK | N stale path(s) found (list)]
-   - .gitattributes: [OK | Created | Warning: missing LF enforcement]
+   - .gitattributes: [OK | Created | Warning: missing LF enforcement | N/A (EC fast-path)]
    - Command sync: [OK: N | Drifted: N | Missing: N, or "N/A (not DSM Central)"]
    - Feedback pushed: [count of entries pushed to DSM Central, or "none pending"]
+   - EC governance scaffold: [N/A (not EC) | OK (all folders present) | Created (list) | Skipped (reason)]
    ```
 
 12a. **Write persistent alignment report:** After printing the report to conversation, write the full report to `.claude/last-align-report.md` (gitignored, overwritten each run). This is the durable audit record so the user, or a future session, can read what the last alignment found without re-running the skill.

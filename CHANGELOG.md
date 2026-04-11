@@ -5,6 +5,19 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.15] - 2026-04-11
+
+### Added - External Contribution Alignment Support (S183)
+
+- **BL-347: Rename `dsm-collaboration-storage` → `dsm-external-contribution-storage`.** The governance folder for external contribution projects was named `dsm-collaboration-storage`, a vague label that did not communicate its purpose. DSM_3 §6.6 uses the term "External Contribution" for this project type, so the folder name now matches. Updated the physical folder (`mv`), Central ecosystem registry, IronCalc ecosystem registry (cross-repo write), MEMORY.md, and 3 research files. Historical references in done/ BLs, CHANGELOG entries, blog materials, and the EXP-002 graphml were preserved as records of what was true when written.
+
+- **BL-348: `/dsm-align` External Contribution governance scaffold.** `/dsm-align` previously had no code path for External Contribution projects. When run inside an external repo (e.g., `~/IronCalc`), it either ran spoke scaffold checks against the external repo (wrong, would pollute upstream with `dsm-docs/`, the BL-114 incident pattern) or skipped them entirely via the hub fast-path. The governance folder at `{contributions-docs}/{project-name}/` was never audited or scaffolded. New EC fast-path: detection is two-tier, (a) read CLAUDE.md alignment section for "External Contribution" in EITHER the Project type line OR the Participation pattern line, (b) fall back to filesystem signals (README + LICENSE/CONTRIBUTING + `@` reference + absence of `dsm-docs/` and `scripts/commands/`) with user confirmation gate. New step 3-EC scaffolds the governance folder behind an explicit cross-repo write confirmation gate. Idempotent: subsequent runs pass through if the scaffold is already complete. The both-fields tier-1 check was added mid-session after an audit of IronCalc revealed that the original single-field detection would have missed its legitimate layered layout (Project type: Application, Participation pattern: External Contribution), potentially creating `dsm-docs/` in the upstream repo.
+  - **Spoke action:** Run `sync-commands.sh --deploy` to update `/dsm-align`. External Contribution projects should restart their Claude Code window and re-run `/dsm-align` to exercise the new code path. IronCalc has a detailed audit inbox entry at `~/dsm-external-contribution-storage/IronCalc/_inbox/2026-04-11_dsm-central-s183_audit-recommendations.md` with 7 recommended actions including CLAUDE.md cleanup (F3-F5) and legacy folder migration.
+
+### Spawned
+
+- BL-349 (Medium): `/dsm-go` EC governance inbox check. `/dsm-go` currently checks `_inbox/` at the project root only, so EC governance inbox entries are invisible and require a manual prompt each session.
+
 ## [1.4.14] - 2026-04-10
 
 ### Added - Gate 0 Collaborative Definition + /dsm-safe-go + /dsm-go Cleanup (S182)

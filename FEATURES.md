@@ -6,12 +6,13 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-001 is the first, newest entries
 appear at the top).
 
-**Current count:** 99 features across 11 capability domains.
+**Current count:** 100 features across 11 capability domains.
 
 ---
 
 ## April 2026
 
+- **F-100 (2026-04-11) `/dsm-align` External Contribution governance scaffold** — `/dsm-align` now detects External Contribution projects and scaffolds their governance folder at `{contributions-docs}/{project-name}/` instead of creating spoke folders in the upstream repo. Detection is two-tier: reads both the Project type and Participation pattern fields in the CLAUDE.md alignment section, or falls back to filesystem signals (upstream project markers + absence of `dsm-docs/`) with a user confirmation gate. Cross-repo writes to the governance folder are gated by an explicit confirmation on first scaffold. Closes the gap where external repos either had no governance scaffolding or risked the BL-114 failure mode (accidental `dsm-docs/` creation in an upstream repo). Idempotent: subsequent runs pass through without re-prompting.
 - **F-099 (2026-04-10) Minimal troubleshooting boot with /dsm-safe-go** — Zero-dependency, read-only session entry point for diagnosing problems when the normal boot chain is broken. Transcript append is best-effort. No side effects. The escape hatch that makes infrastructure changes safer to ship.
 - **F-098 (2026-04-10) Gate 0 Collaborative Definition Protocol** — New gate in the Pre-Generation Brief that governs the collaborative dialog before any artifact is conceived. Three steps (confirm threads, analyze dependencies, package into units), each requiring explicit confirmation. Ensures the human shapes the work structure, not just approves it.
 - **F-097 (2026-04-09) Unconditional /dsm-align on every /dsm-go** — `/dsm-go` Step 1.8 now invokes `/dsm-align` on every session start, no marker checks, no version gates, no confirmation. Replaces brittle conditional logic that allowed alignment drift to persist between sessions. Eliminates four distinct failure modes hit during DSM Central S180 (hook scripts at index mode 644, stale marker files, Claude Code window cache, scaffold drift). `/dsm-light-go` remains the explicit lightweight escape hatch for context-pressure continuation sessions.
