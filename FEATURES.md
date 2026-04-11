@@ -6,12 +6,13 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-001 is the first, newest entries
 appear at the top).
 
-**Current count:** 100 features across 11 capability domains.
+**Current count:** 101 features across 11 capability domains.
 
 ---
 
 ## April 2026
 
+- **F-101 (2026-04-11) DSM_0.2 §22 stop condition on the current output** — §22 Protocol Violation Triage Response now states explicitly that when a violation is detected, the current output-in-progress is itself a stop condition. The agent must name the violation, halt without completing the output, propose corrective action, and wait for user confirmation before resuming. An anti-pattern clause closes the loophole where a violation could be acknowledged as a footnote while the same output keeps rolling. Cross-referenced to DSM_6.0 Earn Your Assertions. Origin: blog-poster S19 incident, where a mid-paragraph acknowledgment did not actually stop the output and the user had to escalate.
 - **F-100 (2026-04-11) `/dsm-align` External Contribution governance scaffold** — `/dsm-align` now detects External Contribution projects and scaffolds their governance folder at `{contributions-docs}/{project-name}/` instead of creating spoke folders in the upstream repo. Detection is two-tier: reads both the Project type and Participation pattern fields in the CLAUDE.md alignment section, or falls back to filesystem signals (upstream project markers + absence of `dsm-docs/`) with a user confirmation gate. Cross-repo writes to the governance folder are gated by an explicit confirmation on first scaffold. Closes the gap where external repos either had no governance scaffolding or risked the BL-114 failure mode (accidental `dsm-docs/` creation in an upstream repo). Idempotent: subsequent runs pass through without re-prompting.
 - **F-099 (2026-04-10) Minimal troubleshooting boot with /dsm-safe-go** — Zero-dependency, read-only session entry point for diagnosing problems when the normal boot chain is broken. Transcript append is best-effort. No side effects. The escape hatch that makes infrastructure changes safer to ship.
 - **F-098 (2026-04-10) Gate 0 Collaborative Definition Protocol** — New gate in the Pre-Generation Brief that governs the collaborative dialog before any artifact is conceived. Three steps (confirm threads, analyze dependencies, package into units), each requiring explicit confirmation. Ensures the human shapes the work structure, not just approves it.
