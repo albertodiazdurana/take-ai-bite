@@ -197,6 +197,25 @@ PreToolUse shape validator. Any session that finds the file present must
 follow the protocol from the first turn, including continuation sessions
 that defer from `/dsm-light-go` to `/dsm-go` mid-flight.
 
+**Authorized exception: `/dsm-staa` (BL-351).** The Session Transcript
+Analysis Agent (`/dsm-staa`) is the sole authorized exception to the
+unconditional activation rule above. STAA sessions intentionally do not
+write to `.claude/session-transcript.md`, for a meta-recursion reason
+explained in `scripts/commands/dsm-staa.md`: if STAA sessions wrote their
+own transcripts, those transcripts would become subjects of future STAA
+sessions, and STAA would analyze its own analysis indefinitely. The
+concern is about the reasoning-log file being a future subject, not about
+corruption of the archived subject file STAA is currently reading,
+those are two different files (`.claude/transcripts/{timestamp}-ST.md`
+is the archived subject, `.claude/session-transcript.md` is the live
+reasoning log), and writes to the live log do not touch the archived
+subject. No other skill may suppress the protocol without an explicit
+amendment to this section. The `UserPromptSubmit` per-turn hook will
+still fire in STAA sessions and inject the reminder; STAA agents should
+read this paragraph first, then proceed without appending to the live
+transcript. Systematic resolution of the hook/skill collision is tracked
+under BL-343 (Skill/Hook Collaboration Protocol).
+
 **Anti-Patterns:**
 
 **DO NOT:**
