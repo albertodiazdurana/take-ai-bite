@@ -6,8 +6,9 @@
 
 This module contains artifact creation protocols: composition reasoning,
 edit granularity, enabling file constraints, notebook collaboration,
-app development workflow, and revert safeguards. The agent reads this file
-via the Read tool when a protocol listed in the dispatch table is needed.
+app development workflow, revert safeguards, and infrastructure file
+collaboration. The agent reads this file via the Read tool when a protocol
+listed in the dispatch table is needed.
 
 ---
 
@@ -20,6 +21,7 @@ via the Read tool when a protocol listed in the dispatch table is needed.
 5. [Notebook-to-Script Transition](#5-notebook-to-script-transition)
 6. [App Development Protocol (DSM 4.0 Projects)](#6-app-development-protocol-dsm-40-projects)
 7. [Revert Safeguards Protocol](#7-revert-safeguards-protocol)
+8. [Infrastructure File Collaboration Protocol](#8-infrastructure-file-collaboration-protocol)
 
 ---
 
@@ -424,3 +426,110 @@ When a change is explicitly experimental (trial period, evaluation planned):
   procedure is the safety net that replaces git's role for these artifacts
 - Assume cross-repo changes are self-reverting; inbox entries and feedback pushes
   persist until explicitly processed or removed
+
+---
+
+## 8. Infrastructure File Collaboration Protocol
+
+Infrastructure files (skill definitions, hook scripts, settings.json, command
+files) govern agent behavior across all DSM projects. A broken skill propagates
+via `sync-commands.sh --deploy` and the `@` reference chain to every spoke.
+This protocol extends the Pre-Generation Brief (DSM_0.2 §8) with review
+requirements specific to infrastructure files.
+
+### 8.1. Scope Definition for Infrastructure Files
+
+Infrastructure files are files whose content directly controls agent behavior,
+tool permissions, or session lifecycle. The protocol applies to:
+
+| File type | Location | Blast radius |
+|-----------|----------|-------------|
+| Skill definitions | `.claude/skills/*/SKILL.md` | All sessions using this skill |
+| Command files (legacy) | `scripts/commands/*.md`, `.claude/commands/*.md` | All projects via deploy |
+| Hook scripts | `.claude/hooks/*.sh` | Every turn in every session |
+| Settings | `.claude/settings.json` | Session-wide permissions and hooks |
+| Hook templates | `scripts/templates/settings-hooks.json` | All projects via /dsm-align |
+
+Files NOT covered: methodology documents (DSM_0 through DSM_6), guides,
+backlog items, session artifacts. These follow the standard Pre-Generation
+Brief Protocol.
+
+### 8.2. Review Requirements for Infrastructure Edits
+
+Infrastructure edits require **explicit diff review** regardless of IDE
+permission settings. The agent must not rely on auto-approve for these files.
+
+**Per-edit flow:**
+
+1. **Explain the behavioral impact:** Before each edit, state what behavior
+   changes and why. "Adding a line to dsm-wrap-up step 2" is insufficient;
+   "Adding an exclusion list to prevent inbox state from consuming MEMORY
+   lines, which changes what every future wrap-up writes" is the required
+   level.
+2. **One logical change per edit:** Do not batch multiple behavioral changes
+   into a single Edit call. Each edit should change one behavior that the
+   user can evaluate independently. Multiple edits to the same file are
+   fine if each is a separate logical change.
+3. **Show the edit in context:** For skill/command files, show the
+   surrounding section (5 lines before and after) so the user can assess
+   how the change interacts with adjacent instructions.
+4. **Wait for approval:** Do not proceed to the next edit until the user
+   has reviewed the current one via the IDE permission window.
+
+**Anti-pattern (S182):** Seven Edit calls to dsm-go.md and dsm-align.md
+auto-approved in sequence. The user never reviewed individual diffs. Gate 2
+became a no-op for the files with the highest blast radius.
+
+### 8.3. Allowed-Tools Governance for Skills
+
+Skills can declare `allowed-tools` in SKILL.md frontmatter, which pre-approves
+tool use while the skill is active. This bypasses the IDE permission window
+for the listed tools.
+
+**Rules:**
+
+- `allowed-tools: ["Bash(*)"]` or equivalent broad permissions must not be
+  declared without explicit user approval. Broad tool grants effectively
+  disable the permission system for the skill's duration.
+- When creating or modifying a skill, present the `allowed-tools` declaration
+  as a separate review item with a clear statement of what it permits.
+- When reviewing an existing skill, check its `allowed-tools` field and
+  flag overly broad grants.
+
+### 8.4. Hook Type Selection Criteria
+
+When implementing a hook, choose the type based on the task:
+
+| Hook type | When to use | Example |
+|-----------|-------------|---------|
+| `command` | Shell script, deterministic check, no LLM needed | Transcript shape validator |
+| `prompt` | Single LLM call for classification or extraction | Content sensitivity check |
+| `agent` | Multi-turn task with tool access | Complex validation with file reads |
+| `http` | External service notification | CI/CD trigger |
+
+**Default to `command`** for DSM hooks. Command hooks are deterministic,
+fast, and auditable. Prompt and agent hooks introduce LLM variability and
+latency. Use them only when the task genuinely requires language understanding.
+
+### 8.5. Skill-Scoped Hooks and Global Hook Interaction
+
+Skills can define hooks in their SKILL.md frontmatter. These hooks activate
+only when the skill is running, alongside any global hooks in settings.json.
+
+**Interaction rules:**
+
+- Skill-scoped hooks **add to**, not replace, global hooks for the same event
+- If a skill-scoped hook and a global hook both fire on the same event,
+  both execute (order: global first, then skill-scoped)
+- Skill-scoped hooks are preferred when the check is only relevant during
+  that skill's execution (reduces noise in other contexts)
+- Global hooks are preferred when the check applies universally (e.g.,
+  transcript append enforcement)
+
+### 8.6. Structural Standard Reference
+
+For templates, section conventions, frontmatter guidance, and line budgets
+for skill files, see `dsm-docs/guides/skill-file-structural-standard.md`.
+That guide is the companion to this protocol: this section defines *how to
+collaborate* on infrastructure files, the guide defines *how to structure*
+them.

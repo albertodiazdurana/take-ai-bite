@@ -30,9 +30,22 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    c. If this is a spoke project (not DSM Central), also send to DSM Central: `{dsm-central-path}/_inbox/{this-project-name}.md`.
    d. If internal-only: log "Skipping README notification (internal-only change)" and skip sending.
 2. **Session summary:** MEMORY.md is already loaded via auto memory context. Do NOT re-read; update the version in the auto memory directory directly. Update:
-   - Latest Session section: date, session number, brief description of what was done
-   - Update any Pending Improvements or Open Developments that changed
-   - Keep concise; MEMORY.md must stay under 200 lines
+   - **Latest Session section** (target: ≤ 15 lines): date, session number, brief description of what was done. For each BL completed or filed, write BL# + one line. Do not expand implementation details, commit hashes, or file metrics; these are recoverable from `git log` and the BL file itself.
+   - **Pending for next session** (target: ≤ 8 items): Only include items that require human decision or cannot be derived from the backlog, inbox, or git status. Each item gets one line.
+   - **Previous Session section:** Compress the outgoing Latest Session to ≤ 3 lines before writing the new Latest.
+   - Keep concise; MEMORY.md must stay under 200 lines.
+
+   **MEMORY.md exclusion list (do NOT write these to MEMORY):**
+   - Inbox state (e.g., "IronCalc inbox entry not processed"). /dsm-go scans the inbox directly.
+   - Git-recoverable details: commit hashes, file line counts, diff summaries, branch base commits.
+   - Pre-session uncommitted file lists. /dsm-go captures these in the session baseline.
+   - STAA recommendation flags. /dsm-go step 5.7 reads these from the archived transcript.
+   - Detailed BL implementation descriptions. The BL file and git log are the source of truth.
+   - Items that duplicate CLAUDE.md content (patterns, conventions, pitfalls already documented there).
+
+   **Pending list hygiene:** Before writing the new Pending list, review each carried-forward item:
+   - If the item has been carried forward 3+ sessions without action: either promote it to a formal BL (create in `dsm-docs/plans/`) or drop it with a note in the output summary explaining why.
+   - If the item is a housekeeping task with no BL (stray files, uncommitted changes in other repos): include only if it requires human decision. Mechanical cleanup that the agent can do autonomously should be done during the session, not deferred indefinitely.
 3. **Refresh backup:** If `.claude/memory/MEMORY.md` exists in the project, copy the live MEMORY.md there
 4. **Contributor profile:** Check if `.claude/contributor-profile.md` needs updating (new skills exercised, proficiency changes). Skip if the file does not exist or nothing changed.
 5. **Handoff:** Only create a handoff in `dsm-docs/handoffs/` if there is complex pending work that requires detailed context for the next session. Skip if MEMORY.md is sufficient.

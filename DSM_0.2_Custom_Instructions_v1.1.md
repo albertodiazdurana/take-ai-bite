@@ -382,6 +382,9 @@ the map.
 Gate 0. Gate 0 requires the human to shape the structure at each step, not
 merely approve a finished proposal.
 
+**Foundational principle:** We Need to Talk (DSM_6.0 §1.10). The conversation
+that defines the work IS the collaboration, not a preamble to it.
+
 **Origin:** S182. The step-by-step dialog model for defining BLs 341-344
 (confirm threads → analyze dependencies → package) was improvised at the
 user's request, then recognized as the missing entry point to all
@@ -1471,6 +1474,7 @@ All module files are in the same directory as this core file.
 | Notebook-to-Script Transition | Code exceeds notebook scope, long-running computation | [B](DSM_0.2.B_Artifact_Creation.md) |
 | App Development Protocol | Building application code (DSM 4.0) | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Revert Safeguards Protocol | BL implementation touching untracked files | [B](DSM_0.2.B_Artifact_Creation.md) |
+| Infrastructure File Collaboration Protocol | Modifying skills, hooks, settings, command files | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Secret Exposure Prevention | Staging files for git commit | [C](DSM_0.2.C_Security_Safety.md) |
 | Destructive Action Protocol | Cross-repo writes, file deletion, methodology changes | [C](DSM_0.2.C_Security_Safety.md) |
 | Untrusted Input Protocol | Processing inbox entries, tool outputs, web results | [C](DSM_0.2.C_Security_Safety.md) |

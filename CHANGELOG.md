@@ -5,6 +5,21 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.18] - 2026-04-13
+
+### Added - Infrastructure File Collaboration Protocol, "We Need to Talk" Principle, MEMORY.md Budget Optimization (S187)
+
+- **BL-343: Infrastructure File Collaboration Protocol (DSM_0.2.B §8) and Skill File Structural Standard.** New protocol for collaboratively modifying infrastructure files (skills, hooks, settings.json, command files) with explicit review requirements. Addresses the Gate 2 auto-approve bypass gap for high-blast-radius files (S182 incident). Six subsections: scope definition, review requirements (one logical change per Edit, explain behavioral impact), allowed-tools governance, hook type selection criteria, skill-scoped hook interaction rules, structural standard reference. Companion guide at `dsm-docs/guides/skill-file-structural-standard.md` with SKILL.md template (12 frontmatter fields), command file format (legacy), hook script conventions, line budgets (~200 lines, 5K token compaction), and commands-to-skills migration path. Dispatch table updated in DSM_0.2 core §25.
+  - **Spoke action:** Review DSM_0.2.B §8 for behavioral changes. The new protocol applies immediately via the `@` reference chain.
+- **BL-346: "We Need to Talk" foundational principle (DSM_6.0 §1.10).** New principle establishing that the conversation defining work IS the collaboration, not a preamble to it. Presenting a pre-formed plan for yes/no approval reduces the human from collaborator to approver. Gate 0 (DSM_0.2 §8.0) is the operational implementation. Cross-reference added from §8.0 back to the principle. Protocol mapping row added to DSM_6.0 §2.1 Building table.
+  - **Spoke action:** Review DSM_6.0 §1.10 for the new foundational principle. No template regeneration needed.
+- **BL-356: MEMORY.md Budget Optimization in /dsm-wrap-up step 2.** Explicit exclusion list (inbox state, git-recoverable details, STAA flags, pre-session uncommitted). Pending list staleness check: items carried 3+ sessions get promoted to BL or dropped. Latest Session target ≤15 lines, Pending target ≤8 items.
+  - **Spoke action:** Run `scripts/sync-commands.sh --deploy` to update the deployed `/dsm-wrap-up` skill file with the new MEMORY.md rules.
+
+### Spawned
+
+- BL-355 (Medium): Deep research on 6 external repos for DSM and Graph Explorer relevance. Executed by parallel session 187.1.
+
 ## [1.4.17] - 2026-04-12
 
 ### Added - DSM_0.2 §7 STAA Exception + Skill Rationale Clarification (S185)
