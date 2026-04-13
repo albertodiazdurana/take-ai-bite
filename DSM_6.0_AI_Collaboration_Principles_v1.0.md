@@ -416,6 +416,58 @@ the acceleration curve (0.7 → 10.1 commits/day) made ad-hoc prioritization
 unsustainable. Full analysis: `dsm-docs/research/2026-03-16_dsm-evolution-git-history-analysis.md`
 and `dsm-docs/research/2026-03-16_dsm-feature-inventory.md`.
 
+### 1.10 We Need to Talk
+
+**The conversation that defines the work IS the collaboration, not a preamble
+to it.**
+
+When a complex task arrives, the instinct is to plan quickly and start building.
+The agent drafts a proposal, the human says "yes" or "no," and work begins. This
+feels efficient. It is not. The proposal carries assumptions about scope,
+dependencies, and packaging that the human never shaped. The "yes" is not
+approval; it is acquiescence to a structure the human did not co-create.
+
+The quality of collaboration is determined by the quality of the conversation
+that precedes the work. When the human is invited to confirm threads ("are these
+the right topics?"), analyze dependencies ("which must come first?"), and package
+units ("how should we group these?"), they are not approving a plan. They are
+building one. Each step creates a decision point where the human's knowledge,
+context, and judgment actively shape what will be built.
+
+The difference is subtle but structural:
+
+- **Approval-seeking:** Agent presents a finished plan. Human approves or
+  rejects. The human's contribution is a boolean: yes or no.
+- **Collaborative definition:** Agent and human build the plan together in
+  steps. The human's contribution is directional: "not those threads, these
+  threads," "that dependency is wrong," "package these two together."
+
+When the agent presents a pre-formed plan and asks for approval, it reduces
+the human from collaborator to approver. The "human in the loop" becomes a
+rubber stamp. The collaboration loses the human's most valuable input: the
+ability to reframe the problem before the first line of work begins.
+
+This principle applies to every entry point where work is defined: backlog
+creation, sprint planning, architecture decisions, infrastructure changes,
+and any task whose scope is not already confirmed by prior conversation.
+Single-topic, well-defined work with no ambiguity ("fix this typo,"
+"implement the BL we just scoped") does not need this dialog; the prior
+conversation already provided it.
+
+**Relationship to other principles:** We Need to Talk complements Take a Bite
+(§1.1): where Take a Bite governs the size of individual deliveries, We Need
+to Talk governs the quality of the conversation that decides what to deliver.
+It also reinforces The Human Brings the Spark (§1.2): the human's directional
+judgment is most impactful when it shapes work definition, not just work review.
+
+**Evidence:** S182. The three-step dialog model for defining BLs 341-344
+(confirm threads → analyze dependencies → package into units) was improvised
+at the user's request when the agent proposed a pre-formed BL list for
+approval. The user redirected: "let's slow down and figure out what the
+threads actually are." The improvised model was then recognized as the
+missing entry point to all collaboration, codified as Gate 0 in DSM_0.2
+§8.0. The principle names the reasoning that makes Gate 0 necessary.
+
 ---
 
 ## 2. Guidelines
@@ -440,6 +492,7 @@ to existing DSM protocols and identifies the gaps that remain.
 | Protocol | DSM Location | Principle |
 |----------|-------------|-----------|
 | Pre-Generation Brief (what/why/structure before creating) | DSM_0.2 | Critical Thinking |
+| Gate 0 Collaborative Definition (confirm threads → dependencies → package) | DSM_0.2 §8.0 | We Need to Talk |
 | Composition Challenge (justify multi-item collections) | DSM_0.2 | Challenge Myself to Reason |
 | Edit Explanation Stop (review each edit before execution) | DSM_0.2 | Challenge Myself to Reason |
 | Notebook Collaboration (one cell, wait for output) | DSM_0.2 | Take a Bite |
