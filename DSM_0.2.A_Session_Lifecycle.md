@@ -807,8 +807,13 @@ outputs a STAA recommendation after each auto extraction.
      than memory; it codifies the pattern into the framework itself. Create a
      backlog item for the protocol addition, implement via feature branch, and
      remove the original lesson after the protocol is merged.
-  3. **Archive:** session-specific entries for permanently resolved contexts;
-     remove
+  3. **Archive:** session-specific entries for permanently resolved contexts.
+     Move the entry as a comment line into `.claude/reasoning-lessons-archived.md`
+     under a `## Archived in S{N}` header for the current prune session, grouped
+     by the original Category. Remove from the live file. The archive file is
+     read-only audit and is not loaded by `/dsm-go` Step 1.5, the wrap-up
+     extraction step, or `/dsm-staa`. Do not leave inline `<!-- Archived ... -->`
+     comments in the live file (BL-358).
   4. **Consolidate:** entries expressing the same insight from different sessions
      merge into one with session cross-references (e.g., `[+S55]`)
 
