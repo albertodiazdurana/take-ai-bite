@@ -40,6 +40,7 @@ protocol listed in the dispatch table is needed.
 22. [Two-Pass Reading Strategy for Long Structured Files](#22-two-pass-reading-strategy-for-long-structured-files)
 23. [CLAUDE.md Section Completeness Gate for New Projects](#23-claudemd-section-completeness-gate-for-new-projects)
 24. [Sprint Plan Cross-Reference Before Completion](#24-sprint-plan-cross-reference-before-completion)
+25. [Cloned-Mirror Kick-off Protocol](#25-cloned-mirror-kick-off-protocol)
 
 ---
 
@@ -2029,3 +2030,247 @@ Do not count "discussed" or "planned" as evidence of completion.
 - Declare a gate passed when the metric is below threshold, regardless of
   how close it is
 - Cross-reference from memory; always re-read the plan file
+
+---
+
+## 25. Cloned-Mirror Kick-off Protocol
+
+> **Origin:** BACKLOG-372. Defines the first-session behavior for a freshly
+> cloned DSM mirror (take-ai-bite or any downstream fork). Closes the gap
+> between "clone the repo" and "functional agent session" that surfaced in
+> TAB PR #36 (first-clone test, 17 friction findings).
+
+When a user clones a DSM mirror repository and runs `/dsm-go` for the first
+time, the clone is missing runtime configuration that the mirror sync
+cannot ship: per-instance ecosystem paths, author identity, and the
+runtime copies of templates that ship as `.claude/*.template` files. This
+protocol defines the one-time Kick-off that bridges the mirror-ships state
+and the session-ready state.
+
+### 25.1. Detection Signals
+
+Kick-off fires on the current session when **at least one** of these signals
+is true:
+
+1. `.claude/dsm-ecosystem.md` does not exist in the repo root
+2. `.claude/dsm-ecosystem.md` exists but its `Paths` table does not contain
+   a `dsm-central` row whose `Path` value equals the current repo root
+
+Kick-off is **skipped** (session proceeds normally) when:
+
+- `.claude/kickoff-done.txt` exists (marker written at the end of a successful
+  Kick-off; a re-run would be idempotent but the marker saves the detection
+  cost on every session)
+
+### 25.2. Kick-off Steps
+
+Executed in order. Each step is idempotent; a step that was already done on
+a previous partial Kick-off should be skipped without error.
+
+1. **Collect user input.** Prompt the user for:
+   - `{author}` , display name
+   - `{github}` , GitHub profile URL or username (optional)
+   - `{linkedin}` , LinkedIn URL (optional)
+   - `{project_name}` , human-readable project name
+   Leave optional fields blank if the user declines.
+2. **Resolve `{REPO_ROOT}`.** Run `pwd`; the returned absolute path is the
+   substitution value for `{REPO_ROOT}` in templates.
+3. **Copy `CLAUDE.md` from template.** If `.claude/CLAUDE.md` does not exist
+   or contains only the template placeholders, copy
+   `.claude/CLAUDE.md.template` to `.claude/CLAUDE.md`. Substitute all
+   placeholder tokens in the copied file using the Edit tool. Strip any
+   line whose only value is an unpopulated optional placeholder (e.g., a
+   `{github}` line where the user declined to provide a value).
+4. **Copy `settings.json` from template.** Copy
+   `.claude/settings.json.template` to `.claude/settings.json` if the target
+   does not exist. No substitution needed; the template is environment-neutral.
+5. **Copy `dsm-ecosystem.md` from template.** Copy
+   `.claude/dsm-ecosystem.md.template` to `.claude/dsm-ecosystem.md`.
+   Substitute `{REPO_ROOT}` with the clone's repo root in the `dsm-central`
+   row. Replace `{ISO_DATE}` with today's date. Set `Instance type:` to
+   `cloned-mirror`. Remove the `{UPDATE THIS PATH OR REMOVE ROW}` rows
+   unless the user provides paths for them during the prompt in step 1.
+6. **Copy `reasoning-lessons.md` from template.** Copy
+   `.claude/reasoning-lessons.md.template` to `.claude/reasoning-lessons.md`
+   if the target does not exist. Substitute `{N}` with `5` (initial pruning
+   cadence target).
+7. **Copy `skills-registry.md` from template.** Copy
+   `.claude/skills-registry.md.template` to `.claude/skills-registry.md`
+   if the target does not exist. No substitution needed.
+8. **Create `.claude/memory/MEMORY.md` as an empty stub.** If the directory
+   does not exist, create it with `mkdir -p .claude/memory`. Then write a
+   minimal header:
+   ```markdown
+   # {project_name} - Session Memory
+
+   _Populated by the user and by /dsm-wrap-up over time._
+   ```
+   Substitute `{project_name}` with the value from step 1.
+9. **Deploy command runtime copies.** Run `scripts/sync-commands.sh --deploy`
+   to populate `.claude/commands/dsm-*.md` (project-level) or
+   `~/.claude/commands/dsm-*.md` (user-level) runtime copies from
+   `scripts/commands/*.md`. If the script is missing (indicates an
+   incomplete mirror sync), report and skip, do not fail Kick-off.
+10. **Ensure hooks are executable.** Run
+    `chmod +x .claude/hooks/transcript-reminder.sh .claude/hooks/validate-transcript-edit.sh`.
+    Re-chmod every Kick-off because copy operations (including Edit/Write
+    tools) can strip the executable bit.
+11. **Inspect `.git/info/exclude` for the blanket rule.** Claude Code
+    auto-adds `.claude/` as a blanket ignore rule on fresh clones. Kick-off
+    does NOT remove this line. Instead, the shipped `.gitignore` provides
+    the fine-grained rules for `.claude/*` and the files that matter for
+    cross-clone propagation (hooks, templates) are already tracked in the
+    repo, so they remain tracked regardless of the exclude rule. Kick-off
+    reports this as informational: "Claude Code's `.git/info/exclude`
+    retains `.claude/` blanket rule. Tracked files stay tracked; new
+    session-scoped `.claude/*` files (transcripts, baselines) remain hidden
+    from `git status` by this rule, which is the intended behavior."
+12. **Scaffold `_inbox/` and `dsm-docs/` folders.** Delegate to `/dsm-align`
+    Step 3 (Canonical dsm-docs folder check). Either invoke `/dsm-align`
+    now or defer to `/dsm-go` Step 1.8 which will run `/dsm-align`
+    unconditionally.
+13. **Write Kick-off marker.** Create `.claude/kickoff-done.txt` containing:
+    ```
+    # Cloned-Mirror Kick-off completed
+    date: YYYY-MM-DD
+    author: {author}
+    project_name: {project_name}
+    repo_root: {REPO_ROOT}
+    ```
+    This marker prevents re-running Kick-off on subsequent sessions. Users
+    can delete the marker to re-run Kick-off intentionally.
+14. **Report completion.** Tell the user:
+    "Cloned-Mirror Kick-off complete. This clone is now its own DSM hub,
+    self-registered as `dsm-central` in `.claude/dsm-ecosystem.md`.
+    `/dsm-align` will now populate the CLAUDE.md alignment section from
+    the DSM_0.2 §17.1 template. Resume `/dsm-go` to finish session setup."
+
+### 25.3. What Kick-off Does NOT Do
+
+Explicit anti-requirements to prevent scope creep in future Kick-off
+implementations:
+
+- **No personal-content copy.** Central's MEMORY.md entries, CLAUDE.md
+  outside-delimiter content specific to Central, contributor-profile.md,
+  and spoke-backups/ are never copied to the clone. Those files are
+  Layer 2.5 per BL-336 (tracked-but-instance-specific). The clone
+  generates its own empty equivalents, populated over time by the user
+  and by wrap-up skills.
+- **No `.git/info/exclude` edits.** Kick-off does not touch the local
+  git exclude file. See §25.5 for rationale.
+- **No inbox history import.** The clone's `_inbox/` starts empty (apart
+  from the scaffolded `README.md`). Central's notification history stays
+  at Central.
+- **No third-party skill configuration.** `.claude/skills-registry.md`
+  starts as an empty scaffold. The user adds skills and their registry
+  entries per-instance per DSM_0.2 §23.2.
+- **No upstream tracking.** The clone does not maintain a remote reference
+  to Central or to the upstream mirror. It is self-rooted. Users who want
+  to pull future mirror updates do so explicitly via `git pull upstream`
+  or equivalent, not through any Kick-off-managed mechanism.
+
+### 25.4. Self-Registration as `dsm-central`
+
+The cloned instance writes its own repo root to the `dsm-central` entry in
+its own ecosystem registry. This is the architectural decision that
+distinguishes a cloned mirror from a spoke:
+
+- A **spoke** has `dsm-central` pointing to the original hub on the same
+  filesystem (e.g., `/home/user/dsm-agentic-ai-data-science-methodology`).
+- A **cloned mirror** has `dsm-central` pointing to itself (e.g.,
+  `/home/user/dsm-take-ai-bite`). The clone is its own self-rooted
+  ecosystem hub. Users can later add pointers to other filesystem-local
+  DSM instances as spokes of this new hub if they choose.
+
+Consequence for `/dsm-align`: a Kick-off'd clone runs the hub fast-path in
+`/dsm-align` (detection: `scripts/commands/` directory presence, shipped by
+T1a sync). The clone is functionally a hub, not a spoke, even though it
+descended from an upstream mirror. This is the correct behavior: the clone
+owns its methodology going forward.
+
+### 25.5. Handling Claude Code's `.git/info/exclude`
+
+Claude Code automatically adds `.claude/` as a blanket ignore rule to
+`.git/info/exclude` when it recognizes a repo. This rule is **per-clone
+local state** (not in git, not synced, not shared).
+
+The interaction with shipped `.claude/*` content:
+
+1. Files tracked in the repo (hooks, templates) remain **tracked** after
+   Kick-off. Git's tracking precedence means `.git/info/exclude` does not
+   untrack already-tracked files; it only hides untracked ones.
+2. New files created during sessions (`session-transcript.md`,
+   `session-baseline.txt`, `transcripts/*`, `last-*.txt`) are untracked and
+   match the blanket rule, so they correctly stay out of git history.
+3. The shipped `.gitignore` contains line-specific rules for these same
+   session-scoped files. Both the blanket rule and the line-specific rules
+   keep session state out of git; they are complementary, not conflicting.
+
+**Kick-off does not edit `.git/info/exclude`.** The default behavior is
+correct: session state is protected, shared infrastructure is tracked, no
+action needed.
+
+### 25.6. Relation to `/dsm-align` and `/dsm-go`
+
+Execution sequence on a fresh clone's first session:
+
+1. User runs `/dsm-go`.
+2. `/dsm-go` Step 0.5 checks scaffold completeness (will usually fail
+   because `.claude/dsm-ecosystem.md` is absent, deferring scaffold
+   creation to Step 1.8).
+3. `/dsm-go` Step 0.8 (**new step, BACKLOG-372 T5**) checks Kick-off
+   detection signals per §25.1. If fired, invokes the Kick-off steps in
+   §25.2. On completion, writes the marker and continues to Step 1.
+4. `/dsm-go` Step 1.8 invokes `/dsm-align`. `/dsm-align` runs the hub
+   fast-path (because `scripts/commands/` is present, shipped via T1a).
+   It populates the `<!-- BEGIN DSM_0.2 ALIGNMENT -->` section from the
+   §17.1 template, installs session-transcript hooks (Step 10b in
+   `/dsm-align`), and verifies `.gitattributes`.
+5. Session proceeds normally from Step 2 onward.
+
+On subsequent sessions, Step 0.8 detects the marker and skips Kick-off.
+Step 1.8 still runs `/dsm-align` unconditionally (per `/dsm-go` Step 1.8
+rules, the alignment runs every session regardless).
+
+### 25.7. Behavioral Trigger
+
+This protocol activates when **any** of these conditions are true at the
+start of a session:
+
+- `/dsm-go` Step 0.8 detects a clone needing Kick-off per §25.1
+- The user explicitly invokes Kick-off via a manual trigger (e.g.,
+  `/dsm-align --kick-off` if such a flag is added in a future BL; not
+  currently scoped)
+- The user re-runs Kick-off by deleting the `.claude/kickoff-done.txt`
+  marker and starting a new session
+
+Kick-off does **not** activate when:
+
+- The repo is DSM Central itself (hub detection: this repo is the one
+  that ships `scripts/take-ai-bite-sync.txt`)
+- The repo is a spoke (detection: `.claude/dsm-ecosystem.md` has
+  `dsm-central` pointing to a DIFFERENT filesystem path)
+
+### 25.8. Origin
+
+Origin: BACKLOG-372 (Session 191, 2026-04-15). Context: the author cloned
+`dsm-take-ai-bite` on a fresh WSL environment and discovered that the
+clone could not complete `/dsm-go` without manual scaffolding. TAB PR #36
+documented 17 friction findings from this test. Root-cause analysis showed
+two coupled issues:
+
+1. `scripts/take-ai-bite-sync.txt` had decayed, omitting ~30 load-bearing
+   files (DSM_0.2 + modules, DSM_3 suite, DSM_6.1, all slash commands,
+   `dsm-docs/guides/`, `FEATURES.md`, `README.md`, `.claude/hooks/*.sh`).
+   Fixed in BL-372 phase T1a (TAB PR #38, merged).
+2. TAB shipped no `.claude/` infrastructure at all (no hooks, no templates,
+   no scaffold). Fixed in BL-372 phase T1b (TAB PR #39), which introduced
+   the five Cloned-Mirror Kick-off templates and the two per-turn hooks.
+
+Findings #3 (no `.claude/` ships), #9 (no `.gitignore` ships), #1 (incomplete
+`dsm-docs/` scaffold), and #2 (commands not registered) are the direct
+motivators of this protocol. Findings #11 (standalone incompatibility of
+`/dsm-go` Step 1.8), #13 (IDE buffer clobber), #14 (Windows PATH), #15
+(colon in archive filenames), #16 (review-only branching hazard), and #17
+(two MEMORY.md systems) are out of scope for this protocol and tracked
+separately.
