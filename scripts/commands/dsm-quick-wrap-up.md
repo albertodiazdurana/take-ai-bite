@@ -65,6 +65,16 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    - If `.claude/session-baseline.txt` does not exist (session started without `/dsm-go`), fall back to staging all changed files
    Then `git commit` and `git push` in sequence. If no session changes exist, skip the commit.
    After committing, delete `.claude/session-baseline.txt` (consumed).
+7.5. **Parallel sessions registry cleanup:** Read `.claude/parallel-sessions.txt` if it exists.
+   - If the file does not exist: skip silently.
+   - If every section has `State: wrapped`: delete the file. Report:
+     "Parallel sessions registry cleaned: {N} entries (all wrapped)."
+   - If any section has `State: active`: warn the user with the section
+     name(s) — "Parallel session(s) {section-name(s)} did not wrap (state=active).
+     Investigate before proceeding. Skipping registry cleanup; file retained
+     for inspection in the next session." This warning is NOT a hard stop;
+     proceed to the next step.
+
 8. **Write wrap-up type marker:** Write `.claude/last-wrap-up.txt` with the session number, date, and wrap-up type. This marker is read by `/dsm-go` and `/dsm-light-go` at next session start to guide the user toward the appropriate startup command.
     ```
     session: N

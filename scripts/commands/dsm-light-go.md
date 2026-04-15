@@ -58,6 +58,25 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 - **Session baseline (Step 4):** Write only the timestamp line and `mode: light`; skip git fields
 - **Branch verification (Step 1.5):** Skip; no branch operations without git
 
+## Session Numbering (Source of Truth)
+
+The session number is the integer parsed from the current branch name
+(`session-{N}/YYYY-MM-DD`). It is NEVER derived from the session-archive
+count, transcript labels, MEMORY's "Latest Session" entry, or any other
+heuristic.
+
+Lightweight sessions CONTINUE an existing main session and INHERIT its
+number from the branch. They do NOT increment the number. If the current
+branch is `session-190/2026-04-14`, the lightweight continuation is
+S190 — never S191.
+
+Distinguish from `/dsm-go`: a fresh `/dsm-go` start derives a NEW session
+number for a NEW branch; this rule applies only there. `/dsm-light-go`
+and `/dsm-parallel-session-go` always inherit, never derive.
+
+If the branch name is malformed or absent (no parseable integer), stop
+and request user disambiguation rather than guessing a number.
+
 ## Steps (only if safety gate passes)
 
 1. **MEMORY.md:** Already loaded via auto memory context. Do NOT re-read; use the version in context.
@@ -81,12 +100,12 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    If multiple checkpoints exist in `dsm-docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation. If no checkpoint exists, skip silently.
 3. **Git status:** Run `git status` to check for uncommitted changes.
 4. **Save session baseline:** Save a new baseline snapshot (same as full `/dsm-go` step 6), then append `mode: light` to preserve the chain for the next lightweight wrap-up.
-5. **Transcript boundary marker:** Append a session boundary marker to the existing `.claude/session-transcript.md` (do NOT archive or overwrite):
+5. **Transcript boundary marker:** Append a session boundary marker to the existing `.claude/session-transcript.md` (do NOT archive or overwrite). The session number `{N}` MUST be the integer parsed from the current branch name per the Session Numbering rule above (e.g., branch `session-190/2026-04-14` → N=190). Do NOT increment, do NOT use archive count:
    ```markdown
 
    ---
 
-   ## Session N (lightweight continuation)
+   ## Session {N} (lightweight continuation)
    **Started:** [timestamp]
    **Previous session artifacts:**
    - Checkpoint: [filename from step 2]
@@ -99,7 +118,9 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    ---
    ```
 6. **Report:** Brief summary:
-   - Last session: [from MEMORY.md]
+   - Current session: S{N} (from branch, per Session Numbering rule)
+   - Last completed session: [from MEMORY.md "Latest Session" entry — distinct
+     from current session number; this is the most recent FULL wrap-up]
    - Session branch: [branch name from Step 1.5, or "main (no git)" if GIT_AVAILABLE is false]
    - Task context: [from checkpoint, what remains]
    - Deferred items: [list from checkpoint]

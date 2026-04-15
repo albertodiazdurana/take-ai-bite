@@ -567,6 +567,61 @@ will feed into a deliverable, it captures findings first. The Citation Standards
 DSM_0.1 cover format and placement of citations; this protocol ensures the underlying
 evidence exists to cite.
 
+### 10.1. Validation Depth for Deliverable-Critical Claims
+
+For deliverable-critical claims (claims that will appear in a final deliverable,
+publication, or external-facing artifact), a single research pass is insufficient.
+Each validation pass catches errors invisible to the previous one: behavioral
+verification confirms the claim holds in practice, comparative verification
+surfaces contradicting work, and source verification catches mismatched or
+non-authoritative citations. At least two passes at different abstraction levels
+are required before synthesis.
+
+**Pass types:**
+
+| Pass | Question answered | Applies when |
+|------|------------------|--------------|
+| Behavioral | Does the claim hold in practice? | The claim asserts runtime behavior, output, or empirical effect |
+| Comparative | Does competing or prior work contradict, or has the approach been proposed before? | The claim is novel, contested, or occupies a space with known alternatives |
+| Source | Are citations accurate, authoritative, and actually present at the cited URL? | The deliverable will cite external sources |
+
+**Mandatory cases (at least two passes required, spanning at least two distinct pass types):**
+- Research feeding a publication, blog post, external deliverable, or external contribution
+- Claims that will be cited or quoted in a user-facing artifact
+- Novel or counterintuitive findings that a reader would reasonably challenge
+- Any research marked for inclusion in `dsm-docs/research/` that feeds a downstream deliverable
+
+**Single-pass exemption (one pass acceptable):**
+- Internal notes, backlog context, and non-critical claims
+- Quick lookups that produce a single verifiable fact (e.g., checking a version number or flag name)
+- Research performed for internal decision-making where the finding will not leave the session or repo
+
+**Behavioral trigger:** When the agent identifies research as deliverable-critical
+(per the mandatory cases above), it proposes a multi-pass plan before executing
+the first pass. The plan names which pass types will run and why, so the user
+can confirm the depth matches the stakes. The passes are recorded in the same
+`dsm-docs/research/{date}_{topic}.md` file (per §10), with one section per pass.
+
+**Origin:** german-adversarial-prompting project STAA, cross-session pattern #2.
+Eight-session evidence: pass 1 (S4) confirmed Python ß/SS behavior and rated
+strategy medium-strength, pass 2 (S5) established originality by confirming no
+competing model proposed the approach, pass 3 (S6) caught 3/6 mismatched cached
+PDFs and added authoritative sources. A single pass would have shipped a
+deliverable with phantom citations and unconfirmed assumptions.
+
+**Risks / what could go wrong:**
+- Ritualistic compliance: running two passes that both ask the same question
+  (e.g., two behavioral passes) satisfies the count but not the intent. The
+  "spanning at least two distinct pass types" clause in the mandatory cases
+  is the guard
+- Pass inflation for non-critical work: treating every lookup as
+  deliverable-critical wastes context budget and slows sessions. The
+  single-pass exemption list must be read alongside the mandatory cases
+- Source-pass drift: a source pass that only checks URLs resolve (HTTP 200)
+  without verifying the cited content is present at the URL misses the
+  failure mode from S6 (cached PDFs mismatched to citations). The "actually
+  present at the cited URL" wording in the Source row is deliberate
+
 ---
 
 ## 11. Context Budget Protocol

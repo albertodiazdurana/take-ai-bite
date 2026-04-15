@@ -567,43 +567,61 @@ Every parallel session requires a typed prefix in the first prompt. The prefix
 serves two purposes: (1) it gates unscoped work, and (2) it generates a
 descriptive session name in VS Code's chat history.
 
-| Type | Prompt prefix | Scope | Writes |
-|------|--------------|-------|--------|
-| QA | `QA dsm parallel session` | Read-only analysis, validation | `.claude/` only (findings, notes) |
-| BL | `BL-{NNN} dsm parallel session` | File-scoped edits per BL definition | Files declared in BL scope |
+| Type | Short prefix (canonical) | Long prefix (legacy, still accepted) | Scope | Writes |
+|------|--------------------------|--------------------------------------|-------|--------|
+| QA | `QA` | `QA dsm parallel session:` | Read-only analysis, validation | `.claude/` only (findings, notes) |
+| BL | `BL-{NNN}` or `dsm-docs/plans/BACKLOG-{NNN}` | `BL-{NNN} dsm parallel session:` | File-scoped edits per BL definition | Files declared in BL scope |
+
+Both short and long forms are accepted; short is canonical for new
+prompts, long remains supported for backward compatibility and muscle
+memory.
 
 **Guided failure mode:** If `/dsm-parallel-session-go` does not detect a valid
-prefix (QA or BL-{NNN}) in the prompt, the agent must:
+prefix (QA, BL-{NNN}, or `dsm-docs/plans/BACKLOG-{NNN}` in any accepted
+form) in the prompt, the agent must:
 
 1. Refuse to proceed with any work
-2. Explain the two valid prefix formats with examples:
+2. Explain the accepted prefix formats with examples:
    ```
-   This session requires a typed prefix to proceed. Valid formats:
+   This session requires a typed prefix to proceed. Accepted formats:
 
    For read-only analysis (QA):
-     QA dsm parallel session: [describe the validation task]
+     QA: [task description]
+     QA dsm parallel session: [task description]   (legacy form)
 
    For scoped BL implementation:
-     dsm parallel session: [describe the implementation task]
+     BL-{NNN}: [task description]
+     dsm-docs/plans/BACKLOG-{NNN} [task description]
+     BL-{NNN} dsm parallel session: [task description]   (legacy form)
 
    Please start a new session with one of these prefixes.
    ```
 3. Wait for the user to provide a correctly prefixed prompt
 
-**Recovery path:** If the user started without a prefix, the simplest recovery
-is to close the session and open a new one with the correct prefix. The session
-tab name is auto-generated from the first prompt and cannot be changed after
-the fact.
+**Recovery path:** If the user started without a valid prefix, there are
+two recoveries of comparable effort: (a) copy one of the accepted prefix
+examples above and re-paste the original request prepended with it in
+this same session, or (b) close this session and open a new one starting
+with the correct prefix. The session tab name is auto-generated from the
+first prompt and cannot be changed after the fact, so option (b) also
+gives a more descriptive tab title.
 
 ### 7.2. Parallel Session Lifecycle
 
 ```
 main session running -> user opens new Claude Code chat panel in VS Code
-  -> types: "QA dsm parallel session: [task]" or "dsm parallel session: [task]"
+  -> types: "QA: [task]" or "BL-{NNN}: [task]" or
+            "dsm-docs/plans/BACKLOG-{NNN} [task]"
+            (legacy "QA dsm parallel session: [task]" still accepted)
   -> /dsm-parallel-session-go activates
+  -> appends a new section to .claude/parallel-sessions.txt (State: active)
   -> work (scoped to declared files)
-  -> /dsm-parallel-session-wrap-up -> commit on shared session branch
+  -> /dsm-parallel-session-wrap-up
+     -> commit on shared session branch
+     -> flips this section's State: active → wrapped (file retained)
 main session picks up committed artifacts
+main session /dsm-wrap-up (final) -> deletes .claude/parallel-sessions.txt
+                                     when all sections are wrapped
 ```
 
 All sessions share the same working directory and the same Level 2 session
@@ -613,7 +631,7 @@ branch. There are no Level 3 branches and no worktrees.
 
 **Main session responsibilities (before launching a parallel session):**
 - Validate file disjointness: no two parallel sessions may edit the same file
-- Assign parallel session number (X.Y format, see §7.6)
+- Assign parallel session number ({N}.{M} format, see §7.6)
 - Communicate the allowed file list to the parallel session via the prompt
 
 **Parallel session responsibilities (at startup):**
@@ -626,17 +644,39 @@ branch. There are no Level 3 branches and no worktrees.
 - Refuse any edit request outside the declared scope
 - QA sessions: no tracked file edits; only `.claude/` writes (findings, notes)
 
-**Scope declaration file:** The parallel session writes
-`.claude/parallel-session-baseline.txt` with:
+**Parallel sessions registry:** Each parallel session appends a section
+to `.claude/parallel-sessions.txt` (gitignored, multi-entry, one section
+per session). The file is created on first append and persists across
+the main session's lifetime until `/dsm-wrap-up` (main) cleans it up
+after confirming all sections are in `State: wrapped`.
 
-```
-# Parallel session X.Y baseline
+Section format:
+
+```markdown
+## parallel-{N}.{M}/{type}/{topic-slug}
 Type: QA | BL-{NNN}
 Task: [brief description]
 Scope: [list of files to be modified, or "read-only" for QA]
 Session branch: [current session branch name]
-Created: [timestamp]
+Created: [ISO timestamp]
+CLAUDE_PID: [pid of the Claude Code instance owning this section]
+State: active | wrapped
 ```
+
+State transitions: `active` after `/dsm-parallel-session-go`, then
+`wrapped` after `/dsm-parallel-session-wrap-up`. The registry is never
+truncated mid-session; dead entries remain until main wrap-up.
+
+**Session Numbering (Source of Truth).** The session number is the
+integer parsed from the current branch name (`session-{N}/YYYY-MM-DD`).
+It is NEVER derived from the session-archive count, transcript labels,
+MEMORY's "Latest Session" entry, or any other heuristic. Parallel
+sessions inherit the main session's number as `{N}`; lightweight
+continuations inherit the number unchanged; only a fresh `/dsm-go`
+derives a new `{N}`. Parallel session numbering uses `{N}.{M}` where
+`M` is the per-main-session parallel counter (1-indexed). If the branch
+name is malformed or absent, stop and request user disambiguation
+rather than guessing.
 
 ### 7.4. Commit Window Booking System
 
@@ -664,18 +704,25 @@ user and abort (VS Code can silently switch branches).
 ### 7.5. BL Lifecycle in Parallel Sessions
 
 - Parallel session does **not** move BL to `done/`
-- Parallel session updates BL status to: `Implemented by parallel session #X.Y`
+- Parallel session updates BL status to: `Implemented by parallel session #{N}.{M}`
 - Main session validates the work and moves BL to `done/`
 - This separation ensures the main session reviews parallel work before closing
 
 ### 7.6. Session Numbering Format
 
-Format: `X.Y` where X is the main session number and Y is the parallel session
-sequence number (assigned by the main session at launch time).
+Format: `{N}.{M}` where `{N}` is the main session number parsed from the
+branch name (per the Session Numbering rule in §7.3) and `{M}` is the
+per-main-session parallel counter (1-indexed, derived from the count of
+existing registry sections whose `Session branch:` matches the current
+branch).
 
-Example: Main session 156 launches two parallels:
+Example: Main session on branch `session-156/2026-02-14` launches two
+parallels:
 - 156.1 (QA: validate cross-references)
 - 156.2 (BL-271: structural compliance)
+
+Both inherit N=156 from the branch; M increments per parallel launch
+within the same main session.
 
 ### 7.7. Parallel Session Isolation Rules
 
@@ -734,9 +781,10 @@ BACKLOG-281 (lifecycle skill prohibition)
 
 **Applies to:** `/dsm-wrap-up`, `/dsm-light-wrap-up`, `/dsm-quick-wrap-up`
 
-Before executing any wrap-up skill, check for `.claude/parallel-session-baseline.txt`.
-If the file exists and the current context is a parallel session (no session
-transcript header was written by this session), refuse execution:
+Before executing any wrap-up skill, check for `.claude/parallel-sessions.txt`.
+If the file exists and contains a section whose `CLAUDE_PID:` matches
+the current Claude Code instance with `State: active`, the current
+context is a parallel session; refuse execution:
 
 > "Wrap-up skills cannot run from parallel sessions. Use
 > `/dsm-parallel-session-wrap-up` to end this parallel session, or switch to
