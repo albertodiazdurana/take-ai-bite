@@ -1,0 +1,2 @@
+# Enforce LF line endings on checkout (prevents CRLF issues on WSL/Windows)
+* text=auto eol=lf

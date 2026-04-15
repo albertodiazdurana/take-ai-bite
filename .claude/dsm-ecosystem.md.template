@@ -1,0 +1,33 @@
+# DSM Ecosystem Path Registry
+
+**Reference:** DSM_0.2 §18 (Ecosystem Path Registry)
+
+Local configuration mapping logical ecosystem names to filesystem paths.
+This file is gitignored per-instance. Each DSM installation (hub, spoke, or
+cloned mirror) declares its own ecosystem layout here.
+
+Cloned-Mirror Kick-off populates `dsm-central` with the clone's own repo root
+(self-registration, so the clone becomes its own local ecosystem hub). Other
+rows are added by the user if they maintain additional ecosystem members.
+
+**Created:** {ISO_DATE}
+**Instance type:** {cloned-mirror | hub | spoke}
+
+## Paths
+
+| Name | Path | Description | Mirror |
+|------|------|-------------|--------|
+| dsm-central | {REPO_ROOT} | Local DSM hub (this clone) | - |
+| portfolio | {UPDATE THIS PATH OR REMOVE ROW} | Portfolio project for cross-repo notifications | - |
+| contributions-docs | {UPDATE THIS PATH OR REMOVE ROW} | Governance folder for external contributions | - |
+
+<!--
+  Add one row per ecosystem member (spokes, other clones, external contribution
+  governance folders, mirrors). Set `Mirror: true` in the last column for any
+  member that should receive mirror sync at wrap-up or version release. See
+  DSM_0.2 §18 for the full schema and `scripts/sync-take-ai-bite.sh` for an
+  example mirror sync script.
+
+  For a standalone clone not participating in a multi-instance ecosystem,
+  keeping only the `dsm-central` row is valid.
+-->

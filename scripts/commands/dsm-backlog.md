@@ -24,7 +24,7 @@ Create a new DSM backlog item.
 **Priority:** [High/Medium/Low]
 **Date Created:** YYYY-MM-DD
 **Origin:** [Where the idea came from]
-**Author:** Alberto Diaz Durana
+**Author:** {author}
 
 ---
 
@@ -66,7 +66,7 @@ Conditions that must pass before the implementing branch merges to main:
 
 ---
 
-**Author:** Alberto Diaz Durana (with AI assistance)
+**Author:** {author} (with AI assistance)
 ```
 
 5. Update the README in the target directory (`plan/backlog/{developments|improvements}/README.md`):

@@ -1,0 +1,17 @@
+# Third-Party Skills Registry
+
+**Reference:** DSM_0.2 §23.1 (Third-Party Skill Governance)
+**Status:** Local-only, gitignored per-instance. Lists third-party skills installed
+on this DSM installation (global `~/.claude/skills/` or project-level `.claude/skills/`).
+
+## Installed Skills
+
+| Skill | Source | Version | Scope | Purpose | Conflicts | Register-sensitive |
+|-------|--------|---------|-------|---------|-----------|--------------------|
+
+## Maintenance
+
+Update this file when installing, removing, or updating a third-party skill.
+See DSM_0.2 §23.2 (Evaluation Gate for Skill Installation) for the pre-install
+review checklist. Register-sensitive skills (e.g., humanizer) require a runtime
+context block on every invocation per §23.4.
