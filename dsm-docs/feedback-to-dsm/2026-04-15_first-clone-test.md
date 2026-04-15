@@ -403,6 +403,40 @@ It is not limited to `session-transcript.md`; any `/dsm-go` artifact (baseline, 
 - (b) **Prefer `git stash` + edit in place over demo branches** for exposing gitignored artifacts when the goal is short-lived inspection. Demo branches are appropriate only when the exposure is meant to outlive a single session.
 - (c) **Agent-level guard in `/dsm-go` session-start:** detect the case "session-transcript.md is missing but transcripts/ has entries" — likely indicator that the eviction just happened — and offer to recover from the demo branch automatically. This is speculative; only worth shipping if the pattern recurs.
 
+### 17. Two parallel `MEMORY.md` systems (Claude Code auto-memory vs. DSM convention)
+
+**Surfaced in session 2 (2026-04-15) when the user asked "where is MEMORY.md stored?" before wrap-up.**
+
+DSM_0.2 and Claude Code each define a file named `MEMORY.md` with a completely different location, owner, and lifecycle. They coexist silently, and nothing in either system warns the user or the agent when they diverge.
+
+**System 1 — Claude Code auto-memory (used by this session):**
+- Path: `C:\Users\{user}\.claude\projects\{project-slug}\memory\MEMORY.md` (plus per-entry files like `feedback_branching.md`, `user_role.md`)
+- Owner: Claude Code. The directory is auto-created the first time any memory is saved.
+- Loaded: automatically injected into the agent's system prompt at every session start.
+- Not in the repo. Not committed. Machine-local.
+
+**System 2 — DSM convention:**
+- Path: `{repo-root}/MEMORY.md` (or `dsm-docs/MEMORY.md` in some spoke variants).
+- Owner: the project. Committed to the repo.
+- Expected by: `/dsm-go` Step 1 ("Read MEMORY.md"), `/dsm-wrap-up` ("update MEMORY.md"), DSM_6.0 Know-Your-Context principle, any agent that is not Claude Code (e.g. a hypothetical human-only or non-anthropic-SDK session).
+
+**Status on this repo:** System 1 populated (three files from S1 + S2). System 2 does not exist. Session 1 did not create a repo-root MEMORY.md; neither did I.
+
+**Why this is a real problem, not just redundancy:**
+
+- An agent that follows DSM_0.2 literally (`/dsm-go` Step 1: "Read MEMORY.md") will look at `./MEMORY.md`, find nothing, and conclude "no prior session context" — starting a new session that silently discards the auto-memory state. This session worked only because Claude Code's system prompt pre-injects the auto-memory content, which is a Claude-Code-specific channel not described anywhere in DSM_0.2.
+- A non-Claude-Code DSM session (another assistant, a manual operator reading the docs) has no access to System 1. For them, `MEMORY.md` literally does not exist on this repo, and every session is a cold start.
+- External contributors reviewing the repo cannot see what the project "remembers" because System 1 is gitignored-by-absence (lives outside the repo entirely).
+- MEMORY.md is load-bearing: DSM_6.0 Know-Your-Context positions it as the primary continuity mechanism. A session starting from the wrong MEMORY.md is a session in silent protocol regression.
+
+**Recommendations (tiered):**
+
+- (a) **Pick one canonical location and document it in DSM_0.2.** Either System 1 wins (committed file obsolete, DSM_0.2 must say so and explain the Claude-Code-specific loading) or System 2 wins (DSM projects must commit a repo-root `MEMORY.md` and Claude Code's auto-memory should sync to/from it). Silently supporting both is the root cause; picking one eliminates the split.
+- (b) **Ship a sync hook** in `.claude/hooks/` that mirrors Claude Code auto-memory to `{repo-root}/MEMORY.md` at every wrap-up (or at every save, if System 2 is canonical). This lets both systems stay populated without operator intervention. Hook-based solution lives in the existing DSM hook infrastructure.
+- (c) **Update `/dsm-go` Step 1** to read from BOTH locations and report the state of each. If only System 1 is populated, warn: "System 2 (`./MEMORY.md`) is empty; non-Claude-Code agents will not see session history. Run `/dsm-align` to sync." If only System 2 is populated, note: "Auto-memory system missing; this Claude Code instance may have been reset."
+- (d) **If System 1 is chosen as canonical** (likely, since it's the Claude Code default and already works): document in DSM_0.2 that on Claude Code projects, `MEMORY.md` physically lives in `~/.claude/projects/{slug}/memory/` and is injected via system prompt. Explicitly deprecate the repo-root location for Claude-Code-hosted projects.
+- (e) **For this repo specifically:** write a repo-root `MEMORY.md` this session as a minimal mirror of the auto-memory, so DSM skills that look there find something. Not a long-term solution (see (b)), but a correct interim state for the demo PR reviewer to see.
+
 ## Friction-ordered summary
 
 | # | Severity | Category | Who feels it |
@@ -423,9 +457,10 @@ It is not limited to `session-transcript.md`; any `/dsm-go` artifact (baseline, 
 | 14 | High | Cross-cut / Windows | Windows cloners and agents — misdiagnosis risk |
 | 15 | High | Platform / Windows | Windows cloners, every session after S1 |
 | 16 | Medium | Protocol workflow hazard | Any cloner using demo / review-only branches |
+| 17 | High | Protocol split / session continuity | Every DSM project; worst for non-Claude-Code agents |
 
 ## Status
 
 Live document — will be extended as the session continues through steps 2-10 and any wrap-up.
 
-**Session 2 appendix (2026-04-15):** Findings 11-16 added. Six findings from a single `/dsm-go` re-run on the already-scaffolded clone. Several surfaced only because the session exercised the repo's newly-declared review-only branching workflow (findings #12, #13, #15, #16). The meta-pattern: new workflows on a first-clone rig generate new friction classes; first-clone testing is not a one-shot event.
+**Session 2 appendix (2026-04-15):** Findings 11-17 added. Seven findings from a single `/dsm-go` re-run on the already-scaffolded clone. Several surfaced only because the session exercised the repo's newly-declared review-only branching workflow (#12, #13, #15, #16) or because the user surfaced a gap between DSM convention and Claude Code's memory model (#17). The meta-pattern: new workflows on a first-clone rig generate new friction classes; first-clone testing is not a one-shot event.
