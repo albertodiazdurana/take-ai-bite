@@ -1,0 +1,15 @@
+# Session-local DSM artifacts (per DSM_0.2 convention)
+.claude/session-transcript.md
+.claude/session-baseline.txt
+.claude/transcripts/
+.claude/last-align.txt
+.claude/last-align-report.md
+.claude/last-wrap-up.txt
+.claude/hooks/
+.claude/settings.local.json
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
