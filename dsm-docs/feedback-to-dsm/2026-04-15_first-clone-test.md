@@ -222,6 +222,21 @@ This is a privacy / hygiene risk for cloners who fork the repo and push back ups
 
 `.claude/CLAUDE.md`, `.claude/dsm-ecosystem.md`, `.claude/reasoning-lessons.md`, `.claude/contributor-profile.md`, `.claude/commands/`, and `.claude/settings.json` should remain committed (project config that benefits from version control).
 
+### 10. `/dsm-wrap-up` Step 10 assumes `gh` CLI is installed
+
+`dsm-wrap-up.md` Step 10 ("Merge session branch to main via PR") invokes `gh pr create` and `gh pr merge --merge --delete-branch`. Step 10e has a fallback: "If `gh` is not available or the PR fails, warn: 'Branch protection is active. Cannot merge to main without a PR. The session branch `{session-branch}` has been pushed to remote. Merge manually via GitHub.' and stop."
+
+The fallback works for **merge**, but Step 10b ("Create PR") has no fallback — if `gh` isn't installed, the cloner can't create a PR either via the skill. They have to use the GitHub web UI URL that `git push -u origin {branch}` prints to stderr.
+
+**Empirical confirmation during this session:** `gh` is not installed on this Windows machine. The push succeeded and printed the standard GitHub URL `https://github.com/{user}/{repo}/pull/new/{branch}`. Falling back to the web UI worked, but the wrap-up skill silently exits at this step rather than capturing the URL or guiding the user.
+
+This is the same pattern as finding #4 (Windows bash doesn't inherit Git PATH): skill files assume CLI tools resolve, but Windows installations frequently don't include them.
+
+**Recommendations:**
+- (a) **Capture the PR URL from `git push` output** — `git push -u origin {branch}` prints `Create a pull request for '{branch}' on GitHub by visiting: https://...`. The wrap-up could parse this and surface it explicitly: "PR URL: https://... — open in browser to create the PR."
+- (b) **Make `gh` optional in Step 10b**, with a graceful fallback: "gh not installed. Branch pushed. Open this URL in a browser to create the PR: {url}"
+- (c) **Document `gh` as a recommended (not required) dependency** in README. The DSM workflow degrades gracefully without it but with extra manual steps.
+
 ## Friction-ordered summary
 
 | # | Severity | Category | Who feels it |
@@ -235,6 +250,7 @@ This is a privacy / hygiene risk for cloners who fork the repo and push back ups
 | 7 | Low | Protocol nitpick | Every cloner, session 1 |
 | 8 | High | Internal inconsistency / data-loss risk | Diligent agents following the protocol |
 | 9 | High | Privacy / hygiene | Every cloner who pushes back |
+| 10 | Medium | Platform / Windows | Windows cloners without gh CLI |
 
 ## Status
 
