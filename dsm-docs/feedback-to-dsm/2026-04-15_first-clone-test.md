@@ -325,6 +325,29 @@ The S1 content was safely archived to `.claude/transcripts/2026-04-15T04:26-ST.m
 - (c) **Document the IDE buffer risk** in DSM_0.2 §7 and in `/dsm-go` Step 6. Recommend that `/dsm-go` instruct the user, as part of Step 6, to close and reopen the transcript file in their editor so the editor re-reads from disk. A one-line note at the end of Step 6: "If you have `.claude/session-transcript.md` open in an editor, close and reopen it now."
 - (d) **Optional: have `/dsm-go` Step 6 write to a new filename** (`session-transcript-{N}.md`) and symlink / rename rather than overwriting in place, so stale IDE buffers cannot stomp fresh content.
 
+### 14. Windows CLI PATH-visibility is a cross-cutting pattern (#4 + #10 are instances)
+
+**Surfaced in session 2 (2026-04-15) when the agent misdiagnosed `gh` as "not installed."**
+
+Findings #4 (git) and #10 (gh) were written as independent issues in S1. S2 produced direct evidence they are instances of a single class:
+
+- S2 agent ran `which gh` with only the Git PATH prepended, got "not in PATH", and reported "gh not installed" as fact.
+- User corrected: "gh is available now."
+- Re-probe with `/c/Program Files/GitHub CLI` also prepended: `gh` 2.89.0, authenticated. It was installed the whole time; it was PATH-invisible.
+
+**The meta-observation is the finding.** A diligent agent (me) with S1 finding #4 already in hand still concluded "not installed" rather than "PATH-hidden" on the first probe. Any ordinary cloner will reproduce this misdiagnosis. The prior findings did not prevent it.
+
+**Generalization.** Any Windows GUI-installer CLI tool installs to `C:\Program Files\{Tool}\...` and is reachable from `cmd.exe` / PowerShell but NOT from the bash shell Claude Code spawns. Affected tools observed or likely: `git`, `gh`, and by extension `python`, `node`, `docker`, `kubectl`, anything installed via a Windows installer that writes to `HKLM\...\PATH` instead of the user environment block bash inherits.
+
+**This reframes #10.** #10's premise ("gh not installed") was partially wrong — on this machine, gh WAS installed. The recommendation (graceful fallback to the GitHub web URL printed by `git push`) is still correct as a defense against *genuine* absence and as a no-dependency path, but the *first-line diagnosis* in `/dsm-wrap-up` Step 10 should be "is it installed but PATH-hidden?" before "is it absent?".
+
+**Recommendations (tiered):**
+
+- (a) **Ship a `.claude/bash-path-prepend.sh` helper** that exports the common Windows tool paths (`/c/Program Files/Git/cmd`, `/c/Program Files/Git/usr/bin`, `/c/Program Files/Git/bin`, `/c/Program Files/GitHub CLI`). Cloners source it once; every Bash tool call thereafter sees the installed tools. Cheaper than editing every skill file.
+- (b) **`/dsm-go` session-start PATH probe.** After the Git Awareness pre-step, probe for the CLIs DSM skills actually use (`git`, `gh`; extensible). For each, distinguish "absent" from "PATH-hidden" by checking `C:\Program Files\{Tool}\...` when `which` fails. Report the diagnosis and recommend prepend if any are PATH-hidden.
+- (c) **Re-frame #4 and #10 recommendations** (in this doc) to put "check PATH visibility first" before "assume absence". No rewrite of those findings' bodies — a one-line cross-reference to #14 is enough.
+- (d) **Agent-level lesson** in `.claude/reasoning-lessons.md`: when `which X` fails on Windows bash, also check `C:\Program Files\X\...` before concluding absence. Tag `[windows-path]`. Prevents DSM agents from reproducing the S2 misdiagnosis.
+
 ## Friction-ordered summary
 
 | # | Severity | Category | Who feels it |
@@ -342,9 +365,10 @@ The S1 content was safely archived to `.claude/transcripts/2026-04-15T04:26-ST.m
 | 11 | High | Protocol scope / judgment-call trap | Standalone repos, review-only projects |
 | 12 | Medium | Template gap | Review-only projects |
 | 13 | High | Session-artifact silent data loss | Every cloner using VS Code / any editor |
+| 14 | High | Cross-cut / Windows | Windows cloners and agents — misdiagnosis risk |
 
 ## Status
 
 Live document — will be extended as the session continues through steps 2-10 and any wrap-up.
 
-**Session 2 appendix (2026-04-15):** Findings 11-13 added. All three surfaced during the second `/dsm-go` run on the clone, confirming that even after session-1 scaffolding landed, the first-clone experience continues to generate friction data on re-runs.
+**Session 2 appendix (2026-04-15):** Findings 11-14 added. All four surfaced during the second `/dsm-go` run on the clone, confirming that even after session-1 scaffolding landed, the first-clone experience continues to generate friction data on re-runs. Finding #14 specifically came from the agent reproducing the PATH-visibility misdiagnosis from S1 finding #4 despite having that finding in context — evidence that the pattern is not eliminated by prior documentation alone.
