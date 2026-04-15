@@ -1522,6 +1522,7 @@ All module files are in the same directory as this core file.
 | GitHub Issue Intake Protocol | Session-start issue check, external issue triage | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | CLAUDE.md Section Completeness Gate | New project setup, CLAUDE.md missing sections | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Sprint Plan Cross-Reference Before Completion | Work block done, sprint wrap-up, completion declaration | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Cloned-Mirror Kick-off Protocol | First session of a cloned mirror repo (detection: no self-as-central registry) | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Composition Challenge Protocol | Producing a collection of 2+ discrete items | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Edit Explanation Stop Protocol | Multiple distinct edits to a single file | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Enabling File Content Protocol | Working with backlog items, checkpoints, plans | [B](DSM_0.2.B_Artifact_Creation.md) |
