@@ -1,12 +1,15 @@
 # Session-local DSM artifacts (per DSM_0.2 convention)
-.claude/session-transcript.md
-.claude/session-baseline.txt
-.claude/transcripts/
-.claude/last-align.txt
-.claude/last-align-report.md
-.claude/last-wrap-up.txt
-.claude/hooks/
-.claude/settings.local.json
+# Commented out on branch `demo/show-gitignored-session-artifacts` so the
+# PR diff exposes the session-local files to DSM Central reviewers.
+# Restore by uncommenting on any other branch.
+#.claude/session-transcript.md
+#.claude/session-baseline.txt
+#.claude/transcripts/
+#.claude/last-align.txt
+#.claude/last-align-report.md
+#.claude/last-wrap-up.txt
+#.claude/hooks/
+#.claude/settings.local.json
 
 # OS / editor noise
 .DS_Store
