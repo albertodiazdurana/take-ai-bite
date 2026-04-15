@@ -9,31 +9,62 @@ declarations, and a commit booking system. No session transcript is collected.
 
 ## Session Type Detection (Mandatory Prompt Prefix)
 
-The first prompt MUST contain a typed prefix. Detect it from $ARGUMENTS:
+The first prompt MUST contain a typed prefix. Detect it from $ARGUMENTS.
+Both short (canonical) and long (legacy) forms are accepted.
 
-| Pattern | Type | Scope |
-|---------|------|-------|
-| Starts with `QA` | QA session | Read-only; writes to `.claude/` only |
-| Starts with `BL-{NNN}` | BL session | File-scoped edits per BL definition |
+| Type | Short prefix (canonical) | Long prefix (legacy, still accepted) |
+|------|--------------------------|--------------------------------------|
+| QA   | `QA`                     | `QA dsm parallel session:`           |
+| BL   | `BL-{NNN}` or `dsm-docs/plans/BACKLOG-{NNN}` | `BL-{NNN} dsm parallel session:` |
+
+Parser logic: a prompt is a valid parallel-session prompt if `$ARGUMENTS`
+matches any of these patterns (anchored at the start, case-sensitive on
+QA / BL-):
+
+- `^QA(\b|$)` (short QA, with or without trailing description)
+- `^QA dsm parallel session:` (long QA)
+- `^BL-\d+(\b|$)` (short BL)
+- `^BL-\d+ dsm parallel session:` (long BL)
+- `^dsm-docs/plans/BACKLOG-\d+` (BL by file path; the agent extracts the BL number from the path)
 
 **If no valid prefix is detected,** refuse to proceed and guide the user:
 
 ```
-This session requires a typed prefix to proceed. Valid formats:
+This session requires a typed prefix to proceed. Accepted formats:
 
 For read-only analysis (QA):
-  QA dsm parallel session: [describe the validation task]
+  QA: [task description]
+  QA dsm parallel session: [task description]   (legacy form)
 
 For scoped BL implementation:
-  BL-271 dsm parallel session: [describe the implementation task]
+  BL-{NNN}: [task description]
+  dsm-docs/plans/BACKLOG-{NNN} [task description]
+  BL-{NNN} dsm parallel session: [task description]   (legacy form)
 
-Please start a new session with one of these prefixes.
+Please start a new session with one of these prefixes. The session tab
+name is auto-generated from the first prompt and cannot be changed after
+the fact, so the simplest recovery is to close this session and open a
+new one with the correct prefix. Alternatively, copy one of the accepted
+prefix examples above and re-paste your request prepended with it.
 ```
 
-**Wait for a correctly prefixed prompt before proceeding.** If the user started
-without a prefix, the simplest recovery is to close this session and open a new
-one with the correct prefix. The session tab name is auto-generated from the
-first prompt and cannot be changed after the fact.
+## Session Numbering (Source of Truth)
+
+The session number is the integer parsed from the current branch name
+(`session-{N}/YYYY-MM-DD`). It is NEVER derived from the session-archive
+count, transcript labels, or any other heuristic. Lightweight sessions,
+parallel sessions, and continuation sessions all inherit the main
+session's number from the branch.
+
+Parallel session numbering uses an `{N}.{M}` form where `N` is the main
+branch session number and `M` is the per-main-session parallel counter
+(starts at 1, increments per parallel session within the same main
+session). The counter is derived by reading the registry file
+`.claude/parallel-sessions.txt` and counting existing sections that match
+the current `session-{N}/YYYY-MM-DD` branch (active or wrapped).
+
+If the branch name is malformed or absent, stop and request user
+disambiguation rather than guessing a number.
 
 ## Git Requirement
 
@@ -42,8 +73,9 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
 
 ## Steps
 
-1. **Validate prefix:** Parse $ARGUMENTS for QA or BL-{NNN} prefix. If missing
-   or malformed, output the guided failure message above and stop.
+1. **Validate prefix:** Parse $ARGUMENTS against the patterns in the prefix
+   table above (short canonical or long legacy form). If no pattern matches,
+   output the guided failure message above and stop.
 
 2. **Load context:** Read this project's MEMORY.md from the auto memory directory.
    Read `.claude/CLAUDE.md` for project conventions. Do NOT read reasoning lessons,
@@ -55,11 +87,11 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    **Hook behavior (BL-324 structural fix):** The `UserPromptSubmit` hook is
    backed by `.claude/hooks/transcript-reminder.sh`, which detects parallel
    sessions via the `CLAUDE_PID` field written to
-   `.claude/parallel-session-baseline.txt` at Step 6 below. Once that baseline
-   is written, the hook emits a parallel-mode reminder instead of the main
-   §7 reminder. Until Step 6 writes the baseline (i.e., during Step 2 itself),
-   the main reminder may still fire once; ignore it. After Step 6 the hook
-   auto-switches.
+   `.claude/parallel-sessions.txt` at Step 6 below. Once a section with the
+   current PID is written to the registry, the hook emits a parallel-mode
+   reminder instead of the main §7 reminder. Until Step 6 writes the
+   section (i.e., during Step 2 itself), the main reminder may still fire
+   once; ignore it. After Step 6 the hook auto-switches.
 
 3. **Determine session type and scope:**
    - **QA type:** Scope is read-only. Only `.claude/` writes are allowed (findings,
@@ -73,19 +105,29 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
 
 5. **Safety check:** Before proceeding:
    - Run `git status --porcelain` to check for uncommitted changes
-   - Check `.claude/parallel-session-baseline.txt` for active parallel sessions
+   - Check `.claude/parallel-sessions.txt` for any sections with `State: active`
+     (existing concurrent parallel sessions)
    - For BL type: verify that the planned file scope does not overlap with any
-     active parallel session's declared scope
+     active parallel session's declared scope (read each `active` section's
+     `Scope:` field)
    - **STOP if:**
      - Uncommitted changes overlap with the planned scope
      - Another parallel session targets the same files
      - The planned work requires shared file modifications
    - If stopped, explain the conflict and ask the user to reframe.
 
-6. **Write parallel session baseline:**
-   The main session assigns the session number (X.Y format). If $ARGUMENTS
-   includes a session number, use it. Otherwise, default to the session branch
-   number + ".1" (incrementing if baseline already exists).
+6. **Append parallel session entry to registry:**
+   The registry file is `.claude/parallel-sessions.txt`. The file is gitignored;
+   create it if missing.
+
+   Derive the parallel session number `{N}.{M}`:
+   - `{N}` = session number parsed from the branch name (`session-{N}/...`).
+     Per the Session Numbering rule above, this is the only source of truth.
+   - `{M}` = 1 + count of existing sections in the registry whose
+     `Session branch:` value matches the current branch (active or wrapped).
+
+   Derive a topic slug: pick a 3-5 word kebab-case slug summarizing the task
+   (e.g., `knowledge-summary-format`, `bl-300-impl`). Cap at 50 chars.
 
    Capture the Claude Code instance PID by walking the parent process chain
    from the shell until a process named `claude` is found:
@@ -107,19 +149,34 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    Ignore transcript reminders manually for this session." Continue without
    blocking.
 
-   ```
-   # Parallel session X.Y baseline
+   **Duplicate-PID guard:** Before appending, scan the registry for any
+   existing section whose `CLAUDE_PID:` matches the current PID. If found,
+   refuse to add a second entry: "This Claude Code instance (PID {pid})
+   already has a parallel session entry in `.claude/parallel-sessions.txt`.
+   Either run `/dsm-parallel-session-wrap-up` to close the existing entry,
+   or remove the stale section manually if it is an orphan." Stop.
+
+   Append a new section (use `>>` to preserve existing entries):
+
+   ```markdown
+   ## parallel-{N}.{M}/{type}/{topic-slug}
    Type: QA | BL-{NNN}
    Task: {description from prompt}
    Scope: {list of files, or "read-only" for QA}
    Session branch: {current session branch name}
-   Created: {timestamp}
+   Created: {ISO timestamp}
    CLAUDE_PID: {pid from parent chain walk}
+   State: active
    ```
+
+   Use `>>` shell append (atomic for sub-PIPE_BUF writes) when writing via
+   Bash. Race conditions between two truly-simultaneous launches are
+   accepted; parallel sessions are created manually and sub-second
+   collisions are not a real concern.
 
 7. **Declare scope (first output):** Report:
    ```
-   PARALLEL SESSION X.Y ({QA|BL-NNN})
+   PARALLEL SESSION {N}.{M} ({QA|BL-NNN})
 
    Session branch: {branch name} (shared, no separate branch)
    Type: {QA (read-only) | BL-NNN (file-scoped)}
@@ -128,6 +185,7 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    This session will only edit: {file list}.
    Any edit outside this scope will be refused.
 
+   Registry entry: .claude/parallel-sessions.txt → ## parallel-{N}.{M}/...
    Commit booking: enabled (.claude/commit-lock)
    ```
 

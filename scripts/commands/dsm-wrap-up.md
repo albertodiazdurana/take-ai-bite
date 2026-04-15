@@ -157,6 +157,17 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    c. If merge succeeds: report "Merged mirror sync PR #{number} on {repo}"
    d. If merge fails or `gh` unavailable: warn "Open mirror sync PR on {repo}: #{number} ({title}). Merge manually."
    e. If no open sync PRs exist, skip silently.
+11.5. **Parallel sessions registry cleanup:** Read `.claude/parallel-sessions.txt` if it exists.
+   - If the file does not exist: skip silently.
+   - If every section has `State: wrapped`: delete the file. Report:
+     "Parallel sessions registry cleaned: {N} entries (all wrapped)."
+   - If any section has `State: active`: warn the user with the section
+     name(s) — "Parallel session(s) {section-name(s)} did not wrap (state=active).
+     Investigate before proceeding. Skipping registry cleanup; file retained
+     for inspection in the next session." This warning is NOT a hard stop;
+     proceed to the next step. The file persists into the next session so
+     the active entry can be investigated.
+
 12. **Write wrap-up type marker:** Write `.claude/last-wrap-up.txt` with the session number, date, and wrap-up type. This marker is read by `/dsm-go` and `/dsm-light-go` at next session start to guide the user toward the appropriate startup command.
     ```
     session: N
