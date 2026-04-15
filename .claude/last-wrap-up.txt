@@ -1,0 +1,3 @@
+session: 1
+date: 2026-04-15
+type: full
