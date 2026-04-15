@@ -38,7 +38,6 @@ fi
 #
 # Categories:
 #   - Personal name (Alberto, Diaz, Durana)
-#   - Credentials specific to the user (PMP)
 #   - External profiles (LinkedIn, github.com/albertodiazdurana)
 #   - Engagement model framing (freelance, client engagement, cover letter)
 #   - User-preference phrasing ("the user prefers", "the user is", "I am")
@@ -48,7 +47,6 @@ PATTERNS=(
   '\balberto\b'
   '\bdiaz durana\b'
   '\bdurana\b'
-  '\bpmp\b'
   '\blinkedin\b'
   'albertodiazdurana'
   '\bfreelance\b'
