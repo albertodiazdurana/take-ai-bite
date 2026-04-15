@@ -237,6 +237,94 @@ This is the same pattern as finding #4 (Windows bash doesn't inherit Git PATH): 
 - (b) **Make `gh` optional in Step 10b**, with a graceful fallback: "gh not installed. Branch pushed. Open this URL in a browser to create the PR: {url}"
 - (c) **Document `gh` as a recommended (not required) dependency** in README. The DSM workflow degrades gracefully without it but with extra manual steps.
 
+### 11. `/dsm-go` Step 1.8 "unconditional, no exceptions" does not fit standalone projects
+
+**Surfaced in session 2 (2026-04-15) when `/dsm-go` re-ran on the clone.**
+
+`/dsm-go` Step 1.8 is emphatic:
+
+> **Always run /dsm-align (unconditional, no exceptions):** Invoke `/dsm-align` immediately. Do not check `.claude/last-align.txt`. Do not gate on version mismatch. Do not gate on marker presence. Do not ask the user. Do not present a y/n confirmation gate. Do not defer.
+
+The rationale (BL-319 follow-up, S180 §22 hardening) is sound for hub-and-spoke ecosystems where `/dsm-align` is cheap and fixes drift silently. But `/dsm-align` itself is built around a spoke -> DSM Central topology:
+
+- Step 2 (ecosystem registry lookup) expects `dsm-central` to point to an external repo with `_inbox/`, `CHANGELOG.md`, etc.
+- Step 7 (version check) reads `{dsm-central}/CHANGELOG.md`.
+- Step 11 (command drift check) assumes drift between this repo and a remote Central.
+- Step 12 (hook install) pulls from `{dsm-central}/.claude/hooks/`.
+
+For `take-ai-bite` — a **standalone** repo whose "central" *is* itself (`dsm-central = .` in the ecosystem registry) — none of these cross-repo operations are meaningful, and several would actively regress local state (e.g., the hand-curated `.claude/CLAUDE.md` alignment section explicitly marked `"inline scaffold, not via full /dsm-align"`).
+
+In this session I skipped Step 1.8 with a logged deviation. The fact that a **reasoned deviation** was required on the second `/dsm-go` run of a brand-new clone is the finding: an "unconditional, no exceptions" rule that requires judgment-call exceptions on common project types (standalone samples, public demos, first-clone rigs) is not actually unconditional.
+
+**Recommendations:**
+- (a) **Add a `standalone` participation-pattern short-circuit to Step 1.8.** If `.claude/CLAUDE.md` declares `Participation pattern: Self-contained` (or the ecosystem registry has `dsm-central = .`), Step 1.8 should downgrade to "verify alignment marker exists; skip cross-repo sync steps."
+- (b) **Split `/dsm-align` into sub-steps with opt-out flags** for standalone projects: (i) local scaffold check (always runs), (ii) CLAUDE.md alignment template (always runs if drift detected), (iii) ecosystem sync (runs only if external `dsm-central` exists).
+- (c) **Document "standalone" as a first-class participation pattern in DSM_0.2** alongside hub/spoke/external-contribution. Module A §17 already mentions participation patterns; adding `standalone` with an explicit "Step 1.8 short-circuit" rule makes the behavior discoverable rather than a judgment call.
+
+### 12. CLAUDE.md default `## 4. Branching` template bakes in merge-to-main assumption
+
+**Surfaced in session 2 (2026-04-15) when the user declared the no-merge-to-main rule.**
+
+The session-1 scaffold wrote this line in `.claude/CLAUDE.md`:
+
+```
+## 4. Branching
+
+Standard DSM three-level branching applies (`main` -> `session-N/YYYY-MM-DD` -> `bl-*` / `sprint-*`).
+```
+
+That one-liner is defensible as a default — §20.2 and §20.3 of DSM_0.2 do describe a merge-to-main workflow. But "standard three-level branching applies" tacitly endorses **merge behavior** (§20.2: "Merge to Level 1: At session wrap-up, only if all Level 3 branches have been formally merged back"), not just the naming convention.
+
+The user's actual rule for `take-ai-bite` is: **no branch is ever merged to `main`**. Every branch is committed, pushed, and opened as a review PR; the PR diff is the review artifact for DSM Central maintainers; `main` stays pinned to the upstream clone baseline. This required a project-specific override of §20.2/§20.3 via §17 precedence (done this session, commit TBD).
+
+The gap is that the default CLAUDE.md scaffolding has no option for "review-only" or "no-merge" projects. A first-time cloner who wanted this workflow would have to:
+1. Discover that §20.2/§20.3 force merge behavior.
+2. Know that §17 protocol precedence lets them override.
+3. Write the override themselves.
+
+None of that is signposted; `/dsm-align`'s CLAUDE.md template system (§17.1) produces the same merge-endorsing line for every project type.
+
+**Recommendations:**
+- (a) **Add a fourth branching mode to the CLAUDE.md template system** (§17.1 Base template), alongside notebook / app / hybrid: **review-only** projects get a Section 4 body that declares "never merges to main; branches delivered as PRs."
+- (b) **Tag `take-ai-bite` specifically as a review-only project** in whatever registry `/dsm-align` consults — so re-runs of `/dsm-align` don't overwrite the hand-curated Section 4 back to the merge-endorsing default.
+- (c) **Add a DSM_0.2 §20 subsection** documenting "review-only branching" as a first-class pattern, with explicit rules: (i) branches are never merged locally, (ii) PRs are the review artifact, (iii) session wrap-up pushes and opens/updates PRs instead of running `git merge`, (iv) `main` tracks an external baseline.
+
+### 13. VS Code stale buffer overwrites fresh `/dsm-go` Step 6 transcript reset
+
+**Surfaced in session 2 (2026-04-15) when the transcript was clobbered mid-session.**
+
+`/dsm-go` Step 6 overwrites `.claude/session-transcript.md` on disk with a fresh `Session N` header:
+
+```bash
+cat > .claude/session-transcript.md << EOF
+# Session N Transcript
+**Started:** $(date -Iseconds)
+...
+EOF
+```
+
+If VS Code has the file **open with a buffer from the previous session loaded** when Step 6 runs, the on-disk content is replaced correctly — but any subsequent IDE save (autosave, manual save, or a buffer flush triggered by focus change) writes the stale Session N-1 buffer back over the fresh header. Silent data loss; no warning from Claude Code, no warning from VS Code.
+
+**What happened this session:**
+
+1. 04:53: `/dsm-go` Step 6 ran, wrote Session 2 header to disk. File on disk: Session 2.
+2. 04:53-05:03: Agent appended Session 2 Start User / Thinking / Output entries via Edit tool. File on disk: Session 2 + ~60 lines of S2 entries.
+3. ~05:03: VS Code (with the S1 buffer still loaded in the editor pane) saved the buffer back, overwriting the file on disk.
+4. 05:04: Agent tried to Read / Edit the transcript to add the Gate 2 output summary, found only S1 content (38 lines).
+5. Recovery: rebuilt S2 content with a `[RETROACTIVE]` wrapper per DSM_0.2 §7.
+
+The S1 content was safely archived to `.claude/transcripts/2026-04-15T04:26-ST.md` before Step 6 overwrote the file, so no data was permanently lost — but the S2 reasoning appended between 04:53 and 05:03 WAS lost and had to be reconstructed from memory.
+
+**Why this matters:**
+
+`/dsm-go` Step 6 is documented in DSM_0.2 §7 as the **canonical activation point** for the Session Transcript Protocol. If the IDE can silently undo Step 6, the protocol's foundational invariant ("the transcript reflects the current session's reasoning") is broken without any signal to the agent. The `validate-transcript-edit.sh` PreToolUse hook enforces shape (delimiters, anchors) but does not detect whole-file reversion.
+
+**Recommendations:**
+- (a) **Add a post-Step-6 checksum / header verification.** After writing the fresh header, compute its hash. Before every transcript append, re-read the first 5 lines and verify the header matches the Step-6 hash. If it doesn't, the agent knows the IDE clobbered the file and can recover (re-run Step 6, inject a `[RETROACTIVE]` block) rather than silently overwriting S1 content with S2 edits.
+- (b) **Add a guard to the PreToolUse hook** (`validate-transcript-edit.sh`) that rejects Edit calls whose `old_string` anchor matches an older session's header (`# Session {N-1} Transcript`) when the current session is `N`. Forces explicit recovery.
+- (c) **Document the IDE buffer risk** in DSM_0.2 §7 and in `/dsm-go` Step 6. Recommend that `/dsm-go` instruct the user, as part of Step 6, to close and reopen the transcript file in their editor so the editor re-reads from disk. A one-line note at the end of Step 6: "If you have `.claude/session-transcript.md` open in an editor, close and reopen it now."
+- (d) **Optional: have `/dsm-go` Step 6 write to a new filename** (`session-transcript-{N}.md`) and symlink / rename rather than overwriting in place, so stale IDE buffers cannot stomp fresh content.
+
 ## Friction-ordered summary
 
 | # | Severity | Category | Who feels it |
@@ -251,7 +339,12 @@ This is the same pattern as finding #4 (Windows bash doesn't inherit Git PATH): 
 | 8 | High | Internal inconsistency / data-loss risk | Diligent agents following the protocol |
 | 9 | High | Privacy / hygiene | Every cloner who pushes back |
 | 10 | Medium | Platform / Windows | Windows cloners without gh CLI |
+| 11 | High | Protocol scope / judgment-call trap | Standalone repos, review-only projects |
+| 12 | Medium | Template gap | Review-only projects |
+| 13 | High | Session-artifact silent data loss | Every cloner using VS Code / any editor |
 
 ## Status
 
 Live document — will be extended as the session continues through steps 2-10 and any wrap-up.
+
+**Session 2 appendix (2026-04-15):** Findings 11-13 added. All three surfaced during the second `/dsm-go` run on the clone, confirming that even after session-1 scaffolding landed, the first-clone experience continues to generate friction data on re-runs.

@@ -22,4 +22,14 @@ Standalone sample repo. Sessions run fully local. Feedback captured in `dsm-docs
 
 ## 4. Branching
 
-Standard DSM three-level branching applies (`main` → `session-N/YYYY-MM-DD` → `bl-*` / `sprint-*`).
+Three-level branching (`main` → `session-N/YYYY-MM-DD` → `bl-*` / `sprint-*`) applies
+for structure, but this repo **never merges branches to `main`**. Every branch is:
+
+1. Committed locally,
+2. Pushed to `origin`,
+3. Opened as a PR against `main`.
+
+The PR diff is the review package for DSM Central maintainers. `main` stays aligned
+with the upstream clone baseline; per-session / per-BL branches accumulate as open
+(or closed-without-merge) review PRs. This overrides generic DSM_0.2 §20.2 and §20.3
+merge rules for this repo (project-specific precedence, §17).
