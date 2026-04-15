@@ -31,7 +31,7 @@ Examples of unacceptable behavior:
 
 ## Project-Specific Standards
 
-Given the professional and educational nature of this data science methodology:
+Given the professional and educational nature of this methodology:
 
 ### Expected Conduct
 

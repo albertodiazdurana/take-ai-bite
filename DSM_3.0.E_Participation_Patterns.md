@@ -302,10 +302,11 @@ DSM Central <--reads--- dsm-docs/feedback-to-dsm/         (sanitized by user, re
 - Append thinking to `.claude/session-transcript.md` BEFORE acting
 - Output summary AFTER completing work
 - Conversation text = results only
-- Use Reasoning Delimiter Format for every thinking block:
+- Use Session Transcript Delimiter Format for every block:
   `<------------Start Thinking / HH:MM------------>`
-  [reasoning content]
-- HH:MM is 24-hour local time when thinking begins; no end delimiter needed
+  `<------------Start Output / HH:MM------------>`
+  `<------------Start User / HH:MM------------>`
+- HH:MM is 24-hour local time when the block begins; no end delimiter needed
 ```
 
 Extend the Agent Constraints with project-specific sensitive data types
@@ -516,10 +517,11 @@ Standard spoke pattern (see DSM_3 Section 6.9).
 - Append thinking to `.claude/session-transcript.md` BEFORE acting
 - Output summary AFTER completing work
 - Conversation text = results only
-- Use Reasoning Delimiter Format for every thinking block:
+- Use Session Transcript Delimiter Format for every block:
   `<------------Start Thinking / HH:MM------------>`
-  [reasoning content]
-- HH:MM is 24-hour local time when thinking begins; no end delimiter needed
+  `<------------Start Output / HH:MM------------>`
+  `<------------Start User / HH:MM------------>`
+- HH:MM is 24-hour local time when the block begins; no end delimiter needed
 ```
 
 #### Directory Structure
