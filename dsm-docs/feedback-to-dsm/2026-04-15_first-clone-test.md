@@ -348,6 +348,61 @@ Findings #4 (git) and #10 (gh) were written as independent issues in S1. S2 prod
 - (c) **Re-frame #4 and #10 recommendations** (in this doc) to put "check PATH visibility first" before "assume absence". No rewrite of those findings' bodies — a one-line cross-reference to #14 is enough.
 - (d) **Agent-level lesson** in `.claude/reasoning-lessons.md`: when `which X` fails on Windows bash, also check `C:\Program Files\X\...` before concluding absence. Tag `[windows-path]`. Prevents DSM agents from reproducing the S2 misdiagnosis.
 
+### 15. `/dsm-go` Step 5.5 produces archive filenames with literal `:` (breaks Windows `git add`)
+
+**Surfaced in session 2 (2026-04-15) when opening the demo PR #37 required `git add` on the archived S1 transcript.**
+
+`/dsm-go` Step 5.5 archives the previous session's transcript to `.claude/transcripts/${TS}-ST.md` where `${TS}` is extracted from the transcript's `**Started:**` header. The header format is ISO-8601 with a colon-separated time: `2026-04-15T04:26:21+02:00`. The `sed` expression in Step 5.5 trims it to `2026-04-15T04:26`, and the archive filename becomes `2026-04-15T04:26-ST.md`.
+
+**The literal `:` in the filename causes multiple failures on Windows:**
+
+1. `git add .claude/transcripts/2026-04-15T04:26-ST.md` → `fatal: pathspec ... did not match any files`. Empirically observed in this session.
+2. `git ls-files` outputs the path as `".claude/transcripts/2026-04-15T04\357\200\27226-ST.md"` (quoted octal escape, where `\357\200\272` is UTF-8 for U+F03A, a private-use-area glyph Windows sometimes substitutes for disallowed NTFS characters). `grep`, downstream tooling, and copy-paste workflows that round-trip the filename all break.
+3. `git diff --stat` shows the path quoted and escaped, polluting the commit message preview.
+4. On strict POSIX filesystems the file can still be written, but on NTFS the `:` is actually the Alternate Data Stream separator — the file exists here only because Git's on-disk abstraction bypasses the NTFS filename check. A cloner using a different filesystem may see creation fail entirely.
+
+**Workaround (used in this session):** `git add .claude/transcripts/` (add the parent directory) staged the file correctly. But this works only because no other files in the directory needed different staging, and the cloner or agent has to know the trick.
+
+**Recommendations:**
+- (a) **Replace `:` with `-` or `_` in `${TS}`.** One-line fix in `dsm-go.md` Step 5.5:
+  ```bash
+  TS=$(echo "$STARTED" | sed 's/\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\)T\([0-9]\{2\}\):\([0-9]\{2\}\).*/\1T\2\3/')
+  ```
+  Produces `2026-04-15T0426-ST.md` (colon-free, still sortable, still ISO-ish).
+- (b) **Document the cross-platform filename contract** in DSM_0.2: session artifacts must use characters valid on all target filesystems (NTFS disallows `: < > " / \ | ? *`). Archive filenames from other DSM skills should be audited for the same issue.
+- (c) **Short-term mitigation in `/dsm-go` Step 5.5**: detect the colon in the computed filename and refuse to archive, emitting a clear error. Better a loud failure than a silently-malformed filename.
+
+### 16. Committing gitignored files on one branch evicts them from the working tree on another
+
+**Surfaced in session 2 (2026-04-15) after pushing the demo branch and switching back to the session branch.**
+
+Sequence reproduced live:
+
+1. On `session-1/2026-04-15`: `.claude/session-transcript.md` is **gitignored**, present on disk, untracked. The user keeps it open in VS Code as the live reasoning log.
+2. On `demo/show-gitignored-session-artifacts` (branched off session-1): `.gitignore` was edited to comment out the DSM-artifact rules, and `git add` + commit staged the session-transcript.md. It is now **tracked** on the demo branch.
+3. `git checkout session-1/2026-04-15` back to the session branch.
+4. **Git removes the file from disk** because it is tracked on the source branch (demo) but not on the target branch (session-1), and there are no unstaged modifications to preserve.
+
+The user's live reasoning log disappears mid-session. VS Code shows the editor pane empty (or throws a "file not found" error). Recovery required:
+```bash
+git checkout demo/show-gitignored-session-artifacts -- .claude/session-transcript.md [...other files]
+git reset HEAD .claude/session-transcript.md [...other files]
+```
+
+This is **correct git behavior** — not a bug. But it is a **non-obvious hazard** of the review-only / demo-branch workflow this repo just adopted (finding #12 + CLAUDE.md §4). Any session that uses a demo branch to temporarily expose gitignored artifacts, then switches back, will hit this. A cloner reproducing the workflow without knowing the recovery sequence will think they have lost their transcript.
+
+**Generalization.** The pattern applies to any file that:
+- Is listed in `.gitignore` on branch A
+- Is committed (with `.gitignore` overridden or edited) on branch B
+- Gets evicted when switching from B back to A
+
+It is not limited to `session-transcript.md`; any `/dsm-go` artifact (baseline, last-wrap-up, archived transcripts) or hook file handled the same way has the same hazard.
+
+**Recommendations:**
+- (a) **Document the hazard in DSM_0.2 §20** (the new review-only branching subsection proposed in #12). Include the exact recovery sequence: `git checkout {demo-branch} -- {paths}` + `git reset HEAD {paths}`.
+- (b) **Prefer `git stash` + edit in place over demo branches** for exposing gitignored artifacts when the goal is short-lived inspection. Demo branches are appropriate only when the exposure is meant to outlive a single session.
+- (c) **Agent-level guard in `/dsm-go` session-start:** detect the case "session-transcript.md is missing but transcripts/ has entries" — likely indicator that the eviction just happened — and offer to recover from the demo branch automatically. This is speculative; only worth shipping if the pattern recurs.
+
 ## Friction-ordered summary
 
 | # | Severity | Category | Who feels it |
@@ -366,9 +421,11 @@ Findings #4 (git) and #10 (gh) were written as independent issues in S1. S2 prod
 | 12 | Medium | Template gap | Review-only projects |
 | 13 | High | Session-artifact silent data loss | Every cloner using VS Code / any editor |
 | 14 | High | Cross-cut / Windows | Windows cloners and agents — misdiagnosis risk |
+| 15 | High | Platform / Windows | Windows cloners, every session after S1 |
+| 16 | Medium | Protocol workflow hazard | Any cloner using demo / review-only branches |
 
 ## Status
 
 Live document — will be extended as the session continues through steps 2-10 and any wrap-up.
 
-**Session 2 appendix (2026-04-15):** Findings 11-14 added. All four surfaced during the second `/dsm-go` run on the clone, confirming that even after session-1 scaffolding landed, the first-clone experience continues to generate friction data on re-runs. Finding #14 specifically came from the agent reproducing the PATH-visibility misdiagnosis from S1 finding #4 despite having that finding in context — evidence that the pattern is not eliminated by prior documentation alone.
+**Session 2 appendix (2026-04-15):** Findings 11-16 added. Six findings from a single `/dsm-go` re-run on the already-scaffolded clone. Several surfaced only because the session exercised the repo's newly-declared review-only branching workflow (findings #12, #13, #15, #16). The meta-pattern: new workflows on a first-clone rig generate new friction classes; first-clone testing is not a one-shot event.
