@@ -1,0 +1,43 @@
+# Reasoning Lessons
+
+**Reference:** DSM_0.2 Reasoning Lessons Protocol
+**Pruning cadence:** Every 5 sessions (next: Session {N})
+**File size target:** ~50 entry lines (excluding headers and comments)
+**Last pruned:** _(none yet)_
+
+## Tagging Convention
+
+- `[auto]` , extracted by CA at wrap-up (lightweight, automated)
+- `[STAA]` , extracted by STAA in dedicated analysis session (full analysis)
+
+## Categories
+
+### Decision Heuristics
+
+_Lessons about when to apply a rule or how to choose between alternatives._
+
+### Ecosystem Patterns
+
+_Lessons about how this project interacts with DSM Central and other spokes._
+
+### Infrastructure
+
+_Lessons about tooling, hooks, skills, settings, and the agent's working environment._
+
+### Methodology
+
+_Lessons about protocol effectiveness, gaps, or boundary conditions._
+
+### Skills
+
+_Lessons about slash-command behavior, edge cases, and skill authoring._
+
+<!--
+  This file is the per-project reasoning-lessons runtime file (gitignored in Central).
+  It starts empty. Wrap-up (/dsm-wrap-up) appends [auto]-tagged lessons extracted from
+  the session transcript. STAA sessions append [STAA]-tagged lessons from full analysis.
+
+  Ecosystem-scope lessons (ones that apply across projects) should be promoted to
+  dsm-docs/reasoning-lessons-ecosystem.md (tracked, Layer 3) instead of accumulating here.
+  See BL-358 for archive/pruning protocol.
+-->

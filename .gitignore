@@ -1,0 +1,123 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+.virtualenv/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Data Files (large datasets should not be in git)
+*.csv
+*.xlsx
+*.xls
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+data/raw/*
+data/processed/*
+data/results/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/results/.gitkeep
+
+# Outputs (generated figures and reports)
+outputs/figures/*
+outputs/reports/*
+!outputs/figures/.gitkeep
+!outputs/reports/.gitkeep
+
+# Models
+models/*.pkl
+models/*.h5
+models/*.joblib
+*.model
+*.sav
+
+# IDE
+.vscode/
+.idea/
+.claude/settings.json
+.claude/settings.local.json
+.claude/personal-rules-allowlist.md
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Documentation builds
+docs/_build/
+site/
+
+# OS
+Thumbs.db
+.DS_Store
+*.bak
+*.tmp
+
+# Project specific
+# Uncomment if needed:
+# *.db
+# *.sqlite
+# scratch/
+# experiments/
+.claude/session-transcript.md
+.claude/session-baseline.txt
+.claude/parallel-sessions.txt
+.claude/commit-lock
+.claude/reasoning-lessons.md
+.claude/reasoning-lessons-archived.md
+.claude/transcripts/
+.claude/commands/dsm-*.md
+contributions-docs/
+.claude/dsm-ecosystem.md
+.claude/last-align.txt
+.claude/last-align-report.md
+.claude/last-wrap-up.txt
+.claude/*.code-workspace

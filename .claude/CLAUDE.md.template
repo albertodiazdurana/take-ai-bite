@@ -1,0 +1,145 @@
+@{REPO_ROOT}/DSM_0.2_Custom_Instructions_v1.1.md
+
+<!-- BEGIN DSM_0.2 ALIGNMENT - do not edit manually, managed by /dsm-align -->
+<!-- /dsm-align will populate this section on first run from DSM_0.2 §17.1 template. -->
+<!-- END DSM_0.2 ALIGNMENT -->
+
+# Quick Reference
+
+## Common Commands
+
+_Add project-specific commands here (e.g., setup scripts, dev servers, test runners)._
+
+## Key Paths
+- Methodology: `DSM_1.0_Data_Science_Collaboration_Methodology_v1.1.md`
+- Appendices: `DSM_1.0_Methodology_Appendices.md`
+- PM Guidelines: `DSM_2.0_ProjectManagement_Guidelines_v2_v1.1.md`
+- PM Production Extension: `DSM_2.1_PM_ProdGuidelines_extension.md` (enterprise/production projects)
+- Software Engineering: `DSM_4.0_Software_Engineering_Adaptation_v1.0.md` (ML applications)
+- Handoffs: `dsm-docs/handoffs/` (session continuity documents)
+- Checkpoints: `dsm-docs/checkpoints/` (milestone snapshots)
+
+## Author
+**{author}**
+{github} | {linkedin}
+
+_Fill in the author block with your name and optional GitHub/LinkedIn URLs.
+Remove placeholders that you do not want to publish._
+
+## Command Execution
+- Routine write commands (git commit, git push, git add, cp, mv, pip install, file edits) are auto-approved via permission settings
+
+## Destructive Command Protocol
+Bash commands are broadly auto-approved. The following commands are **NEVER** allowed without explicit user request:
+- `rm -rf` (recursive forced deletion)
+- `git push --force` / `git push -f` (overwrites remote history)
+- `git reset --hard` (discards uncommitted work)
+- `git checkout -- .` / `git restore .` (discards all working tree changes)
+- `git clean -f` (deletes untracked files)
+- `git branch -D` (force-deletes branch without merge check)
+- `drop`, `truncate`, `delete from` without WHERE (database destruction)
+
+The following **non-bash operations** also require explicit user confirmation (see DSM_0.2 Destructive Action Protocol):
+- Cross-repo file writes to a path not previously written in this session
+- Deletion of files with substantive content (>10 lines)
+- Adding, removing, or renumbering sections in DSM methodology documents (DSM_0 through DSM_6)
+
+If any of these commands or operations is needed, **stop and explain why** before running it. Never use these as shortcuts to bypass errors or obstacles.
+
+## Secret Exposure Prevention
+Before staging files, check filenames against sensitive patterns: `.env`, `.env.*`, `*.key`, `*.pem`, `credentials.*`, `secrets.*`, `*_secret*`, `*.p12`, `*.pfx`, `*password*`, `*.keystore`.
+If a match is found, refuse to stage, alert the user, and wait for explicit confirmation. A blanket "stage everything" does not override this check.
+
+**Content-level protection:** Before writing any content to a tracked file, classify data by sensitivity (Public, Internal, Confidential, Restricted). Never write secrets in plaintext, redact PII, use env var placeholders for credentials. See DSM_0.2 Module C §5 for the full Sensitive Data Protection protocol.
+
+
+## Change Tracking Workflow
+
+### Backlog System (`dsm-docs/plans/`)
+- **Purpose:** Track proposed enhancements and project definitions
+- **Active BLs:** `dsm-docs/plans/` (new BLs go here)
+- **Format:** `BACKLOG-###_short-description.md`
+- **Required fields:** Status, Priority (High/Medium/Low), Date Created, Origin, Author
+- **When implemented:** Move to `dsm-docs/plans/done/` and update Status to "Implemented"
+- **When deferred:** Move to `dsm-docs/plans/deferred/` with Status "Deferred" and a Reason field. Review at sprint boundaries.
+- **Yearly archival:** At calendar year end, reorganize done/ directories into yearly subdirectories (`done/2025/`, `done/2026/`). This reduces directory clutter while maintaining traceability.
+
+### CHANGELOG.md
+- **Purpose:** Public record of what changed in each version
+- **Format:** Keep a Changelog format with Added/Changed/Deprecated/Removed/Fixed sections
+- **When to update:** Every version release, include backlog references (BACKLOG-###)
+
+### Git Tags
+- **Release tags:** `vX.Y.Z` for content/feature releases
+- **Checkpoint tags:** `vX.Y.Z-consistency` for post-release cleanup (version alignment, docs fixes)
+- **Create after:** Major releases to mark recovery points
+
+### Checkpoints (`dsm-docs/checkpoints/`)
+- **Purpose:** Internal snapshots with detailed context (rationale, session state, next steps)
+- **Different from CHANGELOG:** CHANGELOG = "what changed" (public), Checkpoints = "what was happening" (internal)
+- **Format:** `YYYY-MM-DD_vX.Y.Z_release_checkpoint.md`
+
+### Commit Messages
+- Be descriptive, explain what and why
+- No co-author lines
+- Reference BACKLOG-### when implementing backlog items
+- Example: `Implement BACKLOG-001: Capability Experiment Template (v1.3.1)`
+- **Commit after each BL fix:** Commit (and push) immediately after implementing each backlog item; never batch multiple BL implementations into one commit. Use `git mv` for tracked files to avoid ghost deletion cleanup commits.
+- **Command file sync:** If a commit includes changes to `scripts/commands/*.md`, run `scripts/sync-commands.sh --deploy` immediately after committing to update the global runtime copies in `~/.claude/commands/`. Stale global copies cause project sessions to miss protocol updates.
+
+### Branching Strategy (Three-Level Model)
+All DSM projects follow the Three-Level Branching Strategy defined in DSM_0.2:
+- **Level 1:** main (production)
+- **Level 2:** session branch (created at `/dsm-go`, merged at `/dsm-wrap-up`)
+- **Level 3:** task branches (BL, sprint). Parallel sessions use Level 2 directly.
+
+Every BL implementation that modifies methodology files (DSM_0 through DSM_6, DSM_0.1, DSM_0.2) or command files (`scripts/commands/`) or that is aimed to modify them (as in the case of research) must use a Level 3 BL branch (`bl-NNN/short-description`).
+
+**Exceptions (commit directly to session branch):** mechanical status updates (BL moved to done/), trivial fixes (typos, dates), session artifacts (handoffs, checkpoints, feedback).
+
+**Agent behavior:** When the user requests a BL implementation, the agent's first action is to create a Level 3 branch off the current session branch. During `/dsm-light-wrap-up`, check if the current branch is a task branch with unpushed commits; if so, push it to remote before wrapping up.
+
+**Post-merge branch recreation (DSM_0.2 §20.8):** After any in-session `gh pr merge --delete-branch`, the working copy lands on main and the next commit silently violates the strategy. **Immediately create a new session branch before any further edits.** Chain pattern: `gh pr merge {N} --merge --delete-branch && git checkout -b session-{N}/{YYYY-MM-DD}-{purpose}`. Recovery if a commit lands on main: create a safety-net branch at HEAD, then `git update-ref refs/heads/main refs/remotes/origin/main` (do NOT use `git reset --hard`). See DSM_0.2 §20.8 for the full rule.
+
+See DSM_0.2 Three-Level Branching Strategy for push policy, resumption protocol, and merge conditions.
+
+### Backlog Priorities
+| Priority | When to Use                                  |
+| -------- | -------------------------------------------- |
+| High     | Addresses significant gap, blocks other work |
+| Medium   | Valuable enhancement, can wait               |
+| Low      | Nice to have, future consideration           |
+
+## Humanizer Protocol
+After editing any human-facing file, run `/humanizer` on it before committing.
+The wrap-up command also checks for this as a safety net.
+
+**Human-facing files** (designed to be read by humans, not agents):
+- `DSM_0.0_START_HERE_Complete_Guide.md`
+- `README.md`
+- `TAKE_A_BITE.md`
+- `FEATURES.md`
+- `CONTRIBUTING.md`
+- `dsm-docs/blog/*.md` (excluding `done/`)
+
+**Not human-facing** (agent-consumed, skip humanizer):
+- DSM_0.1, DSM_0.2 + modules, DSM_1.0-6.1 + modules
+- `.claude/CLAUDE.md` and other config files
+- Plan/backlog files, session artifacts
+
+<!--
+  Cloned-Mirror Kick-off template (DSM_0.2, Cloned-Mirror Kick-off Protocol).
+
+  This file is the starting template copied by Kick-off to `.claude/CLAUDE.md`
+  on first session. Placeholders:
+    {REPO_ROOT}  - substituted with the clone's repo root on `@` reference
+    {author}     - your display name
+    {github}     - your GitHub profile URL or username (optional)
+    {linkedin}   - your LinkedIn URL (optional)
+
+  /dsm-align populates the alignment section between the BEGIN/END delimiters
+  from DSM_0.2 §17.1 template on first run. Do not hand-edit that section.
+
+  Add project-specific instructions after this template if your project has
+  workflows, constraints, or conventions not covered by the inherited protocol.
+-->
