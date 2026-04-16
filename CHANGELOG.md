@@ -5,6 +5,17 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-04-16
+
+### Added - Git-mv rename-staging warning hook (BL-370)
+
+- **BL-370: `.claude/hooks/validate-rename-staging.sh` pre-commit warning hook.** New PreToolUse:Bash hook catches the recurring pattern where Edit-tool or `sed -i` content changes made before `git mv` get dropped from the commit because `git mv` does not auto-restage prior content deltas. Three sightings in DSM Central (S184 BL-349, S190 IronCalc inbox move, S191 `/dsm-light-go` checkpoint annotation) forced the "file a BL" threshold per MEMORY.md convention. The hook filters to `git commit` calls, parses `git diff --cached --name-status` for R-typed renames, and for each renamed new-path checks whether the working tree differs from the staged content. If yes, blocks with exit 2 and emits clear bypass instructions (`git add <path>` to stage the content, or `git commit --no-verify` for intentional rename-first workflows). Silent (exit 0) when no renames are staged or all content is staged. MEMORY pitfall entry updated to reference BL-370 as the enforcement mechanism.
+  - **Spoke action:** Run `/dsm-align` on next `/dsm-go` to install the new hook (Step 10b copies the script to `.claude/hooks/` and merges the `PreToolUse:Bash` entry into `.claude/settings.json`). Cloned mirrors get it pre-wired via `.claude/settings.json.template`.
+
+### Spawned
+
+- None.
+
 ## [1.5.0] - 2026-04-16
 
 ### Added - Cloned-Mirror Kick-off Protocol (S191)
