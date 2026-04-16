@@ -94,8 +94,13 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    once; ignore it. After Step 6 the hook auto-switches.
 
 3. **Determine session type and scope:**
-   - **QA type:** Scope is read-only. Only `.claude/` writes are allowed (findings,
-     notes, analysis output).
+    - **QA type:** No edits to code, methodology documents (DSM_0 through DSM_6
+    and their modules), BL files, or any tracked project source-of-truth file.
+    Writes allowed to: `.claude/` (findings, notes, analysis output) and
+    `dsm-docs/research/{date}_{topic}.md` when DSM_0.2 §10 Web Research Capture
+    Protocol applies. For the §10 path, follow the protocol's naming and
+    citation requirements.
+
    - **BL type:** Read the referenced BL file to determine which files are in scope.
      If the BL file does not exist, stop: "BL-{NNN} not found. Check the BL number."
 
@@ -162,7 +167,7 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    ## parallel-{N}.{M}/{type}/{topic-slug}
    Type: QA | BL-{NNN}
    Task: {description from prompt}
-   Scope: {list of files, or "read-only" for QA}
+   Scope: {list of files, or "read-only + dsm-docs/research/{file}" for QA}
    Session branch: {current session branch name}
    Created: {ISO timestamp}
    CLAUDE_PID: {pid from parent chain walk}
@@ -179,8 +184,8 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    PARALLEL SESSION {N}.{M} ({QA|BL-NNN})
 
    Session branch: {branch name} (shared, no separate branch)
-   Type: {QA (read-only) | BL-NNN (file-scoped)}
-   Scope: {file list or "read-only"}
+   Type: {QA | BL-NNN (file-scoped)}
+   Scope: {file list or "read-only + dsm-docs/research/{file}" for QA}
 
    This session will only edit: {file list}.
    Any edit outside this scope will be refused.
@@ -206,8 +211,10 @@ Before every commit:
 
 ## Behavioral Rules (active for the entire parallel session)
 
-- **QA sessions:** Read any file, write only to `.claude/` (findings, notes).
-  Never edit tracked repository files.
+- **QA sessions:** Read any file. Writes allowed only to `.claude/` and
+  `dsm-docs/research/{date}_{topic}.md` (per §10). Never edit code, methodology
+  documents, BL files, or other tracked source-of-truth files.
+
 - **BL sessions:** Edit only files in the declared scope. Generated artifacts
   go into canonical folders (`dsm-docs/research/`, `dsm-docs/plans/`, etc.).
 - **Never modify shared or central files.** Determined from CLAUDE.md.
