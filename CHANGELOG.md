@@ -5,6 +5,27 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-04-16
+
+### Added - Cloned-Mirror Kick-off Protocol (S191)
+
+- **BL-372: Cloned-Mirror Kick-off Protocol (DSM_0.2.A §25) and `/dsm-go` Step 0.8 integration.** Fresh clones of public DSM mirrors (Take-AI-Bite and any downstream fork) now bootstrap into a functional session state automatically on first `/dsm-go`. New DSM_0.2.A §25 defines the 14-step Kick-off sequence with zero user prompts: all runtime values (`{REPO_ROOT}`, `{project_name}`, `{ISO_DATE}`) auto-derive from `pwd`/`basename`/`date`. Kick-off copies 5 shipped `.claude/*.template` files (CLAUDE.md, settings.json, dsm-ecosystem.md, reasoning-lessons.md, skills-registry.md) to runtime paths with placeholder substitution, self-registers the clone as `dsm-central` in its own ecosystem registry (so the clone is its own self-rooted hub), deploys slash commands via `sync-commands.sh --deploy`, `chmod +x`'s the hooks, and writes `.claude/kickoff-done.txt` to prevent re-running on subsequent sessions. Anti-requirements (§25.3) are symmetric: no personal-content **copy** and no personal-content **collection** (GitHub identity is already implicit via `git remote -v`; LinkedIn / author attribution is added manually post-Kick-off if desired). `/dsm-go` Step 0.8 (new step between 0.5 and 0) detects cloned-mirror state, invokes Kick-off, and passes through otherwise. Skip conditions prevent Kick-off from firing on Central (detection: `scripts/take-ai-bite-sync.txt` presence), spokes (detection: `dsm-central` points to DIFFERENT filesystem path), and already-Kick-off'd clones (marker check).
+  - **Spoke action:** Run `/dsm-align` on next `/dsm-go` to pick up the §25 protocol and Step 0.8 integration via the `@` reference chain. Mirror clones of TAB on first `/dsm-go` after v1.5.0 will auto-bootstrap.
+- **BL-372: `scripts/take-ai-bite-sync.txt` expanded from 15 to 69 entries.** Previously the sync list had decayed, omitting ~30 load-bearing files (DSM_0.2 + modules A/B/C/D, DSM_3.0 + modules A-F, DSM_6.1 + modules, all `scripts/commands/*.md`, `dsm-docs/guides/`, `FEATURES.md`, `README.md`, `.claude/hooks/*.sh`). Step 9 of `/dsm-version-update` syncs *existing* list entries but never *adds* new ones, so the list silently drifted as Central expanded. Expansion adds all missing methodology modules, all 18 slash commands, both per-turn transcript hooks, five new `.claude/*.template` files, `.gitignore`, `.gitattributes`, `_inbox/README.md`, and the scanner/deploy scripts.
+  - **Spoke action:** None. This is a Central-only tooling change; TAB receives the expanded payload on next mirror sync.
+- **BL-372: Change Propagation Protocol impact table (`.claude/CLAUDE.md`) extended with three rows** for `.claude/hooks/*.sh`, `.claude/*.template`, and repo-level scaffolding (`.gitignore`, `.gitattributes`, `_inbox/README.md`) mirror-sync propagation.
+  - **Spoke action:** None. This is a Central-only documentation update.
+- **BL-372: `scripts/commands/dsm-backlog.md` template author field replaced with `{author}` placeholder.** Removes scanner noise flagged in each future mirror sync (previously the command file hit `\balberto\b` on every sync run). Command files are templates used across projects and users; the author slot should be a placeholder substituted per-project, not a literal personal name.
+  - **Spoke action:** None. Template output unchanged for users; scanner noise eliminated.
+- **BL-372: `scripts/sync-take-ai-bite.sh` creates missing parent directories before `cp`.** Fix for sync failure when a target file's parent directory does not yet exist on the mirror (e.g., `.claude/hooks/` on a TAB without prior hook shipping). Idempotent.
+  - **Spoke action:** None. Central-only tooling fix.
+- **BL-372: `/dsm-align` Hub fast-path now runs Step 3 (canonical `dsm-docs/` folder scaffold).** Fixes the integration gap discovered during T7 behavioral verification where Kick-off §25.2 step 12 delegated folder scaffolding to `/dsm-align` Step 3, but `/dsm-align`'s Hub fast-path skipped Step 3 entirely. Since Kick-off'd clones are functionally hubs per §25.4, the hub fast-path fired and the scaffold was never created. Step 3 is idempotent, so no-op for existing hubs with complete scaffold and creates missing folders for fresh clones.
+  - **Spoke action:** Run `/dsm-align` on next `/dsm-go` to pick up the updated hub fast-path behavior. Already-Kick-off'd clones with manual-intervention scaffolds need no action.
+
+### Spawned
+
+- **BACKLOG-373** (to be filed): Cloned-Mirror Kick-off follow-up findings from T7. Scope: F1 (`sync-commands.sh` should `mkdir -p $USER_TARGET` before existence check), F2 (ship `.claude/commands/*.md` tracked in mirror clones to eliminate bash dependency on first run), F3 (`/dsm-go` Step 0a session-number formula should consider remote `session-*` branches for mirror-with-prior-history cases).
+
 ## [1.4.18] - 2026-04-13
 
 ### Added - Infrastructure File Collaboration Protocol, "We Need to Talk" Principle, MEMORY.md Budget Optimization (S187)
