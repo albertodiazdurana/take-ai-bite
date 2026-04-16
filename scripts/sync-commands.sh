@@ -29,11 +29,7 @@ if [ ! -d "$SOURCE_DIR" ]; then
     exit 1
 fi
 
-if [ ! -d "$USER_TARGET" ]; then
-    echo "ERROR: User target directory not found: $USER_TARGET"
-    exit 1
-fi
-
+mkdir -p "$USER_TARGET"
 mkdir -p "$PROJECT_TARGET"
 
 is_project_command() {
