@@ -2067,29 +2067,34 @@ Kick-off is **skipped** (session proceeds normally) when:
 Executed in order. Each step is idempotent; a step that was already done on
 a previous partial Kick-off should be skipped without error.
 
-1. **Collect user input.** Prompt the user for:
-   - `{author}` , display name
-   - `{github}` , GitHub profile URL or username (optional)
-   - `{linkedin}` , LinkedIn URL (optional)
-   - `{project_name}` , human-readable project name
-   Leave optional fields blank if the user declines.
-2. **Resolve `{REPO_ROOT}`.** Run `pwd`; the returned absolute path is the
-   substitution value for `{REPO_ROOT}` in templates.
+1. **Auto-derive runtime values.** Kick-off does not prompt the user for any
+   input. All template placeholders are derived deterministically:
+   - `{REPO_ROOT}` = `pwd` (absolute path to the clone's repo root)
+   - `{project_name}` = `basename $(pwd)` (directory name)
+   - `{ISO_DATE}` = `date -I` (today's date in YYYY-MM-DD format)
+   Rationale: author, GitHub, and LinkedIn data are personal-profile content
+   a clone user may or may not want to publish in their CLAUDE.md. By symmetry
+   with §25.3's "no personal-content copy" anti-requirement, Kick-off also
+   minimizes personal-content *collection*. Users add author attribution
+   manually to their CLAUDE.md post-Kick-off if they want it. GitHub identity
+   is already implicit in the git remote (`git remote -v`).
+2. **Verify working directory.** Confirm `pwd` resolves to the expected
+   repo root. If the Kick-off was invoked from a subdirectory, resolve via
+   `git rev-parse --show-toplevel` instead.
 3. **Copy `CLAUDE.md` from template.** If `.claude/CLAUDE.md` does not exist
-   or contains only the template placeholders, copy
-   `.claude/CLAUDE.md.template` to `.claude/CLAUDE.md`. Substitute all
-   placeholder tokens in the copied file using the Edit tool. Strip any
-   line whose only value is an unpopulated optional placeholder (e.g., a
-   `{github}` line where the user declined to provide a value).
+   or contains only template placeholders, copy `.claude/CLAUDE.md.template`
+   to `.claude/CLAUDE.md`. Substitute `{REPO_ROOT}` in the `@` reference line
+   using the Edit tool. No other placeholder substitution is needed because
+   the template ships without author/profile placeholders.
 4. **Copy `settings.json` from template.** Copy
    `.claude/settings.json.template` to `.claude/settings.json` if the target
    does not exist. No substitution needed; the template is environment-neutral.
 5. **Copy `dsm-ecosystem.md` from template.** Copy
    `.claude/dsm-ecosystem.md.template` to `.claude/dsm-ecosystem.md`.
-   Substitute `{REPO_ROOT}` with the clone's repo root in the `dsm-central`
-   row. Replace `{ISO_DATE}` with today's date. Set `Instance type:` to
-   `cloned-mirror`. Remove the `{UPDATE THIS PATH OR REMOVE ROW}` rows
-   unless the user provides paths for them during the prompt in step 1.
+   Substitute `{REPO_ROOT}` and `{ISO_DATE}` in the copied file. Set
+   `Instance type:` to `cloned-mirror`. Remove the
+   `{UPDATE THIS PATH OR REMOVE ROW}` rows; the clone user can add ecosystem
+   pointers (portfolio, other clones, etc.) later if they need them.
 6. **Copy `reasoning-lessons.md` from template.** Copy
    `.claude/reasoning-lessons.md.template` to `.claude/reasoning-lessons.md`
    if the target does not exist. Substitute `{N}` with `5` (initial pruning
@@ -2105,7 +2110,8 @@ a previous partial Kick-off should be skipped without error.
 
    _Populated by the user and by /dsm-wrap-up over time._
    ```
-   Substitute `{project_name}` with the value from step 1.
+   Substitute `{project_name}` with the value derived in step 1
+   (`basename $(pwd)`).
 9. **Deploy command runtime copies.** Run `scripts/sync-commands.sh --deploy`
    to populate `.claude/commands/dsm-*.md` (project-level) or
    `~/.claude/commands/dsm-*.md` (user-level) runtime copies from
@@ -2132,18 +2138,19 @@ a previous partial Kick-off should be skipped without error.
 13. **Write Kick-off marker.** Create `.claude/kickoff-done.txt` containing:
     ```
     # Cloned-Mirror Kick-off completed
-    date: YYYY-MM-DD
-    author: {author}
+    date: {ISO_DATE}
     project_name: {project_name}
     repo_root: {REPO_ROOT}
     ```
     This marker prevents re-running Kick-off on subsequent sessions. Users
     can delete the marker to re-run Kick-off intentionally.
 14. **Report completion.** Tell the user:
-    "Cloned-Mirror Kick-off complete. This clone is now its own DSM hub,
-    self-registered as `dsm-central` in `.claude/dsm-ecosystem.md`.
-    `/dsm-align` will now populate the CLAUDE.md alignment section from
-    the DSM_0.2 §17.1 template. Resume `/dsm-go` to finish session setup."
+    "Cloned-Mirror Kick-off complete. This clone is now self-registered as
+    `dsm-central` in `.claude/dsm-ecosystem.md`, pointing to `{REPO_ROOT}`.
+    `/dsm-align` will now populate the CLAUDE.md alignment section from the
+    DSM_0.2 §17.1 template. To customize the per-instance CLAUDE.md (add
+    author attribution, project-specific commands, etc.), edit the content
+    outside the alignment delimiters. Resume `/dsm-go` to finish session setup."
 
 ### 25.3. What Kick-off Does NOT Do
 
@@ -2156,6 +2163,12 @@ implementations:
   Layer 2.5 per BL-336 (tracked-but-instance-specific). The clone
   generates its own empty equivalents, populated over time by the user
   and by wrap-up skills.
+- **No personal-content collection.** Kick-off does not prompt the user
+  for author name, GitHub profile, LinkedIn URL, or any other
+  personal-profile data. All runtime values are auto-derived (`pwd`,
+  `basename`, `date`). Users who want author attribution in their
+  CLAUDE.md add it manually post-Kick-off; GitHub identity is already
+  implicit via `git remote -v`.
 - **No `.git/info/exclude` edits.** Kick-off does not touch the local
   git exclude file. See §25.5 for rationale.
 - **No inbox history import.** The clone's `_inbox/` starts empty (apart

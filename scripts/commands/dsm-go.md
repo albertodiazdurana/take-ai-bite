@@ -78,16 +78,15 @@ registration but no `kickoff-done.txt` marker.
 Invoke the 14-step sequence documented in **DSM_0.2.A §25.2**. Step 0.8 is
 the invocation point, not the specification. Key steps summarized:
 
-1. Prompt the user for `{author}`, `{github}` (optional), `{linkedin}`
-   (optional), `{project_name}`
-2. Resolve `{REPO_ROOT}` via `pwd`
+1. Auto-derive runtime values (no user prompt): `{REPO_ROOT}` from `pwd`,
+   `{project_name}` from `basename $(pwd)`, `{ISO_DATE}` from `date -I`.
+2. Verify working directory resolves to the repo root; if invoked from a
+   subdirectory, use `git rev-parse --show-toplevel` instead.
 3. Copy the five `.claude/*.template` files to runtime paths
    (`.claude/CLAUDE.md`, `.claude/settings.json`, `.claude/dsm-ecosystem.md`,
    `.claude/reasoning-lessons.md`, `.claude/skills-registry.md`). Substitute
-   `{REPO_ROOT}`, `{author}`, `{github}`, `{linkedin}`, `{project_name}`,
-   `{ISO_DATE}`, and `{N}` using the Edit tool (not shell `sed`; avoids
-   regex-quoting issues with URLs and paths). Strip lines where optional
-   placeholders were left blank.
+   `{REPO_ROOT}`, `{project_name}`, `{ISO_DATE}`, and `{N}` using the Edit
+   tool (not shell `sed`; avoids regex-quoting issues with paths).
 4. Self-register the clone as `dsm-central` by writing a row with
    `Name: dsm-central`, `Path: {REPO_ROOT}`, `Description: Local DSM hub
    (this clone)`, `Mirror: -` in the new `.claude/dsm-ecosystem.md`.

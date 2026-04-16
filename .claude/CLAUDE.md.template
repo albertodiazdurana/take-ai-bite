@@ -19,13 +19,6 @@ _Add project-specific commands here (e.g., setup scripts, dev servers, test runn
 - Handoffs: `dsm-docs/handoffs/` (session continuity documents)
 - Checkpoints: `dsm-docs/checkpoints/` (milestone snapshots)
 
-## Author
-**{author}**
-{github} | {linkedin}
-
-_Fill in the author block with your name and optional GitHub/LinkedIn URLs.
-Remove placeholders that you do not want to publish._
-
 ## Command Execution
 - Routine write commands (git commit, git push, git add, cp, mv, pip install, file edits) are auto-approved via permission settings
 
@@ -131,15 +124,15 @@ The wrap-up command also checks for this as a safety net.
   Cloned-Mirror Kick-off template (DSM_0.2, Cloned-Mirror Kick-off Protocol).
 
   This file is the starting template copied by Kick-off to `.claude/CLAUDE.md`
-  on first session. Placeholders:
-    {REPO_ROOT}  - substituted with the clone's repo root on `@` reference
-    {author}     - your display name
-    {github}     - your GitHub profile URL or username (optional)
-    {linkedin}   - your LinkedIn URL (optional)
+  on first session. Kick-off auto-derives all placeholder values; no user
+  input required:
+    {REPO_ROOT}  - substituted from `pwd` on `@` reference
 
   /dsm-align populates the alignment section between the BEGIN/END delimiters
   from DSM_0.2 §17.1 template on first run. Do not hand-edit that section.
 
-  Add project-specific instructions after this template if your project has
-  workflows, constraints, or conventions not covered by the inherited protocol.
+  Add project-specific instructions (author block, common commands, custom
+  workflows) after this template if desired. Kick-off deliberately does not
+  collect author, profile URLs, or project name; add them yourself if you
+  want them in your CLAUDE.md.
 -->
