@@ -1,5 +1,11 @@
 Guide the user through the DSM Version Update Workflow.
 
+**Audience (BL-236e):** Run only in DSM Central. This skill versions the DSM methodology itself; standalone TAB and other spokes consume DSM versions but do not author them.
+
+**Early-stop:** If no `DSM_0.0_*.md` file exists in the current working directory, refuse with: `"Run only in DSM Central; this skill versions DSM methodology files which are absent here."` Do not proceed.
+
+**Heuristic limitation (documented):** The early-stop catches non-mirror spokes but does NOT catch mirror clones (e.g., TAB) that have a synced `DSM_0.0_*.md` copy. The Audience note above is the primary guard; user attentiveness is the backstop. If a misclick on a mirror clone becomes a recurring issue, file a follow-up BL to add a stronger `scripts/take-ai-bite-sync.txt`-based check (BL-236e narrowed scope chose option (a), accept + document, per Tier-2 protocol T2b finding).
+
 ## Prerequisites
 
 Before starting, verify there are uncommitted changes that warrant a version bump. Check `git status` and `git log` to understand what changed.

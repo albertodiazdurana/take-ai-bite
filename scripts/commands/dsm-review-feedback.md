@@ -1,5 +1,9 @@
 Review feedback from a completed DSM spoke project.
 
+**Audience (BL-236e):** Run only in DSM Central. This skill triages spoke feedback that does not apply in standalone TAB or other spokes.
+
+**Early-stop:** If `plan/backlog/` does not exist in the current working directory, refuse with: `"Run only in DSM Central; this skill triages spoke feedback that does not apply here."` Do not proceed.
+
 ## Input
 
 The user provides the project path (e.g., `~/sql-query-agent-ollama`).
