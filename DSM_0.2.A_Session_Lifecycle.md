@@ -2083,9 +2083,13 @@ a previous partial Kick-off should be skipped without error.
    `git rev-parse --show-toplevel` instead.
 3. **Copy `CLAUDE.md` from template.** If `.claude/CLAUDE.md` does not exist
    or contains only template placeholders, copy `.claude/CLAUDE.md.template`
-   to `.claude/CLAUDE.md`. Substitute `{REPO_ROOT}` in the `@` reference line
-   using the Edit tool. No other placeholder substitution is needed because
-   the template ships without author/profile placeholders.
+   to `.claude/CLAUDE.md`. No substitution is needed: the template's `@`
+   reference is a static relative path (`@../DSM_0.2_Custom_Instructions_v1.1.md`)
+   that resolves from `.claude/CLAUDE.md` to the repo root on any clone,
+   independent of the user's filesystem layout. Earlier versions of the
+   template used a `{REPO_ROOT}` placeholder substituted with `pwd`; the
+   relative path makes the file portable across clone moves and removes one
+   Kick-off substitution step (see BL-236a for rationale).
 4. **Copy `settings.json` from template.** Copy
    `.claude/settings.json.template` to `.claude/settings.json` if the target
    does not exist. No substitution needed; the template is environment-neutral.
