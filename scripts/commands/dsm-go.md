@@ -156,7 +156,7 @@ prevents the silent commit-to-main failure mode.
 
 ### 0a. Determine session number
 
-Determine the new session number using **two sources** and taking the higher value:
+Determine the new session number using **three sources** and taking the higher value:
 
 1. **Archive count:** Count files in `.claude/transcripts/*.md`. If the directory
    does not exist, archive count is 0.
@@ -166,12 +166,22 @@ Determine the new session number using **two sources** and taking the higher val
 2. **MEMORY.md:** Extract the session number from the "Latest Session" line in
    MEMORY.md (from auto memory context). If MEMORY.md does not exist or has no
    session number, memory session number is 0.
+3. **Remote session branches:** Count pre-existing `origin/session-*` branches.
+   On fresh mirror clones with pre-existing test-session remotes (e.g., from a
+   pre-Kick-off PR), this is the only non-zero signal. Merged branches still
+   block the branch name, so count all matches regardless of merge state.
+   ```bash
+   REMOTE_SESSION_COUNT=$(git branch -r --list 'origin/session-*' 2>/dev/null | wc -l)
+   ```
 
-**Formula:** `N = max(ARCHIVE_COUNT, MEMORY_SESSION_NUMBER) + 1`
+**Formula:** `N = max(ARCHIVE_COUNT, MEMORY_SESSION_NUMBER, REMOTE_SESSION_COUNT) + 1`
 
-This handles both cases: projects with many archived transcripts but stale
-MEMORY.md (spokes with incomplete wrap-ups), and projects with few/no archives
-but high session numbers (DSM Central, long-running projects).
+This handles three cases: projects with many archived transcripts but stale
+MEMORY.md (spokes with incomplete wrap-ups), projects with few/no archives
+but high session numbers (DSM Central, long-running projects), and fresh
+mirror clones that inherit pre-existing remote session branches from
+pre-Kick-off test work (e.g., TAB's T7 case inheriting `origin/session-1`
+from the mirror-bootstrap PR).
 
 ### 0b. Check for open branches from previous sessions
 
