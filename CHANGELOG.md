@@ -5,6 +5,31 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.4] - 2026-04-18
+
+### Added - Parallel-session turn-1 hook fix + broadened Project Type Detection signals (BL-377, BL-379)
+
+- **BL-377: Fix parallel-session turn-1 transcript-hook collision.** `scripts/commands/dsm-parallel-session-go.md` gains a top-of-file WARNING block (adversarial framing for the agent), a new Step 0 (provisional registry stub, first tool call of turn 1), Step 1 abort-cleanup, Step 2 hook-behavior note update, and a Step 6 transform from "append" to "promote provisional stub to active". Resolves the reproducible §7 violation where the agent wrote a rogue transcript block on turn 1 because the registry entry (with `CLAUDE_PID`) had not yet been written, causing the `UserPromptSubmit` hook to emit the main-session §7 reminder. With Step 0 writing a provisional stub as the first tool call, the hook detects parallel mode on turn 2 onward; turn 1 is still subject to the mis-fired reminder but the top-of-file WARNING counter-primes the agent to ignore it. Part 1 (structural) + Part 2 (adversarial wording) only; Part 3 (hook-side fallback) deferred per BL-377. Known limitation: provisional stub survives if session aborts between Step 1 pass and Step 6 completion; a future `/dsm-align` sweep can reap orphans, out of scope here.
+  - **Spoke action:** None required. Change lands in the `/dsm-parallel-session-go` skill file (a mirrored command file); spokes pick it up via the next `sync-commands.sh --deploy`. Effect: parallel sessions started from any Central or TAB clone no longer produce a rogue transcript write on turn 1.
+
+- **BL-379: Broaden Project Type Detection Application signals for non-Python toolchains.** DSM_0.2.A §17 (Project Type Detection) replaces the Python-biased Application indicator (`src/`, `tests/`, `app.py`) with a structured signal list: primary runtime markers (`package.json`, `Cargo.toml`, `go.mod`, `pyproject.toml` with `[project]`, `setup.py`, `src/`+`tests/`, `app.py`) and supporting signals (`scripts/` with executables, `bin/`/`cmd/` with executables, `.github/workflows/` with build/deploy jobs). Only primary markers classify as Application; supporting signals disambiguate edge cases. Documentation branch narrowed to require no primary runtime marker AND no build output directories (`dist/`, `build/`, `site/`, `_site/`, `public/`). New reporting rule: `/dsm-align` and `/dsm-go` must REPORT a detected classification change before regenerating, not silently reclassify. Originally drafted as `17.0`+`17.1 Detection Table` subsections; kept inline under §17 to avoid colliding with the pre-existing §17.1 Participation Pattern Detection.
+  - **Spoke action:** Run `/dsm-align` on next `/dsm-go`. Existing spokes re-evaluate detection; Node/Rust/Go/shell-script spokes previously misclassified as Documentation will flip to Application. `/dsm-align` will report the change before regenerating; user can veto.
+
+### Spawned
+
+- None directly. Deferred threads from S193 inbox triage (T3, T4, T6, T7, T10, T11, T12) live in `_inbox/2026-04-18_deferred-threads-from-s193-triage.md` for future BL authoring.
+
+## [1.5.3] - 2026-04-18
+
+### Added - Mirror Central release tags to TAB (BL-376)
+
+- **BL-376: `/dsm-version-update` Step 4b mirrors Central release tags to TAB (and any `mirror: true` ecosystem entry).** Closes the gap where Central had 29 tags and TAB had 0: mirror sync propagated files but not refs, so downstream consumers (dsm-jupyter-book and other TAB-clone projects) could not `git checkout vX.Y.Z` against a TAB checkout. New Step 4b (in `scripts/commands/dsm-version-update.md`) iterates `mirror: true` ecosystem entries after the CLAUDE.md Version Update Workflow Step 9 file sync has completed, verifies the sync commit landed, detects pre-existing tags (no overwrite, halts and reports for manual resolution), then creates and pushes `vX.Y.Z` on each mirror at the mirror's sync commit. Fires only at version-bump events; `/dsm-wrap-up` silent-drift syncs do NOT push tags. Inline semantic note documents that the mirror tag points to the mirror's sync commit, not Central's release commit (mirror commit histories are independent). CLAUDE.md Version Update Workflow Step 9 gains a one-line cross-reference to Step 4b for discoverability. First mirror to exercise Step 4b in a real version release: this release (v1.5.3) landing `v1.5.3` on TAB at its current sync commit.
+  - **Spoke action:** None required. Mirror tag push is a Central-side + mirror-side operation; spokes that consume TAB (e.g., dsm-jupyter-book) will see `vX.Y.Z` tags appear on TAB going forward and can `git fetch <tab-remote> --tags` to pull them. Historical tags (v1.3.0 through v1.5.2) are NOT backfilled on TAB; CHANGELOG remains the full history record.
+
+### Spawned
+
+- None.
+
 ## [1.5.2] - 2026-04-16
 
 ### Added - Commands shipped tracked in mirrors (BL-373 F2)
