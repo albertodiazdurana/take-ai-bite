@@ -16,13 +16,23 @@ Before starting alignment, check if git is initialized:
 
 ## Steps
 
-1. **Detect project type** using DSM_0.2 Project Type Detection table:
-   - `notebooks/` only, no `src/` → Data Science (DSM 1.0)
-   - `src/`, `tests/`, `app.py` → Application (DSM 4.0)
-   - Both `notebooks/` and `src/` → Hybrid
-   - `dsm-docs/`, markdown-only, no `notebooks/` or `src/` → Documentation (DSM 5.0)
-   - `contributions-docs/{project}/` in DSM Central → External Contribution (DSM_3 Section 6.6)
+1. **Detect project type** using the table in **DSM_0.2.A §17** (Project Type
+   Detection). Read §17 directly; do NOT rely on an inline copy of the table,
+   which drifts (BL-379 broadened the Application signals; an inline cache
+   here would go stale). Primary runtime markers per §17: `package.json`,
+   `Cargo.toml`, `go.mod`, `pyproject.toml` with `[project]`, `setup.py`,
+   `src/`+`tests/`, `app.py`. Supporting signals (scripts/bin/cmd with
+   executables, CI workflows with build/deploy) count only alongside a
+   primary. Documentation requires no primary runtime marker AND no build
+   output directories (`dist/`, `build/`, `site/`, `_site/`, `public/`).
+   External Contribution: `contributions-docs/{project}/` in DSM Central.
    State the detected type.
+
+   **Classification-change reporting (§17):** if the detected type differs
+   from the type recorded in the CLAUDE.md alignment section, REPORT the
+   change before regenerating. Do not silently reclassify; the user may
+   have an explicit reason to retain the recorded type.
+
    **Implementation note:** Use `test -d` for directory existence checks, not `ls -d` (which returns non-zero when paths don't exist, cancelling parallel tool calls).
 
    **Hub fast-path:** If the project is DSM Central (has `scripts/commands/` directory), skip steps 2, 4, 5, 6, and 8c. These steps check spoke scaffold structure and validate CLAUDE.md paths against the filesystem, both of which are redundant on the hub that defines the templates. Run steps 1, **3 (canonical dsm-docs/ folder scaffold, idempotent)**, 7, 7b, 8, 8b, 9, 10, 10b, 11, 12, 13. Step 3 is included in the hub fast-path because a Kick-off'd mirror clone is functionally a hub (per DSM_0.2.A §25.4) but arrives with an empty scaffold; Step 3's idempotent check-then-create is a no-op for Central (scaffold already exists) and the missing piece for fresh clones. Step 10b is mandatory on the hub because hub-self-installs the BL-319 hooks (transcript-reminder + validate-transcript-edit) and applies `chmod +x`. Omitting 10b on hub fast-path was the S180 root cause of a full session of zero transcript appends in DSM Central, the hooks were present on disk but not executable, so Claude Code's hook subsystem silently dropped the per-turn reminder injection.
