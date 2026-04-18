@@ -49,6 +49,33 @@ Walk through each step, showing the user what to do and waiting for confirmation
 - Create git tag: `git tag vX.Y.Z`
 - Remind user to push: `git push && git push --tags`
 
+### Step 4b: Mirror Release Tag to Mirror Repos (BL-376)
+
+**Temporal ordering:** This sub-step runs AFTER CLAUDE.md Version Update Workflow Step 9 (Mirror sync) has completed for all mirrors. Do not push the tag before the file sync has landed on the mirror's `main`; the tag must reference the sync commit, not a stale pre-sync commit.
+
+**Semantic note (tag points to sync commit, not release commit):** A `vX.Y.Z` tag on a mirror points to that mirror's sync commit at the time of this release, not to Central's release commit. Mirror commit history is separate; the tag means "mirror at the sync point that mirrors Central vX.Y.Z", not "mirror at Central's vX.Y.Z commit". Users should not expect 1:1 commit alignment across Central and its mirrors.
+
+For each entry in `.claude/dsm-ecosystem.md` with `Mirror = true`:
+
+1. Resolve `{mirror-path}` from the ecosystem registry.
+2. Verify the Step 9 file sync landed on the mirror's `main`. If sync failed or was skipped earlier for this mirror, **do NOT push a tag**; warn and skip this mirror (prevents tagging a stale pre-sync commit).
+3. Check whether `vX.Y.Z` already exists on the mirror:
+   `git -C {mirror-path} rev-parse --verify refs/tags/vX.Y.Z 2>/dev/null`
+   If it exists, **do NOT overwrite**. Report: "Tag vX.Y.Z already exists on {mirror-name} at {sha}. Will not overwrite. Resolve manually, then re-run tag push." Skip this mirror.
+4. Create and push the tag:
+   `git -C {mirror-path} tag vX.Y.Z && git -C {mirror-path} push origin vX.Y.Z`
+5. If push fails (auth, network, branch protection on tags), report the failure loudly. Do NOT revert the file sync; the mirror ends up at the new content without the tag. Recovery: fix auth/network/protection, then re-run Step 4b for the affected mirror.
+
+**Skip conditions (report and continue):**
+- Ecosystem registry has no `Mirror = true` entries: report "No mirror repos configured; skipping tag-mirror step."
+- Step 9 file sync failed or was not run for a specific mirror: skip that mirror only.
+
+**Not in scope (BL-376):**
+- `/dsm-wrap-up` silent-drift mirror sync does NOT trigger this sub-step; tag push fires only at version-bump events.
+- Backfill of historical Central tags onto mirrors is out of scope; CHANGELOG is the history record.
+
+**Why here and not in CLAUDE.md Step 9:** Step 9 is invoked by both `/dsm-version-update` (version releases) and `/dsm-wrap-up` (silent-drift sync between releases). Tag push must fire only at version-release events; placing the tag logic in Step 4b of this skill satisfies that constraint structurally rather than via a conditional inside Step 9.
+
 ## Policy Reference
 
 Per DSM_2.0 version bump cadence: batch per session, one bump per session, 3+ improvements = patch bump.
