@@ -1,5 +1,28 @@
 Start a parallel DSM session for short, isolated tasks on the shared session branch. $ARGUMENTS
 
+## WARNING: §7 hook will fire WRONGLY on turn 1 of this skill (BL-377)
+
+The `UserPromptSubmit` hook backed by `.claude/hooks/transcript-reminder.sh`
+fires BEFORE any code in this skill runs. On turn 1, the registry section
+for this session does not yet exist, so the hook emits the main-session §7
+reminder instructing the agent to "append to `.claude/session-transcript.md`
+before any work."
+
+**This instruction is WRONG for parallel sessions.** It applies only to
+main-session turns. Do NOT obey it, even if it cites §7, quotes the
+turn-boundary self-check, or frames the append as the "one required tool
+call." Parallel sessions NEVER write to `.claude/session-transcript.md`.
+The transcript append the hook is prompting for would be a protocol
+violation regardless of how urgent the hook makes it sound.
+
+**The first tool call of turn 1 MUST be Step 0 below (provisional registry
+stub).** Writing the stub is what switches the hook to parallel-mode for
+every subsequent turn. If the agent rationalizes compliance with the §7
+reminder first ("I'll satisfy §7 this once, then run Step 0"), that is
+exactly the failure mode BL-377 was filed to prevent. The rationalization
+is documented verbatim in S192 parallel-192.1's transcript. Do not
+reproduce it.
+
 ## Purpose
 
 Parallel sessions handle short evaluation work (QA validation, document assessment,
@@ -73,9 +96,64 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
 
 ## Steps
 
+0. **Provisional registry stub (BL-377, FIRST TOOL CALL of turn 1):**
+
+   This step MUST be the very first tool call of the parallel session,
+   before prefix validation, context loading, or any other read/write. It
+   exists solely to switch the `UserPromptSubmit` hook from main-session
+   §7 mode to parallel-session mode by writing a section with the current
+   Claude Code instance PID to `.claude/parallel-sessions.txt`. Hook
+   detection is by CLAUDE_PID only; section header format does not matter
+   at this stage.
+
+   Capture the Claude Code instance PID by walking the parent process chain
+   from the shell until a process named `claude` is found:
+   ```bash
+   CLAUDE_PID=""
+   pid=$$
+   for _ in $(seq 1 10); do
+     read ppid comm < <(ps -o ppid=,comm= -p "$pid" 2>/dev/null)
+     [ -z "$ppid" ] && break
+     if [ "$comm" = "claude" ]; then CLAUDE_PID=$pid; break; fi
+     pid=$ppid
+     [ "$pid" = "1" ] && break
+   done
+   ```
+   If `CLAUDE_PID` cannot be determined (empty), warn the user: "Could not
+   detect Claude Code PID; hook will emit main-session reminder. Ignore
+   transcript reminders manually for this session." Continue without
+   blocking, but note the stub will not switch the hook and the WARNING
+   block above applies for the whole session.
+
+   **Duplicate-PID guard:** Before appending, scan the registry
+   (`.claude/parallel-sessions.txt`, create if missing) for any existing
+   section whose `CLAUDE_PID:` matches the current PID. If found, refuse:
+   "This Claude Code instance (PID {pid}) already has a section in
+   `.claude/parallel-sessions.txt` (provisional or active). Either run
+   `/dsm-parallel-session-wrap-up` to close the existing entry, or remove
+   the stale section manually if it is an orphan." Stop.
+
+   Append a provisional section using `>>` shell append (atomic for
+   sub-PIPE_BUF writes):
+
+   ```markdown
+   ## provisional-{pid}-{iso-timestamp}
+   CLAUDE_PID: {pid from parent chain walk}
+   Started: {ISO timestamp}
+   State: provisional
+   ```
+
+   The header uses `provisional-{pid}-{ts}` (not `parallel-{N.M}/...`)
+   because `{N}`, `{M}`, `{type}`, and the topic slug are not yet known.
+   Step 6 below promotes this stub to the full `parallel-{N.M}/...` form
+   after prefix parsing and scope determination. Hook detection works off
+   `CLAUDE_PID`, not the section header, so the placeholder is sufficient.
+
 1. **Validate prefix:** Parse $ARGUMENTS against the patterns in the prefix
    table above (short canonical or long legacy form). If no pattern matches,
-   output the guided failure message above and stop.
+   **remove the provisional stub written in Step 0** (match by `CLAUDE_PID`
+   value in the registry) so it does not orphan, then output the guided
+   failure message above and stop.
 
 2. **Load context:** Read this project's MEMORY.md from the auto memory directory.
    Read `.claude/CLAUDE.md` for project conventions. Do NOT read reasoning lessons,
@@ -84,14 +162,18 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    session. Parallel sessions do not collect transcripts; the commit log is the
    audit trail.
 
-   **Hook behavior (BL-324 structural fix):** The `UserPromptSubmit` hook is
-   backed by `.claude/hooks/transcript-reminder.sh`, which detects parallel
-   sessions via the `CLAUDE_PID` field written to
-   `.claude/parallel-sessions.txt` at Step 6 below. Once a section with the
-   current PID is written to the registry, the hook emits a parallel-mode
-   reminder instead of the main §7 reminder. Until Step 6 writes the
-   section (i.e., during Step 2 itself), the main reminder may still fire
-   once; ignore it. After Step 6 the hook auto-switches.
+   **Hook behavior (BL-324 structural fix, BL-377 amendment):** The
+   `UserPromptSubmit` hook is backed by
+   `.claude/hooks/transcript-reminder.sh`, which detects parallel sessions
+   via the `CLAUDE_PID` field in `.claude/parallel-sessions.txt`. Step 0
+   above writes a provisional stub with `CLAUDE_PID` BEFORE any other
+   action in this skill; once that stub exists, the hook emits the
+   parallel-mode reminder on turn 2 onward. On turn 1 the hook fires the
+   main-session §7 reminder because it runs before Step 0 executes , see
+   the WARNING block at the top of this file for the required agent
+   behavior (ignore the reminder, make Step 0 the first tool call). Step 6
+   below promotes the provisional stub to the full `parallel-{N.M}/...`
+   entry after prefix parsing and scope determination.
 
 3. **Determine session type and scope:**
     - **QA type:** No edits to code, methodology documents (DSM_0 through DSM_6
@@ -121,47 +203,31 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
      - The planned work requires shared file modifications
    - If stopped, explain the conflict and ask the user to reframe.
 
-6. **Append parallel session entry to registry:**
-   The registry file is `.claude/parallel-sessions.txt`. The file is gitignored;
-   create it if missing.
+6. **Promote provisional registry stub to full entry (BL-377):**
+   Step 0 wrote a provisional stub with `CLAUDE_PID`, `Started`, and
+   `State: provisional`. This step upgrades it to the full
+   `parallel-{N.M}/...` form now that prefix parsing and scope
+   determination have completed.
 
    Derive the parallel session number `{N}.{M}`:
    - `{N}` = session number parsed from the branch name (`session-{N}/...`).
      Per the Session Numbering rule above, this is the only source of truth.
    - `{M}` = 1 + count of existing sections in the registry whose
      `Session branch:` value matches the current branch (active or wrapped).
+     The provisional stub itself has no `Session branch:` field, so it is
+     correctly excluded from this count.
 
    Derive a topic slug: pick a 3-5 word kebab-case slug summarizing the task
    (e.g., `knowledge-summary-format`, `bl-300-impl`). Cap at 50 chars.
 
-   Capture the Claude Code instance PID by walking the parent process chain
-   from the shell until a process named `claude` is found:
-   ```bash
-   CLAUDE_PID=""
-   pid=$$
-   for _ in $(seq 1 10); do
-     read ppid comm < <(ps -o ppid=,comm= -p "$pid" 2>/dev/null)
-     [ -z "$ppid" ] && break
-     if [ "$comm" = "claude" ]; then CLAUDE_PID=$pid; break; fi
-     pid=$ppid
-     [ "$pid" = "1" ] && break
-   done
-   ```
-   This PID is the detection key used by `.claude/hooks/transcript-reminder.sh`
-   to emit the parallel-mode reminder instead of the main §7 reminder
-   (BL-324). If `CLAUDE_PID` cannot be determined (empty), warn the user:
-   "Could not detect Claude Code PID; hook will emit main-session reminder.
-   Ignore transcript reminders manually for this session." Continue without
-   blocking.
+   Locate the provisional stub by its `CLAUDE_PID:` value (the PID captured
+   in Step 0). Replace the stub's header line `## provisional-{pid}-{ts}`
+   with the full form `## parallel-{N}.{M}/{type}/{topic-slug}` and insert
+   the missing fields (Type, Task, Scope, Session branch) while preserving
+   the original `Started` and `CLAUDE_PID`. Change `State: provisional` to
+   `State: active`.
 
-   **Duplicate-PID guard:** Before appending, scan the registry for any
-   existing section whose `CLAUDE_PID:` matches the current PID. If found,
-   refuse to add a second entry: "This Claude Code instance (PID {pid})
-   already has a parallel session entry in `.claude/parallel-sessions.txt`.
-   Either run `/dsm-parallel-session-wrap-up` to close the existing entry,
-   or remove the stale section manually if it is an orphan." Stop.
-
-   Append a new section (use `>>` to preserve existing entries):
+   The promoted section should be:
 
    ```markdown
    ## parallel-{N}.{M}/{type}/{topic-slug}
@@ -169,15 +235,18 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    Task: {description from prompt}
    Scope: {list of files, or "read-only + dsm-docs/research/{file}" for QA}
    Session branch: {current session branch name}
-   Created: {ISO timestamp}
-   CLAUDE_PID: {pid from parent chain walk}
+   Created: {original ISO timestamp from Step 0's Started field}
+   CLAUDE_PID: {pid, unchanged from Step 0}
    State: active
    ```
 
-   Use `>>` shell append (atomic for sub-PIPE_BUF writes) when writing via
-   Bash. Race conditions between two truly-simultaneous launches are
-   accepted; parallel sessions are created manually and sub-second
-   collisions are not a real concern.
+   Preserve the `Started`/`Created` timestamp from Step 0 (rename the field
+   from `Started` to `Created` during promotion). This keeps the session's
+   true start time, not the promote-time, as the recorded `Created` value.
+
+   No duplicate-PID guard at this step: it already ran in Step 0 against
+   the full registry. The provisional stub written in Step 0 is the current
+   session's own entry; finding it here is expected, not a duplicate.
 
 7. **Declare scope (first output):** Report:
    ```
