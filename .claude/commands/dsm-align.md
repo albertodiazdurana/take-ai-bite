@@ -16,13 +16,23 @@ Before starting alignment, check if git is initialized:
 
 ## Steps
 
-1. **Detect project type** using DSM_0.2 Project Type Detection table:
-   - `notebooks/` only, no `src/` → Data Science (DSM 1.0)
-   - `src/`, `tests/`, `app.py` → Application (DSM 4.0)
-   - Both `notebooks/` and `src/` → Hybrid
-   - `dsm-docs/`, markdown-only, no `notebooks/` or `src/` → Documentation (DSM 5.0)
-   - `contributions-docs/{project}/` in DSM Central → External Contribution (DSM_3 Section 6.6)
+1. **Detect project type** using the table in **DSM_0.2.A §17** (Project Type
+   Detection). Read §17 directly; do NOT rely on an inline copy of the table,
+   which drifts (BL-379 broadened the Application signals; an inline cache
+   here would go stale). Primary runtime markers per §17: `package.json`,
+   `Cargo.toml`, `go.mod`, `pyproject.toml` with `[project]`, `setup.py`,
+   `src/`+`tests/`, `app.py`. Supporting signals (scripts/bin/cmd with
+   executables, CI workflows with build/deploy) count only alongside a
+   primary. Documentation requires no primary runtime marker AND no build
+   output directories (`dist/`, `build/`, `site/`, `_site/`, `public/`).
+   External Contribution: `contributions-docs/{project}/` in DSM Central.
    State the detected type.
+
+   **Classification-change reporting (§17):** if the detected type differs
+   from the type recorded in the CLAUDE.md alignment section, REPORT the
+   change before regenerating. Do not silently reclassify; the user may
+   have an explicit reason to retain the recorded type.
+
    **Implementation note:** Use `test -d` for directory existence checks, not `ls -d` (which returns non-zero when paths don't exist, cancelling parallel tool calls).
 
    **Hub fast-path:** If the project is DSM Central (has `scripts/commands/` directory), skip steps 2, 4, 5, 6, and 8c. These steps check spoke scaffold structure and validate CLAUDE.md paths against the filesystem, both of which are redundant on the hub that defines the templates. Run steps 1, **3 (canonical dsm-docs/ folder scaffold, idempotent)**, 7, 7b, 8, 8b, 9, 10, 10b, 11, 12, 13. Step 3 is included in the hub fast-path because a Kick-off'd mirror clone is functionally a hub (per DSM_0.2.A §25.4) but arrives with an empty scaffold; Step 3's idempotent check-then-create is a no-op for Central (scaffold already exists) and the missing piece for fresh clones. Step 10b is mandatory on the hub because hub-self-installs the BL-319 hooks (transcript-reminder + validate-transcript-edit) and applies `chmod +x`. Omitting 10b on hub fast-path was the S180 root cause of a full session of zero transcript appends in DSM Central, the hooks were present on disk but not executable, so Claude Code's hook subsystem silently dropped the per-turn reminder injection.
@@ -70,6 +80,59 @@ Before starting alignment, check if git is initialized:
    | `dsm-docs/handoffs/` | Yes | README.md |
    | `dsm-docs/plans/` | Yes | README.md |
    | `dsm-docs/research/` | Yes | README.md |
+
+3a. **Sprint-plan structural audit (BL-378):**
+
+   Audit sprint-plan files in `dsm-docs/plans/` (and `done/`) for DSM_2.0.C
+   §1 Template 8 compliance. Detective only: report missing sections as
+   warnings in the alignment report; do NOT auto-inject the template and
+   do NOT block the alignment run on missing sections.
+
+   **Candidate selection:** `.md` files in `dsm-docs/plans/` or
+   `dsm-docs/plans/done/` whose first-line heading matches
+   `^#\s+Sprint\s+\d+\b` (e.g., `# Sprint 1: Parser MVP`). Filename patterns
+   are not sufficient; header match avoids false positives on BL files
+   that happen to discuss sprint work.
+
+   **Required sections per Template 8 (DSM_2.0.C §1):** each candidate
+   plan must contain all of these section headings (match on `^##\s+`
+   prefix, case-sensitive):
+
+   - `Research Assessment` (or equivalent subsection if merged into
+     prerequisites) , soft check; warn if missing but do not block
+   - `Deliverables`
+   - `Phases`
+   - `Phase Boundary Checklist`
+   - `Sprint Boundary Checklist` , **hardest to omit, most critical**
+
+   **Soft-match for header-block fields:** `Duration`, `Goal`,
+   `Prerequisites` live in the header block (before the first `##`). Check
+   their presence by regex on bold labels (e.g., `\*\*Goal:\*\*`). Warn if
+   missing.
+
+   **Report format (warning, not error):**
+
+   ```
+   Sprint plan {file path} is missing Template 8 sections: {list}.
+   See DSM_2.0.C §1 for the canonical structure.
+   ```
+
+   **Regex caveats:** sprint plans with non-canonical titles ("MVP Sprint",
+   "Sprint Alpha", "Sprint-1") will NOT match the candidate regex. Document
+   this limitation; if a project needs non-canonical titles audited, the
+   workaround is to add a second heading matching `^#\s+Sprint\s+\d+\b` to
+   the file or rename the plan.
+
+   **False-positive guard:** if the candidate file matches the regex but is
+   clearly not a sprint plan (e.g., a research file that happens to open
+   with "# Sprint 1 retrospective ..."), the audit will still run. The warn
+   is informational; users can ignore benign false positives.
+
+   **Complements:** BL-378 pairs this detective audit with a hard gate in
+   `/dsm-go` Step 3.6 (the Sprint Boundary Checklist check at session
+   start). Together they cover creation-time and closure-time validation of
+   plan structure, complementing BL-362/363/364 on the closure/verification
+   side.
 
 3-EC. **External Contribution governance scaffold** (EC fast-path only; skip for spokes and hub).
 
