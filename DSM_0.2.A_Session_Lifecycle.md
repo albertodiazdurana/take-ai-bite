@@ -1536,18 +1536,62 @@ The label serves as:
 
 > **Core reference:** DSM_0.2 §1. Moved here from core to reduce always-loaded context.
 
-At session start, identify the project type by examining the directory structure:
+At session start, identify the project type by examining the directory structure.
+The Application track is identified by any runtime marker from the list in §17.0
+(BL-379); a project with no runtime marker but with `dsm-docs/` and markdown-only
+content is Documentation (DSM 5.0). This decouples detection from Python-specific
+signals that previously made Node.js, Rust, Go, and shell-script projects fall
+silently into Documentation.
+
+**Runtime markers (signal reference for the detection table below):**
+
+The Application track (and the Hybrid track's Application half) is identified by
+the presence of **any** primary runtime marker. Supporting signals reinforce but
+do not qualify on their own.
+
+**Primary runtime markers (any one is sufficient):**
+
+- **Python:** `src/` + `tests/` layout, `app.py`, `pyproject.toml` with a
+  `[project]` section, or `setup.py`.
+- **Node.js:** `package.json`.
+- **Rust:** `Cargo.toml`.
+- **Go:** `go.mod`.
+
+**Supporting signals (count ONLY alongside a primary marker):**
+
+- `scripts/` directory containing executables (shebang lines + `+x` bit).
+  A `scripts/` directory that contains only setup helpers, utility snippets, or
+  markdown docs does NOT qualify. Rationale: nearly every DSM project has a
+  `scripts/` directory for setup; the rule distinguishes application runtime
+  code from project ceremony.
+- `bin/` or `cmd/` directory containing executables (same `+x` + shebang rule).
+- `.github/workflows/` containing build or deploy jobs. Lint-only,
+  link-check-only, or docs-build-only workflows do NOT qualify.
+
+**Rule:** a project with only supporting signals and no primary runtime marker is
+NOT classified as Application. Supporting signals exist to disambiguate edge
+cases where a primary marker is already present (e.g., a Rust project with
+`Cargo.toml` + `scripts/` is clearly Application; a Documentation project with
+`.github/workflows/` for link-checking is not).
+
+**Detection table:**
 
 | Indicator | Project Type | DSM Track |
 |-----------|--------------|-----------|
-| `notebooks/` only, no `src/` | Data Science | DSM 1.0 (Sections 2.1-2.5) |
-| `src/`, `tests/`, `app.py` | Application | DSM 4.0 |
-| Both `notebooks/` and `src/` | Hybrid | DSM 1.0 for analysis, DSM 4.0 for modules |
-| `dsm-docs/`, markdown-only, no `notebooks/` or `src/` | Documentation | DSM 5.0 |
+| `notebooks/` only, no primary runtime marker (see above) | Data Science | DSM 1.0 (Sections 2.1-2.5) |
+| Any primary runtime marker (see above), no `notebooks/` | Application | DSM 4.0 |
+| Both `notebooks/` and a primary runtime marker (see above) | Hybrid | DSM 1.0 for analysis, DSM 4.0 for modules |
+| `dsm-docs/`, markdown-only, no `notebooks/`, no primary runtime marker (see above), no build output directories (`dist/`, `build/`, `site/`, `_site/`, `public/`) | Documentation | DSM 5.0 |
 | `{contributions-docs-path}/{project}/` exists | External Contribution | DSM_3 Section 6.6 |
 
 **State the identified type at session start:**
 "This appears to be a [Notebook/Application/Hybrid/Documentation/External Contribution] project. I'll follow [DSM 1.0/DSM 4.0/both/DSM 5.0/Section 6.6] accordingly."
+
+**Classification-change reporting:** When `/dsm-align` or `/dsm-go` detects a
+different project type than the one currently recorded in the CLAUDE.md
+alignment section, REPORT the change before regenerating. The user may have an
+explicit reason to retain the recorded type (e.g., the filesystem has not yet
+caught up with sprint intent). Do not silently reclassify.
 
 **External contribution sessions:** Open the project in the external repo's local
 clone but reference governance artifacts in `{contributions-docs-path}/{project}/`
