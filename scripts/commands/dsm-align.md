@@ -81,6 +81,59 @@ Before starting alignment, check if git is initialized:
    | `dsm-docs/plans/` | Yes | README.md |
    | `dsm-docs/research/` | Yes | README.md |
 
+3a. **Sprint-plan structural audit (BL-378):**
+
+   Audit sprint-plan files in `dsm-docs/plans/` (and `done/`) for DSM_2.0.C
+   §1 Template 8 compliance. Detective only: report missing sections as
+   warnings in the alignment report; do NOT auto-inject the template and
+   do NOT block the alignment run on missing sections.
+
+   **Candidate selection:** `.md` files in `dsm-docs/plans/` or
+   `dsm-docs/plans/done/` whose first-line heading matches
+   `^#\s+Sprint\s+\d+\b` (e.g., `# Sprint 1: Parser MVP`). Filename patterns
+   are not sufficient; header match avoids false positives on BL files
+   that happen to discuss sprint work.
+
+   **Required sections per Template 8 (DSM_2.0.C §1):** each candidate
+   plan must contain all of these section headings (match on `^##\s+`
+   prefix, case-sensitive):
+
+   - `Research Assessment` (or equivalent subsection if merged into
+     prerequisites) , soft check; warn if missing but do not block
+   - `Deliverables`
+   - `Phases`
+   - `Phase Boundary Checklist`
+   - `Sprint Boundary Checklist` , **hardest to omit, most critical**
+
+   **Soft-match for header-block fields:** `Duration`, `Goal`,
+   `Prerequisites` live in the header block (before the first `##`). Check
+   their presence by regex on bold labels (e.g., `\*\*Goal:\*\*`). Warn if
+   missing.
+
+   **Report format (warning, not error):**
+
+   ```
+   Sprint plan {file path} is missing Template 8 sections: {list}.
+   See DSM_2.0.C §1 for the canonical structure.
+   ```
+
+   **Regex caveats:** sprint plans with non-canonical titles ("MVP Sprint",
+   "Sprint Alpha", "Sprint-1") will NOT match the candidate regex. Document
+   this limitation; if a project needs non-canonical titles audited, the
+   workaround is to add a second heading matching `^#\s+Sprint\s+\d+\b` to
+   the file or rename the plan.
+
+   **False-positive guard:** if the candidate file matches the regex but is
+   clearly not a sprint plan (e.g., a research file that happens to open
+   with "# Sprint 1 retrospective ..."), the audit will still run. The warn
+   is informational; users can ignore benign false positives.
+
+   **Complements:** BL-378 pairs this detective audit with a hard gate in
+   `/dsm-go` Step 3.6 (the Sprint Boundary Checklist check at session
+   start). Together they cover creation-time and closure-time validation of
+   plan structure, complementing BL-362/363/364 on the closure/verification
+   side.
+
 3-EC. **External Contribution governance scaffold** (EC fast-path only; skip for spokes and hub).
 
    This step scaffolds the governance folder at `{contributions-docs}/{project-name}/` instead of creating any folders in the external repo. The external repo (upstream) is never touched by this step; DSM artifacts only live in the governance folder.
