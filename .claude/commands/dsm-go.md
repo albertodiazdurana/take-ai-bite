@@ -287,7 +287,34 @@ After branch setup, clean up stale refs from prior sessions:
    - Blog journal entry in `dsm-docs/blog/journal.md` with a matching date
    - Feedback files updated (per-session file in `dsm-docs/feedback-to-dsm/` or entry in `technical.md`)
    If any are missing, flag them: "Sprint N boundary incomplete: missing [items]. Complete these before starting Sprint N+1, or defer with confirmation."
-   **Skip when:** First sprint in a project (no prior boundary to check), or when no sprint identifier is found in MEMORY.md/checkpoint.
+
+   **Sprint plan structural hard gate (BL-378):** When MEMORY.md or the
+   checkpoint references sprint N closure, locate the Sprint N plan in
+   `dsm-docs/plans/` (or `dsm-docs/plans/done/` if already moved , check
+   both). Candidate selection: `.md` files whose first-line heading
+   matches `^#\s+Sprint\s+N\b` where N is the referenced sprint number. If
+   found, check for the presence of a `## Sprint Boundary Checklist`
+   section header in the plan file. If the section is MISSING, halt with:
+
+   > "Sprint N plan (`{path}`) is missing the Sprint Boundary Checklist
+   > section (DSM_2.0.C §1 Template 8). Closure cannot proceed until the
+   > section is added or a deferral is confirmed. Options:
+   >   1. Add the missing section to the plan (recommended).
+   >   2. Confirm the checklist was executed out-of-band and proceed
+   >      anyway (type 'defer' to bypass this gate for this session).
+   >   3. Stop and resolve manually."
+
+   This is a hard gate because the Sprint Boundary Checklist is the only
+   surviving plan-level record of what "closed" means. Without it, closure
+   is ambiguous and reproduces the GE S47 failure mode that spawned
+   BL-362. The 'defer' escape hatch exists for real cases where the
+   checklist was executed through other means; log deferrals in the
+   session transcript so they surface during retrospectives.
+
+   **Skip when:** First sprint in a project (no prior boundary to check),
+   when no sprint identifier is found in MEMORY.md/checkpoint, or when
+   the Sprint N plan file itself cannot be located (e.g., plan was never
+   formalized in `dsm-docs/plans/`).
 4. **Git status:** Run `git status` to check for uncommitted changes
 5. **Save session baseline:** Save a snapshot of the current working tree state to `.claude/session-baseline.txt` so that `/dsm-wrap-up` can identify which changes belong to this session. Run:
    ```
