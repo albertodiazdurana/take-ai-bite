@@ -1,5 +1,7 @@
 # Take AI Bite
 
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+
 **A framework for human-AI collaboration where the human stays in control, grows through the work, and retains every lesson learned.**
 
 <p align="center">
@@ -60,18 +62,19 @@ For the full chapter, see [`DSM_6.1_Systems_Prompt_Engineering_v1.0.md`](DSM_6.1
 
 Read [`TAKE_A_BITE.md`](TAKE_A_BITE.md) for the short version of the founding principle. It takes two minutes and captures the core idea: someone offers you a bite of a cookie, you take a bite the size you will enjoy; too small and you won't taste the cookie, too much and it will cause a lot of issues.
 
-## Field-Tested
+## Current Status
 
-These principles were developed and validated across real projects spanning:
+Take AI Bite is at the WIP stage. The methodology has been developed and used internally across data science, software engineering, open source contribution, methodology documentation, research synthesis, and administrative work. It is published here as a public mirror, but no one outside the original practitioner has used it yet.
 
-- **Data science:** exploratory analysis, feature engineering, modeling pipelines
-- **Software engineering:** ML applications, production code, test-driven development
-- **Open source contribution:** external projects in unfamiliar technology domains (Android/Kotlin), with all contributions merged upstream
-- **Structured documentation:** complex, interconnected methodology systems with thousands of cross-referenced lines
-- **Research synthesis:** multi-source analysis, competitive landscape mapping, literature review
-- **Administrative processes:** financial documentation, regulatory compliance
+The API surface (command files, protocols, templates) may shift before v2.0; pin to a tagged version if you need stability. If you want to engage with the design as it evolves, not only consume the output, this is the right stage to show up.
 
-They are not theoretical; they emerged from daily practice with AI agents across these domains. Practitioners working on complex multi-session tasks independently recreate DSM patterns (checkpoint directories, session handoffs, decision logs) before encountering the framework. DSM formalizes behavior that emerges naturally from deliberate work.
+## Known Limitations
+
+- No automated test coverage of the methodology itself. Behavioral validation happens per session.
+- Single-maintainer project. Development pace tracks one person's bandwidth.
+- No external validation yet. The methodology has been exercised on the hub plus one practitioner's spoke ecosystem; no third-party adoption.
+- API surface may shift before v2.0. Expect breaking changes between minor versions during this phase.
+- Documentation is authoritative but not exhaustive. Some patterns surface as the methodology evolves and have not yet been written down.
 
 ## Recent Features
 
@@ -93,11 +96,29 @@ They are not theoretical; they emerged from daily practice with AI agents across
 
 See the full timeline of 84+ features → [FEATURES.md](FEATURES.md)
 
-## What's Coming
+## Direction
 
-- **Structural compliance retrofit** — Applying document structure standards (TOC, intro paragraphs, line budgets) across all methodology files
-- **A queryable knowledge graph** that compiles human-authored methodology into a navigable, interconnected structure, making the ecosystem's accumulated knowledge searchable across projects and sessions
-- **Onboarding guide** — A newcomer-friendly path into the framework for practitioners encountering DSM for the first time
+Direction, not commitment. Items below describe where attention is going, not what will ship by a specific date.
+
+**Near-term (active work):**
+
+- **Structural compliance retrofit** — Applying document structure standards (TOC, intro paragraphs, line budgets) across all methodology files.
+- **Onboarding guide** — Building a newcomer-friendly path into the framework for practitioners encountering DSM for the first time.
+
+**Longer-term (exploratory):**
+
+- **Queryable knowledge graph** — Exploring how to compile the human-authored methodology into a navigable, interconnected structure so the ecosystem's accumulated knowledge becomes searchable across projects and sessions. Design questions still open.
+
+## Contributing
+
+The project is at a stage where design input is more useful than feature requests. Useful contributions include:
+
+- Design critique on protocols, principles, and command files; counterexamples from your own practice are especially valuable.
+- Pattern suggestions drawn from how you already structure human-AI collaboration; what does your workflow do that DSM does not name yet?
+- Bug reports against command files or scaffolding; concrete reproduction steps make these easy to act on.
+- Usability feedback from trying to apply DSM to a new project; the friction you hit is the signal.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution process.
 
 ## Links
 
