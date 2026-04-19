@@ -60,11 +60,15 @@ For the full chapter, see [`DSM_6.1_Systems_Prompt_Engineering_v1.0.md`](DSM_6.1
 
 ## Start Here
 
-Read [`TAKE_A_BITE.md`](TAKE_A_BITE.md) for the short version of the founding principle. It takes two minutes and captures the core idea: someone offers you a bite of a cookie, you take a bite the size you will enjoy; too small and you won't taste the cookie, too much and it will cause a lot of issues.
+Two entry points serve different purposes.
+
+Read [`DSM_0.0_START_HERE_Complete_Guide.md`](DSM_0.0_START_HERE_Complete_Guide.md) for the working introduction: what DSM is, how the ecosystem is organized, what each project type looks like, and how to start a session. This is the operational guide for practitioners.
+
+Read [`TAKE_A_BITE.md`](TAKE_A_BITE.md) for the founding principle in two minutes: the cookie analogy that gives the project its name. This is the philosophical core that the operational guide implements.
 
 ## Current Status
 
-Take AI Bite is at the WIP stage. The methodology has been developed and used internally across data science, software engineering, open source contribution, methodology documentation, research synthesis, and administrative work. It is published here as a public mirror, but no one outside the original practitioner has used it yet.
+Take AI Bite is at the WIP stage. The methodology has been developed and used internally across data science, software engineering, open source contribution, methodology documentation, research synthesis, and administrative work. It is published here as a public mirror.
 
 The API surface (command files, protocols, templates) may shift before v2.0; pin to a tagged version if you need stability. If you want to engage with the design as it evolves, not only consume the output, this is the right stage to show up.
 
