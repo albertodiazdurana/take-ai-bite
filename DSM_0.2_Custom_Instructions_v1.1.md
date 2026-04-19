@@ -412,6 +412,56 @@ IDE permission window.
 proceed to the next artifact or to execution until the user has reviewed
 the implementation.
 
+### 8.2.1. Strongest Counter-Evidence Requirement (BL-385)
+
+Before requesting Gate 2 approval for any recommendation-style artifact, the
+agent MUST surface the strongest counter-evidence to its own recommendation,
+drawn from sources read during brief preparation. Confidence-shaped briefs
+hide weakness signals until the user pushes back; codifying counter-evidence
+surfacing shifts the burden from user vigilance to protocol.
+
+**Format (required when the brief contains a recommendation):**
+
+```markdown
+## Strongest counter-evidence
+
+- [Counter-claim or risk]: [source / reasoning]
+- Why I am still recommending [recommendation] despite this:
+  [explicit weighing of why the chosen path wins anyway]
+```
+
+**Anti-pattern guard:** the section must be substantive. Acceptable forms:
+
+- "Source X says the opposite, ranked it weaker because [evidence-strength
+  tier, sample size, methodology gap, etc.]"
+- "No counter-evidence found. Sources checked for counter-evidence: X, Y, Z."
+
+NOT acceptable: "No counter-evidence found" without listing which sources
+were surveyed. Empty sections satisfy the rule's letter while violating its
+intent (Earn Your Assertions, DSM_6.0 §1.3).
+
+**Trigger scope:** applies to Gate 2 invocations involving recommendations
+(architecture choices, BL implementations, approach selection, design
+trade-offs). Does NOT apply to:
+
+- Pure mechanical edits (typo fixes, version bumps, status flips)
+- Trivial artifacts already excluded by §8.4 Gate Scope
+- Brief-less actions (e.g., responding to "make this typo fix" without a
+  Gate 1 brief)
+
+**Consequence of skipping:** §22 Protocol Violation Triage Response
+applies. A recommendation that lands without surfaced counter-evidence,
+where counter-evidence existed in sources read during brief prep, is a
+§22 violation. The agent must halt, surface the counter-evidence
+retroactively, and propose a §22 fix-root-cause-prevent triage.
+
+**Origin:** BL-385. Heating-systems S5 incident (two ranking errors needed
+user pushback to surface counter-evidence visible at brief time) was the
+filing trigger. S194 demonstrated voluntary application: every Gate 1
+brief in BL-236f/h, BL-386, BL-387, BL-380 included a "Counter-evidence
+(per BL-385)" section before this codification landed; this rule promotes
+that pattern from voluntary to required.
+
 ### 8.3. Gate 3: Run Approval (when applicable)
 
 When the artifact needs to be executed (tests, scripts, benchmarks, CI

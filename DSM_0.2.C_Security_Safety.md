@@ -90,6 +90,18 @@ CLAUDE.md.
   switching git branches when session state depends on the current branch's files.
   The agent must recognize these as destructive, refuse without explicit user
   confirmation, and warn that the action will likely require a new session.
+- **PR-merge to main:** `gh pr merge {N} --merge|--squash|--rebase` against the
+  project's main line. Equivalent in publication outcome to `git push origin main`
+  , a commit lands on main, becomes visible in default GitHub views, and the
+  source branch is deleted. The agent MUST obtain explicit user confirmation per
+  merge to main; prior session approvals do not transitively authorize subsequent
+  merges. Confirmation may be batched within a larger work-block approval (e.g.,
+  "merge BL-X PR + push" as one sentence) but must be specific to the merge
+  action, not absorbed into a general "proceed" instruction. **Equivalence
+  scope:** equivalent in publication outcome, not in policy enforcement. PR merge
+  respects branch protection rules (required reviewers, CI gates); direct push
+  bypasses them. The risk equivalence is about what lands on main, not about
+  what filters the action passes through. Origin: BL-387.
 
 **Behavior when triggered:**
 
@@ -111,6 +123,100 @@ to non-bash agent operations. Both protocols apply simultaneously.
 - Delete methodology sections to "clean up" without explicit request
 - Batch destructive operations to reduce confirmation prompts; each operation
   gets its own confirmation
+
+### 2.1. Command Default Verification (BL-386 Check B)
+
+When invoking `gh pr create` against a project whose intended base is the
+project's main line, the agent MUST pass `--base` explicitly, resolved
+from the value cached by `/dsm-go` Step 2a.6 (Default-branch verification).
+Never rely on `gh`'s implicit base resolution. Immediately after creation,
+verify with `gh pr view {N} --json baseRefName` and assert the returned
+base matches the intended target. If the assertion fails, halt before
+any merge.
+
+**Why:** command defaults are unverified assertions. Earn Your Assertions
+(DSM_6.0 §1.3) extends to "resolve the relevant default before running a
+destructive command that depends on it." The default a CLI tool resolves
+implicitly is just as much an assertion as a hardcoded literal, and a
+destructive operation built on top of it inherits the assertion's risk.
+Verifying post-create turns latent base-drift into immediate visible
+failure rather than a silent corruption that surfaces sessions later.
+
+**When this applies:**
+
+- The PR's intended base is the project's main line (the same value
+  Step 2a.6 caches)
+- The agent invokes `gh pr create` programmatically (not the user
+  invoking it through the IDE)
+
+**When this does NOT apply:**
+
+- PRs targeting a non-main branch (e.g., a feature branch receiving a
+  sub-PR) , the verification mechanism still applies if useful, but is
+  not mandated by this rule
+- User-invoked `gh pr create` outside agent control , the agent cannot
+  intercept; the rule covers agent behavior only
+
+**Failure mode this prevents:** dsm-jupyter-book S4 issued
+`gh pr create` without `--base`, `gh` correctly used the misconfigured
+repo default (a stale session branch), and the merge fired against the
+wrong base. The agent caught the mismatch only after reading the merge
+output. With Check A active, the misconfig would have halted at session
+start; with Check B active, the wrong base would have halted before
+merge regardless of session-start state.
+
+**Origin:** BL-386, paired with `/dsm-go` Step 2a.6.
+
+### 2.2. Permission Rule Pattern: Opt-in for PR-Merge Confirmation (BL-387)
+
+The PR-merge-to-main equivalence rule above (in §2's bullet list) is the
+default for all DSM projects: protocol-level guidance, enforced by agent
+discipline. Security-sensitive projects can additionally adopt a permission-
+level guard that fires regardless of agent discipline by extending the
+project's `.claude/settings.json` permission rules.
+
+**Pattern (illustrative, not normative):**
+
+```json
+{
+  "permissions": {
+    "deny": [
+      "Bash(gh pr merge:*)"
+    ]
+  }
+}
+```
+
+This denies all `gh pr merge` invocations; the user authorizes each merge
+through the IDE permission window. Trade-off: the rule cannot scope precisely
+to "PR base resolves to main" (permission patterns match command prefix, not
+runtime arguments), so the broader scope catches PR merges to non-main
+branches as well.
+
+**When to adopt:**
+
+- Projects with strict change-control requirements (production code, regulated
+  domains)
+- Projects where multiple agents share the working tree and per-merge audit is
+  required
+- Projects where the user wants a hard guarantee independent of agent
+  discipline
+
+**When NOT to adopt:**
+
+- Routine development projects where the §2 bullet rule (Option B) is
+  sufficient
+- Projects where merge frequency is high enough that per-merge prompts would
+  produce confirmation fatigue
+
+**Relationship to BL-386 Check B:** §2.1 (Check B) verifies the merge target
+before merge fires; §2 PR-merge bullet (Option B) requires explicit
+authorization for the merge action; §2.2 (Option A) hardens the
+authorization with a permission-system gate. The three layer: target
+verification → action authorization → permission enforcement. Each catches
+a different failure mode.
+
+**Origin:** BL-387.
 
 ---
 
