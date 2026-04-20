@@ -5,6 +5,18 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2026-04-20
+
+### Added - Claude Code Platform Check in Sprint Cadence (BL-353 T1, closes BL-353)
+
+- **DSM_0.2.A §11.2 Claude Code Platform Check** (new subsection, ~45 lines): sprint-boundary triage to keep DSM aligned with Claude Code platform evolution. Scope: DSM Central only. Procedure: read Claude Code changelog, assess per DSM-used area, append dated amendment to the BL-342 baseline research file. Output report line added to sprint retrospective. Scope limiter: only 12 platform areas covered by the baseline; skip the rest.
+  - **Spoke action:** None. Step is scoped "DSM Central only"; spokes inherit protocol changes through the `@` reference chain and do not read the Claude Code changelog at their own sprint boundaries. Review DSM_0.2.A §11.2 on next `/dsm-go` for awareness, no behavioral change required.
+- **DSM_0.2.A §11 Sprint Boundary Checklist** bullet updated to list "Claude Code platform check (DSM Central only, see §11.2 below)" alongside the existing retrospective/epoch/next-steps items.
+
+### Closed
+
+- **BL-353 (Claude Code Platform Alignment Protocol)** closed. T1 implemented in this version; T2 + T4 completed in parallel session 195.1 (v1.5.x), T3 closed by BL-356 (v1.5.0). All success criteria and test-plan items met.
+
 ## [1.6.1] - 2026-04-20
 
 ### Added - Read the User's Manual principle, Gate 1 token-minimizing config recommendation, DSM_7.0 AI Platform Collaboration Guide (BL-344, BL-402, BL-345 rollout: Phase 1 + BL-398 + BL-399 + BL-400 + BL-401)
