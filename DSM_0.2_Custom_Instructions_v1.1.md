@@ -548,6 +548,103 @@ file *is* the source.
 actually lives in `/dsm-finalize-project` Section G.3. The claim was
 made without reading either file.
 
+**Relationship to DSM_6.0 §1.11 Read the User's Manual:** §8.6 is the
+skill-file-scoped instance of the broader principle. §1.11 governs
+external-tool grounding in general (Claude Code harness, `gh` CLI,
+Gitleaks, third-party APIs); §8.6 applies the same read-before-claim
+discipline to DSM's own skill files. Protocols that invoke external
+tools inherit §1.11 directly; the skill-file case is routed through §8.6.
+
+### 8.7. Token-Minimizing Config Recommendation at Gate 1 (BL-402)
+
+Module A §14 Session Configuration Recommendation sets a session-level
+baseline at session start and on major task shifts. A single session
+routinely produces multiple Gate 1 artifacts whose cognitive demand varies
+widely: a mechanical BL status flip and an architectural decision both
+run at the session baseline, which either burns context on trivial work or
+under-provisions complex work. DSM_6.0 §2.3 Environmental Awareness states
+"prefer the sufficient configuration over the maximal one" as a principle
+but has no Gate-1-visible operational trigger. §8.7 closes that gap at
+per-artifact granularity.
+
+**Trigger:** within every Gate 1 brief where the artifact's demand profile
+diverges from the current session baseline. Asymmetric: the recommendation
+is absent when the baseline matches, present only when divergence is clear.
+
+**Agent behavior:** the Gate 1 brief includes a one-line recommendation
+when divergence is clear, drawn from this table:
+
+| Artifact demand | Current baseline | Recommended action |
+|-----------------|------------------|--------------------|
+| Clearly below baseline (mechanical edit, status flip, trivial) | Standard / Deep | Downshift (lower effort, Thinking OFF, Fast ON) for this artifact |
+| Clearly above baseline (architectural decision, novel design, multi-source synthesis) | Efficient / Light | Upshift (Opus / High effort / Thinking ON) for this artifact |
+| Reading-heavy (research sweep, codebase exploration, large-file comprehension) | Any | Offload to Sonnet subagent; keep main thread at baseline |
+| Matches baseline | Any | No recommendation (skip this line) |
+
+**Format in the Gate 1 brief:**
+
+```markdown
+## Gate 1: [artifact name]
+
+**What:** ...
+**Why:** ...
+**Key decisions:** ...
+**Structure:** ...
+
+**Config recommendation (per §8.7):** [action] , [one-line reason].
+```
+
+**Skip condition (ritualism guard):** if the artifact's demand matches the
+session baseline, do NOT include a config recommendation in the Gate 1
+brief. An empty "Config recommendation: no change" line is itself
+ritualistic compliance and is explicitly prohibited (same guard pattern as
+§10.1's "ritualistic compliance" anti-pattern and §8.2.1's "No counter-
+evidence found" anti-pattern).
+
+**Subagent-first for reading-heavy artifacts:** when the artifact requires
+reading large files, multi-file codebase sweeps, or multi-source research,
+the strongest token-minimizer is typically delegating to a Sonnet subagent
+rather than downshifting main-thread effort. Recommend subagent delegation
+first; downshift effort second. Subscription-awareness: before recommending
+subagent offload, check `~/.claude/claude-subscription.md` for a separate
+Sonnet pool (Max plan has one); on plans without a separate pool the
+subagent consumes the same budget and the recommendation should be
+suppressed or flagged with a cost note.
+
+**Ordering with §8.2.1 Strongest Counter-Evidence:** when a Gate 1 brief
+requires both the counter-evidence section (§8.2.1) and a config
+recommendation (§8.7), the config recommendation appears FIRST (before
+counter-evidence). Rationale: config recommendation shapes the
+computational approach to the artifact; counter-evidence shapes the
+artifact's content. The computational decision comes before the content
+decision.
+
+**User options:** accept the recommendation, override with a different
+config, or skip and keep the baseline. §8.7 does not introduce a new gate
+pause; the recommendation lives inside the Gate 1 brief and shares its
+approval under the same gate-behavior rules as the rest of §8.
+
+**Relationship to other protocols:**
+
+- Module A §14 (Session Configuration Recommendation) sets the session
+  baseline; §8.7 adjusts per artifact within that baseline. Different
+  granularities, complementary.
+- DSM_6.0 §2.3 Environmental Awareness is the foundational principle §8.7
+  operationalizes.
+- §23.4 Runtime Register Context Convention is the analogous pattern at
+  skill-invocation granularity (per-invocation annotation for a skill).
+  §8.7 applies the same per-invocation shape to Gate 1 config
+  recommendations.
+- BL-397 Auto-Mode Boundaries governs whether the Gate 1 pause holds; §8.7
+  fits within whichever gate behavior BL-397 has established for the
+  session.
+
+**Origin:** BL-402. S194 filed 4 BLs of varying complexity (mechanical,
+procedural, architectural); all ran at the session baseline without
+per-artifact calibration. S195 surfaced the gap when the user asked
+"which config should I run in the parallel sessions?", which had no
+Gate-1-visible protocol to answer from.
+
 ---
 
 ## 9. Experiment Execution Protocol

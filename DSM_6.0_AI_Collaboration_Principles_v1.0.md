@@ -470,6 +470,91 @@ missing entry point to all collaboration, codified as Gate 0 in DSM_0.2
 
 ---
 
+### 1.11 Read the User's Manual
+
+**Ground your collaboration on what the tool actually does, not what you
+assume it does.**
+
+Every AI-collaboration practice built on an external tool , a CLI, a hook
+runtime, a platform API, a standards document , inherits the tool's real
+behavior whether or not the practitioner has read how the tool works. When
+the practice is designed around assumed behavior rather than documented
+behavior, the gap is invisible until something breaks. By then, the practice
+has been propagated across sessions and projects; the cost of discovery
+compounds with the cost of unwinding.
+
+"Read the User's Manual" is the discipline of treating external-tool
+understanding as a prerequisite to collaboration design, not an optional
+afterthought. Also known as "Ground Before You Build": before a pattern is
+built on a platform feature, the practitioner reads the platform's own
+documentation, verifies the understanding against the documentation (not
+against memory or experiential knowledge), and documents the understanding so
+it is shared, not individual.
+
+The principle is a specific form of Earn Your Assertions (§1.3) applied to
+the tools the collaboration runs on, and a specific form of Know Your Context
+(§1.5) applied to external systems rather than the current project. Its
+distinctiveness is scope: §1.3 governs claims made in work; §1.5 governs the
+context of the current project; §1.11 governs the external substrate that
+collaboration patterns are built on. The three reinforce one another without
+replacing.
+
+This principle maps to the PMP Procurement knowledge area. Procurement is
+about what you acquire from outside your team before you build with it; in
+the agentic-stakeholder translation, the acquired artifact is the platform,
+the hook runtime, the slash-command execution model, the API contract. The
+procurement step is reading the manual. Skipping procurement in either
+discipline produces the same class of failure: late discovery that the
+acquired artifact does not behave as assumed.
+
+The practitioner's behavioral trigger is pre-emptive: before designing a
+pattern around tool X, spend time reading X's documentation. Not after the
+pattern fails. The cost of the up-front read is measured in minutes; the
+cost of a broken pattern propagated across N sessions is measured in
+sessions.
+
+**Relationship to other principles:** Read the User's Manual sits at the
+intersection of Earn Your Assertions (§1.3, don't claim what you haven't
+verified) and Know Your Context (§1.5, know what surrounds your work). It
+operationalizes both for the specific case of external substrate. Think
+Ahead (§1.9) provides the temporal framing: the cost of reading the manual
+is paid once; the cost of not reading compounds.
+
+**Evidence:**
+
+- **F-094 (per-turn transcript hook).** The hook scripts were stored in the
+  git index at mode `100644`. `core.fileMode = false` on WSL hid the
+  divergence, so every fresh clone of any DSM project got non-executable
+  hooks and the per-turn reminder hook silently failed end-to-end. The cause
+  was not a bug in the hook code; it was a lack of grounding in how Claude
+  Code dispatches `UserPromptSubmit` hooks (mode bit enforcement, exit code
+  semantics, index-mode persistence across clones). 2.5 months of hook
+  non-function accrued before the root cause was traced. Resolved via
+  `git update-index --chmod=+x`, `/dsm-align` hub fast-path step 10b
+  inclusion, and sub-step b re-applying `chmod +x` on every run.
+
+- **S180 executable-bit incident.** The same class of failure as F-094 at
+  smaller scale: hooks were bytewise correct but not executable on a
+  specific instance, and the symptom was silent non-firing rather than a
+  loud error. Diagnosis required reading Claude Code's hook-execution model
+  end-to-end, not reading the hook scripts themselves. The manual was
+  authoritative; the agent's working mental model was not.
+
+- **BL-342 (Claude Code platform research).** The corrective mitigation:
+  BL-342 filed as a High-priority research BL to read Claude Code's
+  changelogs and hook documentation systematically. BL-342 Implemented
+  2026-04-12. The research surfaced multiple platform capabilities the DSM
+  skills had been working around rather than using (allowed-tools
+  governance, register-sensitive skill evaluation, PreToolUse/PostToolUse
+  matchers). BL-342's output made subsequent decisions defensible; its
+  absence is what made F-094 and S180 possible.
+
+The principle does not prevent the first encounter with a new tool from
+surfacing surprises; it establishes that the surprises should come from
+reading the documentation, not from running the system.
+
+---
+
 ## 2. Guidelines
 
 The principles above translate into concrete practices at each scale of work.
@@ -509,6 +594,8 @@ to existing DSM protocols and identifies the gaps that remain.
 | Session Close-Out and Wrap-Up | DSM_0.2 | Know Your Context |
 | Checkpoint and Handoff system | DSM_0.2, DSM_5.0 | Know Your Context |
 | Daily Documentation Protocol | DSM 1.0, Section 6.1.4 | Know Your Context |
+| Skill Self-Reference Protocol (read skill file before claiming behavior) | DSM_0.2 §8.6 | Read the User's Manual, Earn Your Assertions |
+| Platform Research Backlog Items (BL-342 Claude Code research, ongoing under BL-353) | DSM_0.2 §10, `dsm-docs/research/` | Read the User's Manual |
 
 **Quality and Feedback**
 
@@ -640,3 +727,4 @@ patterns (emergent concepts like Ripple Effect and My Fork, My Rules).
 | 1.4 | 2026-03-01 | AI Collaboration Ethics (BACKLOG-124). Added Principle 1.7 "Own Your Process" (attribution/disclosure framework with decision table). Extended Principle 1.3 with accountability corollary. Added Guideline 2.3 "Environmental Awareness." Updated gap table with 3 ethics rows. Based on research: NIST AI RMF, EU AI Act, IEEE CertifAIEd, arXiv:2512.00867. |
 | 1.5 | 2026-03-12 | Critical Thinking restructure (BACKLOG-175). Renamed Section 1.4 "Understand, Review, Decide" to "Critical Thinking" with two subsections: 1.4.1 Understand, Review, Decide (preserved), 1.4.2 Challenge Myself to Reason (new). Grounded in Facione (1990) self-regulation concept. Added Composition Challenge and Edit Explanation Stop to protocol mapping. Updated protocol references from "Understand/Review/Decide" to "Critical Thinking." |
 | 1.6 | 2026-03-16 | Strategic Thinking Layer (BACKLOG-212). Added Principle 1.9 "Think Ahead" documenting the four-layer maturity progression (operational → philosophical → learning → strategic). Added 4 Evolution protocol mappings (Roadmap System, Phase-Gated Work, Backlog Scope Rule, Feature Branch Rule). Evidence: 83 features across 14 repos, 796 commits, backlog self-generation as maturity signal. |
+| 1.7 | 2026-04-19 | Read the User's Manual (BACKLOG-344). Added Principle 1.11 establishing external-tool grounding as a prerequisite to collaboration design. Maps to PMP Procurement knowledge area. Evidence: F-094 (per-turn transcript hook 2.5 months broken due to index-mode `100644`), S180 (+x bug from same root cause), BL-342 (Claude Code platform research as corrective mitigation, Implemented 2026-04-12). Added protocol mappings in Session Management: Skill Self-Reference Protocol (DSM_0.2 §8.6) and Platform Research Backlog Items. |
