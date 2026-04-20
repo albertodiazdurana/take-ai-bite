@@ -103,6 +103,7 @@ See the full timeline of 84+ features → [FEATURES.md](FEATURES.md)
 
 - **Website:** [take-ai-bite.com](https://take-ai-bite.com)
 - **Author:** [Alberto Diaz Durana](https://www.linkedin.com/in/albertodiazdurana/)
+- **Vocabulary:** [DSM terminology reference](dsm-docs/guides/dsm-vocabulary.md) (spoke, hub, Level 3 branch, Pre-Generation Brief gates, `@` reference, and more)
 
 ## License
 

@@ -5,6 +5,18 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.3] - 2026-04-20
+
+### Added - Vocabulary Linking Convention (BL-239 T3 + T4, closes BL-239)
+
+- **DSM_0.1 §7.1 Vocabulary Linking Convention** (new subsection): blog posts and public documents link DSM-specific terms to `dsm-docs/guides/dsm-vocabulary.md` on first use. Internal methodology files skip because the vocabulary is part of the set. Alternative "Terms used" footer for short posts.
+  - **Spoke action:** Review DSM_0.1 §7.1 on next `/dsm-go`. Applies to spokes that produce blog posts or public-facing documents (Take-AI-Bite, Graph Explorer, Blog Poster).
+- **README.md Links section** now references the DSM vocabulary file with a short parenthetical showing example terms (spoke, hub, Level 3 branch, `@` reference). README is mirror-synced; TAB receives the same link via next sync.
+
+### Closed
+
+- **BL-239 (DSM Vocabulary Comprehensive Update and Spoke Propagation)** closed. T1 (vocabulary expansion, 14 entries) + T2 (mirror sync inclusion) landed in parallel session 195.3 (2026-04-19). T3 (README link) + T4 (blog cross-reference convention) landed in this version.
+
 ## [1.6.2] - 2026-04-20
 
 ### Added - Claude Code Platform Check in Sprint Cadence (BL-353 T1, closes BL-353)
