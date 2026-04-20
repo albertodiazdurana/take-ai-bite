@@ -249,6 +249,7 @@ agent loads what is relevant. This map helps if you want to explore.
 | **DSM_5.0** | Documentation project adaptation | Working on documentation-only projects |
 | **DSM_6.0** | AI collaboration principles | Understanding the philosophy behind DSM |
 | **DSM_6.1** | Systems prompt engineering and AI product architecture | Understanding DSM as an instruction system |
+| **DSM_7.0** | AI platform collaboration guide (Claude Code and future platforms) | Understanding how DSM operates on a specific AI platform |
 
 DSM_0.2 is the operational backbone. It defines how sessions work, how the agent
 communicates, and how safety protocols operate. The agent loads it via the `@`
