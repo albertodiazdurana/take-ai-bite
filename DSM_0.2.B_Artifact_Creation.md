@@ -431,6 +431,14 @@ When a change is explicitly experimental (trial period, evaluation planned):
 
 ## 8. Infrastructure File Collaboration Protocol
 
+**Relationship to DSM_7.0 §2.1:** §B.8 defines infrastructure-file
+review discipline (diff-first, blast-radius awareness, post-edit
+validation). DSM_7.0 §2.1.6 enumerates the Claude-specific
+infrastructure file surface: `.claude/CLAUDE.md`, `.claude/settings.json`,
+`.claude/hooks/*.sh`, `.claude/commands/*.md`, plus the user-scope
+equivalents. The review discipline is here; the Claude-specific file
+inventory and scope-order rules live in DSM_7.0.
+
 Infrastructure files (skill definitions, hook scripts, settings.json, command
 files) govern agent behavior across all DSM projects. A broken skill propagates
 via `sync-commands.sh --deploy` and the `@` reference chain to every spoke.

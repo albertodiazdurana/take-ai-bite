@@ -1,4 +1,4 @@
-# Contributing to Take AI Bite
+# Contributing to Agentic AI Data Science Methodology
 
 Thank you for your interest in contributing to this methodology framework. This guide will help you understand how to contribute effectively.
 

@@ -5,6 +5,33 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-04-20
+
+### Added - Read the User's Manual principle, Gate 1 token-minimizing config recommendation, DSM_7.0 AI Platform Collaboration Guide (BL-344, BL-402, BL-345 rollout: Phase 1 + BL-398 + BL-399 + BL-400 + BL-401)
+
+- **BL-344: DSM_6.0 §1.11 Read the User's Manual + DSM_0.2 §8.6 relationship paragraph.** New foundational principle establishing that external-tool understanding is a prerequisite to collaboration design, not an optional afterthought. DSM_6.0 §1.11 (97 lines) names the principle, grounds it in PMP Procurement (acquire from outside before building with it), and relates it to §1.3 Earn Your Assertions, §1.5 Know Your Context, and §1.9 Think Ahead. DSM_0.2 §8.6 Skill Self-Reference Protocol gains a "Relationship to DSM_6.0 §1.11" paragraph that positions §8.6 as the skill-file-scoped instance of the broader principle. Origin: BL-342 platform-assessment research spawned BL-343 (skill governance), BL-344 (this principle), and BL-345 (DSM_7.0); the three close the gap between "we understood Claude Code experientially" and "we read the manual".
+  - **Spoke action:** Review DSM_6.0 §1.11 and DSM_0.2 §8.6 relationship paragraph on next `/dsm-go`. Applies to every DSM project via the `@` reference chain the moment spokes re-load DSM_0.2.
+
+- **BL-402: DSM_0.2 §8.7 Token-Minimizing Config Recommendation at Gate 1.** New subsection operationalizing DSM_6.0 §2.3 Environmental Awareness at per-artifact granularity. Module A §14 sets the session baseline; §8.7 adjusts per artifact inside Gate 1. Asymmetric trigger: recommendation appears only when artifact demand clearly diverges from the baseline (mechanical → downshift, architectural → upshift, reading-heavy → Sonnet subagent offload). Includes a ritualism guard ("Config recommendation: no change" is explicitly prohibited, same guard pattern as §8.2.1 and §10.1), subscription-awareness for subagent offload cost on non-Max plans, and explicit ordering with §8.2.1 counter-evidence (config recommendation appears first, because computational decision precedes content decision). Origin: S194 filed 4 BLs of varying complexity at the session baseline without per-artifact calibration; S195 surfaced the gap when the user asked "which config should I run in the parallel sessions?" with no Gate-1-visible protocol to answer from.
+  - **Spoke action:** Review DSM_0.2 §8.7 on next `/dsm-go`. Affects every Gate 1 brief where artifact demand diverges from the session baseline.
+
+- **BL-345 + BL-398 + BL-399 + BL-400 + BL-401: DSM_7.0 AI Platform Collaboration Guide, full rollout end-to-end.** New top-level DSM document (759 lines, v0.3) centralizing platform-specific collaboration knowledge. DSM_0 through DSM_6 are platform-agnostic methodology; DSM_7.0 is where platform-specific understanding lives. Five-phase rollout:
+  - **Phase 1 (BL-345 scaffold):** Seven-section skeleton: Purpose/Scope, Platform Inventory, §3 generalized template, §4 Boundary Rules (Claude-specific content currently embedded in DSM_0-6, classified as naming-only or semantic-also), §5 Incident Catalog (F-094, S180, BL-342/343/344/345, BL-377), §6 References, §7 Version History. Added DSM_7.0 row to DSM_0.0 §7 Document Map.
+  - **Phase 2 (BL-398 research):** 10-subsection template derived from platform-doc structure research, plus §2.1.11 Production Readiness as optional Full-Agent-tier add-on.
+  - **Phase 3 (BL-399 audit):** 16 TAB/DSM-exclusive Claude patterns cataloged; 14 map into §2.1 (2 are already codified in DSM_0.2 §17).
+  - **Phase 4 (BL-400): §2.1 Claude Code filled instance.** All 11 BL-398 subsections filled: Overview, Installation/Authentication, Core Concepts (7 concepts), Platform Capability Surface (Y/P/N matrix), How to Work With Claude Code in a DSM Context (14 TAB/DSM patterns mapped), Configuration and Customization, Integration, Security and Permissions (6 modes + counter-evidence callouts), Troubleshooting and Incident Catalog, Reference cheatsheet, Production Readiness. Counter-evidence surfaced inline per §8.2.1: auto-mode plan-gating, skill compaction budget, `@` 5-hop recursion verification caveat.
+  - **Phase 5 (BL-401): §3 template filled + 9 external cross-references applied.** §3 is now a platform-agnostic template (§3.1-§3.10 required, §3.11 optional for Full Agent tier, §3.12 "How to Instantiate This Template for a New Platform" 8-step procedure). Cross-references follow the §8.6 "Relationship to DSM_7.0 §2.1" pattern, added to DSM_0.2 §7, §8.2, §17, §23; DSM_0.2.A §7, §25; DSM_0.2.B §8; DSM_6.0 §1.11; and `.claude/reasoning-lessons.md` header (new `[claude]` tag category). No semantic changes to DSM_0.2 content (Option 3 deferred); all edits are pointer-only.
+  - **Spoke action:** Review DSM_7.0 §2.1 (Claude Code filled instance) and §3 (template for future platforms) on next `/dsm-go`. DSM_7.0 is mirror-synced to take-ai-bite; downstream spokes read via the `@` chain through their mirror. The 9 new cross-reference paragraphs in DSM_0.2 and DSM_6.0 apply to every DSM project the moment spokes re-load.
+
+### Changed
+
+- **DSM_0.0 §7 Document Map** gains a DSM_7.0 row (added in BL-345 Phase 1).
+- **`.claude/reasoning-lessons.md` Tagging Convention** gains `[claude]` tag for Claude-Code-specific lessons with a pointer to DSM_7.0 §2.1 for the operational layer (BL-401).
+
+### Spawned
+
+No new BLs were spawned by v1.6.1's work, because the entire rollout chain (BL-398 → BL-399 → BL-400 → BL-401) was pre-declared at BL-345 Phase 1 time and fully consumed in this release. BL-353 Platform Alignment Protocol remains the ongoing maintenance loop for DSM_7.0 §2.1 as Claude Code evolves.
+
 ## [1.6.0] - 2026-04-19
 
 ### Added - Counter-evidence surfacing, default-branch verification, PR-merge parity, sprint-plan template injection (BL-380, BL-385, BL-386, BL-387)
