@@ -240,6 +240,37 @@ Track creation and publication status of blog materials.
   `{contributions-docs-path}/{project}/blog/`, not in the external repo.
   The tracker follows the blog content to that location.
 
+### 7.1. Vocabulary Linking Convention (BL-239 T4)
+
+Blog posts, external-facing deliverables, and public documents routinely
+use DSM-specific terms (spoke, hub, Level 3 branch, `@` reference,
+Pre-Generation Brief, Session Transcript, etc.). Readers outside the
+project cannot be assumed to know these terms.
+
+**Convention:** on first use of a DSM-specific term in a blog post or
+public document, link to the matching entry in
+`dsm-docs/guides/dsm-vocabulary.md`. Subsequent uses in the same document
+do not need to re-link.
+
+Format:
+
+```markdown
+... the [spoke project](dsm-docs/guides/dsm-vocabulary.md#spoke) sends
+feedback to the hub via the inbox system ...
+```
+
+**Scope:** blog posts in `dsm-docs/blog/`, README.md, external-facing
+guides in `dsm-docs/guides/` that a public reader might encounter.
+Internal methodology files (DSM_0 through DSM_6) do not need links
+because the vocabulary itself is part of the methodology set.
+
+**Alternative for short posts:** if a post uses only 1-2 DSM terms, a
+single "Terms used in this post" footer with links is acceptable.
+
+**What NOT to do:** do not inline-define every term (bloats the post).
+Do not re-link on every occurrence (noise). Do not link from internal
+methodology files (redundant).
+
 ---
 
 ## 8. Citation Standards
