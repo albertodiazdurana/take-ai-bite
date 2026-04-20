@@ -1098,7 +1098,7 @@ Move superseded checkpoints to `dsm-docs/checkpoints/done/`. Add
 Prefer shorter sprints with feedback at each boundary over long monolithic sprints:
 
 - Each sprint should deliver a testable, demonstrable increment
-- **Sprint boundary checklist:** checkpoint document, feedback files updated, decision log updated, blog journal entry, README updated, technical progress report updated, superseded checkpoints moved to done/ (see Artifact Lifecycle Management), hub/portfolio notified (see below), alignment review, sprint retrospective intelligence (see §11.1 below), epoch plan check (see below), next steps summary (3-5 sentences connecting to next sprint)
+- **Sprint boundary checklist:** checkpoint document, feedback files updated, decision log updated, blog journal entry, README updated, technical progress report updated, superseded checkpoints moved to done/ (see Artifact Lifecycle Management), hub/portfolio notified (see below), alignment review, sprint retrospective intelligence (see §11.1 below), Claude Code platform check (DSM Central only, see §11.2 below), epoch plan check (see below), next steps summary (3-5 sentences connecting to next sprint)
 - **Epoch plan check:** If this sprint completes an epoch (or is the last sprint
   before an epoch boundary), verify: (1) the epoch plan reflects actual outcomes,
   (2) remaining epoch goals are flagged as carried over or dropped, (3) the next
@@ -1262,6 +1262,57 @@ is analysis. The value of this protocol is the synthesis, not the arithmetic.
 - Defer feedback file updates to "later"; update at the boundary or observations are lost
 
 Reference: PM Guidelines Template 8 (Sprint Plan)
+
+### 11.2. Claude Code Platform Check
+
+**Scope:** DSM Central only. Spokes inherit protocol changes through the `@`
+reference chain and do not re-read the Claude Code changelog at their own
+sprint boundaries. This step lives at the hub where the platform baseline
+document and the gap-to-BL pipeline both live.
+
+**Trigger:** Sprint boundary, or every ~10 sessions (whichever comes first).
+Runs alongside sprint retrospective intelligence (§11.1), not as a separate
+skill invocation.
+
+**Purpose:** Keep DSM aligned with the Claude Code platform it runs on.
+Platform capabilities evolve weekly; without a systematic check, DSM drifts
+from the platform (observed failure modes: F-094 hooks broken 2.5 months,
+S180 chmod bug, S171 transcript-skip drift). The check is the platform-
+alignment counterpart to `/dsm-align` for spokes.
+
+**Procedure (3 steps):**
+
+1. **Read the changelog.** Pull Claude Code changelog entries and "What's
+   New" digests published since the previous check. Source of truth:
+   `code.claude.com/docs/en/changelog`.
+2. **Assess per area.** For each entry that touches a DSM-used platform
+   area (hooks, skills, settings, permissions, context window, memory,
+   tools), classify:
+   - **No impact:** note as reviewed, no action
+   - **Enhancement opportunity:** file a BL, priority from value/effort
+   - **Breaking change or deprecation:** file a High-priority BL
+3. **Update the baseline.** Append a dated amendment section to
+   `dsm-docs/research/done/2026-04-12_claude-code-platform-assessment.md`
+   (the BL-342 baseline). Append, do not rewrite; preserves the change
+   history.
+
+**Output report (included in sprint retrospective):**
+
+```
+Platform check: N entries reviewed, M gaps filed as BLs ([BL numbers])
+Baseline amended: [yes/no, line reference]
+```
+
+**Scope limiter:** Only check areas DSM uses (the 12 platform areas covered
+by the baseline). Skip the rest. The check is filtering, not research.
+
+**Anti-patterns:**
+- Deep platform research every sprint (the check is a triage, not an audit)
+- Updating the baseline by rewriting instead of amending (destroys history)
+- Deferring when "nothing looks changed" (the check confirms no-change as
+  an explicit reviewed state, not silence)
+
+Reference: BL-342 (baseline research), BL-353 (protocol establishment).
 
 ---
 
