@@ -103,6 +103,14 @@ implicitly closes the previous block. No explicit end delimiter is needed.
 
 ## 7. Session Transcript Protocol
 
+**Relationship to DSM_7.0 §2.1:** §7 defines the transcript protocol
+shape (append-only, first-tool-call thinking, last-tool-call output,
+delimiter format). DSM_7.0 §2.1.5 describes the Claude-specific
+mechanism: the `UserPromptSubmit` hook that injects the per-turn
+reminder and the `PreToolUse` validator that enforces anchor shape on
+Edit tool calls. The protocol stays here; the Claude execution layer
+lives in DSM_7.0 §2.1.
+
 The session transcript is the **primary and only** channel for agent reasoning.
 The user keeps `.claude/session-transcript.md` open in VS Code and reads
 reasoning there in real time. Conversation text is for results, summaries,
@@ -404,6 +412,12 @@ Explain:
 gate still applies.
 
 ### 8.2. Gate 2: Implementation Approval
+
+**Relationship to DSM_7.0 §2.1:** Gate 2 is the platform-agnostic
+implementation-review gate. DSM_7.0 §2.1.5 describes the Claude-specific
+realization: the VS Code extension's file-write approval dialog,
+activated by `claudeCode.initialPermissionMode: "default"`. Other
+platforms realize Gate 2 through their own permission surfaces.
 
 Create the artifact using Write/Edit tools. The user reviews the diff in the
 IDE permission window.
@@ -901,6 +915,15 @@ passive compliance and degrades the collaboration.
 ---
 
 ## 17. CLAUDE.md Configuration
+
+**Relationship to DSM_7.0 §2.1:** §17 specifies the agent-config file
+pattern (filename convention, `@` import as the discovery mechanism,
+delimited alignment section managed by `/dsm-align`, reinforcement-block
+requirements). DSM_7.0 §2.1.6 covers the Claude-specific surface: the
+`settings.json` scope order, the hook-wiring architecture, the 5-hop
+`@` recursion depth, and the skill / command file layouts. The
+configuration discipline is here; the Claude-specific realization is
+in DSM_7.0.
 
 Every project CLAUDE.md must include an `@` reference to this Custom Instructions template:
 
@@ -1528,6 +1551,14 @@ behind a module read.
 ---
 
 ## 23. Third-Party Skill Governance
+
+**Relationship to DSM_7.0 §2.1:** §23 defines the registry +
+evaluation-gate + conflict-resolution pattern for skill governance;
+it is platform-agnostic. DSM_7.0 §2.1.6 covers the Claude-specific
+surface: the legacy `.claude/commands/*.md` format DSM currently uses
+vs the newer `.claude/skills/SKILL.md` format with frontmatter, plus
+the 5K-per-skill / 25K-combined compaction budget that shapes how
+many skills a session can safely load.
 
 Claude Code skills (`~/.claude/skills/` for global, `.claude/skills/` for
 project-level) inject prompt content that the agent follows alongside DSM

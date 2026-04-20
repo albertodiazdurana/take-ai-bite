@@ -513,6 +513,15 @@ pattern fails. The cost of the up-front read is measured in minutes; the
 cost of a broken pattern propagated across N sessions is measured in
 sessions.
 
+**Relationship to DSM_7.0 §2.1:** §1.11 is the principle; DSM_7.0 §2.1
+Claude Code is its first full operational instance. The §2.1 filled
+template (installation, core concepts, capability surface, permission
+model, troubleshooting catalog, reference cheatsheet) is what "reading
+the manual" produces when the output is shared, not individual. Future
+`§2.N` platform instances extend the same discipline to other
+substrates. When this principle fires, the practitioner's destination
+is DSM_7.0 §2.N, or the backlog item to write one.
+
 **Relationship to other principles:** Read the User's Manual sits at the
 intersection of Earn Your Assertions (§1.3, don't claim what you haven't
 verified) and Know Your Context (§1.5, know what surrounds your work). It

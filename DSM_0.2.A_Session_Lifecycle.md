@@ -542,6 +542,14 @@ Reference: BACKLOG-151
 
 ## 7. Parallel Session Protocol
 
+**Relationship to DSM_7.0 §2.1:** §A.7 defines the parallel-session
+shape (shared Level 2 branch, typed prefixes, commit booking, file
+scope declarations). DSM_7.0 §2.1.5 covers the Claude-specific
+realization: the PID-scoped registry in `.claude/parallel-sessions.txt`,
+the provisional-stub pattern that resolves the turn-1 hook collision
+(BL-377), and the `.claude/commit-lock` file-based lock with TTL. The
+protocol stays here; the Claude mechanism lives in DSM_7.0.
+
 Parallel sessions allow multiple concurrent AI sessions to work on independent
 tasks within the same repository. All sessions share the Level 2 session branch
 (no Level 3 branches, no worktrees). Isolation is enforced through typed session
@@ -2078,6 +2086,15 @@ Do not count "discussed" or "planned" as evidence of completion.
 ---
 
 ## 25. Cloned-Mirror Kick-off Protocol
+
+**Relationship to DSM_7.0 §2.1:** §A.25 defines the Kick-off sequence
+(detection signals, 14-step promotion, idempotency rules). DSM_7.0
+§2.1.5 covers the Claude-specific realization: `.claude/*.template`
+files promoted to runtime paths, `{REPO_ROOT}` / `{project_name}` /
+`{ISO_DATE}` substitution via the Edit tool (not shell `sed`), and the
+`.claude/kickoff-done.txt` marker that guards against re-runs. The
+protocol sequence stays here; the Claude template-promotion mechanism
+lives in DSM_7.0.
 
 > **Origin:** BACKLOG-372. Defines the first-session behavior for a freshly
 > cloned DSM mirror (take-ai-bite or any downstream fork). Closes the gap

@@ -41,7 +41,7 @@ Each in-scope category row has five fields:
 
 | # | Category | Pattern | Examples | Rationale | Mapping |
 |---|----------|---------|----------|-----------|---------|
-| 1 | Core methodology documents | `DSM_*.md` plus module files `DSM_0.2.[A-D]_*.md`, `DSM_1.0.[A-D]_*.md`, `DSM_2.0.[A-D]_*.md`, `DSM_3.0.[A-F]_*.md`, `DSM_4.0.[A-B]_*.md`, `DSM_6.1.[A-C]_*.md` | `DSM_0.2_Custom_Instructions_v1.1.md`, `DSM_0.2.A_Session_Lifecycle.md`, `DSM_3.0.C_External_Contribution_Guidelines.md` | Spokes follow the methodology verbatim; mirrors carry the canonical text so `@` references resolve locally. | 1:1 |
+| 1 | Core methodology documents | `DSM_*.md` plus module files `DSM_0.2.[A-D]_*.md`, `DSM_1.0.[A-D]_*.md`, `DSM_2.0.[A-D]_*.md`, `DSM_3.0.[A-F]_*.md`, `DSM_4.0.[A-B]_*.md`, `DSM_6.1.[A-C]_*.md`, `DSM_7.0_AI_Platform_Collaboration_Guide.md` | `DSM_0.2_Custom_Instructions_v1.1.md`, `DSM_0.2.A_Session_Lifecycle.md`, `DSM_7.0_AI_Platform_Collaboration_Guide.md` | Spokes follow the methodology verbatim; mirrors carry the canonical text so `@` references resolve locally. | 1:1 |
 | 2 | Methodology guides | `dsm-docs/guides/*.md` | `document-structure-standard.md`, `skill-file-structural-standard.md`, this file | Companion docs referenced from methodology files; spokes need them for the `@` chain to stay complete. | 1:1 |
 | 3 | Essays | `TAKE_A_BITE.md` | `TAKE_A_BITE.md` | Public-facing framework essay; shared between Central and mirrors. | 1:1 |
 | 4 | Public governance docs | `README.md`, `FEATURES.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `LICENSE` | `README.md`, `CONTRIBUTING.md`, `LICENSE` | Public-facing repo metadata; kept in sync so downstream users see consistent governance. | 1:1 |
