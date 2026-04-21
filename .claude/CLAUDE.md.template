@@ -110,7 +110,7 @@ The wrap-up command also checks for this as a safety net.
 **Human-facing files** (designed to be read by humans, not agents):
 - `DSM_0.0_START_HERE_Complete_Guide.md`
 - `README.md`
-- `TAKE_A_BITE.md`
+- `TAKE_AI_BITE.md`
 - `FEATURES.md`
 - `CONTRIBUTING.md`
 - `dsm-docs/blog/*.md` (excluding `done/`)

@@ -337,7 +337,7 @@ Sources referenced in this document, organized by origin.
 - DSM_0.2 §8: Pre-Generation Brief Protocol
 - DSM_0.2 §9: Experiment Execution Protocol
 - DSM_0.2 §22: Protocol Violation Triage Response
-- TAKE_A_BITE.md: Short-form collaboration philosophy
+- TAKE_AI_BITE.md: Short-form collaboration philosophy
 - Document Structure Standard: `dsm-docs/guides/document-structure-standard.md`
 
 ### 9.2. External References

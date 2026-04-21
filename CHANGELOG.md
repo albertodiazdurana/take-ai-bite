@@ -613,7 +613,7 @@ None this version.
 - GitHub issue triage: 3-check system with research queue classification (BL-261)
 - Canonical inbox location clarified as `_inbox/` at project root (BL-266)
 - README unified: adopted Take AI Bite public-facing README as single source for both repos
-- README and TAKE_A_BITE.md updated with Systems Prompt Engineering section and 9 principles (was 7)
+- README and TAKE_AI_BITE.md updated with Systems Prompt Engineering section and 9 principles (was 7)
 - GitHub repo description updated to reflect current scope
 
 ## [1.3.70] - 2026-03-16
@@ -1272,18 +1272,18 @@ None this version.
 - Gap analysis identifying 3 areas requiring new protocols (BACKLOG-119, 121, 122)
 - Cross-validated against full DSM documentation (BACKLOG-123)
 
-**TAKE_A_BITE.md** (new document):
+**TAKE_AI_BITE.md** (new document):
 - Short version of the central principle with cookie metaphor
 - Hints at Earn Your Assertions and the broader framework
 
 **DSM_0 START HERE** updated:
 - Added DSM 6.0 section with six principles and key sections
-- Added TAKE_A_BITE.md cross-reference
+- Added TAKE_AI_BITE.md cross-reference
 
 **README.md** updated:
 - Broadened scope: DSM is a human-AI collaboration framework, not just data science project management
 - Replaced "battle-tested" with neutral language throughout
-- Added DSM_6.0 and TAKE_A_BITE.md to System Components, Repository Structure, and document table
+- Added DSM_6.0 and TAKE_AI_BITE.md to System Components, Repository Structure, and document table
 - Added Documentation Track (DSM 5.0) and Collaboration Principles (DSM 6.0) to System Architecture diagram
 - Heading "Battle-Tested Case Studies" renamed to "Applied Across Projects"
 

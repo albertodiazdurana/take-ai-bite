@@ -33,7 +33,7 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    session and whether a version bump or mirror sync is needed.
    a. Extract the baseline commit SHA from `.claude/session-baseline.txt` (the line
       after `# HEAD commit`). Run:
-      `git diff <baseline-sha>..HEAD --name-only -- 'DSM_*.md' 'CHANGELOG.md' 'README.md' 'LICENSE*' 'TAKE_A_BITE.md' 'scripts/commands/*.md'`
+      `git diff <baseline-sha>..HEAD --name-only -- 'DSM_*.md' 'CHANGELOG.md' 'README.md' 'LICENSE*' 'TAKE_AI_BITE.md' 'scripts/commands/*.md'`
       If the baseline is missing, fall back to `git diff HEAD --name-only` with the
       same file patterns.
    b. If no methodology files changed, skip this step entirely.
@@ -52,7 +52,7 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    session. Extract the baseline commit SHA from `.claude/session-baseline.txt`,
    then run:
    ```
-   git diff <baseline-sha>..HEAD --name-only -- DSM_0.0*.md README.md TAKE_A_BITE.md FEATURES.md CONTRIBUTING.md 'dsm-docs/blog/*.md'
+   git diff <baseline-sha>..HEAD --name-only -- DSM_0.0*.md README.md TAKE_AI_BITE.md FEATURES.md CONTRIBUTING.md 'dsm-docs/blog/*.md'
    ```
    Also check `git diff --name-only` for uncommitted changes to the same files.
    Exclude `dsm-docs/blog/done/`. If any human-facing files changed, run
@@ -63,6 +63,15 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    - Files in the baseline whose content changed (compare `md5sum` against baseline checksums) = modified further this session (stage them)
    - Files in the baseline with unchanged checksums = pre-existing, not touched this session (skip them)
    - If `.claude/session-baseline.txt` does not exist (session started without `/dsm-go`), fall back to staging all changed files
+
+   **Mirror self-detection inbox guard (BL-407):** If
+   `scripts/take-ai-bite-sync.txt` does NOT exist in the current
+   working tree, this repo is a mirror (not the hub). Exclude any
+   `_inbox/*` path from the stage-set except `_inbox/README.md` and
+   `_inbox/.gitkeep`. Log each excluded path: "Mirror inbox guard:
+   skipped `_inbox/{file}` (BL-407)." Parity with `/dsm-wrap-up`
+   Step 9.
+
    Then `git commit` and `git push` in sequence. If no session changes exist, skip the commit.
    After committing, delete `.claude/session-baseline.txt` (consumed).
 7.5. **Parallel sessions registry cleanup:** Read `.claude/parallel-sessions.txt` if it exists.

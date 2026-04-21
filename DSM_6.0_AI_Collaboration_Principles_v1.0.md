@@ -51,7 +51,7 @@ the human scrolls instead of analyzing. Generate only what you can meaningfully
 process in the next step. Comprehensive reports serve as reference material and
 safety nets ("did we miss anything?"), not as the analysis itself.
 
-See `TAKE_A_BITE.md` for the short version.
+See `TAKE_AI_BITE.md` for the short version.
 
 ### 1.2 The Human Brings the Spark
 
@@ -561,6 +561,55 @@ is paid once; the cost of not reading compounds.
 The principle does not prevent the first encounter with a new tool from
 surfacing surprises; it establishes that the surprises should come from
 reading the documentation, not from running the system.
+
+### 1.12 Don't be a Hero, Delegate the Effort
+
+When a sub-task inside the current work fits a subagent's profile,
+bounded scope, token-heavy, reasoning-light, or parallelizable with
+the main reasoning thread, propose delegation rather than absorbing
+the sub-task on-thread. Heroism, meaning taking on everything on-
+thread to "just get it done," burns context budget the main reasoning
+needs, delays the decision chain, and hides the delegation choice
+from the human.
+
+The principle operationalizes Environmental Awareness (§2.3) at the
+sub-task granularity. §2.3 establishes that the sufficient
+configuration is preferable to the maximal one; §1.12 extends that
+preference to the orchestration layer: prefer the sufficient agent
+for the sub-task over absorbing every sub-task into the main agent.
+
+Three guard rails keep delegation honest:
+
+- **Propose, do not decide.** The human approves each offload
+  explicitly (DSM_0.2 §8.8). The principle authorizes the proposal,
+  not the action.
+- **Count synthesis cost.** Delegation is counterproductive when
+  reading and integrating the subagent's output costs more than the
+  sub-task would have on-thread. Offload only when *net* savings are
+  positive.
+- **Do not fragment the reasoning.** Delegate sub-tasks that are
+  self-contained enough to produce a discrete deliverable; do not
+  split the core reasoning of the artifact into subagent pieces the
+  main agent must stitch together. Reasoning stays with the main
+  agent; labor can travel.
+
+Relationship to other principles:
+
+- **§1.1 Take a Bite.** Don't swallow a large sub-task whole when you
+  can slice it off to a subagent. Delegation is "taking a bite" at
+  the orchestration layer.
+- **§1.10 We Need to Talk.** The offload analysis IS the conversation
+  about how the work will get done; it is not a preamble to the real
+  work.
+- **§2.3 Environmental Awareness.** §2.3 anchors the *why*. §1.12
+  extends the preference to the sub-task granularity with §8.8 as
+  its operational protocol.
+
+The wrong failure mode is silent heroism: the main agent absorbs a
+bulk rename, a multi-file context sweep, or an external research
+pass on-thread, burns Opus-scale tokens on Sonnet-scale work, and
+never surfaces the alternative to the human. §1.12 exists to make
+that failure visible.
 
 ---
 
