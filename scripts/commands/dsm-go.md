@@ -200,6 +200,39 @@ Also check for remote branches not yet checked out:
 - Check it out: `git checkout {branch-name}`
 - Proceed to Step 1
 
+**If an open `session-N/*` branch exists AND MEMORY marks session N as wrapped (closed-session leftover):**
+
+Detect using four signals — all four must be true:
+1. An open `session-N/*` local branch exists
+2. The branch name parses a session number N
+3. MEMORY's "Latest Session" line reports session N
+4. MEMORY text for session N contains wrap-up markers: "wrap-up", "wrapped",
+   "full wrap-up", "merged to main", or "released"
+
+If all four are true:
+- Treat as **close-out reconciliation**, not resumption
+- Do NOT check out the leftover branch; stay on main (or whichever branch
+  Step 0 is running from)
+- The session number arithmetic in Step 0a already produces N+1 correctly
+  once the leftover branch is not resumed — proceed with that N+1
+- Run Steps 5.5 (archive transcript) and 6 (transcript reset) normally;
+  the leftover branch's state does not block these steps
+- Create new `session-{N+1}/{YYYY-MM-DD}` branch off main (standard path)
+- After Step 8 report, surface the leftover branch to the user:
+  "Leftover branch `{branch}` has commits from post-wrap work in session N.
+   Merge into main, continue work on it this session, or discard? (m/c/d)"
+
+If fewer than four signals match, fall through to the standard resumption path below.
+
+**Note:** This case is the inverse complement of Step 5.8 (Incomplete wrap-up
+recovery). Step 5.8 fires when the branch session number is HIGHER than MEMORY's
+latest session (branch is ahead of MEMORY). This new case fires when branch and
+MEMORY agree on N but MEMORY says N is already wrapped (MEMORY is ahead of branch
+state). Together they cover the full matrix of MEMORY-vs-branch disagreement.
+
+**Origin:** BACKLOG-405 (S199). S198 §22 violation (Steps 5.5/6 skipped) was
+caused by this missing case.
+
 **If an open Level 2 session branch exists (session-*):**
 - Inform the user: "Resuming open session branch `{branch-name}` from a
   previous session."
@@ -217,8 +250,9 @@ Also check for remote branches not yet checked out:
 - Proceed to Step 1
 
 **Priority order:** Level 3 branches take precedence over Level 2 branches.
-If multiple branches exist at the same level, present the list and ask the
-user which one to resume.
+The closed-session leftover case takes precedence over the generic Level 2
+resumption case. If multiple branches exist at the same level, present the
+list and ask the user which one to resume.
 
 ### 0d. Stale branch cleanup
 
@@ -374,16 +408,36 @@ After branch setup, clean up stale refs from prior sessions:
 
    **Heredoc warning (BL-331):** The `cat > ... << EOF` form below uses an unquoted heredoc deliberately so `$(date -Iseconds)` expands. Do NOT change to `<< 'EOF'` (single-quoted); single-quoted heredocs suppress expansion and write the literal `$(date -Iseconds)` string into the transcript instead of the timestamp. Observed in portfolio S69.
 
-   Write exactly this content, replacing N, timestamp, and project name:
+   Write exactly this content, replacing N, timestamp, project name, agent, and model:
    ```bash
    cat > .claude/session-transcript.md << EOF
    # Session N Transcript
    **Started:** $(date -Iseconds)
    **Project:** [project name from MEMORY.md or directory name]
+   **Agent:** [harness identifier, e.g., "Claude Code"]
+   **Model:** [model identifier, e.g., "claude-opus-4-7"]
+   EOF
+   ```
+
+   After the mandatory header, append optional platform-specific fields when retrievable (omit entirely when not — ritualism guard: do NOT write placeholder values like `Effort: unknown`):
+   ```bash
+   cat >> .claude/session-transcript.md << EOF
+   **Effort:** [low | medium | high]
+   **Thinking:** [on | off]
+   **Fast mode:** [on | off]
+   EOF
+   ```
+
+   Then append the closing separator:
+   ```bash
+   cat >> .claude/session-transcript.md << EOF
 
    ---
    EOF
    ```
+
+   **Agent/Model self-reporting:** the agent introspects its identity from the runtime environment. If retrieval is uncertain, append `(self-reported)` to the value (e.g., `**Model:** claude-opus-4-7 (self-reported)`). Do NOT fail `/dsm-go` on missing metadata.
+
    This file is the persistent reasoning log per the Session Transcript Protocol in DSM_0.2. The user keeps it open in VS Code to monitor agent thinking in real time.
 
    **Behavioral activation (mandatory, immediate):** From this point forward,
