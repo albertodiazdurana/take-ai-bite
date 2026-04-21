@@ -18,7 +18,7 @@ maintain separate vocabularies.
 
 | # | Term | One-liner | Source |
 |---|------|-----------|--------|
-| 1.1 | **Take a Bite** | Deliver only what the reviewer can chew | DSM 6.0, TAKE_A_BITE.md |
+| 1.1 | **Take a Bite** | Deliver only what the reviewer can chew | DSM 6.0, TAKE_AI_BITE.md |
 | 1.2 | **The Human Brings the Spark** | AI amplifies; the human directs | DSM 6.0 |
 | 1.3 | **Earn Your Assertions** | Investigate before you claim, verify before you act | DSM 6.0 |
 | 1.3.1 | **Accountability Corollary** | Mistakes are the human's responsibility; the agent's job is to make them unlikely | DSM 6.0 |

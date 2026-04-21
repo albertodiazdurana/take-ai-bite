@@ -652,12 +652,160 @@ approval under the same gate-behavior rules as the rest of §8.
 - BL-397 Auto-Mode Boundaries governs whether the Gate 1 pause holds; §8.7
   fits within whichever gate behavior BL-397 has established for the
   session.
+- §8.8 Parallel Offload Analysis is the complementary Gate 1 sub-section
+  covering subagent orchestration. §8.7 decides the main-agent config;
+  §8.8 decides whether sub-tasks of the same artifact run on parallel
+  subagents. Both sit inside Gate 1; see §8.8 for ordering.
 
 **Origin:** BL-402. S194 filed 4 BLs of varying complexity (mechanical,
 procedural, architectural); all ran at the session baseline without
 per-artifact calibration. S195 surfaced the gap when the user asked
 "which config should I run in the parallel sessions?", which had no
 Gate-1-visible protocol to answer from.
+
+### 8.8. Parallel Offload Analysis at Gate 1 (BL-409)
+
+§8.7 sets the main-agent config per artifact. It does not address
+whether sub-tasks of the upcoming Gate 2 implementation should be
+delegated to parallel subagents (typically Sonnet) while the main
+agent (typically Opus) stays on the reasoning thread. Without a
+protocol-level obligation, offload happens ad hoc: sometimes the
+main agent silently delegates mid-implementation, sometimes it
+absorbs reading-heavy or mechanical work that would have been
+cheaper to hand off. Neither is a user-approved plan. §8.8 closes
+that gap by making offload analysis a first-class part of the
+Gate 1 brief, with explicit per-task user approval required before
+any parallel agent spins.
+
+**Foundational principle:** Don't be a Hero, Delegate the Effort
+(DSM_6.0 §1.12).
+
+**Trigger:** within every Gate 1 brief where the main agent
+identifies at least one sub-task of the upcoming Gate 2
+implementation that fits the offload profile. Asymmetric like §8.7:
+the section is absent when no candidates exist, present only when
+they do.
+
+**Candidate sub-task types:**
+
+- Mechanical text operations (bulk rename, find/replace across many
+  files, enumerable string substitutions)
+- In-repo context research (multi-file sweeps, cross-link audits,
+  dependency scans, "where is X used?" surveys)
+- External research (web searches, URL fetches, source-verification
+  passes per §10 / §10.1, competitive comparisons)
+- Other sub-tasks whose shape matches the offload profile: bounded
+  scope, token-heavy, reasoning-light, or parallelizable with the
+  main thread
+
+**Agent behavior:** the Gate 1 brief includes a new section when
+candidates exist, listing each candidate as a per-task
+recommendation:
+
+```markdown
+## Parallel offload analysis (per §8.8)
+
+Candidate sub-tasks for parallel Sonnet offload:
+
+1. **[sub-task name]** — [what the subagent would do] — expected
+   net savings: [tokens / context slots freed, net of synthesis
+   cost] — risk: [coordination cost, synthesis cost, fan-out on
+   shared budget].
+2. **[sub-task name]** — ...
+
+Per-task approval requested. Reply with explicit yes/no for each,
+or "skip all" to decline. No parallel agent spins without explicit
+approval.
+```
+
+**Hard constraint — explicit per-task approval:** no parallel
+subagent spins without explicit per-task user approval. A general
+Gate 1 "y" does NOT approve offload; offload requires its own
+explicit per-task yes. This is the core user requirement behind
+the BL and is not waivable under any autonomy mode (see BL-397
+Auto-Mode Boundaries).
+
+**Fail-closed default:** if the user says "proceed" / "y" /
+"continue" to the Gate 1 brief without addressing the offload
+section, treat as REJECTED for every offload candidate. The main
+agent handles everything on-thread.
+
+**User options per candidate:** approve, reject, or defer. Defer
+means "do it on-thread for now; I may offload if it grows."
+Rejection is the default on silence.
+
+**Skip condition (ritualism guard):** if the main agent identifies
+no offload candidates (e.g., the artifact is purely a decision call
+with no mechanical or reading-heavy sub-tasks), do NOT include a
+§8.8 section in the brief. An empty "Offload: none" line is itself
+ritualistic compliance and is prohibited (same guard pattern as
+§8.7, §8.2.1, §10.1).
+
+**Subscription-awareness:** before proposing offload, check
+`~/.claude/claude-subscription.md` for a separate Sonnet pool. On
+plans without one, subagent tokens consume the same budget as
+main-agent tokens; flag the cost in the savings estimate or
+suppress the proposal when expected savings are net-negative.
+
+**Net-savings requirement:** the Gate 1 brief must state *net*
+expected savings, not gross. Synthesis cost (main agent reading and
+integrating subagent output) is part of the total; if synthesis
+exceeds raw delegation savings, offload is counterproductive and
+should not be proposed.
+
+**Subagent write authority:** by default, the main agent writes
+files (preserves Gate 2 diff review). Exception: pure research
+subagents whose deliverable IS a research file (per §10) may write
+the research file directly. Any other file change must return to
+the main agent for Gate 2 review.
+
+**Gate 2 drift rule:** if a subagent's results materially change
+the main agent's approach after Gate 2 was already approved on the
+pre-offload plan, loop back to Gate 1 with a revised brief before
+proceeding. Gate 2 approval does not survive a material change in
+the underlying plan.
+
+**Ordering with other Gate 1 sub-sections:** when a Gate 1 brief
+contains multiple recommendation sections, order them:
+
+1. §8.7 config recommendation (main-agent computational approach)
+2. §8.8 parallel offload analysis (subagent orchestration)
+3. §8.2.1 counter-evidence (content-level)
+
+Rationale: computational decisions (main-agent config, then
+subagent delegation) come before content decisions (counter-
+evidence shapes what the artifact says).
+
+**Relationship to other protocols:**
+
+- **§8.7 (Token-Minimizing Config):** §8.7 sets main-agent config
+  per artifact; §8.8 sets subagent orchestration per sub-task.
+  Different axes, complementary.
+- **§8.2.1 (Strongest Counter-Evidence):** both live inside the
+  Gate 1 brief; ordering defined above.
+- **Module A §7 Parallel Session Protocol:** distinct from §8.8.
+  Parallel *sessions* are user-initiated sibling main sessions on
+  a separate chat tab, committed via the commit booking system.
+  §8.8 is agent-initiated subagent delegation within one turn.
+  The two must not be conflated.
+- **Module A §14 Session Configuration Recommendation:** §14 sets
+  session-wide baseline, §8.7 adjusts per artifact, §8.8
+  orchestrates per sub-task. Three granularities: session →
+  artifact → sub-task.
+- **§10 / §10.1 (Web Research Capture and Validation Depth):**
+  external research offloaded to a subagent MUST still satisfy §10
+  (raw findings captured to `dsm-docs/research/`) and §10.1
+  (multi-pass for deliverable-critical claims). Offload is a
+  thread delegation, not a standard reduction.
+- **§23.4 (Runtime Register Context):** if the offloaded sub-task
+  invokes a register-sensitive skill, the main agent must pass the
+  §23.4 runtime context block in the subagent prompt.
+
+**Origin:** BL-409. S198 parallel-198.1 filed this BL after the
+user observed ad-hoc offload in earlier S198 turns and requested a
+protocol-level approval gate. The foundational principle DSM_6.0
+§1.12 was filed jointly with the §8.8 protocol; reading the
+principle before invoking §8.8 grounds the *why*.
 
 ---
 
@@ -889,7 +1037,7 @@ foundational reasoning; this document provides the operational protocols.
 When evaluating whether a delivery is the right size, apply the three-question
 test from DSM 6.0 §1.1 before presenting output: (1) can the reviewer read it,
 (2) can they form an opinion, (3) can they redirect if needed? If the answer to
-any question is no, split the delivery. See `TAKE_A_BITE.md` for the short version.
+any question is no, split the delivery. See `TAKE_AI_BITE.md` for the short version.
 
 ---
 

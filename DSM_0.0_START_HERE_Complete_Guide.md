@@ -291,7 +291,7 @@ their own DSM sessions.
 
 ## 9. References
 
-- **Take AI Bite philosophy:** [`TAKE_A_BITE.md`](TAKE_A_BITE.md)
+- **Take AI Bite philosophy:** [`TAKE_AI_BITE.md`](TAKE_AI_BITE.md)
 - **Full implementation guide:** [`DSM_3.0_Methodology_Implementation_Guide_v1.1.md`](DSM_3.0_Methodology_Implementation_Guide_v1.1.md)
 - **AI collaboration principles:** [`DSM_6.0_AI_Collaboration_Principles_v1.0.md`](DSM_6.0_AI_Collaboration_Principles_v1.0.md)
 - **Systems prompt engineering:** [`DSM_6.1_Systems_Prompt_Engineering_v1.0.md`](DSM_6.1_Systems_Prompt_Engineering_v1.0.md)

@@ -76,7 +76,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    session and whether a version bump or mirror sync is needed.
    a. Extract the baseline commit SHA from `.claude/session-baseline.txt` (the line
       after `# HEAD commit`). Run:
-      `git diff <baseline-sha>..HEAD --name-only -- 'DSM_*.md' 'CHANGELOG.md' 'README.md' 'LICENSE*' 'TAKE_A_BITE.md' 'scripts/commands/*.md'`
+      `git diff <baseline-sha>..HEAD --name-only -- 'DSM_*.md' 'CHANGELOG.md' 'README.md' 'LICENSE*' 'TAKE_AI_BITE.md' 'scripts/commands/*.md'`
       If the baseline is missing, fall back to `git diff HEAD --name-only` with the
       same file patterns (catches only uncommitted changes).
    b. If no methodology files changed, skip this step entirely.
@@ -127,11 +127,24 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
       The scanner is a safety net, not a content classifier. The
       authoritative split rule is in `.claude/personal-rules-allowlist.md`
       (BL-336) and Layer 1/2/3 model documented in feedback memory.
+
+      **Mirror inbox guard (BL-407):** Before staging files in the
+      mirror repo, inspect `git -C {mirror-repo-path} status --porcelain`
+      output. For any line whose path matches `_inbox/*` and is NOT
+      `_inbox/README.md` or `_inbox/.gitkeep`, exclude it from the
+      stage-set and log one line per skip: "Mirror inbox guard: skipped
+      `{mirror-repo}:_inbox/{file}` (BL-407)." Do NOT abort the sync;
+      skip only the prohibited paths. Rationale: past Central wrap-up
+      sessions wrote notification files into mirror tracked `_inbox/`
+      paths, polluting every fresh clone. The primary protection is
+      the mirror's own `.gitignore _inbox/*` rule; this guard is
+      belt-and-suspenders for the case where the gitignore is missing
+      or weakened.
 8.5. **Humanizer check:** Detect whether any human-facing files were modified this
    session. Extract the baseline commit SHA from `.claude/session-baseline.txt`,
    then run:
    ```
-   git diff <baseline-sha>..HEAD --name-only -- DSM_0.0*.md README.md TAKE_A_BITE.md FEATURES.md CONTRIBUTING.md 'dsm-docs/blog/*.md'
+   git diff <baseline-sha>..HEAD --name-only -- DSM_0.0*.md README.md TAKE_AI_BITE.md FEATURES.md CONTRIBUTING.md 'dsm-docs/blog/*.md'
    ```
    Also check `git diff --name-only` for uncommitted changes to the same files.
    Exclude `dsm-docs/blog/done/`. If any human-facing files changed, run
@@ -142,6 +155,18 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    - Files in the baseline whose content changed (compare `md5sum` against baseline checksums) = modified further this session (stage them)
    - Files in the baseline with unchanged checksums = pre-existing, not touched this session (skip them)
    - If `.claude/session-baseline.txt` does not exist (session started without `/dsm-go`), fall back to staging all changed files
+
+   **Mirror self-detection inbox guard (BL-407):** If
+   `scripts/take-ai-bite-sync.txt` does NOT exist in the current
+   working tree, this repo is a mirror (not the hub). Exclude any
+   `_inbox/*` path from the stage-set except `_inbox/README.md` and
+   `_inbox/.gitkeep`. Log each excluded path: "Mirror inbox guard:
+   skipped `_inbox/{file}` (BL-407)." Rationale: mirror repos should
+   not track session-scoped inbox entries; only the README bootstrap
+   stays. This guard protects the edge case where wrap-up runs from a
+   mirror's working tree and the mirror's `.gitignore _inbox/*` rule
+   is missing.
+
    Then `git commit` and `git push` in sequence. If no session changes exist, skip the commit.
    After committing, delete `.claude/session-baseline.txt` (consumed).
 10. **Merge session branch to main via PR:** If the current branch is a session branch (not main/master), merge it to main using a pull request. This is required because branch protection prevents direct pushes to main.

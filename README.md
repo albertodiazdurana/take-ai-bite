@@ -38,7 +38,7 @@ These principles are operationalized by DSM, a living, versioned methodology tha
 
 DSM is not a static document. It evolves through a hub-spoke feedback loop where every session, every project, and every practitioner's experience feeds back into the methodology. Protocols are tested, refined, and propagated across the ecosystem. What one project discovers improves every future project.
 
-This is what makes the avatar possible. Session transcripts capture reasoning. Checkpoints preserve milestones. Memory files retain context across sessions. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that accumulates your expertise, not just your files.
+This is what makes TAB unique to you own experience. Session transcripts capture reasoning. Checkpoints preserve milestones. Memory files retain context across sessions. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that accumulates your expertise, not just your files.
 
 ## Systems Prompt Engineering
 
@@ -58,7 +58,7 @@ For the full chapter, see [`DSM_6.1_Systems_Prompt_Engineering_v1.0.md`](DSM_6.1
 
 ## Start Here
 
-Read [`TAKE_A_BITE.md`](TAKE_A_BITE.md) for the short version of the founding principle. It takes two minutes and captures the core idea: someone offers you a bite of a cookie, you take a bite the size you will enjoy; too small and you won't taste the cookie, too much and it will cause a lot of issues.
+Read [`TAKE_AI_BITE.md`](TAKE_AI_BITE.md) for the short version of the founding principle. It takes two minutes and captures the core idea: someone offers you a bite of a cookie, you take a bite the size you will enjoy; too small and you won't taste the cookie, too much and it will cause a lot of issues.
 
 ## Field-Tested
 
@@ -109,5 +109,5 @@ See the full timeline of 84+ features → [FEATURES.md](FEATURES.md)
 
 This project uses dual licensing:
 
-- **Methodology documentation** (DSM_0 through DSM_6, guides, TAKE_A_BITE.md): [CC BY-SA 4.0](LICENSE-DOCS.md)
+- **Methodology documentation** (DSM_0 through DSM_6, guides, TAKE_AI_BITE.md): [CC BY-SA 4.0](LICENSE-DOCS.md)
 - **Software components** (scripts/, configuration files): [MIT](LICENSE)
