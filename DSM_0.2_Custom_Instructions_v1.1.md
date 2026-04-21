@@ -172,9 +172,23 @@ tool calls or file edits.
 # Session N Transcript
 **Started:** YYYY-MM-DDTHH:MM+TZ
 **Project:** [project name]
+**Agent:** [harness identifier, e.g., "Claude Code"]
+**Model:** [model identifier, e.g., "claude-opus-4-7"]
+```
 
+Optional platform-specific fields (append when retrievable; omit entirely when not — do NOT write placeholder values like `Effort: unknown`):
+
+```
+**Effort:** [low | medium | high]
+**Thinking:** [on | off]
+**Fast mode:** [on | off]
+```
+
+```
 ---
 ```
+
+`Agent` and `Model` are mandatory. If introspection is uncertain, append `(self-reported)` to the value (e.g., `**Model:** claude-opus-4-7 (self-reported)`). The schema is agent-agnostic; only the values differ across harnesses.
 
 **When to write thinking:**
 - Non-trivial decisions (choosing between approaches, interpreting ambiguous input)

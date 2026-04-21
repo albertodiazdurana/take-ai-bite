@@ -2218,7 +2218,14 @@ a previous partial Kick-off should be skipped without error.
 7. **Copy `skills-registry.md` from template.** Copy
    `.claude/skills-registry.md.template` to `.claude/skills-registry.md`
    if the target does not exist. No substitution needed.
-8. **Create `.claude/memory/MEMORY.md` as an empty stub.** If the directory
+8. **Copy welcome inbox entry from template.** Copy
+   `.claude/inbox-hello-world.md.template` to `_inbox/hello-world.md`
+   if the target does not exist. No substitution needed. This gives the
+   first-time user a guided path into TAB concepts and demonstrates the
+   inbox lifecycle (read → move to `_inbox/done/`) hands-on. If `_inbox/`
+   does not yet exist, create it with `mkdir -p _inbox`. If the target
+   already exists (re-run of Kick-off), skip silently.
+9. **Create `.claude/memory/MEMORY.md` as an empty stub.** If the directory
    does not exist, create it with `mkdir -p .claude/memory`. Then write a
    minimal header:
    ```markdown
@@ -2228,16 +2235,16 @@ a previous partial Kick-off should be skipped without error.
    ```
    Substitute `{project_name}` with the value derived in step 1
    (`basename $(pwd)`).
-9. **Deploy command runtime copies.** Run `scripts/sync-commands.sh --deploy`
-   to populate `.claude/commands/dsm-*.md` (project-level) or
-   `~/.claude/commands/dsm-*.md` (user-level) runtime copies from
-   `scripts/commands/*.md`. If the script is missing (indicates an
-   incomplete mirror sync), report and skip, do not fail Kick-off.
-10. **Ensure hooks are executable.** Run
+10. **Deploy command runtime copies.** Run `scripts/sync-commands.sh --deploy`
+    to populate `.claude/commands/dsm-*.md` (project-level) or
+    `~/.claude/commands/dsm-*.md` (user-level) runtime copies from
+    `scripts/commands/*.md`. If the script is missing (indicates an
+    incomplete mirror sync), report and skip, do not fail Kick-off.
+11. **Ensure hooks are executable.** Run
     `chmod +x .claude/hooks/transcript-reminder.sh .claude/hooks/validate-transcript-edit.sh`.
     Re-chmod every Kick-off because copy operations (including Edit/Write
     tools) can strip the executable bit.
-11. **Inspect `.git/info/exclude` for the blanket rule.** Claude Code
+12. **Inspect `.git/info/exclude` for the blanket rule.** Claude Code
     auto-adds `.claude/` as a blanket ignore rule on fresh clones. Kick-off
     does NOT remove this line. Instead, the shipped `.gitignore` provides
     the fine-grained rules for `.claude/*` and the files that matter for
@@ -2247,11 +2254,11 @@ a previous partial Kick-off should be skipped without error.
     retains `.claude/` blanket rule. Tracked files stay tracked; new
     session-scoped `.claude/*` files (transcripts, baselines) remain hidden
     from `git status` by this rule, which is the intended behavior."
-12. **Scaffold `_inbox/` and `dsm-docs/` folders.** Delegate to `/dsm-align`
+13. **Scaffold `_inbox/` and `dsm-docs/` folders.** Delegate to `/dsm-align`
     Step 3 (Canonical dsm-docs folder check). Either invoke `/dsm-align`
     now or defer to `/dsm-go` Step 1.8 which will run `/dsm-align`
     unconditionally.
-13. **Write Kick-off marker.** Create `.claude/kickoff-done.txt` containing:
+14. **Write Kick-off marker.** Create `.claude/kickoff-done.txt` containing:
     ```
     # Cloned-Mirror Kick-off completed
     date: {ISO_DATE}
@@ -2260,7 +2267,7 @@ a previous partial Kick-off should be skipped without error.
     ```
     This marker prevents re-running Kick-off on subsequent sessions. Users
     can delete the marker to re-run Kick-off intentionally.
-14. **Report completion.** Tell the user:
+15. **Report completion.** Tell the user:
     "Cloned-Mirror Kick-off complete. This clone is now self-registered as
     `dsm-central` in `.claude/dsm-ecosystem.md`, pointing to `{REPO_ROOT}`.
     `/dsm-align` will now populate the CLAUDE.md alignment section from the

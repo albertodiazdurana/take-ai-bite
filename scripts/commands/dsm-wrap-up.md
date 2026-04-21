@@ -182,16 +182,39 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    c. If merge succeeds: report "Merged mirror sync PR #{number} on {repo}"
    d. If merge fails or `gh` unavailable: warn "Open mirror sync PR on {repo}: #{number} ({title}). Merge manually."
    e. If no open sync PRs exist, skip silently.
-11.5. **Parallel sessions registry cleanup:** Read `.claude/parallel-sessions.txt` if it exists.
-   - If the file does not exist: skip silently.
-   - If every section has `State: wrapped`: delete the file. Report:
-     "Parallel sessions registry cleaned: {N} entries (all wrapped)."
-   - If any section has `State: active`: warn the user with the section
-     name(s) — "Parallel session(s) {section-name(s)} did not wrap (state=active).
-     Investigate before proceeding. Skipping registry cleanup; file retained
-     for inspection in the next session." This warning is NOT a hard stop;
-     proceed to the next step. The file persists into the next session so
-     the active entry can be investigated.
+11.5. **Parallel sessions registry cleanup:** Read `.claude/parallel-sessions.txt` if it
+   exists. If the file does not exist, skip silently. Otherwise run three phases in order:
+
+   **Phase 1 — Corrupted-entry pruning:** Remove any `State:` lines that are not
+   preceded by a `## parallel-*` section header within the same section block. These
+   are format-noise artifacts from interrupted `/dsm-parallel-session-go` runs.
+   Report each removed line: "Pruned corrupted registry entry (no section header):
+   `{line}`."
+
+   **Phase 2 — Stale-active GC:** For each section with `State: active`, check two
+   signals:
+   - **PID signal:** `kill -0 {CLAUDE_PID} 2>/dev/null` — exit 0 = process running,
+     non-zero = dead.
+   - **Branch signal:** `git branch --merged main | grep -q " {session-branch}$"` —
+     exit 0 = branch already merged to main.
+
+   Apply the decision table:
+
+   | PID running? | Branch merged? | Action |
+   |---|---|---|
+   | yes | no | Genuinely active — retain, no warning needed |
+   | yes | yes | Unusual state — warn: "Parallel session `{name}`: process running but branch already merged. Retained for inspection." Do NOT auto-GC. |
+   | no | no | Work may be lost — warn: "Parallel session `{name}`: process dead, branch not merged. Work may be unrecoverable. Retained for inspection." Do NOT auto-GC. |
+   | no | yes | Safe to GC — mark `State: wrapped [gc {YYYY-MM-DD}: process dead, branch merged]`. Report: "GC'd stale parallel session `{name}`." |
+
+   Only row 4 modifies the file. After Phase 2, re-read all sections.
+
+   **Phase 3 — All-wrapped cleanup:** If every section now has `State: wrapped`
+   (including any entries just GC'd in Phase 2), delete the file. Report:
+   "Parallel sessions registry cleaned: {N} entries (all wrapped)."
+   If any section is still `State: active` after Phase 2, warn: "Parallel
+   session(s) {names} are still active. Registry retained." This warning is NOT a
+   hard stop; proceed to Step 12.
 
 12. **Write wrap-up type marker:** Write `.claude/last-wrap-up.txt` with the session number, date, and wrap-up type. This marker is read by `/dsm-go` and `/dsm-light-go` at next session start to guide the user toward the appropriate startup command.
     ```

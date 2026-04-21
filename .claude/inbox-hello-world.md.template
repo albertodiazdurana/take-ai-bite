@@ -1,0 +1,33 @@
+# Welcome to TAB
+
+TAB just finished setting up this clone. Kick-off is done; you're ready.
+
+## What you're reading
+
+This is an inbox entry. The inbox (`_inbox/`) is where TAB drops work
+items and notifications for you. When you finish one, move it to
+`_inbox/done/`. You can also ask TAB to "process the inbox" and it will
+walk you through any open entries.
+
+## Two things to know
+
+- `.claude/session-transcript.md` is where TAB's reasoning is logged in
+  real time. Keep it open in your editor. That's how you see what TAB
+  is thinking.
+- Close a session by telling TAB "let's wrap up" or running `/dsm-wrap-up`.
+
+You can talk to TAB the way you'd talk to a collaborator. The slash
+commands are shortcuts, not requirements.
+
+## Your next read
+
+Open `TAKE_AI_BITE.md` — five minutes, explains the "why" behind how TAB
+works. Then `DSM_0.0_START_HERE_Complete_Guide.md` for the deeper map.
+
+## When you're done with this file
+
+```
+mv _inbox/hello-world.md _inbox/done/
+```
+
+Or just tell TAB you're done with the inbox.
