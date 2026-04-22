@@ -5,6 +5,31 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-04-23
+
+### Added
+
+- **BL-409: DSM_0.2 §8.8 Parallel Offload Analysis at Gate 1 + DSM_6.0 §1.12 "Don't be a Hero, Delegate the Effort".** New Gate 1 sub-section requiring per-task user approval before any parallel subagent spins. Trigger is asymmetric: the section appears only when the main agent identifies offload candidates (mechanical text operations, in-repo context research, external research, etc.). Fail-closed default: silence on the offload section = REJECTED. Subscription-aware (flags net cost on non-Max plans). Explicit ordering within Gate 1: §8.7 config recommendation → §8.8 offload analysis → §8.2.1 counter-evidence. DSM_6.0 §1.12 is the foundational principle.
+  - **Spoke action:** Review DSM_0.2 §8.8 and DSM_6.0 §1.12 on next `/dsm-go`. Applies to every Gate 1 brief where the artifact has offload-candidate sub-tasks.
+- **BL-414: Checkpoint step in /dsm-wrap-up and /dsm-quick-wrap-up.** New Step 2.5 (full) / Step 1.5 (quick) in the parallel block creates a minimal checkpoint in `dsm-docs/checkpoints/` at wrap-up time. Checkpoint owns "pending next session" items; MEMORY.md Step 2 drops that list to free space for global context and strategic vision. Closes a gap open since S177 (2026-04-08) where sessions transitioning from light to full wrap-up stopped producing checkpoints silently.
+  - **Spoke action:** Run `sync-commands.sh --deploy` to update runtime copies. Next wrap-up creates a checkpoint instead of carrying pending items in MEMORY.md.
+- **BL-413: /dsm-go context efficiency improvements.** Three changes reducing Sonnet session-start context consumption: (1) Step 0e unconditional `chmod +x hooks`, (2) Step 1.8 conditional `/dsm-align` on version diff (with FORCE_ALIGN override for incomplete scaffold), (3) Step 2b inbox lazy-load (filenames only, content deferred to user request). Estimated 40-55% context savings on version-match sessions.
+  - **Spoke action:** Run `sync-commands.sh --deploy`. Next `/dsm-go` skips `/dsm-align` when version matches and reads inbox filenames only.
+- **BL-410: Agent and Model identity in session-transcript header.** `/dsm-go` Step 6 now appends `**Agent:**` and `**Model:**` fields (mandatory) with optional `**Effort:** / **Thinking:** / **Fast mode:**` fields when retrievable. Agent-agnostic schema; `(self-reported)` suffix when introspection is uncertain.
+- **BL-408: Hello-world welcome inbox template (`.claude/_inbox-hello-world.template`).** Fresh mirror clones receive a welcome entry on Kick-off explaining the inbox mechanism and DSM ecosystem navigation.
+- **BL-407: Mirror-sync inbox write guard.** Two-layer guard in `/dsm-wrap-up` Step 8d (pre-sync) and Step 9 (mirror self-detection, via `scripts/take-ai-bite-sync.txt` absence) excludes `_inbox/*` paths (except README.md and .gitkeep) from mirror stage-sets. Prevents past failure mode where Central wrap-up wrote notification files into mirror tracked `_inbox/` paths, polluting every fresh clone.
+- **BL-406: Parallel-sessions registry stale-active GC.** `/dsm-wrap-up` Step 11.5 now runs a 3-phase cleanup (corrupted-entry pruning, stale-active GC via PID + branch signals, all-wrapped file deletion) on `.claude/parallel-sessions.txt`. Decision table determines safe-to-GC (process dead + branch merged) vs retain-for-inspection.
+- **BL-405: /dsm-go Step 0c disambiguation for closed-session leftover branches.** New case in branch decision: when an open `session-N/*` branch exists AND MEMORY marks session N as wrapped, treat as close-out reconciliation (do not resume on leftover). Origin: S198 §22 violation where Steps 5.5/6 were skipped because the agent resumed on a wrapped-but-leftover branch.
+
+### Changed
+
+- **TAKE_A_BITE.md → TAKE_AI_BITE.md rename.** 40 file updates across the ecosystem to reflect the canonical "Take AI Bite" spelling. Human-facing file; public-facing references updated. Mirror-synced to take-ai-bite at the session of origin (S198).
+  - **Spoke action:** None. Mirror sync delivered the renamed file; downstream consumers see the canonical name automatically.
+
+### Closed
+
+- **BL-405, BL-406, BL-407, BL-408, BL-409, BL-410, BL-413, BL-414** all closed in this version.
+
 ## [1.6.3] - 2026-04-20
 
 ### Added - Vocabulary Linking Convention (BL-239 T3 + T4, closes BL-239)
