@@ -11,7 +11,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 
 ## Steps
 
-**Steps 0, 1, and 2 are independent and can run in parallel.**
+**Steps 0, 1, 2, and 2.5 are independent and can run in parallel.**
 
 0. **Extract reasoning lessons:** Scan `.claude/session-transcript.md` for notable reasoning patterns from this session. For each notable entry, append a 1-2 line summary to `.claude/reasoning-lessons.md` under the appropriate category, tagged `[auto]`. Notable entries include:
    - Mistakes caught mid-reasoning (course corrections)
@@ -43,9 +43,34 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    - Detailed BL implementation descriptions. The BL file and git log are the source of truth.
    - Items that duplicate CLAUDE.md content (patterns, conventions, pitfalls already documented there).
 
-   **Pending list hygiene:** Before writing the new Pending list, review each carried-forward item:
-   - If the item has been carried forward 3+ sessions without action: either promote it to a formal BL (create in `dsm-docs/plans/`) or drop it with a note in the output summary explaining why.
-   - If the item is a housekeeping task with no BL (stray files, uncommitted changes in other repos): include only if it requires human decision. Mechanical cleanup that the agent can do autonomously should be done during the session, not deferred indefinitely.
+   **MEMORY.md exclusion list (additional item — BL-414):**
+   - Pending-next-session items. Step 2.5 (Checkpoint) owns these; do NOT duplicate them in MEMORY.md.
+
+2.5. **Checkpoint:** Create a minimal checkpoint in `dsm-docs/checkpoints/` recording the session state. This step is the primary owner of "pending next session" items — do not duplicate them in MEMORY.md (Step 2).
+
+   **Filename:** `YYYY-MM-DD_sN_checkpoint.md` where N is the session number.
+
+   **Content:**
+   ```markdown
+   # Session N Checkpoint
+   **Date:** YYYY-MM-DD
+   **Branch:** [git branch --show-current]
+   **Last commit:** [git log --oneline -1]
+
+   ## Work completed this session
+   [1-3 line summary drawn from session transcript Output blocks and git log]
+
+   ## Pending next session
+   [items that require human decision or cannot be derived from backlog/inbox/git]
+
+   ## Open branches
+   [any open Level 3 branches not yet merged; "none" if clean]
+   ```
+
+   **If git is unavailable (GIT_AVAILABLE=false):** omit Branch and Last commit fields; write the content fields only.
+
+   **Skip condition:** if `dsm-docs/checkpoints/` does not exist, skip silently and log "Checkpoint skipped: dsm-docs/checkpoints/ not found."
+
 3. **Refresh backup:** If `.claude/memory/MEMORY.md` exists in the project, copy the live MEMORY.md there
 4. **Contributor profile:** Check if `.claude/contributor-profile.md` needs updating (new skills exercised, proficiency changes). Skip if the file does not exist or nothing changed.
 5. **Handoff:** Only create a handoff in `dsm-docs/handoffs/` if there is complex pending work that requires detailed context for the next session. Skip if MEMORY.md is sufficient.
@@ -182,16 +207,39 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    c. If merge succeeds: report "Merged mirror sync PR #{number} on {repo}"
    d. If merge fails or `gh` unavailable: warn "Open mirror sync PR on {repo}: #{number} ({title}). Merge manually."
    e. If no open sync PRs exist, skip silently.
-11.5. **Parallel sessions registry cleanup:** Read `.claude/parallel-sessions.txt` if it exists.
-   - If the file does not exist: skip silently.
-   - If every section has `State: wrapped`: delete the file. Report:
-     "Parallel sessions registry cleaned: {N} entries (all wrapped)."
-   - If any section has `State: active`: warn the user with the section
-     name(s) — "Parallel session(s) {section-name(s)} did not wrap (state=active).
-     Investigate before proceeding. Skipping registry cleanup; file retained
-     for inspection in the next session." This warning is NOT a hard stop;
-     proceed to the next step. The file persists into the next session so
-     the active entry can be investigated.
+11.5. **Parallel sessions registry cleanup:** Read `.claude/parallel-sessions.txt` if it
+   exists. If the file does not exist, skip silently. Otherwise run three phases in order:
+
+   **Phase 1 — Corrupted-entry pruning:** Remove any `State:` lines that are not
+   preceded by a `## parallel-*` section header within the same section block. These
+   are format-noise artifacts from interrupted `/dsm-parallel-session-go` runs.
+   Report each removed line: "Pruned corrupted registry entry (no section header):
+   `{line}`."
+
+   **Phase 2 — Stale-active GC:** For each section with `State: active`, check two
+   signals:
+   - **PID signal:** `kill -0 {CLAUDE_PID} 2>/dev/null` — exit 0 = process running,
+     non-zero = dead.
+   - **Branch signal:** `git branch --merged main | grep -q " {session-branch}$"` —
+     exit 0 = branch already merged to main.
+
+   Apply the decision table:
+
+   | PID running? | Branch merged? | Action |
+   |---|---|---|
+   | yes | no | Genuinely active — retain, no warning needed |
+   | yes | yes | Unusual state — warn: "Parallel session `{name}`: process running but branch already merged. Retained for inspection." Do NOT auto-GC. |
+   | no | no | Work may be lost — warn: "Parallel session `{name}`: process dead, branch not merged. Work may be unrecoverable. Retained for inspection." Do NOT auto-GC. |
+   | no | yes | Safe to GC — mark `State: wrapped [gc {YYYY-MM-DD}: process dead, branch merged]`. Report: "GC'd stale parallel session `{name}`." |
+
+   Only row 4 modifies the file. After Phase 2, re-read all sections.
+
+   **Phase 3 — All-wrapped cleanup:** If every section now has `State: wrapped`
+   (including any entries just GC'd in Phase 2), delete the file. Report:
+   "Parallel sessions registry cleaned: {N} entries (all wrapped)."
+   If any section is still `State: active` after Phase 2, warn: "Parallel
+   session(s) {names} are still active. Registry retained." This warning is NOT a
+   hard stop; proceed to Step 12.
 
 12. **Write wrap-up type marker:** Write `.claude/last-wrap-up.txt` with the session number, date, and wrap-up type. This marker is read by `/dsm-go` and `/dsm-light-go` at next session start to guide the user toward the appropriate startup command.
     ```

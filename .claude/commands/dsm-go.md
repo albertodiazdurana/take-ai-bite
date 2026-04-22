@@ -38,8 +38,9 @@ before any session-start protocol can run correctly.
 2a. Also check for `.claude/reasoning-lessons.md`
 3. **If fewer than 5 of 9 `dsm-docs/` subdirectories exist, or `_inbox/` is missing, or `.claude/reasoning-lessons.md` is missing:**
    - Warn: "Project scaffold incomplete ({N}/9 dsm-docs/ folders found).
-     Step 1.8 will run `/dsm-align` to fix this."
-   - Continue to Step 0 (do NOT invoke `/dsm-align` here; Step 1.8 runs it unconditionally).
+     Forcing /dsm-align in Step 1.8 regardless of version match."
+   - Set a flag `FORCE_ALIGN=true`. Continue to Step 0 (do NOT invoke `/dsm-align` here).
+   - In Step 1.8, if `FORCE_ALIGN=true`, skip the version check and run `/dsm-align` unconditionally.
 4. **If scaffold is complete (5+ folders, `_inbox/` exists, and `.claude/reasoning-lessons.md` exists):** Continue to Step 0.
 
 ## Step 0.8: Cloned-Mirror Kick-off Check
@@ -200,6 +201,39 @@ Also check for remote branches not yet checked out:
 - Check it out: `git checkout {branch-name}`
 - Proceed to Step 1
 
+**If an open `session-N/*` branch exists AND MEMORY marks session N as wrapped (closed-session leftover):**
+
+Detect using four signals — all four must be true:
+1. An open `session-N/*` local branch exists
+2. The branch name parses a session number N
+3. MEMORY's "Latest Session" line reports session N
+4. MEMORY text for session N contains wrap-up markers: "wrap-up", "wrapped",
+   "full wrap-up", "merged to main", or "released"
+
+If all four are true:
+- Treat as **close-out reconciliation**, not resumption
+- Do NOT check out the leftover branch; stay on main (or whichever branch
+  Step 0 is running from)
+- The session number arithmetic in Step 0a already produces N+1 correctly
+  once the leftover branch is not resumed — proceed with that N+1
+- Run Steps 5.5 (archive transcript) and 6 (transcript reset) normally;
+  the leftover branch's state does not block these steps
+- Create new `session-{N+1}/{YYYY-MM-DD}` branch off main (standard path)
+- After Step 8 report, surface the leftover branch to the user:
+  "Leftover branch `{branch}` has commits from post-wrap work in session N.
+   Merge into main, continue work on it this session, or discard? (m/c/d)"
+
+If fewer than four signals match, fall through to the standard resumption path below.
+
+**Note:** This case is the inverse complement of Step 5.8 (Incomplete wrap-up
+recovery). Step 5.8 fires when the branch session number is HIGHER than MEMORY's
+latest session (branch is ahead of MEMORY). This new case fires when branch and
+MEMORY agree on N but MEMORY says N is already wrapped (MEMORY is ahead of branch
+state). Together they cover the full matrix of MEMORY-vs-branch disagreement.
+
+**Origin:** BACKLOG-405 (S199). S198 §22 violation (Steps 5.5/6 skipped) was
+caused by this missing case.
+
 **If an open Level 2 session branch exists (session-*):**
 - Inform the user: "Resuming open session branch `{branch-name}` from a
   previous session."
@@ -217,8 +251,9 @@ Also check for remote branches not yet checked out:
 - Proceed to Step 1
 
 **Priority order:** Level 3 branches take precedence over Level 2 branches.
-If multiple branches exist at the same level, present the list and ask the
-user which one to resume.
+The closed-session leftover case takes precedence over the generic Level 2
+resumption case. If multiple branches exist at the same level, present the
+list and ask the user which one to resume.
 
 ### 0d. Stale branch cleanup
 
@@ -236,17 +271,41 @@ After branch setup, clean up stale refs from prior sessions:
    `git branch -d {branch}` for each. On rejection, skip silently.
 4. **If no stale branches:** Skip silently.
 
+### 0e. Ensure hooks are executable
+
+Run unconditionally on every `/dsm-go`, before any other step:
+
+```bash
+chmod +x .claude/hooks/*.sh 2>/dev/null || true
+```
+
+This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This step is the session guarantee that hooks are always executable, independent of whether `/dsm-align` runs. It replaces the previous dependency on `/dsm-align` Step 10b as the only source of `chmod +x`. The S180 failure mode (hooks present but not executable, align not run) is closed here.
+
 ## Steps
 
 1. **Read MEMORY.md:** Find and load this project's MEMORY.md from the auto memory directory to restore session context. **If MEMORY.md does not exist or fails to load**, continue to Step 2 but note that the agent is operating without prior session context, which increases the risk of applying generic rules to a project with specific overrides.
 1.5. **Read reasoning lessons:** If `.claude/reasoning-lessons.md` exists, read the first 10 lines (header + category names) to check relevance and confirm the file is primed for the session. Do not read the full file; it can exceed 150 lines and 30KB, wasting context budget. Report any category that is particularly relevant to the current project. If the file does not exist, skip this step silently.
-1.8. **Always run /dsm-align (unconditional, no exceptions):** Invoke `/dsm-align` immediately. Do not check `.claude/last-align.txt`. Do not gate on version mismatch. Do not gate on marker presence. Do not ask the user. Do not present a y/n confirmation gate. Do not defer. The only valid output of this step is `/dsm-align` running to completion, then continuing to step 2 with the fixed state.
+1.8. **Run /dsm-align if DSM version changed (BL-413):** Check whether the DSM version has changed since last alignment before invoking `/dsm-align`.
 
-   **Why unconditional (S180 §22 hardening, BL-319 follow-up):** The previous conditional logic (auto-run only on missing marker / critical result / version mismatch) was brittle and allowed at least four distinct failure modes to persist between sessions: (1) hook scripts at index mode 644 silently broke the per-turn reminder hook because no `chmod +x` was applied between sessions; (2) stale `last-align.txt` markers caused the version check to falsely pass; (3) Claude Code window cache loaded a pre-v1.4.12 `/dsm-go` that confirmation-gated `/dsm-align` and let the user say "not now"; (4) scaffold drift (missing folders, missing hooks, broken `@` reference, drifted CLAUDE.md alignment block) was not caught until the next manual `/dsm-align`. Unconditional auto-run on every `/dsm-go` collapses all four modes by guaranteeing every session starts from a known-aligned baseline. The cost is bounded (`/dsm-align` hub fast-path ~5s, full spoke run 10-30s) and the safety value is large.
+   **Version check procedure:**
+   1. Read `.claude/last-align.txt` → extract `dsm-version: vX.Y.Z`. If the file does not exist, treat as version mismatch (force align).
+   2. Resolve DSM Central path: read `dsm-central` from `.claude/dsm-ecosystem.md`, or fall back to the path in the `@` reference of `.claude/CLAUDE.md`. If Central cannot be resolved, fall back to running `/dsm-align` (safe degradation).
+   3. Read `{dsm-central}/CHANGELOG.md` → extract the latest `## [vX.Y.Z]` heading (first match).
+   4. **If versions match:** skip `/dsm-align`. Report: "Skip /dsm-align: last-align version (vX.Y.Z) matches current DSM version. Hook chmod covered by Step 0e."
+   5. **If versions differ:** run `/dsm-align`. Report: "Running /dsm-align: DSM updated from vA.B.C to vX.Y.Z." After `/dsm-align` completes, re-read `.claude/last-align.txt` to confirm the marker is current.
 
-   **`/dsm-light-go` exception:** `/dsm-light-go` is the explicit lightweight escape hatch for context-pressure continuation sessions where the user knows alignment is current. `/dsm-light-go` does NOT auto-run `/dsm-align`; this asymmetry is intentional and documented in `/dsm-light-go`'s own skill file.
+   **Why conditional (BL-413):** The previous unconditional run (S180 §22 hardening) was necessary because `/dsm-align` was the sole source of `chmod +x` on hooks. Step 0e now owns that guarantee unconditionally. The remaining reasons to run `/dsm-align` — scaffold drift, CLAUDE.md alignment block drift, broken `@` reference — are all caused by DSM version updates that change templates or protocols. A version match means no template changed since last alignment; running `/dsm-align` in that case only reads files without making changes. The context cost (~30-40% on Sonnet) is not justified by the safety value when the version is unchanged.
 
-   After `/dsm-align` completes, re-read `.claude/last-align.txt` to confirm the marker is current, then continue to step 2 with the fixed state.
+   **Failure modes covered by Step 0e (not /dsm-align):**
+   - Hook scripts lose executable bit between sessions (Edit/Write tool strips it) → Step 0e chmod runs unconditionally.
+
+   **Failure modes still covered by /dsm-align (on version change):**
+   - CLAUDE.md alignment block drifted from template → detected and fixed.
+   - Scaffold folders missing → created.
+   - `@` reference stale or broken → fixed.
+   - Hook scripts absent (not just non-executable) → copied from Central.
+
+   **`/dsm-light-go` exception:** `/dsm-light-go` is the explicit lightweight escape hatch for context-pressure continuation sessions. It does NOT run this version check or invoke `/dsm-align`; this asymmetry is intentional.
 2. **DSM_0.2 session-start checks (act, not just report):** Read the `@`-referenced DSM_0.2 file in `.claude/CLAUDE.md` for current protocols, then **perform** each session-start action **in the order listed** (each sub-step may depend on results from prior sub-steps):
    - **2a. Project type detection (MUST complete first; gates 2b):** Identify and state the project type. Read the project CLAUDE.md to determine governance boundaries. For External Contribution projects, note that governance artifacts route to DSM Central, not the repo root.
    - **2a.5. Ecosystem Path Registry:** Read `.claude/dsm-ecosystem.md` (created by `/dsm-align` in Step 1.8). Parse the Paths table and cache each Name -> Path mapping for the session. For each entry, verify the path exists on the filesystem:
@@ -270,7 +329,7 @@ After branch setup, clean up stale refs from prior sessions:
      - The governance inbox is the **only** inbox to check for EC projects. Do NOT also scan `_inbox/` at the external repo root; per BL-348 it should not exist there, and scanning would waste a call and risk the wrong-path failure mode
      - **Skip condition:** if `contributions-docs` is missing from the ecosystem registry, or the resolved `{target}/` path does not exist on the filesystem, warn "EC governance inbox resolution failed (contributions-docs registry entry missing OR {target} does not exist). Skipping EC inbox check, run `/dsm-align` to scaffold." and continue the session without halting
 
-     **Processing (all project types):** Process any pending inbox entries: when an entry references a source file (Full evidence, Full report), read the referenced file before evaluating; the inbox is a notification, the source file contains the full evidence. Then evaluate impact, propose action (implement, defer, or reject per DSM_3 Section 6.4.3), and ask the user how to proceed. Do not merely list entry titles.
+     **Processing (all project types, BL-413 lazy-load):** List filenames only at session start. Report: "Inbox: N pending entries: [filename list]. Read and process entries at user request." Do NOT read file contents during session start. The agent reads a specific entry only when the user explicitly requests inbox processing (e.g., "process the inbox" or "read the [name] entry"). This defers context cost to when the user actually acts on an entry. Exception: if a filename contains "urgent" or "critical", surface it as a note in the report.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
 3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:
@@ -374,16 +433,36 @@ After branch setup, clean up stale refs from prior sessions:
 
    **Heredoc warning (BL-331):** The `cat > ... << EOF` form below uses an unquoted heredoc deliberately so `$(date -Iseconds)` expands. Do NOT change to `<< 'EOF'` (single-quoted); single-quoted heredocs suppress expansion and write the literal `$(date -Iseconds)` string into the transcript instead of the timestamp. Observed in portfolio S69.
 
-   Write exactly this content, replacing N, timestamp, and project name:
+   Write exactly this content, replacing N, timestamp, project name, agent, and model:
    ```bash
    cat > .claude/session-transcript.md << EOF
    # Session N Transcript
    **Started:** $(date -Iseconds)
    **Project:** [project name from MEMORY.md or directory name]
+   **Agent:** [harness identifier, e.g., "Claude Code"]
+   **Model:** [model identifier, e.g., "claude-opus-4-7"]
+   EOF
+   ```
+
+   After the mandatory header, append optional platform-specific fields when retrievable (omit entirely when not — ritualism guard: do NOT write placeholder values like `Effort: unknown`):
+   ```bash
+   cat >> .claude/session-transcript.md << EOF
+   **Effort:** [low | medium | high]
+   **Thinking:** [on | off]
+   **Fast mode:** [on | off]
+   EOF
+   ```
+
+   Then append the closing separator:
+   ```bash
+   cat >> .claude/session-transcript.md << EOF
 
    ---
    EOF
    ```
+
+   **Agent/Model self-reporting:** the agent introspects its identity from the runtime environment. If retrieval is uncertain, append `(self-reported)` to the value (e.g., `**Model:** claude-opus-4-7 (self-reported)`). Do NOT fail `/dsm-go` on missing metadata.
+
    This file is the persistent reasoning log per the Session Transcript Protocol in DSM_0.2. The user keeps it open in VS Code to monitor agent thinking in real time.
 
    **Behavioral activation (mandatory, immediate):** From this point forward,

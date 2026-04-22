@@ -2,7 +2,7 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
 
 ## Steps
 
-**Steps 0 and 1 are independent and can run in parallel.**
+**Steps 0, 1, and 1.5 are independent and can run in parallel.**
 
 0. **Extract reasoning lessons:** Scan `.claude/session-transcript.md` for notable reasoning patterns from this session. For each notable entry, append a 1-2 line summary to `.claude/reasoning-lessons.md` under the appropriate category, tagged `[auto]`. Notable entries include:
    - Mistakes caught mid-reasoning (course corrections)
@@ -19,6 +19,33 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    - Latest Session section: date, session number, brief description of what was done
    - Update any Pending Improvements or Open Developments that changed
    - Keep concise; MEMORY.md must stay under 200 lines
+   - **Do NOT write a "Pending next session" list.** Step 1.5 (Checkpoint) owns pending items.
+
+1.5. **Checkpoint:** Create a minimal checkpoint in `dsm-docs/checkpoints/` recording the session state. This step is the primary owner of "pending next session" items — do not duplicate them in MEMORY.md (Step 1).
+
+   **Filename:** `YYYY-MM-DD_sN_checkpoint.md` where N is the session number.
+
+   **Content:**
+   ```markdown
+   # Session N Checkpoint
+   **Date:** YYYY-MM-DD
+   **Branch:** [git branch --show-current]
+   **Last commit:** [git log --oneline -1]
+
+   ## Work completed this session
+   [1-3 line summary drawn from session transcript Output blocks and git log]
+
+   ## Pending next session
+   [items that require human decision or cannot be derived from backlog/inbox/git]
+
+   ## Open branches
+   [any open Level 3 branches not yet merged; "none" if clean]
+   ```
+
+   **If git is unavailable (GIT_AVAILABLE=false):** omit Branch and Last commit fields; write the content fields only.
+
+   **Skip condition:** if `dsm-docs/checkpoints/` does not exist, skip silently and log "Checkpoint skipped: dsm-docs/checkpoints/ not found."
+
 2. **Refresh backup:** If `.claude/memory/MEMORY.md` exists in the project, copy the live MEMORY.md there
 3. **Contributor profile:** Check if `.claude/contributor-profile.md` needs updating (new skills exercised, proficiency changes). Skip if the file does not exist or nothing changed.
 4. **Handoff:** Only create a handoff in `dsm-docs/handoffs/` if there is complex pending work that requires detailed context for the next session. Skip if MEMORY.md is sufficient.
