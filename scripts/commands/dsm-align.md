@@ -18,7 +18,7 @@ Before starting alignment, check if git is initialized:
 
 1. **Detect project type** using the table in **DSM_0.2.A §17** (Project Type
    Detection). Read §17 directly; do NOT rely on an inline copy of the table,
-   which drifts (BL-379 broadened the Application signals; an inline cache
+   which drifts (application signal broadening changed the Application signals; an inline cache
    here would go stale). Primary runtime markers per §17: `package.json`,
    `Cargo.toml`, `go.mod`, `pyproject.toml` with `[project]`, `setup.py`,
    `src/`+`tests/`, `app.py`. Supporting signals (scripts/bin/cmd with
@@ -28,14 +28,41 @@ Before starting alignment, check if git is initialized:
    External Contribution: `contributions-docs/{project}/` in DSM Central.
    State the detected type.
 
+   **1.0. Project type override check:** Before applying detection,
+   scan the project-specific region of `.claude/CLAUDE.md` (content OUTSIDE
+   the `<!-- BEGIN/END DSM_0.2 ALIGNMENT -->` delimiters) for a heading
+   matching `^## DSM Project Type Override$`. If present:
+
+   - Parse the three required fields: `**Declared type:**`, `**Reason:**`,
+     `**Set by:**` (each on its own line within the override section).
+   - Validate `Declared type` against the canonical set (case-insensitive):
+     `Data Science`, `Application`, `Hybrid`, `Documentation`,
+     `External Contribution`. The parenthesized DSM-track metadata (e.g.,
+     `(DSM 4.0)`) is optional and not validated.
+   - **If well-formed:** set `ACTIVE_TYPE = declared`. Record `OVERRIDE_ACTIVE = true`.
+     Still run detection below (`DETECTED_TYPE`) for divergence reporting.
+   - **If malformed** (missing a required field, unknown type name, or more
+     than one `## DSM Project Type Override` heading): set
+     `OVERRIDE_ACTIVE = false`, fall back to detection, and record the malformed
+     reason for the report (`OVERRIDE_MALFORMED_REASON`). Do NOT silently
+     ignore a broken override.
+   - **If absent:** `OVERRIDE_ACTIVE = false`, `ACTIVE_TYPE = DETECTED_TYPE`
+     (assigned after detection runs).
+
+   See **DSM_0.2.A §17.2** for the override specification and user-facing
+   guidance. This step is the runtime enforcement.
+
    **Classification-change reporting (§17):** if the detected type differs
    from the type recorded in the CLAUDE.md alignment section, REPORT the
    change before regenerating. Do not silently reclassify; the user may
-   have an explicit reason to retain the recorded type.
+   have an explicit reason to retain the recorded type. When an override
+   is active, this rule applies to the declared type (not the detected
+   type); the detected type is additionally reported for divergence
+   visibility per §17.2.
 
    **Implementation note:** Use `test -d` for directory existence checks, not `ls -d` (which returns non-zero when paths don't exist, cancelling parallel tool calls).
 
-   **Hub fast-path:** If the project is DSM Central (has `scripts/commands/` directory), skip steps 2, 4, 5, 6, and 8c. These steps check spoke scaffold structure and validate CLAUDE.md paths against the filesystem, both of which are redundant on the hub that defines the templates. Run steps 1, **3 (canonical dsm-docs/ folder scaffold, idempotent)**, 7, 7b, 8, 8b, 9, 10, 10b, 11, 12, 13. Step 3 is included in the hub fast-path because a Kick-off'd mirror clone is functionally a hub (per DSM_0.2.A §25.4) but arrives with an empty scaffold; Step 3's idempotent check-then-create is a no-op for Central (scaffold already exists) and the missing piece for fresh clones. Step 10b is mandatory on the hub because hub-self-installs the BL-319 hooks (transcript-reminder + validate-transcript-edit) and applies `chmod +x`. Omitting 10b on hub fast-path was the S180 root cause of a full session of zero transcript appends in DSM Central, the hooks were present on disk but not executable, so Claude Code's hook subsystem silently dropped the per-turn reminder injection.
+   **Hub fast-path:** If the project is DSM Central (has `scripts/commands/` directory), skip steps 2, 4, 5, 6, and 8c. These steps check spoke scaffold structure and validate CLAUDE.md paths against the filesystem, both of which are redundant on the hub that defines the templates. Run steps 1, **3 (canonical dsm-docs/ folder scaffold, idempotent)**, 7, 7b, 8, 8b, 9, 10, 10b, 11, 12, 13. Step 3 is included in the hub fast-path because a Kick-off'd mirror clone is functionally a hub (per DSM_0.2.A §25.4) but arrives with an empty scaffold; Step 3's idempotent check-then-create is a no-op for Central (scaffold already exists) and the missing piece for fresh clones. Step 10b is mandatory on the hub because hub-self-installs the session-transcript hooks (transcript-reminder + validate-transcript-edit) and applies `chmod +x`. Omitting 10b on hub fast-path was the S180 root cause of a full session of zero transcript appends in DSM Central, the hooks were present on disk but not executable, so Claude Code's hook subsystem silently dropped the per-turn reminder injection.
 
    **External Contribution (EC) fast-path:** If the project is detected as an External Contribution, skip steps 2-6 (spoke scaffold in the current repo), 8c (path validation against spoke structure), and 11 (command sync). Instead, run steps 1, 7, 7b, 8, 8b, 9, 10, 10b, **EC scaffold step (step 3-EC)**, 12, 12a, 13. The EC scaffold step creates governance folders in the external governance repo, not in the current project.
 
@@ -56,7 +83,7 @@ Before starting alignment, check if git is initialized:
    3. Governance folder: `{contributions-docs}/{project-name}/`
    4. If `contributions-docs` is missing from ecosystem registry: warn "Cannot resolve governance folder. Add `contributions-docs` entry to `.claude/dsm-ecosystem.md`." and skip EC scaffold step.
 
-   **Origin:** BL-348 (S183). /dsm-align had no EC code path; governance folders were never audited or scaffolded.
+   **Origin:** S183. /dsm-align had no EC code path; governance folders were never audited or scaffolded.
 
 2. **Check and fix `_inbox/` at project root:**
    - If `dsm-docs/backlog/` exists: move to `_inbox/` at project root. Send migration confirmation to DSM Central's inbox (`~/dsm-agentic-ai-data-science-methodology/_inbox/{project-name}.md`).
@@ -81,7 +108,7 @@ Before starting alignment, check if git is initialized:
    | `dsm-docs/plans/` | Yes | README.md |
    | `dsm-docs/research/` | Yes | README.md |
 
-3a. **Sprint-plan structural audit (BL-378):**
+3a. **Sprint-plan structural audit:**
 
    Audit sprint-plan files in `dsm-docs/plans/` (and `done/`) for DSM_2.0.C
    §1 Template 8 compliance. Detective only: report missing sections as
@@ -128,10 +155,10 @@ Before starting alignment, check if git is initialized:
    with "# Sprint 1 retrospective ..."), the audit will still run. The warn
    is informational; users can ignore benign false positives.
 
-   **Complements:** BL-378 pairs this detective audit with a hard gate in
+   **Complements:** the sprint-plan structural audit pairs this detective step with a hard gate in
    `/dsm-go` Step 3.6 (the Sprint Boundary Checklist check at session
    start). Together they cover creation-time and closure-time validation of
-   plan structure, complementing BL-362/363/364 on the closure/verification
+   plan structure, complementing the sprint closure/verification protocols on the closure/verification
    side.
 
 3-EC. **External Contribution governance scaffold** (EC fast-path only; skip for spokes and hub).
@@ -237,6 +264,15 @@ Before starting alignment, check if git is initialized:
      e. If different: report drift with specific lines that differ. Offer: "Regenerate aligned section? (This preserves all content outside the delimiters.)"
      f. If user accepts: replace content between delimiters with current template
    - **Validation-only mode:** If the user invoked `/dsm-align` with a `--check` argument or equivalent, report drift without modifying files
+   - **Override-misplacement guard:** scan the content BETWEEN the
+     ALIGNMENT delimiters for a `## DSM Project Type Override` heading. If
+     found, warn explicitly: "`## DSM Project Type Override` section found
+     inside ALIGNMENT delimiters at `.claude/CLAUDE.md`. The override must
+     live in project-specific content (outside the delimiters) or it will
+     be overwritten on regeneration. Move the section outside the delimiters
+     and re-run `/dsm-align`." Do NOT auto-move; the user must relocate it.
+     This warning fires regardless of whether the alignment block is drifted
+     or up-to-date.
 
 8. **CLAUDE.md content validation (DSM_0.2 §17.2):**
    - Using the project type from step 1, scan the project-specific sections of `.claude/CLAUDE.md` (content outside the alignment delimiters) for type mismatches.
@@ -281,7 +317,7 @@ Before starting alignment, check if git is initialized:
    - If `.claude/reasoning-lessons.md` exists but is empty (zero bytes) or missing the `# Reasoning Lessons` header on line 1: prepend the template header without touching any existing content below. Report: "Added missing header to `.claude/reasoning-lessons.md`."
    - Otherwise leave the file untouched.
 
-10b. **Install session-transcript hooks (BL-319):**
+10b. **Install session-transcript hooks:**
    Deliver the per-turn transcript append hook and the append-only edit validator to the project's `.claude/hooks/` and wire them into `.claude/settings.json`. Single source of truth: Central's own `.claude/hooks/*.sh` scripts. The hook entries come from `{dsm-central}/scripts/templates/settings-hooks.json`.
 
    **Applies to all project types, including DSM Central itself** (Central's `.claude/settings.json` is gitignored and must stay aligned with the template it ships).
@@ -332,7 +368,7 @@ Before starting alignment, check if git is initialized:
    ```
    The step is idempotent by construction: the second run sees byte-identical hooks and matched commands, so it reports `already_ok` on everything with zero file writes.
 
-   **Origin:** BL-319. Closes the gap between DSM_0.2 §7 per-turn enforcement docs (shipped v1.4.9) and the hook mechanism that enforces them (previously local-only in each Central instance). Evidence: portfolio S69 and blog-poster S17 both ran with zero transcript appends because the hook was absent.
+   **Origin:** Closes the gap between DSM_0.2 §7 per-turn enforcement docs (shipped v1.4.9) and the hook mechanism that enforces them (previously local-only in each Central instance). Evidence: portfolio S69 and blog-poster S17 both ran with zero transcript appends because the hook was absent.
 
 11. **Check command file drift (DSM Central only):**
    - Skip this step if the project is not DSM Central (no `scripts/commands/` directory).
@@ -343,15 +379,23 @@ Before starting alignment, check if git is initialized:
      - If different in all locations where it exists: **report as warning**: "Command {name} has drifted from tracked source. Review and resolve: update tracked source or run `scripts/sync-commands.sh --deploy`."
      - If runtime copy missing from both locations: **report as warning**: "Command {name} exists in tracked source but not deployed. Run `scripts/sync-commands.sh --deploy` to install."
    - Report drift summary in the report.
-   - Reference: BACKLOG-130 (Command File Version Tracking)
+   - Reference: Command File Version Tracking protocol
 
 12. **Report** results in this format. The report header indicates whether changes were applied:
    - **Post-change report** (when any fixes were applied: folders created, `@` reference fixed, alignment section regenerated, files created): header reads `/dsm-align post-change report:` and all items reflect the **completed state**, not the pre-change assessment.
    - **Check-only report** (when no changes were needed, all items already correct): header reads `/dsm-align check-only report:`
 
+   **Project type reporting:** the `Project type` line has four
+   possible shapes depending on override state (values from Step 1.0):
+
+   - No override: `- Project type: [detected]`
+   - Override active, matches detection: `- Project type: [declared] (override active; matches detection , safe to remove the override section)`
+   - Override active, diverges from detection: `- Project type: [declared] (override active; detected=[detected])`
+   - Override malformed, fell back to detection: `- Project type: [detected] (override malformed: [reason]; fell back to detection)`
+
    ```
    /dsm-align [post-change|check-only] report:
-   - Project type: [detected type]
+   - Project type: [see shapes above]
    - Created: [list of folders and files created, or "none"]
    - Already correct: [count of items that needed no changes]
    - Fixed: [list of repairs made, or "none"]
@@ -378,7 +422,7 @@ Before starting alignment, check if git is initialized:
    **DSM version:** vX.Y.Z (from {dsm-central}/CHANGELOG.md latest heading)
    **Run mode:** post-change | check-only
    **Project:** {project name}
-   **Project type:** {detected type}
+   **Project type:** {active type} {override annotation, if any , see Step 12 shapes}
 
    ---
 
@@ -466,7 +510,7 @@ Before starting alignment, check if git is initialized:
    - `result` is `pass` if no warnings or critical issues, `warnings` if only warnings, `critical` if any critical issues were found
    - `dsm-version`: CHANGELOG is the source of truth for version numbers; do not guess or use other files
 
-   **Origin (BL-338):** Previously, spoke-action surfacing lived in `/dsm-go` Step 2c, which read `last-align.txt` after `/dsm-align` Step 13 had already overwritten it. The old version was lost, so 2c always saw "versions match" and never surfaced spoke actions. Moving surfacing into Step 13 (read-before-write) fixes the ordering bug.
+   **Origin:** Previously, spoke-action surfacing lived in `/dsm-go` Step 2c, which read `last-align.txt` after `/dsm-align` Step 13 had already overwritten it. The old version was lost, so 2c always saw "versions match" and never surfaced spoke actions. Moving surfacing into Step 13 (read-before-write) fixes the ordering bug.
 
 ## Templates
 

@@ -1,6 +1,6 @@
 Start a parallel DSM session for short, isolated tasks on the shared session branch. $ARGUMENTS
 
-## WARNING: §7 hook will fire WRONGLY on turn 1 of this skill (BL-377)
+## WARNING: §7 hook will fire WRONGLY on turn 1 of this skill (parallel-session turn-1 hook collision)
 
 The `UserPromptSubmit` hook backed by `.claude/hooks/transcript-reminder.sh`
 fires BEFORE any code in this skill runs. On turn 1, the registry section
@@ -19,7 +19,7 @@ violation regardless of how urgent the hook makes it sound.
 stub).** Writing the stub is what switches the hook to parallel-mode for
 every subsequent turn. If the agent rationalizes compliance with the §7
 reminder first ("I'll satisfy §7 this once, then run Step 0"), that is
-exactly the failure mode BL-377 was filed to prevent. The rationalization
+exactly the failure mode the parallel-session turn-1 hook collision fix was introduced to prevent. The rationalization
 is documented verbatim in S192 parallel-192.1's transcript. Do not
 reproduce it.
 
@@ -96,7 +96,7 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
 
 ## Steps
 
-0. **Provisional registry stub (BL-377, FIRST TOOL CALL of turn 1):**
+0. **Provisional registry stub (FIRST TOOL CALL of turn 1):**
 
    This step MUST be the very first tool call of the parallel session,
    before prefix validation, context loading, or any other read/write. It
@@ -162,7 +162,7 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    session. Parallel sessions do not collect transcripts; the commit log is the
    audit trail.
 
-   **Hook behavior (BL-324 structural fix, BL-377 amendment):** The
+   **Hook behavior (transcript hook structural fix, parallel-session turn-1 hook amendment):** The
    `UserPromptSubmit` hook is backed by
    `.claude/hooks/transcript-reminder.sh`, which detects parallel sessions
    via the `CLAUDE_PID` field in `.claude/parallel-sessions.txt`. Step 0
@@ -203,7 +203,7 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
      - The planned work requires shared file modifications
    - If stopped, explain the conflict and ask the user to reframe.
 
-6. **Promote provisional registry stub to full entry (BL-377):**
+6. **Promote provisional registry stub to full entry:**
    Step 0 wrote a provisional stub with `CLAUDE_PID`, `Started`, and
    `State: provisional`. This step upgrades it to the full
    `parallel-{N.M}/...` form now that prefix parsing and scope

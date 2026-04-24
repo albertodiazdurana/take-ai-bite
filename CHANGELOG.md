@@ -5,6 +5,20 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-04-24
+
+### Added
+
+- **BL-420: DSM_0.2.A §10.2.1 Checkpoint Authoring Identifiers Rule.** New subsection in the checkpoint protocol (placed after §10.2 Checkpoint Supersession). Checkpoint entries MUST use resolvable identifiers (`§X.Y`, protocol/concept names, session/file references) and MUST NOT use bare BL numbers as identifiers, because `/dsm-go` Step 3.5 reads checkpoints across sessions and that reader is often a spoke agent with no access to `dsm-docs/plans/`. Narrow two-condition exception for checkpoints specifically about in-flight BL implementations. Forward-only: past checkpoints in `done/` are frozen historical records. `/dsm-checkpoint` Step 2.5 surfaces the rule at checkpoint-draft time; template placeholders carry an in-context reminder.
+  - **Spoke action:** Review DSM_0.2.A §10.2.1 before creating the next checkpoint. Run `sync-commands.sh --deploy` to update the `/dsm-checkpoint` runtime copy.
+- **BL-419: BL Lookup Index at `dsm-docs/plans/done/INDEX.md`.** BL-number-indexed lookup table (332 rows, sorted ascending) complementing CHANGELOG (chronological) and FEATURES (user-facing capabilities). Columns: BL#, Title, Version, Date, Resolver (§ or concept). Mirrored to TAB via `mirror-sync-manifest.md` Category 4, so TAB readers of the mirrored CHANGELOG and FEATURES can resolve BL numbers in one hop. `/dsm-backlog-done` gains Step 8: add an INDEX row when moving a BL to `done/`. Initial build used a Sonnet subagent (§8.8 approved) scanning 341 files.
+  - **Spoke action:** None (Central-only artifact; TAB receives it via mirror sync, other spokes do not).
+
+### Changed
+
+- **BL-418: Scrub BL-NNN references from mirrored methodology.** Removed ~170 BL-NNN / BACKLOG-NNN anchors from DSM_0-7, `scripts/commands/*.md`, `FEATURES.md` (prose only; F-entry anchors preserved), and `dsm-docs/guides/`, replacing them with resolvable identifiers (section references, protocol/concept names, session/file references). Four replacement rule classes: heading tags stripped, origin markers stripped, cross-links converted to `§X.Y` or concept names, bare BL names converted to concept names. Category 5 entries kept as-is (version history, incident-table "Related BL" columns, provenance cells, gap-table cells, example strings, range citations). `FEATURES.md` BL anchors preserved (Option A) for the F→BL trail; BL-419 Index restores resolvability in one hop. Pure reference cleanup: no behavioral change in any protocol. 174 edits across 26 files.
+  - **Spoke action:** Run `sync-commands.sh --deploy` to update runtime command copies. No behavioral changes; mirrored text reads more cleanly in spoke context.
+
 ## [1.7.0] - 2026-04-23
 
 ### Added

@@ -101,7 +101,7 @@ CLAUDE.md.
   scope:** equivalent in publication outcome, not in policy enforcement. PR merge
   respects branch protection rules (required reviewers, CI gates); direct push
   bypasses them. The risk equivalence is about what lands on main, not about
-  what filters the action passes through. Origin: BL-387.
+  what filters the action passes through. Origin: PR-merge-to-main equivalence rule (S194 filing).
 
 **Behavior when triggered:**
 
@@ -124,7 +124,7 @@ to non-bash agent operations. Both protocols apply simultaneously.
 - Batch destructive operations to reduce confirmation prompts; each operation
   gets its own confirmation
 
-### 2.1. Command Default Verification (BL-386 Check B)
+### 2.1. Command Default Verification
 
 When invoking `gh pr create` against a project whose intended base is the
 project's main line, the agent MUST pass `--base` explicitly, resolved
@@ -165,9 +165,9 @@ output. With Check A active, the misconfig would have halted at session
 start; with Check B active, the wrong base would have halted before
 merge regardless of session-start state.
 
-**Origin:** BL-386, paired with `/dsm-go` Step 2a.6.
+**Origin:** Default-branch verification (paired with `/dsm-go` Step 2a.6).
 
-### 2.2. Permission Rule Pattern: Opt-in for PR-Merge Confirmation (BL-387)
+### 2.2. Permission Rule Pattern: Opt-in for PR-Merge Confirmation
 
 The PR-merge-to-main equivalence rule above (in §2's bullet list) is the
 default for all DSM projects: protocol-level guidance, enforced by agent
@@ -209,14 +209,14 @@ branches as well.
 - Projects where merge frequency is high enough that per-merge prompts would
   produce confirmation fatigue
 
-**Relationship to BL-386 Check B:** §2.1 (Check B) verifies the merge target
+**Relationship to §2.1 Command Default Verification:** §2.1 (Check B) verifies the merge target
 before merge fires; §2 PR-merge bullet (Option B) requires explicit
 authorization for the merge action; §2.2 (Option A) hardens the
 authorization with a permission-system gate. The three layer: target
 verification → action authorization → permission enforcement. Each catches
 a different failure mode.
 
-**Origin:** BL-387.
+**Origin:** PR-merge-to-main equivalence rule.
 
 ---
 
@@ -387,7 +387,7 @@ Before writing content to a tracked file, classify the data by sensitivity level
 
 The classification applies to all DSM project types. Data science projects
 commonly handle Restricted data (datasets with PII); private projects
-(BL-162 pattern) are Restricted by default.
+(private-project pattern) are Restricted by default.
 
 ### 5.2. Write-Time Prevention Rules
 

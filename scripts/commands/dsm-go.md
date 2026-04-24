@@ -16,7 +16,7 @@ Before caching GIT_AVAILABLE, check if git is initialized:
 
 ## Git Awareness
 
-At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the result as `GIT_AVAILABLE` (true/false). If false (no git repo, e.g., private projects per BL-162), the following adjustments apply throughout:
+At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the result as `GIT_AVAILABLE` (true/false). If false (no git repo, e.g., private projects per the private-project protocol), the following adjustments apply throughout:
 
 - **Checkpoint moves (Step 3, 3.5):** Use `mv` instead of `git mv`
 - **Git status (Step 4):** Skip; report "No git repository"
@@ -138,7 +138,7 @@ Kick-off skips any sub-step whose effect is already present (per §25.2's
 per-step "already done, skip without error" rule). This is how `/dsm-go`
 can recover from an interrupted first session.
 
-**Origin:** BACKLOG-372 phase T5 (Session 191). Wires `/dsm-go` into
+**Origin:** Cloned-Mirror Kick-off phase T5 (Session 191). Wires `/dsm-go` into
 DSM_0.2.A §25.
 
 ## Step 0: Session Branch Setup
@@ -231,7 +231,7 @@ latest session (branch is ahead of MEMORY). This new case fires when branch and
 MEMORY agree on N but MEMORY says N is already wrapped (MEMORY is ahead of branch
 state). Together they cover the full matrix of MEMORY-vs-branch disagreement.
 
-**Origin:** BACKLOG-405 (S199). S198 §22 violation (Steps 5.5/6 skipped) was
+**Origin:** S199. S198 §22 violation (Steps 5.5/6 skipped) was
 caused by this missing case.
 
 **If an open Level 2 session branch exists (session-*):**
@@ -285,7 +285,7 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
 
 1. **Read MEMORY.md:** Find and load this project's MEMORY.md from the auto memory directory to restore session context. **If MEMORY.md does not exist or fails to load**, continue to Step 2 but note that the agent is operating without prior session context, which increases the risk of applying generic rules to a project with specific overrides.
 1.5. **Read reasoning lessons:** If `.claude/reasoning-lessons.md` exists, read the first 10 lines (header + category names) to check relevance and confirm the file is primed for the session. Do not read the full file; it can exceed 150 lines and 30KB, wasting context budget. Report any category that is particularly relevant to the current project. If the file does not exist, skip this step silently.
-1.8. **Run /dsm-align if DSM version changed (BL-413):** Check whether the DSM version has changed since last alignment before invoking `/dsm-align`.
+1.8. **Run /dsm-align if DSM version changed (§1.8 conditional-align rule):** Check whether the DSM version has changed since last alignment before invoking `/dsm-align`.
 
    **Version check procedure:**
    1. Read `.claude/last-align.txt` → extract `dsm-version: vX.Y.Z`. If the file does not exist, treat as version mismatch (force align).
@@ -294,7 +294,7 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
    4. **If versions match:** skip `/dsm-align`. Report: "Skip /dsm-align: last-align version (vX.Y.Z) matches current DSM version. Hook chmod covered by Step 0e."
    5. **If versions differ:** run `/dsm-align`. Report: "Running /dsm-align: DSM updated from vA.B.C to vX.Y.Z." After `/dsm-align` completes, re-read `.claude/last-align.txt` to confirm the marker is current.
 
-   **Why conditional (BL-413):** The previous unconditional run (S180 §22 hardening) was necessary because `/dsm-align` was the sole source of `chmod +x` on hooks. Step 0e now owns that guarantee unconditionally. The remaining reasons to run `/dsm-align` — scaffold drift, CLAUDE.md alignment block drift, broken `@` reference — are all caused by DSM version updates that change templates or protocols. A version match means no template changed since last alignment; running `/dsm-align` in that case only reads files without making changes. The context cost (~30-40% on Sonnet) is not justified by the safety value when the version is unchanged.
+   **Why conditional:** The previous unconditional run (S180 §22 hardening) was necessary because `/dsm-align` was the sole source of `chmod +x` on hooks. Step 0e now owns that guarantee unconditionally. The remaining reasons to run `/dsm-align` — scaffold drift, CLAUDE.md alignment block drift, broken `@` reference — are all caused by DSM version updates that change templates or protocols. A version match means no template changed since last alignment; running `/dsm-align` in that case only reads files without making changes. The context cost (~30-40% on Sonnet) is not justified by the safety value when the version is unchanged.
 
    **Failure modes covered by Step 0e (not /dsm-align):**
    - Hook scripts lose executable bit between sessions (Edit/Write tool strips it) → Step 0e chmod runs unconditionally.
@@ -311,7 +311,7 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
    - **2a.5. Ecosystem Path Registry:** Read `.claude/dsm-ecosystem.md` (created by `/dsm-align` in Step 1.8). Parse the Paths table and cache each Name -> Path mapping for the session. For each entry, verify the path exists on the filesystem:
      - If the path exists: note as validated
      - If the path does not exist: warn "Ecosystem path '{name}' points to '{path}' which does not exist. Cross-repo operations using this path will be skipped."
-   - **2a.6. Default-branch verification (BL-386 Check A):** If `GIT_AVAILABLE` is true AND `git remote get-url origin` returns a URL containing `github.com`, resolve the configured remote default branch with `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`. Compare against the local main line: read the project-specific section of `.claude/CLAUDE.md` for an optional `**Main branch:**` declaration; default to `main` if absent. If the remote default differs from the local main line, **halt with a critical warning** that names both values and the fix command (`gh repo edit --default-branch {local}`). This is a hard gate: no session work proceeds until the user fixes the configuration OR types `defer` to bypass for this session only. Cache the resolved value for the session (one `gh` call per session). **Skip silently if:** remote `origin` does not point at GitHub (no `github.com` substring), OR `gh` CLI is not installed (warn once: "install gh to enable default-branch verification" and continue). Origin: BL-386. Failure mode this catches: dsm-jupyter-book S4 lost ~45 minutes to an HTTP 404 cascade because the repo's default branch was a stale session branch, not `main`.
+   - **2a.6. Default-branch verification:** If `GIT_AVAILABLE` is true AND `git remote get-url origin` returns a URL containing `github.com`, resolve the configured remote default branch with `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`. Compare against the local main line: read the project-specific section of `.claude/CLAUDE.md` for an optional `**Main branch:**` declaration; default to `main` if absent. If the remote default differs from the local main line, **halt with a critical warning** that names both values and the fix command (`gh repo edit --default-branch {local}`). This is a hard gate: no session work proceeds until the user fixes the configuration OR types `defer` to bypass for this session only. Cache the resolved value for the session (one `gh` call per session). **Skip silently if:** remote `origin` does not point at GitHub (no `github.com` substring), OR `gh` CLI is not installed (warn once: "install gh to enable default-branch verification" and continue). Origin: Default-branch verification protocol. Failure mode this catches: dsm-jupyter-book S4 lost ~45 minutes to an HTTP 404 cascade because the repo's default branch was a stale session branch, not `main`.
    - **2a.8. CLAUDE.md section completeness (Module A §23):** Check whether CLAUDE.md contains all 4 required sections (DSM_0.2 Alignment, participation pattern, project type, project specific). If all present, pass silently. If sections are missing, report which ones and suggest completing them before implementation. This is a hard gate: no implementation work until all 4 sections exist. Existing complete projects pass silently.
    - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). **Inbox location and resolution by project type:**
 
@@ -320,16 +320,16 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
      - Check: `ls _inbox/` (exclude `README.md` and `done/` from results)
      - If `ls` shows no entries besides `README.md`, confirm with a second method (`ls -la`) before concluding the inbox is empty (Glob with literal paths silently fails for `_inbox/` directories)
 
-     **External contribution (BL-349):**
+     **External contribution governance:**
      - Resolution:
        1. Read `contributions-docs` from the ecosystem registry cached in Step 2a.5
        2. Derive project name: `basename "$(pwd)"`
        3. Target: `{contributions-docs}/{project-name}/_inbox/`
      - Check: `ls {target}/` (exclude `README.md` and `done/` from results). Example: `ls ~/dsm-external-contribution-storage/IronCalc/_inbox/`
-     - The governance inbox is the **only** inbox to check for EC projects. Do NOT also scan `_inbox/` at the external repo root; per BL-348 it should not exist there, and scanning would waste a call and risk the wrong-path failure mode
+     - The governance inbox is the **only** inbox to check for EC projects. Do NOT also scan `_inbox/` at the external repo root; per the External Contribution protocol it should not exist there, and scanning would waste a call and risk the wrong-path failure mode
      - **Skip condition:** if `contributions-docs` is missing from the ecosystem registry, or the resolved `{target}/` path does not exist on the filesystem, warn "EC governance inbox resolution failed (contributions-docs registry entry missing OR {target} does not exist). Skipping EC inbox check, run `/dsm-align` to scaffold." and continue the session without halting
 
-     **Processing (all project types, BL-413 lazy-load):** List filenames only at session start. Report: "Inbox: N pending entries: [filename list]. Read and process entries at user request." Do NOT read file contents during session start. The agent reads a specific entry only when the user explicitly requests inbox processing (e.g., "process the inbox" or "read the [name] entry"). This defers context cost to when the user actually acts on an entry. Exception: if a filename contains "urgent" or "critical", surface it as a note in the report.
+     **Processing (all project types, inbox lazy-load):** List filenames only at session start. Report: "Inbox: N pending entries: [filename list]. Read and process entries at user request." Do NOT read file contents during session start. The agent reads a specific entry only when the user explicitly requests inbox processing (e.g., "process the inbox" or "read the [name] entry"). This defers context cost to when the user actually acts on an entry. Exception: if a filename contains "urgent" or "critical", surface it as a note in the report.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
 3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:
@@ -348,7 +348,7 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
    - Feedback files updated (per-session file in `dsm-docs/feedback-to-dsm/` or entry in `technical.md`)
    If any are missing, flag them: "Sprint N boundary incomplete: missing [items]. Complete these before starting Sprint N+1, or defer with confirmation."
 
-   **Sprint plan structural hard gate (BL-378):** When MEMORY.md or the
+   **Sprint plan structural hard gate (per §3a sprint-plan audit):** When MEMORY.md or the
    checkpoint references sprint N closure, locate the Sprint N plan in
    `dsm-docs/plans/` (or `dsm-docs/plans/done/` if already moved , check
    both). Candidate selection: `.md` files whose first-line heading
@@ -367,7 +367,7 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
    This is a hard gate because the Sprint Boundary Checklist is the only
    surviving plan-level record of what "closed" means. Without it, closure
    is ambiguous and reproduces the GE S47 failure mode that spawned
-   BL-362. The 'defer' escape hatch exists for real cases where the
+   the sprint closure/verification protocol. The 'defer' escape hatch exists for real cases where the
    checklist was executed through other means; log deferrals in the
    session transcript so they surface during retrospectives.
 
@@ -429,9 +429,9 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
    - **If the file does not exist:** No action (step 5.8 handles incomplete wrap-up detection).
 6. **Reset session transcript:** Overwrite `.claude/session-transcript.md` with a fresh session header (the file persists across sessions; do not delete and recreate it).
 
-   **No-skip rule (BL-331):** This step is the canonical activation point for the Session Transcript Protocol. When `/dsm-go` is entered as a deferral from `/dsm-light-go` (the user accepted the safety gate's "switch to /dsm-go?" prompt), Step 6 MUST run before any user task action. Skipping Step 6 to jump straight into the user's task is the failure mode that caused portfolio S69 to run ~6 turns with zero transcript appends. The unconditional activation rule in DSM_0.2 §7 is the third independent enforcement layer, but Step 6 is the canonical reset + activation point and the agent must execute it on every entry to `/dsm-go`, including deferral entries.
+   **No-skip rule (§7 unconditional activation):** This step is the canonical activation point for the Session Transcript Protocol. When `/dsm-go` is entered as a deferral from `/dsm-light-go` (the user accepted the safety gate's "switch to /dsm-go?" prompt), Step 6 MUST run before any user task action. Skipping Step 6 to jump straight into the user's task is the failure mode that caused portfolio S69 to run ~6 turns with zero transcript appends. The unconditional activation rule in DSM_0.2 §7 is the third independent enforcement layer, but Step 6 is the canonical reset + activation point and the agent must execute it on every entry to `/dsm-go`, including deferral entries.
 
-   **Heredoc warning (BL-331):** The `cat > ... << EOF` form below uses an unquoted heredoc deliberately so `$(date -Iseconds)` expands. Do NOT change to `<< 'EOF'` (single-quoted); single-quoted heredocs suppress expansion and write the literal `$(date -Iseconds)` string into the transcript instead of the timestamp. Observed in portfolio S69.
+   **Heredoc warning (§7 append technique):** The `cat > ... << EOF` form below uses an unquoted heredoc deliberately so `$(date -Iseconds)` expands. Do NOT change to `<< 'EOF'` (single-quoted); single-quoted heredocs suppress expansion and write the literal `$(date -Iseconds)` string into the transcript instead of the timestamp. Observed in portfolio S69.
 
    Write exactly this content, replacing N, timestamp, project name, agent, and model:
    ```bash

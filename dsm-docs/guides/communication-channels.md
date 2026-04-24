@@ -38,7 +38,7 @@ completion might produce a blog post (detailed technique), a LinkedIn post
 - **DSM Section 2.5:** Communication standards apply to all channels. The
   Blog Style Guide (Section 2.5.9) is channel-specific guidance for the
   blog channel.
-- **BL-055 (blog platform):** Implements the blog channel's publication
+- **Blog platform implementation:** Implements the blog channel's publication
   infrastructure. Other channels use their own platforms (LinkedIn, portfolio
   site, conference submission systems).
 

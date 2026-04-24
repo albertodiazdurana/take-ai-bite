@@ -38,8 +38,7 @@ where that understanding lives.
 - TAB/DSM patterns that depend on platform-specific mechanisms (per-turn
   transcript hook, parallel-session registry, Cloned-Mirror Kick-off,
   Gate 0-3 IDE permission window behavior)
-- Incident history tied to platform misunderstandings (F-094, S180, BL-342
-  evidence base)
+- Incident history tied to platform misunderstandings (F-094, S180, Claude Code platform assessment evidence base)
 - One section per supported platform, each following the §3 generalized
   template
 
@@ -56,14 +55,14 @@ where that understanding lives.
 
 See §4. Short list: filenames like `CLAUDE.md`, `@` reference syntax,
 directory conventions (`.claude/`), hook event names (`UserPromptSubmit`,
-`PreToolUse`). Phase 5 of the BL-345 scaffolding plan revisits whether any
+`PreToolUse`). Phase 5 of the AI Platform Guide scaffolding plan revisits whether any
 of these should be extracted from DSM_0.2 into this document.
 
 ### Scope of this v0.1 scaffold
 
 This is the Phase 1 scaffold. §2.1 Claude Code is a placeholder pointing to
-a forthcoming Phase 4 filled instance (tracked under BL-400). §3 template is
-empty pending Phase 2 research (BL-398) and Phase 5 generalization (BL-401).
+a forthcoming Phase 4 filled instance (Claude Code filled instance). §3 template is
+empty pending Phase 2 template-structure research and Phase 5 generalization.
 §4 boundary rules contains Phase 1 inventory; Phase 5 applies resolutions.
 
 ---
@@ -76,10 +75,8 @@ own subsection following §3's template once filled.
 ### 2.1. Claude Code (Anthropic)
 
 Filled instance of the §3 template. Capability tier: **Full Agent**.
-Primary sources: BL-342 platform assessment (12 areas, 741 lines), BL-398
-template structure research, BL-399 TAB/DSM-exclusive patterns audit
-(16 patterns). Maintenance discipline lives in BL-353 Platform Alignment
-Protocol.
+Primary sources: Claude Code platform assessment (12 areas, 741 lines), AI platform template structure research, TAB/DSM-exclusive patterns audit
+(16 patterns). Maintenance discipline lives in Platform Alignment Protocol.
 
 #### 2.1.1. Overview
 
@@ -111,42 +108,41 @@ version bump re-runs it via the CHANGELOG spoke-action annotation.
 
 #### 2.1.3. Core Concepts
 
-Seven concepts a DSM collaborator must hold. Each cites BL-342 for the
-full Claude Code definition and names the DSM protocol that consumes
+Seven concepts a DSM collaborator must hold. Each cites the Claude Code platform assessment for the full Claude Code definition and names the DSM protocol that consumes
 it.
 
 1. **Session.** A single Claude Code conversation, bound to a working
-   directory, not a git branch (BL-342 §11). Sessions survive compaction
+   directory, not a git branch (per Claude Code docs §11). Sessions survive compaction
    but not restart. DSM maps one session to one `session-N/YYYY-MM-DD`
    Level 2 branch via `/dsm-go` Step 0.
 2. **Hook.** A shell command dispatched on an event (`UserPromptSubmit`,
    `PreToolUse`, `PostToolUse`, `Stop`, etc.). Exit code `2` blocks the
    triggering action and surfaces stderr to Claude; any other non-zero
-   is a soft warning (BL-342 §2). DSM wires three hooks via
+   is a soft warning (per Claude Code docs §2). DSM wires three hooks via
    `scripts/templates/settings-hooks.json`.
 3. **Skill.** A Markdown prompt file in `.claude/skills/SKILL.md` (new
    format) or `.claude/commands/*.md` (legacy format DSM still uses).
    Skills load once at session start or first invocation and survive
    compaction up to a 5K-per-skill / 25K-combined token budget
-   (BL-342 §6). All 18 DSM lifecycle skills (`/dsm-go`, `/dsm-align`,
+   (per Claude Code docs §6). All 18 DSM lifecycle skills (`/dsm-go`, `/dsm-align`,
    `/dsm-wrap-up`, etc.) are command-format skills.
 4. **Tool.** A Claude Code built-in action (`Read`, `Write`, `Edit`,
    `Bash`, `Grep`, `Glob`, `Agent`, etc.). Bash runs each invocation
    as a fresh subprocess, so env vars do not persist across Bash calls
-   (BL-342 §12). MCP servers add tools with the `mcp__server__tool`
-   naming (BL-342 §8).
+   (per Claude Code docs §12). MCP servers add tools with the `mcp__server__tool`
+   naming (per Claude Code docs §8).
 5. **`@` Reference.** Recursive Markdown import syntax, up to 5 hops
-   (BL-342 §5). DSM_0.2 is loaded into every DSM project through one
+   (per Claude Code docs §5). DSM_0.2 is loaded into every DSM project through one
    `@` import in the project `.claude/CLAUDE.md`; the dispatch table
    inside DSM_0.2 uses Markdown links, not nested `@` imports, to
    control context budget.
 6. **Memory.** Two layers: `CLAUDE.md` (user-written, always loaded)
    and auto memory at `~/.claude/projects/.../memory/MEMORY.md`
-   (Claude-written, first 200 lines or 25 KB loaded) (BL-342 §7).
+   (Claude-written, first 200 lines or 25 KB loaded) (per Claude Code docs §7).
    DSM uses both: CLAUDE.md for durable protocol anchors, auto memory
    for cross-session recall and user-preferences.
 7. **Subagent.** An isolated sub-session spawned via the `Agent` tool
-   with its own context window (BL-342 §9). DSM uses Sonnet subagents
+   with its own context window (per Claude Code docs §9). DSM uses Sonnet subagents
    for reading-heavy pre-brief research so the main thread stays light
    (see DSM_0.2 §8.7).
 
@@ -164,7 +160,7 @@ Y = native and stable; P = partial or plan-gated; N = not supported.
 | Local hardware access (shell, GPU)      | Y | Via Bash tool; sandbox off by default in most DSM setups |
 | Model config and routing                | P | Effort / thinking / fast-mode knobs per session; no fine-tuning |
 | Billing / usage tracking                | P | Subscription-side; see `~/.claude/claude-subscription.md` |
-| Auto mode (unattended execution)        | P | Plan-gated: Team / Enterprise / API + Sonnet 4.6 only (BL-342 §4) |
+| Auto mode (unattended execution)        | P | Plan-gated: Team / Enterprise / API + Sonnet 4.6 only (per Claude Code docs §4) |
 | IDE integration                         | Y | VS Code extension is primary; JetBrains and web also supported |
 
 #### 2.1.5. How to Work With Claude Code in a DSM Context
@@ -175,12 +171,12 @@ Claude-specific mechanisms. Grouped by protocol.
 **Session transcript and the UserPromptSubmit hook.**
 `.claude/hooks/transcript-reminder.sh` (UserPromptSubmit) injects a
 per-turn reminder that the agent must append thinking to
-`.claude/session-transcript.md` before work (BL-399 P-01). A second
+`.claude/session-transcript.md` before work (per TAB/DSM patterns audit P-01). A second
 hook, `.claude/hooks/validate-transcript-edit.sh` (PreToolUse on
 Edit), enforces append-only shape with three checks: anchor is the
 last non-empty line of the file, new content is strictly appended,
 and delimiters match the `<------------Start {Thinking|Output|User} /
-HH:MM------------>` pattern (BL-399 P-02). These two hooks are the
+HH:MM------------>` pattern (per TAB/DSM patterns audit P-02). These two hooks are the
 only operational enforcement of DSM_0.2 §7; IDE monitoring and
 session-start behavioral activation are user affordances, not
 mechanisms. See §5 Incident Catalog F-094 and S180 for why the
@@ -189,7 +185,7 @@ mode-bit handling is load-bearing.
 **Pre-Generation Brief Gate 2 and the IDE permission window.**
 Gate 2 (implementation review) is realized by the VS Code extension's
 file-write approval dialog, activated by
-`claudeCode.initialPermissionMode: "default"` (BL-399 P-08).
+`claudeCode.initialPermissionMode: "default"` (per TAB/DSM patterns audit P-08).
 Accepting the dialog is the explicit approval DSM_0.2 §8.2 requires.
 Setting the mode to `acceptEdits` or `auto` breaks Gate 2 silently;
 DSM recommends `default` for all projects unless the user has an
@@ -199,12 +195,12 @@ explicit reason to override.
 Code instances in the same workspace share a git working copy.
 `/dsm-parallel-session-go` writes a provisional stub to
 `.claude/parallel-sessions.txt` as its first tool call, before the
-UserPromptSubmit hook can fire on turn 1 (BL-399 P-07, P-04). The
+UserPromptSubmit hook can fire on turn 1 (per TAB/DSM patterns audit P-07, P-04). The
 stub lets the hook route transcript behavior correctly
 (main-session-only writes to the live transcript; parallel sessions
 write to their own per-PID files). Commit booking via
 `.claude/commit-lock` with 5-minute TTL prevents interleaved commits
-(BL-399 P-15).
+(per TAB/DSM patterns audit P-15).
 
 **Cloned-Mirror Kick-off and template promotion.** Freshly cloned
 mirror repos arrive with `.claude/*.template` files instead of live
@@ -218,7 +214,7 @@ that turns a cloned mirror into a functional DSM hub.
 
 **Three-Level Branching Strategy.** DSM's L1 (main) / L2 (session) /
 L3 (task) branch model runs on Claude's sessions-are-per-directory
-behavior (BL-342 §11). The agent's working copy stays on the same
+behavior (per Claude Code docs §11). The agent's working copy stays on the same
 branch across turns; explicit `git checkout` in a tool call is the
 only way to move. Post-merge branch recreation (DSM_0.2 §20.8)
 exists because `gh pr merge --delete-branch` leaves the working
@@ -255,18 +251,18 @@ unless noted.
 | `~/.claude/CLAUDE.md`         | User-global instructions                  | User      |
 | `~/.claude/commands/*.md`     | User-scope skills (deployed DSM commands) | User      |
 
-**Settings.json scope order** (BL-342 §3): managed > user > project >
+**Settings.json scope order** (per Claude Code docs §3): managed > user > project >
 local > CLI. `deny` rules at any level are absolute. DSM does not use
 the managed scope; user and project scopes carry DSM's permission and
 hook wiring.
 
-**Hook wiring architecture** (BL-399 P-06). DSM's three hook slots:
+**Hook wiring architecture** (per TAB/DSM patterns audit P-06). DSM's three hook slots:
 
 - `UserPromptSubmit` → transcript-reminder.sh (occurrence enforcement)
 - `PreToolUse` matching Edit → validate-transcript-edit.sh (shape
   enforcement)
 - `PreToolUse` matching Bash with commit-like commands →
-  validate-rename-staging.sh (git-mv staging safety, BL-399 P-03)
+  validate-rename-staging.sh (git-mv staging safety, per TAB/DSM patterns audit P-03)
 
 Because `settings.json` is gitignored per the `.claude/` blanket
 rule, DSM delivers hook entries via
@@ -274,7 +270,7 @@ rule, DSM delivers hook entries via
 them idempotently, matching by command string (so user-added hooks
 are preserved).
 
-**`@` reference chain** (BL-342 §5, DSM_0.2 §17). Every DSM project's
+**`@` reference chain** (per Claude Code docs §5, DSM_0.2 §17). Every DSM project's
 `.claude/CLAUDE.md` starts with one `@` line pointing to DSM Central's
 `DSM_0.2_Custom_Instructions_v1.1.md`. DSM_0.2 internally uses
 Markdown links (not nested `@` imports) to lazy-load modules A-D on
@@ -282,18 +278,18 @@ demand; this is a deliberate context-budget choice, not a limitation.
 Recursive `@` import to 5 hops is supported but not used by DSM's
 architecture.
 
-> **Verification note.** The 5-hop recursion depth (BL-342 §5) was
-> flagged by BL-342 as "needs empirical verification" because DSM
+> **Verification note.** The 5-hop recursion depth (per Claude Code docs §5) was
+> flagged by the platform assessment as "needs empirical verification" because DSM
 > MEMORY previously held an incorrect "no recursion" claim. DSM
 > architecture does not depend on recursion depth >1; future BLs that
 > propose multi-hop `@` chains should verify the depth at commit time.
 
 **Skill format.** DSM uses the legacy `.claude/commands/*.md` format
 exclusively; the new `.claude/skills/SKILL.md` format with frontmatter
-is available (BL-342 §1) but not adopted. Migration is a separate BL,
+is available (per Claude Code docs §1) but not adopted. Migration is a separate BL,
 not a blocker.
 
-**Compact instructions** (BL-342 §6). When context pressure triggers
+**Compact instructions** (per Claude Code docs §6). When context pressure triggers
 auto-compaction, Claude Code preserves project-root CLAUDE.md and any
 skill invoked in the session up to the 5K/25K budget. Long DSM
 sessions that invoke many skills (`/dsm-go`, `/dsm-align`,
@@ -310,20 +306,19 @@ where full `/dsm-go` context is not needed.
   (DSM_0.2.A §17 Step 2a.6). `gh` is a prerequisite, not a Claude
   Code built-in.
 - **Git.** Claude Code sees branch state and uncommitted changes
-  but sessions are tied to directory, not branch (BL-342 §11). DSM
+  but sessions are tied to directory, not branch (per Claude Code docs §11). DSM
   Three-Level Branching runs on top of this.
 - **MCP servers.** DSM does not currently consume MCP tools in
   protocols. Projects may add them (Gmail, Drive, Calendar, etc.);
-  tool names are `mcp__server__tool` (BL-342 §8). Tool definitions
+  tool names are `mcp__server__tool` (per Claude Code docs §8). Tool definitions
   are deferred by default, accessed via ToolSearch on demand.
 - **IDE integration.** VS Code is the primary DSM IDE. The built-in
-  MCP server exposes `getDiagnostics` and `executeCode` (BL-342
-  §10). JetBrains and web UIs work but the DSM Gate 2 permission
+  MCP server exposes `getDiagnostics` and `executeCode` (per Claude Code docs §10). JetBrains and web UIs work but the DSM Gate 2 permission
   model is best tuned for VS Code.
 
 #### 2.1.8. Security and Permissions
 
-**Permission modes** (BL-342 §4), six values:
+**Permission modes** (per Claude Code docs §4), six values:
 
 | Mode                  | Behavior                                      | DSM Use |
 |-----------------------|-----------------------------------------------|---------|
@@ -335,15 +330,13 @@ where full `/dsm-go` context is not needed.
 | `bypassPermissions`   | No prompts at all                             | Never in DSM |
 
 > **Counter-evidence surfacing.** Auto mode is gated by plan
-> (Team / Enterprise / API) AND by model (Sonnet 4.6 only) per BL-342
-> §4. DSM users on personal or Pro plans cannot use auto mode; the
-> fallback is `default` with a broad allowlist. BL-397
-> (Auto-Mode Boundaries) tracks the auto-mode policy for DSM sessions
+> (Team / Enterprise / API) AND by model (Sonnet 4.6 only) per Claude Code docs §4. DSM users on personal or Pro plans cannot use auto mode; the
+> fallback is `default` with a broad allowlist. The Auto-Mode Boundaries protocol tracks the auto-mode policy for DSM sessions
 > that have access.
 
 **Protected paths.** `.claude/` is protected by default EXCEPT for
 `.claude/commands/`, `.claude/agents/`, `.claude/skills/`, and
-`.claude/worktrees/` (BL-342 §4). DSM writes to
+`.claude/worktrees/` (per Claude Code docs §4). DSM writes to
 `.claude/session-transcript.md`, `.claude/last-align-report.md`,
 `.claude/last-align.txt`, and `.claude/session-baseline.txt` under
 the per-project auto-approved allowlist (set by `/dsm-align` via
@@ -353,7 +346,7 @@ the settings.json template).
 Module C §5 plus project CLAUDE.md Destructive Command Protocol. The
 pre-staging filename check (`.env`, `*.key`, `*.pem`, etc.) is agent
 behavior, not a hook; DSM has no Claude-specific secret scanner
-hook today. BL-335 `check-mirror-sync-content.sh` is a content-level
+hook today. The personal content scanner `check-mirror-sync-content.sh` is a content-level
 scanner invoked manually at mirror-sync time.
 
 #### 2.1.9. Troubleshooting and Collaboration Incident Catalog
@@ -365,20 +358,20 @@ cross-document catalog lives in §5; this subsection curates the
 - **F-094 , per-turn transcript hook silently broken (2026-01 to
   2026-04-07).** Hook script at index-mode 100644; WSL with
   `core.fileMode = false` hid the missing +x. Resolution: `/dsm-align`
-  Step 10b sub-step (b) re-applies chmod every run (BL-319). See §5.
+  Step 10b sub-step (b) re-applies chmod every run (session-transcript hook requirement). See §5.
 - **S180 +x bug (2026-04-07).** Same class, smaller scale. Same
   resolution.
-- **BL-377 parallel-session turn-1 hook collision (2026-04-18).**
+- **Parallel-session turn-1 hook collision (2026-04-18).**
   UserPromptSubmit hook fired before parallel registry stub was
   written on turn 1; rogue transcript block ended up in the main
   transcript. Resolution: provisional-stub pattern
   (`/dsm-parallel-session-go` Step 0) writes registry before any
-  other tool call (BL-399 P-07).
-- **BL-342 mental-model gap (filed 2026-04-10).** Prior mental
+  other tool call (per TAB/DSM patterns audit P-07).
+- **Claude Code mental-model gap (filed 2026-04-10).** Prior mental
   model of Claude Code was experiential, not docs-grounded. Resulted
   in three incorrect claims (including the `@` no-recursion claim
   above). Resolution: 741-line systematic assessment, ongoing
-  alignment via BL-353 (Platform Alignment Protocol).
+  alignment via Platform Alignment Protocol.
 - **Heredoc quoting anti-pattern (portfolio S69).** Single-quoted
   heredoc (`<< 'EOF'`) suppresses `$(date ...)` expansion, writing
   literal strings into the transcript. Resolution: Edit-tool append
@@ -394,9 +387,9 @@ Failure modes inherent to Claude Code that DSM should watch:
 - **Hook dispatch timing on turn 1.** UserPromptSubmit fires before
   skill execution; any skill that needs to set up state for the
   hook must either run the setup as a sync pre-hook or use the
-  provisional-stub pattern (BL-399 P-07).
+  provisional-stub pattern (per TAB/DSM patterns audit P-07).
 - **Bash subprocess isolation.** Env vars do not persist across
-  Bash calls (BL-342 §12). Tests that rely on an exported variable
+  Bash calls (per Claude Code docs §12). Tests that rely on an exported variable
   must set it in the same Bash invocation.
 
 #### 2.1.10. Reference
@@ -442,9 +435,8 @@ concerns that do apply:
   it is not a Claude Code feature but depends on Claude Code's
   `@` reference chain to propagate.
 
-Maintenance discipline: BL-353 Platform Alignment Protocol runs as
-the continuous loop. When Claude Code ships a material change, BL-353
-proposes the §2.1 update; §7 version history records the Phase N
+Maintenance discipline: Platform Alignment Protocol runs as
+the continuous loop. When Claude Code ships a material change, the Platform Alignment Protocol proposes the §2.1 update; §7 version history records the Phase N
 increment.
 
 ### 2.2. (Future platforms)
@@ -458,7 +450,7 @@ it.
 
 ## 3. Generalized "How to Work With [Platform]" Template
 
-Extracted from §2.1 Claude Code (BL-400) and BL-398 template-structure
+Extracted from §2.1 Claude Code filled instance and template-structure
 research. Each supported platform gets its own §2.N subsection following
 this template. Subsections §3.1 through §3.10 are required; §3.11
 applies only to Full Agent tier platforms.
@@ -635,12 +627,11 @@ Procedure for filing a new `§2.N [Platform]` subsection.
    with Phase-4-style scope (single-file edit to DSM_7.0, multi-source
    research inputs documented).
 2. **Commission the research.** If the platform has not been
-   systematically assessed, file a BL-342-style platform-assessment
-   research item (N areas matching §3.3 concepts + §3.4 capability
+   systematically assessed, file a platform-assessment research item (12 areas matching §3.3 concepts + §3.4 capability
    rows). Deliverable lands in `dsm-docs/research/`.
 3. **Commission the patterns audit** (optional). If the platform has
    accumulated DSM-exclusive patterns that bend or extend DSM
-   protocols, file a BL-399-style audit. Skip for first-time adoption
+   protocols, file a TAB/DSM-exclusive patterns audit. Skip for first-time adoption
    platforms with no prior DSM use.
 4. **Draft §2.N.** Follow §3 subsection-by-subsection. Cite research
    files for every non-obvious claim (per DSM_0.2 §8.2.1 counter-
@@ -657,8 +648,7 @@ Procedure for filing a new `§2.N [Platform]` subsection.
 8. **Update §7 Version History** with a new entry describing which
    §2.N landed.
 
-BL-398 → BL-399 → BL-400 → BL-401 is the reference chain for the
-first instance (Claude Code). Future platforms can reuse the chain
+Template research → Patterns audit → Filled instance → Template generalization is the phase chain for the first instance (Claude Code). Future platforms can reuse the chain
 pattern or collapse phases when prior research is unnecessary.
 
 ---
@@ -667,7 +657,7 @@ pattern or collapse phases when prior research is unnecessary.
 
 This section documents where platform-specific content currently lives
 inside platform-agnostic DSM documents, classifying each as naming-only or
-semantic-also. Phase 1 inventory only; Phase 5 (BL-401) applies resolutions.
+semantic-also. Phase 1 inventory only; Phase 5 (template generalization) applies resolutions.
 
 ### Inventory (Phase 1)
 
@@ -683,7 +673,7 @@ semantic-also. Phase 1 inventory only; Phase 5 (BL-401) applies resolutions.
 
 ### Phase 5 resolution plan
 
-BL-401 (template generalization + cross-references) applies Option 1 by
+Template generalization (Option 1: cross-references) applies Option 1 by
 default: leave source-of-truth content where it is, add one-line
 cross-references to DSM_7.0 §2.1. Revisit Option 3 (extract Claude
 specifics) only if an external reviewer flags DSM_0.2 as Claude-coupled in a
@@ -691,7 +681,7 @@ way that blocks another platform's adoption.
 
 ### Cross-reference destinations (inventory for Phase 5)
 
-From the Phase 1 Explore survey (BL-345 plan, 2026-04-19). Phase 5 (BL-401)
+From the Phase 1 Explore survey (AI Platform Guide scaffold plan, 2026-04-19). Phase 5 (template generalization)
 applies edits.
 
 1. DSM_0.0 §7 Document Map , add DSM_7.0 entry (this scaffold already does

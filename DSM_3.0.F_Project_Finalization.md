@@ -81,7 +81,7 @@ gaps that appeared repeatedly, and techniques that evolved over the project.
 Extracted reasoning lessons are classified and routed:
 - **Project-specific** lessons stay in the spoke's `.claude/reasoning-lessons.md`
 - **DSM-methodology-relevant** lessons are pushed to DSM Central's inbox
-- **Reusable patterns** are flagged for the Context Library (BL-139) when available
+- **Reusable patterns** are flagged for the Context Library when available
 
 A context budget gate applies: projects with many transcripts offer sampling
 options to avoid exhausting the context window during analysis.

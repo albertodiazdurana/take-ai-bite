@@ -91,12 +91,12 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    - Files in the baseline with unchanged checksums = pre-existing, not touched this session (skip them)
    - If `.claude/session-baseline.txt` does not exist (session started without `/dsm-go`), fall back to staging all changed files
 
-   **Mirror self-detection inbox guard (BL-407):** If
+   **Mirror self-detection inbox guard:** If
    `scripts/take-ai-bite-sync.txt` does NOT exist in the current
    working tree, this repo is a mirror (not the hub). Exclude any
    `_inbox/*` path from the stage-set except `_inbox/README.md` and
    `_inbox/.gitkeep`. Log each excluded path: "Mirror inbox guard:
-   skipped `_inbox/{file}` (BL-407)." Parity with `/dsm-wrap-up`
+   skipped `_inbox/{file}` (mirror inbox guard)." Parity with `/dsm-wrap-up`
    Step 9.
 
    Then `git commit` and `git push` in sequence. If no session changes exist, skip the commit.

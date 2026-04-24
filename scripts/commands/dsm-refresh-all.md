@@ -2,7 +2,7 @@ Re-read all DSM context sources without session-start overhead. Use when CLAUDE.
 
 ## Steps
 
-1. **Re-read governance (defensive, BL-236e):** Read `.claude/CLAUDE.md` and follow the `@` reference to load DSM_0.2. If the `@` reference is missing from CLAUDE.md or its target file does not exist on the filesystem, warn `"Could not load DSM_0.2 (@ reference missing or broken). Refresh limited to MEMORY.md and inbox."` and continue with the remaining steps. Mirrors the defensive read pattern from `dsm-safe-go` Step 2.
+1. **Re-read governance (defensive):** Read `.claude/CLAUDE.md` and follow the `@` reference to load DSM_0.2. If the `@` reference is missing from CLAUDE.md or its target file does not exist on the filesystem, warn `"Could not load DSM_0.2 (@ reference missing or broken). Refresh limited to MEMORY.md and inbox."` and continue with the remaining steps. Mirrors the defensive read pattern from `dsm-safe-go` Step 2.
 2. **Re-read MEMORY.md:** Find and load this project's MEMORY.md from the auto memory directory
 3. **Check inbox:** Read `_inbox/` for new entries; surface any pending to the user
 4. **Read latest artifacts** (skip done/ subfolders, skip if folder is empty):

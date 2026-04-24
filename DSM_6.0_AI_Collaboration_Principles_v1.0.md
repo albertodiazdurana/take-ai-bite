@@ -410,7 +410,7 @@ evidence.
 
 **Evidence:** DSM's own evolution from a single methodology document (November
 2025) to a 14-repo ecosystem with 83 documented features, 796 commits, and a
-38-item strategic roadmap (March 2026). The roadmap system (BL-211) was not
+38-item strategic roadmap (March 2026). The roadmap system was not
 planned at the start; it emerged when the backlog reached ~30 active items and
 the acceleration curve (0.7 → 10.1 commits/day) made ad-hoc prioritization
 unsustainable. Full analysis: `dsm-docs/research/2026-03-16_dsm-evolution-git-history-analysis.md`
@@ -549,13 +549,12 @@ is paid once; the cost of not reading compounds.
   end-to-end, not reading the hook scripts themselves. The manual was
   authoritative; the agent's working mental model was not.
 
-- **BL-342 (Claude Code platform research).** The corrective mitigation:
-  BL-342 filed as a High-priority research BL to read Claude Code's
-  changelogs and hook documentation systematically. BL-342 Implemented
-  2026-04-12. The research surfaced multiple platform capabilities the DSM
+- **Claude Code platform research (2026-04-12 assessment).** The corrective mitigation:
+  The platform research was filed as a High-priority research item to read Claude Code's
+  changelogs and hook documentation systematically. Research completed 2026-04-12. The research surfaced multiple platform capabilities the DSM
   skills had been working around rather than using (allowed-tools
   governance, register-sensitive skill evaluation, PreToolUse/PostToolUse
-  matchers). BL-342's output made subsequent decisions defensible; its
+  matchers). The platform research output made subsequent decisions defensible; its
   absence is what made F-094 and S180 possible.
 
 The principle does not prevent the first encounter with a new tool from
@@ -653,7 +652,7 @@ to existing DSM protocols and identifies the gaps that remain.
 | Checkpoint and Handoff system | DSM_0.2, DSM_5.0 | Know Your Context |
 | Daily Documentation Protocol | DSM 1.0, Section 6.1.4 | Know Your Context |
 | Skill Self-Reference Protocol (read skill file before claiming behavior) | DSM_0.2 §8.6 | Read the User's Manual, Earn Your Assertions |
-| Platform Research Backlog Items (BL-342 Claude Code research, ongoing under BL-353) | DSM_0.2 §10, `dsm-docs/research/` | Read the User's Manual |
+| Platform Research Items (Claude Code research, ongoing under Platform Alignment Protocol) | DSM_0.2 §10, `dsm-docs/research/` | Read the User's Manual |
 
 **Quality and Feedback**
 

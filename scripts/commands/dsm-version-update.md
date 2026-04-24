@@ -1,10 +1,10 @@
 Guide the user through the DSM Version Update Workflow.
 
-**Audience (BL-236e):** Run only in DSM Central. This skill versions the DSM methodology itself; standalone TAB and other spokes consume DSM versions but do not author them.
+**Audience:** Run only in DSM Central. This skill versions the DSM methodology itself; standalone TAB and other spokes consume DSM versions but do not author them.
 
 **Early-stop:** If no `DSM_0.0_*.md` file exists in the current working directory, refuse with: `"Run only in DSM Central; this skill versions DSM methodology files which are absent here."` Do not proceed.
 
-**Heuristic limitation (documented):** The early-stop catches non-mirror spokes but does NOT catch mirror clones (e.g., TAB) that have a synced `DSM_0.0_*.md` copy. The Audience note above is the primary guard; user attentiveness is the backstop. If a misclick on a mirror clone becomes a recurring issue, file a follow-up BL to add a stronger `scripts/take-ai-bite-sync.txt`-based check (BL-236e narrowed scope chose option (a), accept + document, per Tier-2 protocol T2b finding).
+**Heuristic limitation (documented):** The early-stop catches non-mirror spokes but does NOT catch mirror clones (e.g., TAB) that have a synced `DSM_0.0_*.md` copy. The Audience note above is the primary guard; user attentiveness is the backstop. If a misclick on a mirror clone becomes a recurring issue, file a follow-up BL to add a stronger `scripts/take-ai-bite-sync.txt`-based check (narrowed-scope rationale: option (a), accept + document, per Tier-2 protocol T2b finding).
 
 ## Prerequisites
 
@@ -49,7 +49,7 @@ Walk through each step, showing the user what to do and waiting for confirmation
 - Create git tag: `git tag vX.Y.Z`
 - Remind user to push: `git push && git push --tags`
 
-### Step 4b: Mirror Release Tag to Mirror Repos (BL-376)
+### Step 4b: Mirror Release Tag to Mirror Repos
 
 **Temporal ordering:** This sub-step runs AFTER CLAUDE.md Version Update Workflow Step 9 (Mirror sync) has completed for all mirrors. Do not push the tag before the file sync has landed on the mirror's `main`; the tag must reference the sync commit, not a stale pre-sync commit.
 
@@ -70,7 +70,7 @@ For each entry in `.claude/dsm-ecosystem.md` with `Mirror = true`:
 - Ecosystem registry has no `Mirror = true` entries: report "No mirror repos configured; skipping tag-mirror step."
 - Step 9 file sync failed or was not run for a specific mirror: skip that mirror only.
 
-**Not in scope (BL-376):**
+**Not in scope (mirror release tag step):**
 - `/dsm-wrap-up` silent-drift mirror sync does NOT trigger this sub-step; tag push fires only at version-bump events.
 - Backfill of historical Central tags onto mirrors is out of scope; CHANGELOG is the history record.
 

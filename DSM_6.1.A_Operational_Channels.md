@@ -251,7 +251,7 @@ Each mechanism has a characteristic failure mode:
 
 The operational channels and context management practices described in this
 module map to established Project Management knowledge areas. This mapping
-(analyzed in detail in BL-260) reveals that DSM already performs project
+(analyzed in the PromptOps and PMP Parallels research) reveals that DSM already performs project
 management of its instruction system, framed as methodology governance
 rather than PM.
 
@@ -289,7 +289,7 @@ Sources and change history for this module.
 - DSM_0.2 §18: Ecosystem Path Registry
 - DSM_0.2 §22: Protocol Violation Triage Response
 - DSM_0.2 Module A: Session Lifecycle protocols
-- BL-260: PromptOps and PMP Parallels (PMP mapping analysis)
+- PromptOps and PMP Parallels research (PMP mapping analysis)
 - Document Structure Standard: `dsm-docs/guides/document-structure-standard.md`
 
 ### 8.2. Version History
