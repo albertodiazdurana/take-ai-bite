@@ -2,7 +2,6 @@
 
 **Version:** 1.0
 **Created:** 2026-03-24
-**Origin:** BACKLOG-259
 **Scope:** All DSM methodology documents (DSM_0 through DSM_6, modules, guides)
 
 This guide defines the structural rules for DSM documents: when and how to
@@ -229,7 +228,7 @@ for the thresholds defined in Section 1.
 1,254 lines demonstrates the cost of not having a budget: it accumulated
 protocols across multiple sessions without a split trigger.
 
-### 5.2. DSM_1.0 Modularization Data (Session 146, BL-257)
+### 5.2. DSM_1.0 Modularization Data (Session 146)
 
 | File | Lines | Assessment |
 |------|------:|------------|

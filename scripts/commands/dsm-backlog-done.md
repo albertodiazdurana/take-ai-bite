@@ -20,7 +20,14 @@ The user provides a backlog number (e.g., "042" or "BACKLOG-042").
    - Add a chronological entry to `FEATURES.md` at the top of the current month section
    - Format: `- **F-NNN (YYYY-MM-DD) Feature name** — One-line plain language description`
    - Increment the feature count in the header
-8. Show the user what was done and remind them to commit when ready
+8. **BL Lookup Index update:** Add a row to `dsm-docs/plans/done/INDEX.md` for this BL, preserving ascending BL-number order. Columns:
+   - `BL#`: `BACKLOG-NNN`
+   - `Title`: from the BL file's first heading (minus the `BACKLOG-NNN:` prefix)
+   - `Version`: the implementing version if known from the current CHANGELOG section being authored; else `—`
+   - `Date`: today's date (YYYY-MM-DD)
+   - `Resolver (§ or concept)`: the DSM section (e.g., `DSM_0.2 §8.2.1`) or concept name the BL landed as. For research / audit / one-shot-fix BLs without a named-section landing, use `— (implementation-only)`.
+   INDEX is mirrored to TAB per `dsm-docs/guides/mirror-sync-manifest.md` category 4; keeping it current means downstream readers can resolve BL numbers they see in CHANGELOG/FEATURES.
+9. Show the user what was done and remind them to commit when ready
 
 ## Important
 

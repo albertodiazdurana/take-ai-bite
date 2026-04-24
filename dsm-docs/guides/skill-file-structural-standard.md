@@ -2,14 +2,13 @@
 
 **Version:** 1.0
 **Created:** 2026-04-13
-**Origin:** BACKLOG-343
 **Scope:** All DSM skill definitions, command files, and hook scripts
 **Companion:** DSM_0.2 Module B §8 (Infrastructure File Collaboration Protocol)
 
 This guide defines the structural rules for DSM infrastructure files: skill
 definitions (SKILL.md), command files (legacy), and hook scripts. It parallels
 the Document Structure Standard for methodology files and is grounded in
-BL-342 platform research findings.
+Claude Code platform research findings.
 
 ## Section Index
 
@@ -170,7 +169,7 @@ set -euo pipefail
 | Command file | ≤ 200 lines | 300 lines | Same compaction budget applies |
 | Hook script | ≤ 50 lines | 100 lines | Hooks should be focused and fast |
 
-**Compaction note (BL-342 finding):** Claude Code's skill compaction budget
+**Compaction note (per Claude Code platform assessment):** Claude Code's skill compaction budget
 is 5,000 tokens per skill and 25,000 tokens combined across all loaded
 skills. Skills exceeding ~200 lines risk truncation in extended sessions.
 Keep core logic in the first 200 lines; move templates and reference material
@@ -219,5 +218,5 @@ A future BL should update it to:
 2. Maintain backwards compatibility with commands/ during transition
 3. Update /dsm-align step 10b to install skill-format hooks
 
-This pipeline change is outside BL-343 scope. Track as a separate item
-when the first skill migration is needed.
+This pipeline change is outside the Skill File Structural Standard scope.
+Track as a separate item when the first skill migration is needed.

@@ -459,7 +459,7 @@ Sprint N: {brief title}
 
 **Why Priority: Low?** Technical progress reports are informational, not action
 items. They accumulate until a portfolio update cycle or the Context Library
-(BL-139) processes them.
+(the Context Library) processes them.
 
 **Relationship to other feedback channels:**
 
@@ -536,7 +536,7 @@ accumulated multi-session transcript.
 checklist of deferred items. The next full `/dsm-go` processes them as part of
 its standard protocol.
 
-Reference: BACKLOG-151
+Reference: Light Wrap-Up Cadence Gate protocol
 
 ---
 
@@ -547,7 +547,7 @@ shape (shared Level 2 branch, typed prefixes, commit booking, file
 scope declarations). DSM_7.0 §2.1.5 covers the Claude-specific
 realization: the PID-scoped registry in `.claude/parallel-sessions.txt`,
 the provisional-stub pattern that resolves the turn-1 hook collision
-(BL-377), and the `.claude/commit-lock` file-based lock with TTL. The
+(parallel-session turn-1 hook collision fix), and the `.claude/commit-lock` file-based lock with TTL. The
 protocol stays here; the Claude mechanism lives in DSM_7.0.
 
 Parallel sessions allow multiple concurrent AI sessions to work on independent
@@ -783,8 +783,8 @@ operate in isolation from the main session's numbering state.
   `/dsm-quick-wrap-up`) from a parallel session; these merge, push, and update
   session state, which would break the main session's in-progress work
 
-Reference: BACKLOG-276 (supersedes BACKLOG-220, BACKLOG-243, BACKLOG-272),
-BACKLOG-281 (lifecycle skill prohibition)
+Reference: Parallel Session Lifecycle Protocol (supersedes earlier parallel-session drafts),
+Lifecycle Skill Prohibition rule
 
 ### 7.11. Parallel Session Guard for Wrap-Up Skills
 
@@ -803,7 +803,7 @@ This guard prevents a parallel session from merging the session branch to main,
 pushing incomplete work, updating MEMORY.md, or running mirror sync while the
 main session has in-progress work.
 
-Reference: BACKLOG-281
+Reference: Lifecycle Skill Prohibition rule
 
 ---
 
@@ -851,8 +851,8 @@ outputs a STAA recommendation after each auto extraction.
 **Maintenance:**
 
 - **Pruning cadence:** Every 5 sessions, review the file
-- **File size target:** ~50 entry lines (excluding headers and comments); if
-  exceeded, trigger a prune pass regardless of cadence
+- **File size target:** ~70 entry lines (excluding headers and comments); if
+  exceeded, trigger a prune pass regardless of cadence, maximum 200 lines hard cap
 - **Prune actions:**
   1. **Promote to memory:** entries reinforced across 3+ sessions graduate to
      MEMORY.md (as Key Patterns or Common Pitfalls) or CLAUDE.md (as protocol
@@ -870,7 +870,7 @@ outputs a STAA recommendation after each auto extraction.
      by the original Category. Remove from the live file. The archive file is
      read-only audit and is not loaded by `/dsm-go` Step 1.5, the wrap-up
      extraction step, or `/dsm-staa`. Do not leave inline `<!-- Archived ... -->`
-     comments in the live file (BL-358).
+     comments in the live file (reasoning-lessons archive rule).
   4. **Consolidate:** entries expressing the same insight from different sessions
      merge into one with session cross-references (e.g., `[+S55]`)
 
@@ -1079,6 +1079,50 @@ Move superseded checkpoints to `dsm-docs/checkpoints/done/`. Add
 `**Superseded by:** {newer checkpoint filename}` to the moved file's header.
 
 **Cadence:** Per-sprint, integrated into the Sprint Boundary Checklist.
+
+### 10.2.1. Checkpoint Authoring Identifiers
+
+Checkpoints are cross-session reference artifacts. The next session's
+`/dsm-go` Step 3.5 reads the most recent checkpoint to load context for
+continuing work, and in spoke projects that reader is an agent with no
+access to `dsm-docs/plans/`. Checkpoint entries that cite bare BL numbers
+(e.g., "T7 Gate 1 re-brief applying BL-402 + BL-385") leave the next
+agent with unresolvable pointers precisely where agents most need working
+pointers.
+
+**Rule:** checkpoint entries MUST use resolvable identifiers:
+
+- Section references: `§X.Y` or `DSM_X.Y §N`
+- Protocol or concept names: "the Strongest Counter-Evidence requirement"
+- Session or file references: `S194`, `dsm-docs/research/{file}.md`
+
+Checkpoint entries MUST NOT use bare BL numbers as identifiers in prose,
+bullet lists, next-steps sections, or key-decisions sections.
+
+**Narrow exception:** a checkpoint specifically about the state of an
+in-flight BL implementation MAY cite the BL number as the canonical
+artifact identifier when BOTH conditions hold:
+
+(a) the BL number IS the canonical name for the in-flight work (no
+alternative concept name exists yet, because the work is mid-definition)
+(b) the checkpoint will primarily be consumed in Central (not spoke)
+context
+
+**Scope:** forward-only from the version that adds this rule. Past
+checkpoints in `dsm-docs/checkpoints/done/` are frozen historical
+records and are not rewritten. Rewriting them would destroy
+reasoning-trail evidence.
+
+**Cadence:** applies to every new checkpoint creation via
+`/dsm-checkpoint`. The skill's Step 2.5 surfaces this rule to the
+authoring agent at checkpoint-draft time.
+
+**Relationship to sibling rules:** this rule is the forward-only
+authoring complement to the scrub of BL references from mirrored
+methodology. The asymmetry with `FEATURES.md` (which preserves BL
+anchors for its F→BL trail) is intentional: FEATURES is a human-read
+feature timeline; checkpoints are agent-read cross-session context.
+Different reader profiles warrant different identifier policies.
 
 ### 10.3. Anti-Patterns
 
@@ -1293,7 +1337,7 @@ alignment counterpart to `/dsm-align` for spokes.
    - **Breaking change or deprecation:** file a High-priority BL
 3. **Update the baseline.** Append a dated amendment section to
    `dsm-docs/research/done/2026-04-12_claude-code-platform-assessment.md`
-   (the BL-342 baseline). Append, do not rewrite; preserves the change
+   (the Claude Code platform assessment baseline). Append, do not rewrite; preserves the change
    history.
 
 **Output report (included in sprint retrospective):**
@@ -1312,7 +1356,7 @@ by the baseline). Skip the rest. The check is filtering, not research.
 - Deferring when "nothing looks changed" (the check confirms no-change as
   an explicit reviewed state, not silence)
 
-Reference: BL-342 (baseline research), BL-353 (protocol establishment).
+Reference: Claude Code platform assessment (baseline research), Platform Alignment Protocol (protocol establishment).
 
 ---
 
@@ -1597,7 +1641,7 @@ The label serves as:
 
 At session start, identify the project type by examining the directory structure.
 The Application track is identified by any runtime marker from the list in §17.0
-(BL-379); a project with no runtime marker but with `dsm-docs/` and markdown-only
+(application detection broadening); a project with no runtime marker but with `dsm-docs/` and markdown-only
 content is Documentation (DSM 5.0). This decouples detection from Python-specific
 signals that previously made Node.js, Rust, Go, and shell-script projects fall
 silently into Documentation.
@@ -1652,6 +1696,12 @@ alignment section, REPORT the change before regenerating. The user may have an
 explicit reason to retain the recorded type (e.g., the filesystem has not yet
 caught up with sprint intent). Do not silently reclassify.
 
+**Intent-vs-state override:** If the project-specific section of CLAUDE.md
+contains a `## DSM Project Type Override` heading, the declared type supersedes
+detection for alignment-block regeneration. See §17.2 for the override syntax,
+validation rules, and when to use it. Detection still runs and is reported
+alongside the declared type for divergence visibility.
+
 **External contribution sessions:** Open the project in the external repo's local
 clone but reference governance artifacts in `{contributions-docs-path}/{project}/`
 (resolved from the Ecosystem Path Registry). See DSM_3 Section 6.6 for the full
@@ -1679,6 +1729,83 @@ Example: "This is a Documentation project (DSM 5.0) using the Private Project pa
 (automatic vs manual), README notifications (yes/no), and cross-repo write scope.
 Apply the pattern's constraints for the session, even if CLAUDE.md does not
 explicitly override every inherited DSM_0.2 protocol.
+
+### 17.2. Project Type Override
+
+Filesystem-signal detection (§17) classifies a project by what currently exists
+on disk. When a project's intent diverges from its current state, detection is
+wrong by construction. The canonical example: a new sprint plan exists and
+declares the project Application, but the application skeleton has not been
+scaffolded yet, so no primary runtime marker is present and detection falls
+to Documentation. `/dsm-align` then regenerates the alignment block for the
+wrong type and the spoke loses its App Dev reinforcement block.
+
+The override lets the project-specific section of CLAUDE.md declare the type
+explicitly. `/dsm-align` respects the declaration and still runs detection for
+divergence visibility.
+
+**Override syntax (in project-specific CLAUDE.md content, OUTSIDE the
+`<!-- BEGIN/END DSM_0.2 ALIGNMENT -->` delimiters):**
+
+```markdown
+## DSM Project Type Override
+
+**Declared type:** Application (DSM 4.0)
+**Reason:** Application skeleton not yet scaffolded; sprint plan exists.
+**Set by:** alberto on 2026-04-23
+```
+
+**Valid declared type values:** `Data Science`, `Application`, `Hybrid`,
+`Documentation`, `External Contribution`. Case-insensitive match; the
+parenthesized DSM track (e.g., `(DSM 4.0)`) is optional metadata and not
+validated.
+
+**How `/dsm-align` handles the override:**
+
+- **Before detection:** scan the project-specific region of CLAUDE.md for a
+  `## DSM Project Type Override` heading. If present and well-formed, the
+  declared type becomes the active type for alignment-block regeneration.
+- **Detection still runs:** its result is reported alongside the declared
+  type so divergence is visible. No auto-revert; the user removes the
+  override section when the divergence resolves naturally.
+- **Malformed override** (missing fields, unknown type name): warn in the
+  alignment report, fall back to detection. `/dsm-align` never silently
+  ignores a broken override.
+- **Override inside ALIGNMENT delimiters:** the content between
+  `<!-- BEGIN DSM_0.2 ALIGNMENT -->` and `<!-- END DSM_0.2 ALIGNMENT -->` is
+  overwritten on regeneration. If `/dsm-align` Step 7b detects an
+  override-shaped section inside the delimiters, it warns explicitly; the
+  user must move the section to project-specific content to preserve it.
+
+**When to use the override:**
+
+- Sprint plan declares a type the filesystem has not yet caught up with.
+- A deliberate project pattern (Hybrid stub, Application with docs-only first
+  sprint) that detection cannot classify correctly from signals alone.
+- Temporary divergence during refactoring, rename, or toolchain migration.
+
+**When NOT to use the override:**
+
+- Detection is wrong because of missing or weak signals. The fix is to
+  broaden detection (application signal broadening pattern), not to route around it with override.
+  Repeated override usage on the same pattern is a signal to file a
+  detection-broadening BL.
+- The project is genuinely multi-type (e.g., Data Science plus an Application
+  module). The canonical expression is the Hybrid track (see §17 detection
+  table), not a comma-separated override.
+
+**Removal:** edit CLAUDE.md to delete the `## DSM Project Type Override`
+section. No special protocol; standard project-specific edit. Detection
+resumes driving the alignment block on the next `/dsm-align` run.
+
+**Reporting cue:** when declared type matches detected type, `/dsm-align`
+surfaces a hint ("override now matches detection; safe to remove the
+override section") so long-lived overrides do not linger after the state
+catches up.
+
+**Origin:** S202. Addresses the intent-vs-state gap that
+detection-broadening cannot close because the gap is temporal,
+not signal-weakness.
 
 ---
 
@@ -1977,7 +2104,7 @@ or files the agent has already read in the current session.
 
 ## 23. CLAUDE.md Section Completeness Gate for New Projects
 
-> **Origin:** BACKLOG-307. Ensures every project CLAUDE.md is complete before
+> **Origin:** Ensures every project CLAUDE.md is complete before
 > implementation begins.
 
 Every project CLAUDE.md must contain four sections before implementation work
@@ -2060,7 +2187,7 @@ Gate 2 implementation review).
 
 ## 24. Sprint Plan Cross-Reference Before Completion
 
-> **Origin:** BACKLOG-312. Prevents premature completion declarations by
+> **Origin:** Prevents premature completion declarations by
 > requiring the agent to verify deliverables against the sprint plan.
 
 When a project has an active sprint plan, the agent must cross-reference it
@@ -2147,7 +2274,7 @@ files promoted to runtime paths, `{REPO_ROOT}` / `{project_name}` /
 protocol sequence stays here; the Claude template-promotion mechanism
 lives in DSM_7.0.
 
-> **Origin:** BACKLOG-372. Defines the first-session behavior for a freshly
+> **Origin:** Defines the first-session behavior for a freshly
 > cloned DSM mirror (take-ai-bite or any downstream fork). Closes the gap
 > between "clone the repo" and "functional agent session" that surfaced in
 > TAB PR #36 (first-clone test, 17 friction findings).
@@ -2201,7 +2328,7 @@ a previous partial Kick-off should be skipped without error.
    independent of the user's filesystem layout. Earlier versions of the
    template used a `{REPO_ROOT}` placeholder substituted with `pwd`; the
    relative path makes the file portable across clone moves and removes one
-   Kick-off substitution step (see BL-236a for rationale).
+   Kick-off substitution step (relative-path template rationale).
 4. **Copy `settings.json` from template.** Copy
    `.claude/settings.json.template` to `.claude/settings.json` if the target
    does not exist. No substitution needed; the template is environment-neutral.
@@ -2283,7 +2410,7 @@ implementations:
 - **No personal-content copy.** Central's MEMORY.md entries, CLAUDE.md
   outside-delimiter content specific to Central, contributor-profile.md,
   and spoke-backups/ are never copied to the clone. Those files are
-  Layer 2.5 per BL-336 (tracked-but-instance-specific). The clone
+  Layer 2.5 per the tracked-but-instance-specific personal content rule. The clone
   generates its own empty equivalents, populated over time by the user
   and by wrap-up skills.
 - **No personal-content collection.** Kick-off does not prompt the user
@@ -2354,7 +2481,7 @@ Execution sequence on a fresh clone's first session:
 2. `/dsm-go` Step 0.5 checks scaffold completeness (will usually fail
    because `.claude/dsm-ecosystem.md` is absent, deferring scaffold
    creation to Step 1.8).
-3. `/dsm-go` Step 0.8 (**new step, BACKLOG-372 T5**) checks Kick-off
+3. `/dsm-go` Step 0.8 (**new step, Cloned-Mirror Kick-off T5**) checks Kick-off
    detection signals per §25.1. If fired, invokes the Kick-off steps in
    §25.2. On completion, writes the marker and continues to Step 1.
 4. `/dsm-go` Step 1.8 invokes `/dsm-align`. `/dsm-align` runs the hub
@@ -2389,7 +2516,7 @@ Kick-off does **not** activate when:
 
 ### 25.8. Origin
 
-Origin: BACKLOG-372 (Session 191, 2026-04-15). Context: the author cloned
+Origin: Session 191 (2026-04-15). Context: the author cloned
 `dsm-take-ai-bite` on a fresh WSL environment and discovered that the
 clone could not complete `/dsm-go` without manual scaffolding. TAB PR #36
 documented 17 friction findings from this test. Root-cause analysis showed
@@ -2398,9 +2525,9 @@ two coupled issues:
 1. `scripts/take-ai-bite-sync.txt` had decayed, omitting ~30 load-bearing
    files (DSM_0.2 + modules, DSM_3 suite, DSM_6.1, all slash commands,
    `dsm-docs/guides/`, `FEATURES.md`, `README.md`, `.claude/hooks/*.sh`).
-   Fixed in BL-372 phase T1a (TAB PR #38, merged).
+   Fixed in Cloned-Mirror Kick-off phase T1a (TAB PR #38, merged).
 2. TAB shipped no `.claude/` infrastructure at all (no hooks, no templates,
-   no scaffold). Fixed in BL-372 phase T1b (TAB PR #39), which introduced
+   no scaffold). Fixed in Cloned-Mirror Kick-off phase T1b (TAB PR #39), which introduced
    the five Cloned-Mirror Kick-off templates and the two per-turn hooks.
 
 Findings #3 (no `.claude/` ships), #9 (no `.gitignore` ships), #1 (incomplete

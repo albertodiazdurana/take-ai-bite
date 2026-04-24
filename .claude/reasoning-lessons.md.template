@@ -2,7 +2,7 @@
 
 **Reference:** DSM_0.2 Reasoning Lessons Protocol
 **Pruning cadence:** Every 5 sessions (next: Session {N})
-**File size target:** ~50 entry lines (excluding headers and comments)
+**File size target:** ~70 entry lines (excluding headers and comments), maximum 200 lines hard cap
 **Last pruned:** _(none yet)_
 
 ## Tagging Convention

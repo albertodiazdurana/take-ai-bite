@@ -2,7 +2,6 @@
 
 **Version:** 1.0
 **Created:** 2026-03-30
-**Origin:** BACKLOG-279
 **Scope:** All DSM project types (DSM_0.2 §1)
 
 This guide defines which sections a DSM project's root README should contain.

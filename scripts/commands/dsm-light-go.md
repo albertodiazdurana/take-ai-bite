@@ -10,11 +10,11 @@ Before proceeding, check `.claude/last-wrap-up.txt` for the previous session's w
 
 **If the file does not exist (no wrap-up marker):** Warn: "No wrap-up marker found from previous session. There may be uncommitted changes or unpushed work. Switch to `/dsm-go` for full recovery? (y = switch to full go, n = continue with light-go). **The full /dsm-go flow will run from Step 0, including Step 6 (transcript reset and Session Transcript Protocol activation), before any user task action.**" If the user accepts, stop and invoke `/dsm-go` instead.
 
-**Switch-flow guarantee (BL-331):** When the user accepts a switch from `/dsm-light-go` to `/dsm-go`, the agent MUST run the full `/dsm-go` flow from Step 0. The Session Transcript Protocol behavioral activation lives in `/dsm-go` Step 6 and must execute before any user task action. Skipping Step 6 (jumping straight into the user's actual task) is the failure mode that caused portfolio S69 to run ~6 turns with zero transcript appends. The unconditional activation rule in DSM_0.2 §7 is the third independent enforcement layer; it activates regardless of whether Step 6 ran, but Step 6 is still the canonical place where transcript reset happens.
+**Switch-flow guarantee (§7 unconditional activation):** When the user accepts a switch from `/dsm-light-go` to `/dsm-go`, the agent MUST run the full `/dsm-go` flow from Step 0. The Session Transcript Protocol behavioral activation lives in `/dsm-go` Step 6 and must execute before any user task action. Skipping Step 6 (jumping straight into the user's actual task) is the failure mode that caused portfolio S69 to run ~6 turns with zero transcript appends. The unconditional activation rule in DSM_0.2 §7 is the third independent enforcement layer; it activates regardless of whether Step 6 ran, but Step 6 is still the canonical place where transcript reset happens.
 
 **Legacy fallback:** If `.claude/last-wrap-up.txt` does not exist but `.claude/session-baseline.txt` contains `mode: light`, treat as `type: light` and proceed normally. This handles sessions that ran before the wrap-up type marker was introduced.
 
-## Branch Cadence Gate (Origin: BACKLOG-326)
+## Branch Cadence Gate
 
 Light resume is for **same-day continuation only**. If the open session branch was created on a prior calendar day, refuse to resume and direct the user to full `/dsm-go`.
 
@@ -23,7 +23,7 @@ Light resume is for **same-day continuation only**. If the open session branch w
 1. Run `git branch --show-current` and parse the date segment from the branch name if it matches `session-N/YYYY-MM-DD`. For task branches (`bl-*`, `sprint-*`, `parallel/*`), skip this check and continue to Scaffold Pre-Check (task branches may span days).
 2. Compare against today's date (`date +%Y-%m-%d`).
 3. **If dates match:** Continue to Scaffold Pre-Check normally.
-4. **If the branch date is earlier than today:** STOP and prompt interactively (BL-331 sub-item d):
+4. **If the branch date is earlier than today:** STOP and prompt interactively (unconditional activation sub-item d):
    > "Session branch `{branch-name}` was created on {branch-date}, today is {today}. `/dsm-light-go` is for same-day continuation only. This branch should have been closed yesterday with full `/dsm-wrap-up`. Run `/dsm-wrap-up` now to close the stale branch cleanly? (y/n)"
    - **y:** Stop `/dsm-light-go` and invoke `/dsm-wrap-up` directly. After the wrap-up completes, the user can start a fresh session with `/dsm-go`. No further user typing is required between the gate and the wrap-up.
    - **n:** Stop and let the user decide. Present the alternative: "Run `/dsm-go` instead to force a fresh session-start flow with full checks, or invoke `/dsm-wrap-up` manually when ready." Do not proceed with the lightweight flow.
@@ -33,7 +33,7 @@ Light resume is for **same-day continuation only**. If the open session branch w
 
 **Fallback when branch name has no parseable date:** Parse the ISO timestamp from `.claude/session-baseline.txt` (`# Session baseline - {timestamp}`) and compare its date to today. If neither source yields a usable date, warn "Cannot determine session branch age, proceeding as same-day" and continue.
 
-**Why a hard gate:** The efficientnet project ran 7 consecutive lightweight cycles on one session branch without any full wrap-up because nothing enforced the cadence. A soft warning would not have caught it. See BACKLOG-326 for the full failure mode.
+**Why a hard gate:** The efficientnet project ran 7 consecutive lightweight cycles on one session branch without any full wrap-up because nothing enforced the cadence. A soft warning would not have caught it. See the Branch Cadence Gate (efficientnet failure mode).
 
 ## Scaffold Pre-Check
 
@@ -51,7 +51,7 @@ DSM scaffold. Count canonical `dsm-docs/` subdirectories (`blog`, `checkpoints`,
 
 ## Git Awareness
 
-At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the result as `GIT_AVAILABLE` (true/false). If false (no git repo, e.g., private projects per BL-162):
+At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the result as `GIT_AVAILABLE` (true/false). If false (no git repo, e.g., private projects per the private-project protocol):
 
 - **Checkpoint moves (Step 2):** Use `mv` instead of `git mv`
 - **Git status (Step 3):** Skip; report "No git repository"

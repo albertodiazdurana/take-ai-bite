@@ -2,7 +2,7 @@ Execute the DSM session wrap-up checklist autonomously. Run all steps without pa
 
 ## Git Awareness
 
-At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the result as `GIT_AVAILABLE` (true/false). If false (no git repo, e.g., private projects per BL-162):
+At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the result as `GIT_AVAILABLE` (true/false). If false (no git repo, e.g., private projects per the private-project protocol):
 
 - **README check (Step 1):** Skip entirely (no git diff available)
 - **Governance storage commit (Step 7):** Skip entirely
@@ -43,7 +43,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    - Detailed BL implementation descriptions. The BL file and git log are the source of truth.
    - Items that duplicate CLAUDE.md content (patterns, conventions, pitfalls already documented there).
 
-   **MEMORY.md exclusion list (additional item — BL-414):**
+   **MEMORY.md exclusion list (additional item — checkpoint ownership rule):**
    - Pending-next-session items. Step 2.5 (Checkpoint) owns these; do NOT duplicate them in MEMORY.md.
 
 2.5. **Checkpoint:** Create a minimal checkpoint in `dsm-docs/checkpoints/` recording the session state. This step is the primary owner of "pending next session" items — do not duplicate them in MEMORY.md (Step 2).
@@ -127,7 +127,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
       Update Workflow (create sync branch, PR, merge). If `mirror: true` entries
       do not exist, skip.
 
-      **Personal content gate (BL-335):** Before copying any file to a mirror
+      **Personal content gate:** Before copying any file to a mirror
       repo, run the personal content scanner on the changed methodology file
       list:
 
@@ -151,14 +151,14 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 
       The scanner is a safety net, not a content classifier. The
       authoritative split rule is in `.claude/personal-rules-allowlist.md`
-      (BL-336) and Layer 1/2/3 model documented in feedback memory.
+      (tracked-but-instance-specific layer rule) and Layer 1/2/3 model documented in feedback memory.
 
-      **Mirror inbox guard (BL-407):** Before staging files in the
+      **Mirror inbox guard:** Before staging files in the
       mirror repo, inspect `git -C {mirror-repo-path} status --porcelain`
       output. For any line whose path matches `_inbox/*` and is NOT
       `_inbox/README.md` or `_inbox/.gitkeep`, exclude it from the
       stage-set and log one line per skip: "Mirror inbox guard: skipped
-      `{mirror-repo}:_inbox/{file}` (BL-407)." Do NOT abort the sync;
+      `{mirror-repo}:_inbox/{file}` (mirror inbox guard)." Do NOT abort the sync;
       skip only the prohibited paths. Rationale: past Central wrap-up
       sessions wrote notification files into mirror tracked `_inbox/`
       paths, polluting every fresh clone. The primary protection is
@@ -181,12 +181,12 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    - Files in the baseline with unchanged checksums = pre-existing, not touched this session (skip them)
    - If `.claude/session-baseline.txt` does not exist (session started without `/dsm-go`), fall back to staging all changed files
 
-   **Mirror self-detection inbox guard (BL-407):** If
+   **Mirror self-detection inbox guard:** If
    `scripts/take-ai-bite-sync.txt` does NOT exist in the current
    working tree, this repo is a mirror (not the hub). Exclude any
    `_inbox/*` path from the stage-set except `_inbox/README.md` and
    `_inbox/.gitkeep`. Log each excluded path: "Mirror inbox guard:
-   skipped `_inbox/{file}` (BL-407)." Rationale: mirror repos should
+   skipped `_inbox/{file}` (mirror inbox guard)." Rationale: mirror repos should
    not track session-scoped inbox entries; only the README bootstrap
    stays. This guard protects the edge case where wrap-up runs from a
    mirror's working tree and the mirror's `.gitignore _inbox/*` rule

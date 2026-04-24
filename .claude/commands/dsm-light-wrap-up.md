@@ -2,7 +2,7 @@ Execute a lightweight DSM session wrap-up for context-critical sessions where wo
 
 ## Git Awareness
 
-At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the result as `GIT_AVAILABLE` (true/false). If false (no git repo, e.g., private projects per BL-162):
+At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the result as `GIT_AVAILABLE` (true/false). If false (no git repo, e.g., private projects per the private-project protocol):
 
 - **Git commit + push (Step 4):** Skip entirely
 - All non-git steps (MEMORY.md, checkpoint, baseline mode marker) run unchanged.
@@ -11,7 +11,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 
 This command is only valid when the session will continue with `/dsm-light-go` next. It writes `mode: light` to the session baseline, which `/dsm-light-go` checks as a safety gate.
 
-## Cadence Gate (Origin: BACKLOG-326)
+## Cadence Gate
 
 Light wrap-up is for **same-day continuation only**. If the current session branch was created on a prior calendar day, refuse to run and instruct the user to use `/dsm-wrap-up` (full) instead.
 
@@ -21,7 +21,7 @@ Light wrap-up is for **same-day continuation only**. If the current session bran
 2. Compare against today's date (`date +%Y-%m-%d`).
 3. **If the dates match:** Continue to Step 1 normally.
 4. **If the branch date is earlier than today:** STOP and warn:
-   > "Session branch `{branch-name}` was created on {branch-date}, today is {today}. Light wrap-up is for same-day continuation only; multi-day branch accumulation is the exact failure mode BACKLOG-326 closes (efficientnet project ran 7 sessions on one branch because consecutive light wrap-ups never merged). Run `/dsm-wrap-up` (full) to merge this branch to main, then start the next session with `/dsm-go`."
+   > "Session branch `{branch-name}` was created on {branch-date}, today is {today}. Light wrap-up is for same-day continuation only; multi-day branch accumulation is the exact failure mode the Branch Cadence Gate closes (efficientnet project ran 7 sessions on one branch because consecutive light wrap-ups never merged). Run `/dsm-wrap-up` (full) to merge this branch to main, then start the next session with `/dsm-go`."
 5. Do not offer a bypass. The user can still run `/dsm-wrap-up` directly to finish the branch cleanly.
 
 **Why this is a hard gate, not a warning:** The efficientnet failure was 7 consecutive light wrap-ups with no intervention, each one looking normal in isolation. A soft warning would have been dismissed. Only a hard refusal forces the merge cadence.
@@ -69,7 +69,7 @@ Light wrap-up is for **same-day continuation only**. If the current session bran
 - Do NOT refresh memory backup (deferred)
 - Do NOT check contributor profile (deferred)
 - Do NOT delete `.claude/session-baseline.txt` (it carries the mode marker for the next session)
-- Light wrap-up is for **same-day continuation only**. Work that spans multiple calendar days must use full `/dsm-wrap-up` at the end of each day (see Cadence Gate above). This prevents multi-session branch accumulation (BACKLOG-326, efficientnet project incident).
+- Light wrap-up is for **same-day continuation only**. Work that spans multiple calendar days must use full `/dsm-wrap-up` at the end of each day (see Cadence Gate above). This prevents multi-session branch accumulation (the Branch Cadence Gate, efficientnet project incident).
 - No co-author lines in commits
 - If $ARGUMENTS is provided, use it as the session description in MEMORY.md
 - All steps run autonomously; do not pause for confirmation between steps

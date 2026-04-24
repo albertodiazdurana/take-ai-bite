@@ -223,7 +223,7 @@ interaction produces a reviewable unit. The Pre-Generation Brief Protocol
 generating, generate one artifact at a time, wait for review before
 proceeding.
 
-**As modularization principle:** The Document Structure Standard (BL-259)
+**As modularization principle:** The Document Structure Standard (dsm-docs/guides/document-structure-standard.md)
 limits files to 400 lines and requires intro paragraphs before subheadings.
 This is Take a Bite applied to the instruction documents themselves: each
 file is a reviewable unit, each section opens with context before diving

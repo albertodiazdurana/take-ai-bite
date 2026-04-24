@@ -209,7 +209,7 @@ Optional platform-specific fields (append when retrievable; omit entirely when n
 - **Append technique (mandatory):** Every append to the session transcript MUST follow this sequence: (1) read the last 3 lines of the file, (2) use the last non-empty line as the `old_string` anchor, (3) the `new_string` includes that last line PLUS the new content appended after it. **NEVER** search for earlier content to use as an insertion point. The only valid anchor is the current last line of the file. This is not a style preference; mid-file insertions cause out-of-order timestamps, confuse the user reading the transcript in real time, and have been observed in multiple sessions despite existing guidance
 - If a past entry was missed, note the gap in the next entry rather than editing history
 
-**Unconditional activation (BL-331):** If `.claude/session-transcript.md`
+**Unconditional activation:** If `.claude/session-transcript.md`
 exists in the project, the Session Transcript Protocol is active. No skill
 needs to activate it. The presence of the file is the activation signal.
 This rule is independent of `/dsm-go` Step 6 and does not depend on any
@@ -219,7 +219,7 @@ PreToolUse shape validator. Any session that finds the file present must
 follow the protocol from the first turn, including continuation sessions
 that defer from `/dsm-light-go` to `/dsm-go` mid-flight.
 
-**Authorized exception: `/dsm-staa` (BL-351).** The Session Transcript
+**Authorized exception: `/dsm-staa` (STAA exception).** The Session Transcript
 Analysis Agent (`/dsm-staa`) is the sole authorized exception to the
 unconditional activation rule above. STAA sessions intentionally do not
 write to `.claude/session-transcript.md`, for a meta-recursion reason
@@ -236,7 +236,7 @@ amendment to this section. The `UserPromptSubmit` per-turn hook will
 still fire in STAA sessions and inject the reminder; STAA agents should
 read this paragraph first, then proceed without appending to the live
 transcript. Systematic resolution of the hook/skill collision is tracked
-under BL-343 (Skill/Hook Collaboration Protocol).
+under §23 (Skill/Hook Collaboration Protocol).
 
 **Anti-Patterns:**
 
@@ -440,7 +440,7 @@ IDE permission window.
 proceed to the next artifact or to execution until the user has reviewed
 the implementation.
 
-### 8.2.1. Strongest Counter-Evidence Requirement (BL-385)
+### 8.2.1. Strongest Counter-Evidence Requirement
 
 Before requesting Gate 2 approval for any recommendation-style artifact, the
 agent MUST surface the strongest counter-evidence to its own recommendation,
@@ -483,11 +483,11 @@ where counter-evidence existed in sources read during brief prep, is a
 §22 violation. The agent must halt, surface the counter-evidence
 retroactively, and propose a §22 fix-root-cause-prevent triage.
 
-**Origin:** BL-385. Heating-systems S5 incident (two ranking errors needed
+**Origin:** Heating-systems S5 incident (two ranking errors needed
 user pushback to surface counter-evidence visible at brief time) was the
 filing trigger. S194 demonstrated voluntary application: every Gate 1
-brief in BL-236f/h, BL-386, BL-387, BL-380 included a "Counter-evidence
-(per BL-385)" section before this codification landed; this rule promotes
+brief in S194 Gate 1 briefs included a "Counter-evidence (per §8.2.1)"
+section before this codification landed; this rule promotes
 that pattern from voluntary to required.
 
 ### 8.3. Gate 3: Run Approval (when applicable)
@@ -583,7 +583,7 @@ Gitleaks, third-party APIs); §8.6 applies the same read-before-claim
 discipline to DSM's own skill files. Protocols that invoke external
 tools inherit §1.11 directly; the skill-file case is routed through §8.6.
 
-### 8.7. Token-Minimizing Config Recommendation at Gate 1 (BL-402)
+### 8.7. Token-Minimizing Config Recommendation at Gate 1
 
 Module A §14 Session Configuration Recommendation sets a session-level
 baseline at session start and on major task shifts. A single session
@@ -663,21 +663,21 @@ approval under the same gate-behavior rules as the rest of §8.
   skill-invocation granularity (per-invocation annotation for a skill).
   §8.7 applies the same per-invocation shape to Gate 1 config
   recommendations.
-- BL-397 Auto-Mode Boundaries governs whether the Gate 1 pause holds; §8.7
-  fits within whichever gate behavior BL-397 has established for the
+- §8 Auto-Mode Boundaries governs whether the Gate 1 pause holds; §8.7
+  fits within whichever gate behavior the Auto-Mode Boundaries protocol has established for the
   session.
 - §8.8 Parallel Offload Analysis is the complementary Gate 1 sub-section
   covering subagent orchestration. §8.7 decides the main-agent config;
   §8.8 decides whether sub-tasks of the same artifact run on parallel
   subagents. Both sit inside Gate 1; see §8.8 for ordering.
 
-**Origin:** BL-402. S194 filed 4 BLs of varying complexity (mechanical,
+**Origin:** S194 filed 4 BLs of varying complexity (mechanical,
 procedural, architectural); all ran at the session baseline without
 per-artifact calibration. S195 surfaced the gap when the user asked
 "which config should I run in the parallel sessions?", which had no
 Gate-1-visible protocol to answer from.
 
-### 8.8. Parallel Offload Analysis at Gate 1 (BL-409)
+### 8.8. Parallel Offload Analysis at Gate 1
 
 §8.7 sets the main-agent config per artifact. It does not address
 whether sub-tasks of the upcoming Gate 2 implementation should be
@@ -736,8 +736,7 @@ approval.
 subagent spins without explicit per-task user approval. A general
 Gate 1 "y" does NOT approve offload; offload requires its own
 explicit per-task yes. This is the core user requirement behind
-the BL and is not waivable under any autonomy mode (see BL-397
-Auto-Mode Boundaries).
+the BL and is not waivable under any autonomy mode (see Auto-Mode Boundaries protocol).
 
 **Fail-closed default:** if the user says "proceed" / "y" /
 "continue" to the Gate 1 brief without addressing the offload
@@ -815,7 +814,7 @@ evidence shapes what the artifact says).
   invokes a register-sensitive skill, the main agent must pass the
   §23.4 runtime context block in the subagent prompt.
 
-**Origin:** BL-409. S198 parallel-198.1 filed this BL after the
+**Origin:** S198 parallel-198.1 filed this after the
 user observed ad-hoc offload in earlier S198 turns and requested a
 protocol-level approval gate. The foundational principle DSM_6.0
 §1.12 was filed jointly with the §8.8 protocol; reading the
@@ -1026,7 +1025,7 @@ When creating markdown files from other formats (PDF, DOCX, HTML, PPTX),
 short headings from the source document should be expanded or flagged for
 manual review. This convention serves as a quality criterion for converted
 output and directly improves the effectiveness of structural scanning
-strategies (see BL-222).
+strategies (see §14 Heading Parsability).
 
 ### 14.5. Enforcement
 
@@ -1695,7 +1694,7 @@ Assertions principle: claims that rest on unread sources or skipped checks are
 not earned, and presenting them anyway violates the principle even if the gap
 is acknowledged. Origin: blog-poster S19, where the agent detected mid-paragraph
 that it had not read required sources per CLAUDE.md, flagged the gap as an
-inline disclaimer, and then continued presenting BL-010 angle rankings built on
+inline disclaimer, and then continued presenting angle rankings built on
 the unread sources; the user had to escalate ("this is unacceptable") to halt
 the output. The "before continuing other work" phrasing as written permitted
 the failure, which is why this amendment exists.

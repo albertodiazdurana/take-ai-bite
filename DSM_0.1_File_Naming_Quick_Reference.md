@@ -240,7 +240,7 @@ Track creation and publication status of blog materials.
   `{contributions-docs-path}/{project}/blog/`, not in the external repo.
   The tracker follows the blog content to that location.
 
-### 7.1. Vocabulary Linking Convention (BL-239 T4)
+### 7.1. Vocabulary Linking Convention
 
 Blog posts, external-facing deliverables, and public documents routinely
 use DSM-specific terms (spoke, hub, Level 3 branch, `@` reference,

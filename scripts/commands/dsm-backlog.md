@@ -14,13 +14,13 @@ Create a new DSM backlog item.
      (user-level commands in `~/.claude/commands/`, gitignored files in `.claude/`,
      cross-repo artifacts). If yes, the backlog item MUST include a Revert Procedure
      section per the Revert Safeguards Protocol in DSM_0.2.
-2.5. **Sprint-plan detection (BL-380):** check the title and flags for sprint-plan intent. Sprint intent is detected when EITHER:
+2.5. **Sprint-plan detection:** check the title and flags for sprint-plan intent. Sprint intent is detected when EITHER:
    - The title matches `^Sprint\s+\d+\b` (case-insensitive, e.g., "Sprint 5: RAG pipeline"), OR
    - The user passed `--sprint` as an argument.
 
    If sprint intent is detected AND the user did NOT pass `--no-template`, use the **Sprint Plan Template Scaffold** (below) instead of the standard **Backlog Template**. Otherwise use the standard template.
 
-   The detection regex requires a digit after "Sprint" so titles like "Sprint Boundary Checklist tooling" do not falsely trigger injection. Origin: BL-380, paired with BL-378's detective audit at `/dsm-align`.
+   The detection regex requires a digit after "Sprint" so titles like "Sprint Boundary Checklist tooling" do not falsely trigger injection. Origin: sprint-plan template injection, paired with the sprint-plan structural audit at `/dsm-align`.
 3. Generate the next BACKLOG number (highest + 1)
 4. Create the file at `plan/backlog/{developments|improvements}/BACKLOG-XXX_short-description.md`
 
@@ -141,7 +141,7 @@ updating, and this scaffold continues to reference it.
 
 <!-- See DSM_2.0.C §1 Template 8 for guidance. Run at sprint closure
      to verify all deliverables landed and no loose ends remain. The
-     hard gate in /dsm-go Step 3.6 (BL-378) blocks closure when this
+     hard gate in /dsm-go Step 3.6 (sprint-plan structural audit) blocks closure when this
      section is missing. -->
 
 - [ ] All Deliverables checked
@@ -168,4 +168,4 @@ Conditions that must pass before the sprint is declared complete:
 5. Update the README in the target directory (`plan/backlog/{developments|improvements}/README.md`):
    - Add a new row to the **Active Items** table with the BL#, title, priority, status ("Proposed"), and today's date
    - Insert the row in priority order (High before Medium before Low), then by date within the same priority
-6. Confirm the file was created, show the path, and note the README was updated. If the Sprint Plan Template Scaffold was used, also note "Sprint Plan template injected per BL-380; fill the scaffold sections per DSM_2.0.C §1 Template 8."
+6. Confirm the file was created, show the path, and note the README was updated. If the Sprint Plan Template Scaffold was used, also note "Sprint Plan template injected; fill the scaffold sections per DSM_2.0.C §1 Template 8."

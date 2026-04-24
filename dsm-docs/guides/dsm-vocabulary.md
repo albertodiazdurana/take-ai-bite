@@ -23,11 +23,11 @@ maintain separate vocabularies.
 | 1.3 | **Earn Your Assertions** | Investigate before you claim, verify before you act | DSM 6.0 |
 | 1.3.1 | **Accountability Corollary** | Mistakes are the human's responsibility; the agent's job is to make them unlikely | DSM 6.0 |
 | 1.4 | **Understand, Review, Decide** | The user understands first, reviews second, decides third | DSM 6.0 |
-| 1.4.2 | **Challenge Myself to Reason** | The agent must justify its own composition before presenting it | DSM 6.0 (BACKLOG-175) |
+| 1.4.2 | **Challenge Myself to Reason** | The agent must justify its own composition before presenting it | DSM 6.0 §1.4.2 |
 | 1.5 | **Know Your Context** | The agent is responsible for its own resource consumption | DSM 6.0 |
 | 1.6 | **Match the Room** | Contribute proportionally to the project's culture and scale | DSM 6.0 |
 | 1.7 | **Own Your Process** | Disclose how the work was produced | DSM 6.0 |
-| 1.8 | **Know What You Own** | Verify licensing before deploying any third-party asset | DSM 6.0 (BACKLOG-166) |
+| 1.8 | **Know What You Own** | Verify licensing before deploying any third-party asset | DSM 6.0 §1.8 |
 
 ## Emergent Concepts (from spoke projects)
 
