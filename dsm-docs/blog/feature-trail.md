@@ -29,6 +29,23 @@ The combination gives you: the *gap* (Problem), the *trigger* (Inbox or session)
 
 ## Index
 
+### v1.8.0 (2026-04-24)
+
+| F | Date | Title | BL | Origin | Inbox source | Meta-pattern |
+|---|------|-------|----|--------|--------------|--------------|
+| F-121 | 2026-04-29 | Research folder index maintenance skills (`/dsm-research-add` + `/dsm-research-done`) | BL-425 | S205 triage of dsm-docs/research/ (30 active files); user question "why have we never maintained this readme before? It should be kept up to date in the same way we do with BLs." surfaced the asymmetry between plans/README (skill-maintained active index) and research/README (passive convention doc). | — (S205 in-session dialog) | Parity-by-skill across sibling folders. The plans/ system was a working blueprint; research/ inherited the gap because no skill was filed when the folder was created. Skill-encoded staging discipline (BL-370 `git mv` + `git add` sequence) is built into `/dsm-research-done` to prevent the rename-staging hook block at commit time. |
+| F-120 | 2026-04-24 | Checkpoint Authoring Identifiers Rule | BL-420 | S202 thread on BL reference cleanup. Heating-systems S10 light checkpoint cited multiple BL numbers heating-systems agents could not resolve; recurrence path needed a forward-only guard at checkpoint-authoring time. | — (S202 in-session dialog) | Forward-only guard paired with a backward-only scrub: BL-418 cleans existing mirrored methodology, BL-420 prevents recurrence in new checkpoints. Asymmetric policy across artifact types (FEATURES keeps BL anchors for F→BL trail, checkpoints do not). |
+| F-119 | 2026-04-24 | BL Lookup Index | BL-419 | S202 collaborative-definition Gate 0 produced three-BL packaging (Scrub/Index/Checkpoint rule). INDEX restores archaeology after scrub + resolvability for TAB readers of mirrored CHANGELOG/FEATURES. Built by Sonnet subagent (§8.8 approved) scanning 341 files. | — (S202 in-session dialog) | Third lookup axis (by BL number) complementing CHANGELOG (chronological) and FEATURES (capabilities). Mirrored to TAB so the BL anchors preserved in FEATURES (Option A) are resolvable in one hop. |
+| F-118 | 2026-04-24 | Mirrored methodology BL-reference scrub | BL-418 | S202 user concern about BL numbers in mirrored methodology being unresolvable from spoke context; filing trigger was heating-systems S10 light checkpoint pattern. T1 inventory + T2 rule review + T5 scrub all delegated to Sonnet subagents (§8.8 approved twice). 174 edits across 26 files; 55 residuals are legitimate category 5 keeps + FEATURES Option A. | — (S202 in-session dialog) | Agent-audience asymmetry made structural: FEATURES is human-read (BL anchors preserved); methodology and checkpoints are agent-read where resolvability matters most (BL anchors removed). Two Sonnet offloads on the same BL, each with explicit per-task user approval, demonstrated the §8.8 pattern at scale. |
+
+### v1.7.0 (2026-04-23)
+
+| F | Date | Title | BL | Origin | Inbox source | Meta-pattern |
+|---|------|-------|----|--------|--------------|--------------|
+| F-117 | 2026-04-23 | Checkpoint step in /dsm-wrap-up | BL-414 | S201 investigation of why S200 produced no checkpoint. Root cause: `/dsm-wrap-up` never had a checkpoint step; only `/dsm-light-wrap-up` had one (Step 4). When sessions transitioned from light to full wrap-up at S177, checkpoints stopped silently. User refinement during Gate 1: place checkpoint BEFORE MEMORY update so it can own "pending next session" items, freeing MEMORY.md for global context. | — (in-session discovery) | Protocol completeness audit from an absence: the missing artifact (no S200 checkpoint) pointed to a missing step, not a missing invocation. Design refinement during Gate 1 reshaped the MEMORY/checkpoint split. |
+| F-116 | 2026-04-22 | /dsm-go context efficiency | BL-413 | S200 observation that `/dsm-go` consumed ~83% of Sonnet session context before user work began. Three specific contributors identified: full inbox read, unconditional `/dsm-align` run, hook-chmod dependency on `/dsm-align`. | — (in-session observation) | Cost-awareness after cumulative evidence: Sonnet sessions made the inefficiency visible that Opus's larger context had masked. Unbundles three separate concerns that had coupled (align, chmod, inbox) into independent mechanisms. |
+| F-115 | 2026-04-20 | Gate 1 parallel offload analysis | BL-409 + DSM_6.0 §1.12 | S198 parallel-198.1 filing after user observed ad-hoc offload in earlier S198 turns and requested a protocol-level approval gate. Foundational principle DSM_6.0 §1.12 "Don't be a Hero, Delegate the Effort" was filed jointly with the §8.8 protocol. | — (parallel session observation) | User-as-enforcement-layer made structural: ad-hoc agent decisions become user-approved gates. Hard constraint (no spin without explicit per-task yes) is not waivable under autonomy modes. Sibling to §8.7 (config) at sub-task granularity. |
+
 ### v1.6.0 (2026-04-19)
 
 | F | Date | Title | BL | Origin | Inbox source | Meta-pattern |
@@ -153,6 +170,18 @@ Some features tell a richer story together. These threads pre-stage common blog 
 | F-099 | 2026-04-10 | Minimal troubleshooting boot with /dsm-safe-go | BL-340 | S182 pre-BL-338 safety requirement | — | Escape hatch before infrastructure changes |
 
 **Why this matters for users:** Gate 0 ensures the human shapes the work structure at every step, not just approves a finished plan. /dsm-safe-go provides a way back in when the normal boot chain is broken.
+
+---
+
+## v1.6.1 thread (2026-04-20, S195-S196)
+
+| F# | Date | Title | BL | Origin | Inbox | Meta-pattern |
+|----|------|-------|----|--------|-------|-------------|
+| F-112 | 2026-04-13 | Read the User's Manual foundational principle (DSM_6.0 §1.11) | BL-344 | BL-342 platform-assessment surfaced the experiential-vs-docs-grounded understanding gap | — | External-substrate grounding as prerequisite to collaboration design |
+| F-113 | 2026-04-19 | Gate 1 token-minimizing config recommendation (DSM_0.2 §8.7) | BL-402 | S195 user question "which config for the parallel sessions?" with no Gate-1-visible answer | — | Per-artifact operationalization of Environmental Awareness (DSM_6.0 §2.3) |
+| F-114 | 2026-04-20 | DSM_7.0 AI Platform Collaboration Guide (5-phase rollout) | BL-345, BL-398, BL-399, BL-400, BL-401 | BL-342 research → BL-345 scaffolding plan → 4-phase successor chain | — | First operational instance of "Read the User's Manual" (F-112); template for future `§2.N` platforms |
+
+**Why this matters for users:** F-112 establishes external-tool understanding as a prerequisite, not an afterthought. F-113 makes per-artifact config choice visible at Gate 1 so token budget matches artifact demand. F-114 gives DSM a place where platform-specific knowledge lives so DSM_0-6 can stay platform-agnostic, and gives future platforms (Ollama, GPT, Copilot) a clear template and 8-step instantiation procedure. Together they close the "how do we work with this platform" question across principle, Gate 1 operational layer, and document-level architecture.
 
 ---
 
