@@ -851,7 +851,7 @@ outputs a STAA recommendation after each auto extraction.
 **Maintenance:**
 
 - **Pruning cadence:** Every 5 sessions, review the file
-- **File size target:** ~70 entry lines (excluding headers and comments); if
+- **File size target:** ~100 entry lines (excluding headers and comments); if
   exceeded, trigger a prune pass regardless of cadence, maximum 200 lines hard cap
 - **Prune actions:**
   1. **Promote to memory:** entries reinforced across 3+ sessions graduate to
@@ -879,7 +879,107 @@ outputs a STAA recommendation after each auto extraction.
 Reasoning lessons are the curated extract (persistent, accumulating across sessions).
 The transcript feeds the lessons; the lessons feed the agent's priming at session start.
 
-### 8.1. Scope Classification
+### 8.1. Compact Mirror
+
+The live `.claude/reasoning-lessons.md` file is human-readable and grows beyond
+the context budget that `/dsm-go` Step 1.5 can spend on session-start priming
+(target 100 lines, hard cap 200, ~30 KB). This mismatch had reduced Step 1.5
+to a 10-line peek (header + category names only); lesson bodies, where the
+actionable content lives, became invisible to the routine agent. The compact
+mirror restores §8 design intent ("the lessons feed the agent's priming at
+session start") by giving the agent a size-bounded, agent-facing view of the
+same lesson content.
+
+**Files:**
+
+| File | Purpose | Edited by | Read by |
+|------|---------|-----------|---------|
+| `.claude/reasoning-lessons.md` | Source of truth: full lessons + guidelines + provenance | Humans, `/dsm-wrap-up` Step 0 (`[auto]`), `/dsm-staa` (`[STAA]`) | `/dsm-staa`, humans |
+| `.claude/reasoning-lessons-compact.md` | Derived agent-facing mirror, regenerated from the live file | `/dsm-wrap-up` Step 0 (regeneration sub-step) only , never edited by hand | `/dsm-go` Step 1.5 |
+
+The compact mirror file is gitignored (same as the live file) and includes
+a header comment "Do not edit; auto-generated from `reasoning-lessons.md` by
+`/dsm-wrap-up` Step 0."
+
+**Compact format (trim-only):**
+
+The mirror is a deterministic trim of the live file, lossless for agent-relevant
+content:
+
+- Drop the live file's first ~20 guideline lines (Reference, Pruning cadence,
+  File size target, Last pruned, Tagging Convention sub-section). The agent does
+  not need this metadata to act on lessons.
+- Drop the inline provenance prefix `[auto] S{N} [{scope}]:` or
+  `[STAA] S{N} [{scope}]:` from each lesson line. Provenance lives in the live
+  file; the agent does not need it for behavior.
+- Keep the imperative lesson body verbatim. No rewriting, no LLM-driven
+  compression at this stage (those land later via separate work that depends
+  on BL-426 / BL-427 Step 5).
+- Keep category headings (`### Category Name`) so the agent retains the
+  semantic grouping.
+- Prepend a freshness header:
+
+  ```markdown
+  # Reasoning Lessons (compact mirror)
+
+  <!-- Do not edit; auto-generated from .claude/reasoning-lessons.md by /dsm-wrap-up Step 0 -->
+
+  **Source:** `.claude/reasoning-lessons.md`
+  **Last regenerated:** YYYY-MM-DDTHH:MM
+  **Source mtime at regeneration:** YYYY-MM-DDTHH:MM
+  ```
+
+Expected savings: ~25-30% versus the live file. Achieved deterministically
+without any external compression tool. Compression beyond trim-only is
+out of scope for §8.1 and tracked separately under BL-427 Step 5.
+
+**Regeneration trigger:**
+
+`/dsm-wrap-up` Step 0 regenerates the compact mirror as a final sub-step,
+immediately after `[auto]` extraction has appended new lessons to the live
+file. Single-pass: the live file is already open. If the live file does not
+exist (protocol not active for this project), the compact mirror is not
+created either.
+
+**Read pattern at session start:**
+
+`/dsm-go` Step 1.5 prefers the compact mirror over the live file:
+
+1. If `.claude/reasoning-lessons-compact.md` exists AND its
+   `Source mtime at regeneration` is at least as recent as the live file's
+   `mtime`: read the compact mirror in full. Report categories matching
+   the project's domain.
+2. If the compact mirror exists but is stale (live file is newer): regenerate
+   inline before reading.
+3. If only `.claude/reasoning-lessons.md` exists (compact has not yet been
+   generated, e.g., the project has not run a `/dsm-wrap-up` since the
+   protocol amendment): fall back to the legacy 10-line peek and warn that
+   compact regeneration is pending.
+
+**Soft size cap (advisory):**
+
+The compact mirror is bounded by the live file's size minus the trim
+overhead. Empirical measurement during BL-427 implementation: a 113-entry
+live file at 51 KB produced a 48 KB compact mirror, ~5% savings. The
+trim-only path's savings depend heavily on entry verbosity, not entry
+count; compression beyond trim-only (BL-427 Step 5, gated on BL-426) is
+where larger gains live.
+
+The advisory cap is `max(60 KB, 1.2 × live file size)`. If the regenerated
+mirror exceeds the cap, warn "Compact reasoning-lessons mirror is approaching
+the size at which agents typically degrade (>60 KB priming load). Consider
+pruning the live file or promoting older lessons to MEMORY.md before the
+next wrap-up." It still writes the file; the cap is advisory, not blocking.
+
+**Three-layer awareness:**
+
+The compact mirror is the third always-loaded context layer (alongside
+`CLAUDE.md` via `@` and `MEMORY.md`). Promotion of a lesson to MEMORY.md
+should still be the path for behaviorally-critical patterns; the compact
+mirror is the staging surface for lessons that have not yet earned
+promotion but are too valuable to leave invisible.
+
+### 8.2. Scope Classification
 
 Every reasoning lesson entry carries a scope label that determines whether it
 propagates beyond the originating project.
@@ -910,7 +1010,7 @@ Example: `- [auto] S12 [ecosystem]: When placing DSM infrastructure, confirm pro
 - `[STAA]` analysis: the STAA agent prompts for scope classification
   when writing each lesson (Step 6)
 
-### 8.2. Cross-Project Propagation
+### 8.3. Cross-Project Propagation
 
 Reasoning lessons generated in spoke projects must propagate to DSM Central.
 Without propagation, valuable patterns stay siloed in individual projects.

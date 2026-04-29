@@ -344,6 +344,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-419 | BL Lookup Index | v1.8.0 | 2026-04-24 | dsm-docs/plans/done/INDEX.md |
 | BACKLOG-420 | Checkpoint Authoring Identifiers Rule | v1.8.0 | 2026-04-24 | DSM_0.2.A §10.2.1 |
 | BACKLOG-425 | Research Folder Index Maintenance with /dsm-research-add and /dsm-research-done Skills | — | 2026-04-29 | scripts/commands/dsm-research-add.md, scripts/commands/dsm-research-done.md |
+| BACKLOG-427 | Compact Reasoning-Lessons Mirror for Agent-Facing Session-Start Priming (Steps 1-4 trim-only; Step 5 deferred) | — | 2026-04-29 | DSM_0.2.A §8.1 |
 
 ---
 
