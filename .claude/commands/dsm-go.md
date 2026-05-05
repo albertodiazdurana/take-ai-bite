@@ -43,36 +43,162 @@ before any session-start protocol can run correctly.
    - In Step 1.8, if `FORCE_ALIGN=true`, skip the version check and run `/dsm-align` unconditionally.
 4. **If scaffold is complete (5+ folders, `_inbox/` exists, and `.claude/reasoning-lessons.md` exists):** Continue to Step 0.
 
+## Step 0.7: Concurrent-Session Detection
+
+Per **DSM_0.2.A §26** (Concurrent-Session Detection Protocol). Detects whether
+another Claude Code conversation is already operating on this project, and
+hard-halts to prevent silent data hazards (interleaved transcripts, conflicting
+baselines, race conditions on staged changes, MEMORY drift).
+
+**Non-suppressible (per DSM_0.2 §8.9.1):** the halt prompt
+below MUST display and MUST receive an explicit user response. Auto mode does
+NOT bypass this prompt regardless of explicit suspension.
+
+### 0.7a. Lockfile detection
+
+Run the snippet, then act on the result per §0.7b. Do not narrate the
+evaluation; the snippet IS the evaluation.
+
+```bash
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+if [ -f "$ROOT/.claude/session.lock" ]; then
+  echo "LOCK_PRESENT"
+  cat "$ROOT/.claude/session.lock"
+else
+  echo "LOCK_ABSENT"
+fi
+```
+
+### 0.7b. Acting on the result
+
+| Token | Action |
+|-------|--------|
+| `LOCK_ABSENT` | Continue to Step 0.8 (Kick-off check). The lockfile will be written by Step 6 (transcript reset) after all gating completes. |
+| `LOCK_PRESENT` | Hard halt. Display the lockfile contents to the user and prompt for resolution per §0.7c. |
+
+### 0.7c. Halt prompt (non-suppressible)
+
+When the lockfile is present, display:
+
+> "Concurrent session detected. Existing lock from session {N} started at
+> {timestamp} (agent {agent}, model {model}, branch {branch}).
+>
+> Two parallel `/dsm-go` invocations on the same project produce silent
+> data hazards (interleaved transcripts, conflicting baselines, race
+> conditions on staged changes, MEMORY drift).
+>
+> Choose:
+>   (w) Wrap up the existing session first (`/dsm-wrap-up`,
+>       `/dsm-light-wrap-up`, or `/dsm-quick-wrap-up`).
+>   (f) Force concurrent (`--force-concurrent`): the existing lockfile is
+>       removed and a fresh one is written. Use ONLY when the existing
+>       session crashed (no live agent), not when a real second window is
+>       active.
+>   (m) Manual recovery: exit `/dsm-go`, run `rm .claude/session.lock`,
+>       then retry. Functionally equivalent to (f) but explicit."
+
+Wait for the user's response. Do not proceed past Step 0.7 without explicit
+input. Do NOT auto-pick (f) under auto mode; the user's choice changes the
+agent's destination (wrap up the prior session vs continue here), which
+qualifies as a non-suppressible prompt under BL-432.
+
+### 0.7d. Stale-lockfile recovery
+
+If the user reports the prior session crashed (e.g., the Claude Code window
+closed without wrap-up), the recovery path is `--force-concurrent` or manual
+`rm .claude/session.lock`. Both produce identical results: the existing
+lockfile is removed, a fresh one is written by Step 6, and `/dsm-go` proceeds
+normally.
+
+The lockfile lives at `.claude/session.lock` and is gitignored. Removing it
+manually has no side effects beyond clearing the lock state. There is no
+shared-state corruption from manual removal because the lockfile is purely
+local to this clone.
+
+### 0.7e. Parallel-session protocol exemption
+
+`/dsm-parallel-session-go` (Module A §7 Parallel Session Protocol) does NOT
+write or check `.claude/session.lock`. Parallel sessions are designed to share
+the session branch via the commit booking system; the lockfile mechanism is
+scoped to the single-session-per-window invariant, not to parallel siblings.
+A future BL may extend the lockfile to a sibling-aware schema; for now,
+parallel sessions are out-of-band.
+
+### 0.7f. Lockfile write timing
+
+Step 0.7 only DETECTS. The lockfile WRITE happens at the end of Step 6
+(transcript reset), so the `transcript_anchor` field reflects the post-reset
+state. See Step 6 for the write spec.
+
+**Origin:** BL-431 (S207, derived from heating-systems-conversational-ai
+S10.L2 incident where two Claude Code conversations operated the same branch
+in parallel with no awareness, surfacing only when `git status` showed
+foreign entries).
+
 ## Step 0.8: Cloned-Mirror Kick-off Check
 
 Per **DSM_0.2.A §25** (Cloned-Mirror Kick-off Protocol). Detects whether the
 current repo is a freshly cloned DSM mirror that has not yet been kicked off,
 and invokes the Kick-off sequence from §25.2 if so.
 
-### 0.8a. Skip conditions (evaluate first)
+### 0.8a. Deterministic decision check
 
-Skip silently to Step 0 if **any** of these are true:
+Step 0.8 evaluates one of four states deterministically and reports a single
+token. Run the snippet, then act on the token per §0.8b. Do not narrate the
+evaluation; the snippet IS the evaluation.
 
-- `.claude/kickoff-done.txt` exists (Kick-off has already run on a prior session)
-- This repo is DSM Central (detection: `scripts/take-ai-bite-sync.txt` exists
-  at the repo root; Central is the source of mirrors, never a clone of one)
-- The repo is a spoke (detection: `.claude/dsm-ecosystem.md` exists AND has
-  a `dsm-central` row whose `Path` points to a DIFFERENT filesystem location
-  than the current repo root)
+**Decision table** (top to bottom, first match wins):
 
-### 0.8b. Detection signals
+| Condition | Output token |
+|-----------|--------------|
+| `.claude/kickoff-done.txt` exists at repo root | `KICKOFF_DONE` |
+| `scripts/take-ai-bite-sync.txt` exists at repo root | `CENTRAL` |
+| `.claude/dsm-ecosystem.md` exists AND has a `dsm-central` row whose `Path` (with `~` expansion and trailing-slash strip) differs from repo root | `SPOKE` |
+| `.claude/dsm-ecosystem.md` exists AND `dsm-central` row Path equals repo root | `KICKOFF_NEEDED` (self-registered without marker = incomplete prior Kick-off) |
+| `.claude/dsm-ecosystem.md` does not exist | `KICKOFF_NEEDED` |
 
-If none of the skip conditions match, evaluate Kick-off signals. Fire Kick-off
-when **either** is true:
+**Snippet** (run once; capture stdout to a variable):
 
-1. `.claude/dsm-ecosystem.md` does not exist in the repo root
-2. `.claude/dsm-ecosystem.md` exists but its Paths table does not contain a
-   row where `Name = dsm-central` and `Path = $(pwd)` (i.e., the clone has
-   not self-registered as its own local hub)
+```bash
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+if [ -f "$ROOT/.claude/kickoff-done.txt" ]; then
+  echo "KICKOFF_DONE"
+elif [ -f "$ROOT/scripts/take-ai-bite-sync.txt" ]; then
+  echo "CENTRAL"
+elif [ -f "$ROOT/.claude/dsm-ecosystem.md" ]; then
+  CENTRAL_PATH=$(awk -F'|' '/^\| *dsm-central *\|/ {gsub(/^ *| *$/,"",$3); print $3; exit}' "$ROOT/.claude/dsm-ecosystem.md")
+  CENTRAL_PATH_EXP="${CENTRAL_PATH/#\~/$HOME}"
+  CENTRAL_PATH_EXP="${CENTRAL_PATH_EXP%/}"
+  ROOT_NORM="${ROOT%/}"
+  if [ -n "$CENTRAL_PATH_EXP" ] && [ "$CENTRAL_PATH_EXP" != "$ROOT_NORM" ]; then
+    echo "SPOKE"
+  else
+    echo "KICKOFF_NEEDED"
+  fi
+else
+  echo "KICKOFF_NEEDED"
+fi
+```
 
-If neither signal fires, skip to Step 0. This handles the edge case where
-the user manually created `.claude/dsm-ecosystem.md` with correct self-
-registration but no `kickoff-done.txt` marker.
+This snippet matches the canonical version in DSM_0.2.A §25.1. If the two ever
+diverge, DSM_0.2.A §25.1 is authoritative.
+
+### 0.8b. Acting on the result
+
+| Token | Action | Boot report line |
+|-------|--------|------------------|
+| `KICKOFF_DONE` | Skip to Step 0 | `Step 0.8: KICKOFF_DONE (marker present)` |
+| `CENTRAL` | Skip to Step 0 | `Step 0.8: CENTRAL (this repo IS the hub)` |
+| `SPOKE` | Skip to Step 0 | `Step 0.8: SPOKE (ecosystem dsm-central → {path})` |
+| `KICKOFF_NEEDED` | Continue to §0.8c (Execute Kick-off sequence) | `Step 0.8: KICKOFF_NEEDED, invoking Kick-off` |
+
+**Narration suppression rule:** the agent's boot report contains exactly one
+line for Step 0.8, drawn from the table above. Multi-paragraph reasoning about
+which condition matched, which path was compared, or why a skip applies is a
+§22 violation (Earn Your Assertions: a deterministic check is earned by
+execution, not by narration). If the snippet exits non-zero or returns an
+unrecognized token, halt with: "Step 0.8 deterministic check failed: <output>.
+Inspect manually."
 
 ### 0.8c. Execute Kick-off sequence
 
@@ -281,6 +407,16 @@ chmod +x .claude/hooks/*.sh 2>/dev/null || true
 
 This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This step is the session guarantee that hooks are always executable, independent of whether `/dsm-align` runs. It replaces the previous dependency on `/dsm-align` Step 10b as the only source of `chmod +x`. The S180 failure mode (hooks present but not executable, align not run) is closed here.
 
+### 0f. Reset cross-repo write confirmation file (BL-391)
+
+Run unconditionally on every `/dsm-go`:
+
+```bash
+> .claude/cross-repo-writes-session.txt
+```
+
+The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-391, DSM_0.2.C §2 enforcement) is cleared at session start so confirmations from a prior session do not leak. The file is gitignored. The hook degrades gracefully if the file is absent; the reset is a defense-in-depth measure ensuring exactly the contents the user confirmed in this session, no more, no less.
+
 ## Steps
 
 1. **Read MEMORY.md:** Find and load this project's MEMORY.md from the auto memory directory to restore session context. **If MEMORY.md does not exist or fails to load**, continue to Step 2 but note that the agent is operating without prior session context, which increases the risk of applying generic rules to a project with specific overrides.
@@ -313,7 +449,7 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
    - **2a.5. Ecosystem Path Registry:** Read `.claude/dsm-ecosystem.md` (created by `/dsm-align` in Step 1.8). Parse the Paths table and cache each Name -> Path mapping for the session. For each entry, verify the path exists on the filesystem:
      - If the path exists: note as validated
      - If the path does not exist: warn "Ecosystem path '{name}' points to '{path}' which does not exist. Cross-repo operations using this path will be skipped."
-   - **2a.6. Default-branch verification:** If `GIT_AVAILABLE` is true AND `git remote get-url origin` returns a URL containing `github.com`, resolve the configured remote default branch with `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`. Compare against the local main line: read the project-specific section of `.claude/CLAUDE.md` for an optional `**Main branch:**` declaration; default to `main` if absent. If the remote default differs from the local main line, **halt with a critical warning** that names both values and the fix command (`gh repo edit --default-branch {local}`). This is a hard gate: no session work proceeds until the user fixes the configuration OR types `defer` to bypass for this session only. Cache the resolved value for the session (one `gh` call per session). **Skip silently if:** remote `origin` does not point at GitHub (no `github.com` substring), OR `gh` CLI is not installed (warn once: "install gh to enable default-branch verification" and continue). Origin: Default-branch verification protocol. Failure mode this catches: dsm-jupyter-book S4 lost ~45 minutes to an HTTP 404 cascade because the repo's default branch was a stale session branch, not `main`.
+   - **2a.6. Default-branch verification:** **Non-suppressible (per DSM_0.2 §8.9.1):** the halt-with-critical-warning prompt below MUST display and MUST receive an explicit user response (fix the configuration, or type `defer`). Auto mode does NOT bypass this prompt regardless of explicit suspension. If `GIT_AVAILABLE` is true AND `git remote get-url origin` returns a URL containing `github.com`, resolve the configured remote default branch with `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`. Compare against the local main line: read the project-specific section of `.claude/CLAUDE.md` for an optional `**Main branch:**` declaration; default to `main` if absent. If the remote default differs from the local main line, **halt with a critical warning** that names both values and the fix command (`gh repo edit --default-branch {local}`). This is a hard gate: no session work proceeds until the user fixes the configuration OR types `defer` to bypass for this session only. Cache the resolved value for the session (one `gh` call per session). **Skip silently if:** remote `origin` does not point at GitHub (no `github.com` substring), OR `gh` CLI is not installed (warn once: "install gh to enable default-branch verification" and continue). Origin: Default-branch verification protocol. Failure mode this catches: dsm-jupyter-book S4 lost ~45 minutes to an HTTP 404 cascade because the repo's default branch was a stale session branch, not `main`.
    - **2a.8. CLAUDE.md section completeness (Module A §23):** Check whether CLAUDE.md contains all 4 required sections (DSM_0.2 Alignment, participation pattern, project type, project specific). If all present, pass silently. If sections are missing, report which ones and suggest completing them before implementation. This is a hard gate: no implementation work until all 4 sections exist. Existing complete projects pass silently.
    - **2b. Inbox check (behavior depends on project type from 2a):** If this is an External Contribution, do NOT create `_inbox/` in the external repo (see DSM_0.2 External Contribution exception). **Inbox location and resolution by project type:**
 
@@ -332,6 +468,10 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
      - **Skip condition:** if `contributions-docs` is missing from the ecosystem registry, or the resolved `{target}/` path does not exist on the filesystem, warn "EC governance inbox resolution failed (contributions-docs registry entry missing OR {target} does not exist). Skipping EC inbox check, run `/dsm-align` to scaffold." and continue the session without halting
 
      **Processing (all project types, inbox lazy-load):** List filenames only at session start. Report: "Inbox: N pending entries: [filename list]. Read and process entries at user request." Do NOT read file contents during session start. The agent reads a specific entry only when the user explicitly requests inbox processing (e.g., "process the inbox" or "read the [name] entry"). This defers context cost to when the user actually acts on an entry. Exception: if a filename contains "urgent" or "critical", surface it as a note in the report.
+
+     **Enumerate-each-entry rule (per BL-421):** when N > 1, list every entry on its own line. Do NOT collapse N>1 to a single count, a top-entry summary, or "the most recent". The /dsm-align Step 12b notification (when present) is cognitively "fresh" because it was just observed in Step 1.8; pre-existing entries from prior sessions are cognitively "stale" but often more important. Enumeration is the guard against availability bias collapsing N>1 to 1. The rule is about completeness, not verbosity: a 1-entry inbox still gets one line; the rule prevents collapsing N>1, not collapsing 1 to 0.
+
+     **Filesystem-over-MEMORY rule (per BL-421):** MEMORY.md describes inbox state at the END of the previous session, not the START of the current one. New entries may have arrived between wrap-up and session start (cross-repo notifications, hub→spoke pushes). Trust the filesystem (`ls _inbox/`) over MEMORY narration. If MEMORY says "inbox cleared" but `ls` shows entries, report what `ls` shows; do not echo MEMORY's stale claim.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
 3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:
@@ -425,7 +565,7 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
    **If not detected (MEMORY is current):** Skip silently.
    **If no archived transcript exists:** Warn "Incomplete wrap-up detected but no archived transcript found. MEMORY update must be done manually." Still show action suggestions.
 5.9. **Wrap-up type guidance:** Read `.claude/last-wrap-up.txt` if it exists. Extract the `type` field.
-   - **If `type: light`:** The previous session ended with a light wrap-up, signaling continuation. Prompt the user: "Last session ended with a light wrap-up (continuation expected). Switch to `/dsm-light-go` for a faster resume? (y = switch to light-go, n = continue with full go)". If the user accepts, stop `/dsm-go` and invoke `/dsm-light-go` instead. If the user declines, continue with full `/dsm-go`.
+   - **If `type: light`:** **Non-suppressible (per DSM_0.2 §8.9.1):** the prompt below MUST display and MUST receive an explicit user response (y or n). Auto mode does NOT bypass this prompt regardless of explicit suspension; the user's choice changes the agent's destination skill (`/dsm-go` vs `/dsm-light-go`). The previous session ended with a light wrap-up, signaling continuation. Prompt the user: "Last session ended with a light wrap-up (continuation expected). Switch to `/dsm-light-go` for a faster resume? (y = switch to light-go, n = continue with full go)". If the user accepts, stop `/dsm-go` and invoke `/dsm-light-go` instead. If the user declines, continue with full `/dsm-go`.
    - **If `type: quick`:** Note in the session report: "Previous session used quick wrap-up (no feedback push). Check `dsm-docs/feedback-to-dsm/` for unpushed entries."
    - **If `type: full`:** No action needed. Continue normally.
    - **If the file does not exist:** No action (step 5.8 handles incomplete wrap-up detection).
@@ -481,6 +621,29 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
    number determined, branch verified, inbox checked, version checked, transcript
    archived, baseline saved). Then continue with step 7. This ensures the
    transcript is never empty after /dsm-go completes.
+
+   **Lockfile write (BL-431):** After the transcript header is written, write
+   the session lockfile so its `transcript_anchor` reflects the post-reset
+   state. See **DSM_0.2.A §26** for the protocol. Run:
+
+   ```bash
+   ANCHOR=$(md5sum .claude/session-transcript.md | awk '{print $1}')
+   BRANCH=$(git branch --show-current 2>/dev/null || echo "no-git")
+   cat > .claude/session.lock << EOF
+   session: ${SESSION_NUMBER}
+   started: $(date -Iseconds)
+   agent: Claude Code
+   model: ${MODEL_ID:-claude-opus-4-7}
+   branch: ${BRANCH}
+   transcript_anchor: ${ANCHOR}
+   pid: ${CLAUDE_CODE_PID:-unknown}
+   EOF
+   ```
+
+   `${SESSION_NUMBER}` is from Step 0a. `${MODEL_ID}` is the agent's
+   self-reported model (from the transcript header). `${CLAUDE_CODE_PID}` is
+   optional; emit `unknown` if unavailable. The lockfile is removed by every
+   wrap-up skill (full / light / quick) at the end of its final step.
 
 7. **Recent history:** Run `git log --oneline -5` to show recent commits
 8. **Report:** Summarize in this format:

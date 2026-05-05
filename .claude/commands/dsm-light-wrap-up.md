@@ -60,6 +60,8 @@ Light wrap-up is for **same-day continuation only**. If the current session bran
     type: light
     ```
 
+8. **Remove session lockfile (BL-431):** Run `rm -f .claude/session.lock`. Light wrap-up removes the lockfile to keep cleanup symmetric with full and quick wrap-ups (DSM_0.2.A §26). Known limitation: in light-mode continuation chains, the gap between this step and the next `/dsm-light-go` (which currently does NOT re-write the lockfile) leaves the project unprotected against a second concurrent tab. Acceptable trade-off; tracked as a follow-up to BL-431 if the limitation surfaces in practice.
+
 ## Notes
 
 - Do NOT clear or overwrite `.claude/session-transcript.md`; it persists for the next lightweight session

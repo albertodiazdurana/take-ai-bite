@@ -118,6 +118,8 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
     type: quick
     ```
 
+9. **Remove session lockfile (BL-431):** Run `rm -f .claude/session.lock`. Per **DSM_0.2.A §26**, this is the locus of lockfile cleanup for quick wrap-up. The `-f` flag tolerates a missing file (e.g., a session that pre-dated BL-431).
+
 ## Notes
 
 - Do NOT clear or overwrite `.claude/session-transcript.md`; `/dsm-go` handles the reset at next session start
@@ -129,6 +131,7 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
 - **Relationship to `/dsm-wrap-up`:** This command runs the same steps but omits all cross-repo writes to achieve zero permission prompts. Changes to shared steps must be applied to both files.
 - **Omitted steps (all involve cross-repo writes):**
   - README change notification (writes to portfolio and DSM Central inboxes)
+  - Blog-poster FEATURES notification (writes to blog-poster inbox; per BL-424, sub-step (e) of /dsm-wrap-up Step 1)
   - Feedback push (writes to DSM Central inbox)
   - Mirror sync (writes to mirror repos)
   - Governance storage commit (writes to contributions-docs repo)

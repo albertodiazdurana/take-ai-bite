@@ -118,6 +118,8 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
     type: quick
     ```
 
+9. **Remove session lockfile (BL-431):** Run `rm -f .claude/session.lock`. Per **DSM_0.2.A §26**, this is the locus of lockfile cleanup for quick wrap-up. The `-f` flag tolerates a missing file (e.g., a session that pre-dated BL-431).
+
 ## Notes
 
 - Do NOT clear or overwrite `.claude/session-transcript.md`; `/dsm-go` handles the reset at next session start

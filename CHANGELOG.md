@@ -5,6 +5,41 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-05-05
+
+Six BLs landed in S207 from an inbox-derived backlog filing pass. Three new
+DSM_0.2 sub-sections (§8.6.1, §8.9.1, §8.10), one new DSM_0.2.A section (§26),
+two skill amendments. All BLs traced to external spoke incidents
+(haystack-magic S5-S8, heating-systems-conversational-ai S10/S10.L2).
+
+### Added
+
+- **BL-430: DSM_0.2 §8.10 Chunked Drafting Protocol for Structured Documents.** New sub-section operationalizing the four-gate Pre-Generation Brief Protocol for prose deliverables (project plans, proposals, reports, research papers, blog posts). Closes the gap §8 left for prose: the agent's default reading of "produce the artifact at Gate 3" was collapsing to "produce the whole document at Gate 3" for prose, yielding 2000-3500 word full-file Write operations that defeated per-section review and the Take a Bite philosophy. Trigger is document type, not length. Four gates given prose-specific shape: Gate 1 Definition (purpose / audience / outcome / length / scope), Gate 2 TOC (chapters + per-section length budget), Gate 3 Chunked drafting (one section at a time with per-section user review and approval before next), Gate 4 Run / Final Assembly (full-document consistency, format conversion last). Anti-pattern guard enumerates 4 rationalization variants forbidden. §17.1 alignment template gains a Pre-Generation Brief Protocol reinforcement bullet. Origin: haystack-magic S8 R3 hiring challenge produced two structured documents (~2565 + ~3519 words) by full-file Write; first carried a load-bearing factual error (misattributed deepset 5-Step Guide labels) that escaped into the SUBMITTED deliverable because per-section review never happened.
+  - **Spoke action:** Run `/dsm-align` to update the Pre-Generation Brief Protocol reinforcement block (§17.1 template change). Review §8.10 for behavioral changes when generating prose deliverables.
+
+- **BL-431: DSM_0.2.A §26 Concurrent-Session Detection Protocol + lockfile mechanism.** New `/dsm-go` Step 0.7 detects an existing `.claude/session.lock`, hard-halts with three resolution options (wrap-up / force-concurrent / manual rm). Lockfile WRITE happens at end of Step 6 (transcript reset) so the `transcript_anchor` field reflects post-reset state. Cleanup added to all three primary wrap-up skills (full / light / quick). `/dsm-parallel-session-go` exempted per §26.5 because parallel sessions are concurrent siblings by design via the commit booking system. Light-mode continuation gap documented as a known limitation per §26.6. New `.gitignore` entry. Origin: heating-systems-conversational-ai S10.L2 (2026-04-29) where two parallel Claude Code conversations operated the same branch with no awareness, surfacing only when `git status` showed entries the active agent had not authored.
+  - **Spoke action:** Run `sync-commands.sh --deploy` to update runtime command copies. Next `/dsm-go` writes the lockfile; next wrap-up clears it.
+
+- **BL-432: DSM_0.2 §8.9.1 Non-Suppressible Prompts Convention.** New sibling sub-section under §8.9 introducing a prompt classification that auto mode must honor regardless of explicit suspension. Closes the gap §8.9 left for procedural safety prompts living inside skill files (not inside Gate 1/2/3 cycles). Initial scope: `/dsm-go` Step 0.7 (concurrent-session halt, BL-431), Step 2a.6 (default-branch verification), Step 5.9 (light-wrap-up continuation, the original motivating site). Skill file annotation convention: `**Non-suppressible (per DSM_0.2 §8.9.1):**` marker line above the prompt. Anti-pattern guard enumerates 4 rationalization variants forbidden. The user's explicit auto-mode suspension does NOT extend to non-suppressible prompts. Origin: heating-systems S10.L2 where auto mode silently bypassed Step 5.9's light-wrap-up continuation prompt; the agent recognized the prompt's existence in its thinking block, then unilaterally pressed past it.
+  - **Spoke action:** Review §8.9.1 for behavioral changes. No spoke template change; the rule lives in DSM_0.2 core, inherited via `@`.
+
+- **BL-433: /dsm-staa Step 8 regenerate compact reasoning-lessons mirror.** New step in `/dsm-staa` that regenerates `.claude/reasoning-lessons-compact.md` after Step 6 append + Step 7 prune complete. Closes the staleness window between `/dsm-staa` runs and the next `/dsm-wrap-up` (potentially 24+ hours), during which `/dsm-go` Step 1.5 reads a stale boot-time canonical context. The transform implements the same rule `/dsm-wrap-up` Step 0 describes in prose; behaviorally identical output verified by byte-diff against current compact mirror. Auto-generated comment in the mirror header references both regenerators. Origin: haystack-magic S7 STAA continuation where /dsm-staa appended 6 [STAA] entries and pruned 2 [auto] entries, leaving the compact mirror 13 minutes stale, missing 6 lessons and including 2 pruned ones.
+  - **Spoke action:** Run `sync-commands.sh --deploy` to update the `/dsm-staa` runtime copy. Next `/dsm-staa` run will regenerate the compact mirror at exit.
+
+- **BL-434: /dsm-align Step 12 conditional Command sync spec.** Replaces enumerated values with conditional default for the `Command sync` line in /dsm-align Step 12 report template. Spoke runs (Step 11 skipped) emit `Command sync: N/A (not DSM Central)` verbatim; DSM Central runs (Step 11 ran) emit populated `OK: N | Drifted: N | Missing: N` counts. Closes the "blank field invites invention" failure mode where the agent ran an out-of-scope `diff -q` on user-scope command files and populated the field with fabricated `Drifted: 2`. Cost of that detour: ~115 transcript lines of correction. Origin: heating-systems-conversational-ai S10 (2026-04-23).
+  - **Spoke action:** Run `sync-commands.sh --deploy` to update the `/dsm-align` runtime copy. Next spoke `/dsm-align` run emits `N/A (not DSM Central)` exactly.
+
+- **BL-435: DSM_0.2 §8.6.1 Skill Scope Is Authoritative principle.** New sibling sub-section under §8.6 generalizing BL-434's lesson to all skills. §8.6 prevents memory-based claims about skill behavior; §8.6.1 prevents augmentation: agent invokes skill correctly, runs adjacent off-scope checks, folds findings into the skill's report. Core principle: "Silence from the skill on a concern is the skill's answer." Three handling options for adjacent checks: (a) out-of-band audit with its own distinct label, (b) file a BL to extend the skill's documented scope, (c) skip the check. Anti-pattern guard enumerates 4 rationalization variants forbidden. Distinguishes composition (using one skill's output as another skill's input, allowed) from augmentation (folding off-skill findings into a skill's report, forbidden). Origin: same heating-systems S10 incident; §8.6.1 generalizes BL-434's specific Command-sync wording fix.
+  - **Spoke action:** Review §8.6.1 for behavioral changes. No spoke template change; the rule lives in DSM_0.2 core, inherited via `@`.
+
+### Spawned
+
+No new BLs spawned by this version. All 6 BLs in §1.9.0 came FROM external spoke inbox entries (haystack-magic S5-S8, heating-systems S10/S10.L2) processed in S207, not from internal scope-splitting or audit-revealed gaps in this session's work.
+
+### Closed
+
+- **BL-430, BL-431, BL-432, BL-433, BL-434, BL-435** all closed in this version.
+
 ## [1.8.0] - 2026-04-24
 
 ### Added

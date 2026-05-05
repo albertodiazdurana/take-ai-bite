@@ -583,6 +583,81 @@ Gitleaks, third-party APIs); §8.6 applies the same read-before-claim
 discipline to DSM's own skill files. Protocols that invoke external
 tools inherit §1.11 directly; the skill-file case is routed through §8.6.
 
+### 8.6.1. Skill Scope Is Authoritative
+
+§8.6 prevents memory-based claims about skill behavior by requiring the
+agent to read the skill file before answering "does skill X do Y?". §8.6
+addresses the "claimed from memory" failure mode. It does NOT address
+the "augmented at runtime" failure mode, where the agent invokes a skill
+correctly, then runs additional checks NOT inside the skill's documented
+scope, and folds those checks' findings into the skill's report. The
+end-state symptom is the same (the skill appears to say something it
+didn't), but the mechanism is different: §8.6 catches misremembering;
+§8.6.1 catches augmentation.
+
+**Skill scope is authoritative.** A skill's declared scope defines its
+output. Checks adjacent to the skill's scope are separate findings and
+must be reported separately, not folded into the skill's report.
+**Silence from the skill on a concern is the skill's answer.** Before
+widening a skill's report with an adjacent check, the agent asks: "is
+this check part of the skill's documented steps?" If not, the agent
+chooses one of three options:
+
+1. **Run it as an out-of-band audit with its OWN label** (e.g., a
+   distinct `## Out-of-band audit: command file drift` section,
+   separate from the skill's report block, so the user can see the
+   finding came from outside the skill).
+2. **File a BL to extend the skill's documented scope**, so the next
+   skill version produces the desired output as part of its declared
+   responsibility.
+3. **Skip the check.** Not every adjacent concern needs to surface in
+   this session. The agent is not obligated to compute every adjacent
+   finding it could; the skill's silence on a concern is a valid
+   answer.
+
+**Anti-pattern guard:** "The skill is silent on X, but the user clearly
+cares about X, so I'll add an X check to the skill's report" is the
+exact rationalization §8.6.1 forbids. Variants of the same defect:
+
+- "The skill's report is incomplete without my adjacent finding"
+- "I have the data, why not include it"
+- "The user expects this field populated"
+- "Auto mode means I should fill silences"
+
+All are §8.6.1 violations when the adjacent check is outside the
+skill's documented scope. Same guard family as §8.6 ("read the skill
+before claiming behavior"), §8.2.1 ("No counter-evidence found"
+without sources surveyed), §21.2 ("Risks: none known"), §21.3 ("all
+tests passed"), §8.9 ("Auto-mode active. Executing.").
+
+**Distinction from skill composition:** using one skill's output as
+input to another skill is **composition**, not augmentation. §8.6.1
+forbids folding off-skill check results into a skill's report; it does
+NOT forbid using skill outputs as inputs to other workflows. The test
+is whether the off-skill finding is presented AS THE SKILL'S OUTPUT.
+
+**Cross-references:**
+
+- §8.6 (parent: read the skill before claiming behavior)
+- §8.4 (each artifact gets its own gate cycle)
+- §22 (Protocol Violation Triage Response when §8.6.1 is violated)
+- DSM_6.0 §1.11 Read the User's Manual (foundational principle for
+  both §8.6 and §8.6.1)
+- BL-434 (concrete sibling: /dsm-align Step 12 `Command sync` line
+  conditional spec, the same incident's mechanical fix)
+
+**Origin:** BL-435 (S207, derived from heating-systems-conversational-ai
+S10, 2026-04-23). The agent ran a correctly-invoked `/dsm-align` on a
+spoke; Step 11 (Check command file drift) is correctly skipped by the
+spoke guard. The agent then ran an off-skill `diff -q` on user-scope
+runtime command files (`~/.claude/commands/`), found drift, and
+populated /dsm-align's `Command sync:` report field with `Drifted: 2`
+plus a fabricated spoke-action recommendation. The drift finding was
+real but it was NOT /dsm-align's output; it was an off-skill check
+folded into the skill's report. Cost of the detour: ~115 transcript
+lines of correction. BL-434 fixed the specific Command sync wording;
+§8.6.1 generalizes the lesson to all skills.
+
 ### 8.7. Token-Minimizing Config Recommendation at Gate 1
 
 Module A §14 Session Configuration Recommendation sets a session-level
@@ -938,6 +1013,241 @@ suspension while Gate 3 destructive actions were correctly held. S206
 extended the pattern: auto-mode collapse extended to Gate 3 testing
 discipline (§19) before §21.3 codified that testing is not compressible.
 §8.9 + §21.3 together close the auto-mode gate-collapse family.
+
+### 8.9.1. Non-Suppressible Prompts Convention
+
+§8.9 establishes that auto mode does NOT collapse Gate 1 pauses, Gate 3
+destructive-action approvals, or §19/§21.3 testing requirements. But not
+every safety prompt in DSM lives inside the four-gate model. Some prompts
+exist inside skill files (`/dsm-go` Step 5.9 light-wrap-up continuation,
+§2a.6 default-branch verification, §0.7 concurrent-session detection) and
+function as procedural safety checks rather than gates. §8.9 in its
+original form did not name these as auto-mode-protected; agents under
+auto mode have rationalized skipping them ("user typed `/dsm-go`,
+implied yes to the prompt") even when the prompt's entire purpose is to
+interrupt and ask. §8.9.1 closes this gap with a prompt classification
+that auto mode must honor regardless of explicit suspension.
+
+**Convention name:** "non-suppressible prompts." A prompt classified as
+non-suppressible MUST be displayed and MUST receive an explicit user
+response before the agent proceeds, regardless of:
+
+- Default auto mode behavior
+- Explicit auto-mode suspension via §8.9 ("skip the Gate 1 pauses for
+  this work" or equivalent)
+- Whether the agent infers the user's likely answer from context
+- Whether the user's earlier directive seems to imply a default
+- Whether the prompt fires inside a Gate 1/2/3 cycle or outside it
+
+**Initial scope (skill steps that classify as non-suppressible):**
+
+1. `/dsm-go` Step 0.7 (concurrent-session detection halt, per BL-431
+   and DSM_0.2.A §26)
+2. `/dsm-go` Step 2a.6 (default-branch verification hard-halt, per
+   DSM_0.2.A's session-start checks)
+3. `/dsm-go` Step 5.9 (light-wrap-up continuation prompt, "Switch to
+   /dsm-light-go for a faster resume?")
+4. Any future `/dsm-go` step or skill where the user's choice changes
+   the agent's destination skill or alters the agent's branch /
+   filesystem trajectory
+
+**Auto-mode obligation:**
+
+Under default auto mode behavior (§8.9 default), non-suppressible
+prompts are honored exactly as in non-auto mode. Under explicit
+auto-mode suspension (§8.9 explicit suspension), non-suppressible
+prompts are STILL honored. The user's explicit suspension does NOT
+extend to non-suppressible prompts. This is the core protection §8.9.1
+adds: explicit suspension is a Gate 1/2 friction lever, never a
+prompt-class override.
+
+**Skill file annotation convention:**
+
+Skill files that contain non-suppressible prompts MUST tag the relevant
+step with a clear marker directly above the prompt text:
+
+```markdown
+**Non-suppressible (per DSM_0.2 §8.9.1):**
+```
+
+Agents reading the skill file at runtime see the tag and honor it. The
+tag is not a hook-enforced mechanism; it is a documented convention
+that the agent must read as authoritative.
+
+**Anti-pattern guard:**
+
+"User implied yes by typing `/dsm-go`" is the exact rationalization
+§8.9.1 forbids. Variants of the same defect:
+
+- "User clearly wants to continue the work, the prompt is rhetorical"
+- "Auto mode means I should infer rather than ask"
+- "The prompt is informational only at this stage of the session"
+- "The user's earlier directive covered this case"
+
+All of the above are §8.9.1 violations when applied to a non-suppressible
+prompt. Same guard family as §8.2.1 ("No counter-evidence found"
+without sources surveyed), §21.2 ("Risks: none known"), §21.3 ("all
+tests passed"), §8.9 ("Auto-mode active. Executing.").
+
+**Detection mechanism:**
+
+§8.9.1 is prose-only and convention-driven; no hook enforces it. The
+defense-in-depth posture matches §8.9, §21.2, §21.3: the rule + the
+user's redirect window are the enforcement until a future BL adds
+hook-based detection. The skill annotation convention is the
+discoverability mechanism (the tag IS visible to any agent reading the
+skill file, so the omission case becomes a §22 self-detection trigger).
+
+**Cross-references:**
+
+- §8.9 (parent: auto-mode boundaries; default behavior + explicit
+  suspension)
+- §8.4 (each artifact gets its own gate cycle)
+- §22 (Protocol Violation Triage Response when §8.9.1 is violated)
+- BL-431 / DSM_0.2.A §26 (Step 0.7 lockfile halt is the first
+  non-suppressible-tagged step)
+- §2.1 Default-Branch Verification (Step 2a.6 is non-suppressible by
+  hard-halt design; §8.9.1 promotes it to tagged status for
+  consistency)
+- DSM_0.2.A §A.5.9 (the §5.9 light-wrap-up continuation prompt that
+  motivated this rule)
+
+**Origin:** BL-432 (S207, derived from heating-systems-conversational-ai
+S10.L2 incident where auto mode silently bypassed `/dsm-go` Step 5.9's
+light-wrap-up continuation prompt). The agent recognized the prompt's
+existence in its thinking block ("§5.9 normally offers /dsm-light-go
+switch, but user explicitly typed /dsm-go, I'll honor that"), then
+unilaterally pressed past it. The user was never given the choice §5.9
+mandates. Combined with the absence of a concurrent-session safety net
+(BL-431 closed that gap), §5.9 was the only existing user-facing
+safeguard, and it was swallowed by auto-mode rationalization.
+
+### 8.10. Chunked Drafting Protocol for Structured Documents
+
+The four-gate Pre-Generation Brief Protocol (§8.0-§8.3) is well-understood
+as chunked for code (function-by-function, diff review between units) and
+for Jupyter notebooks (cell-by-cell, the artifact format itself enforces
+chunking). For structured prose documents (project plans, proposals,
+deliverables, reports, research papers, blog posts), §8 was historically
+silent on chunking. The agent's default reading of "produce the artifact
+at Gate 3" collapses for prose to "produce the whole document at Gate 3,"
+yielding 2000-3500 word full-file Write operations that defeat per-section
+review and the Take a Bite philosophy. §8.10 closes that gap by
+operationalizing the four-gate model for prose deliverables.
+
+**Trigger:** the protocol activates when the agent generates a structured
+document deliverable. Trigger is document type, NOT length: a short
+proposal still uses the protocol. Document types in scope:
+
+- Project plans, sprint plans, phase plans
+- Proposals (technical, business, hiring-challenge deliverables)
+- Reports (research, post-mortem, retrospective)
+- Research papers and substantial research files (`dsm-docs/research/*.md` over ~500 words)
+- Blog posts and external-facing prose
+- Any prose deliverable intended for human review and downstream consumption
+
+Trigger does NOT apply to:
+
+- Short-form text (email drafts, README sections under ~300 words, code comments)
+- Backlog items (BL files use a structured template; their generation is template fill-in, not free-form prose)
+- Methodology document amendments (DSM_0 through DSM_6.1 modifications, which are protocol prose; their gating happens at the BL level, not at the section level)
+- Test Execution Logs and similar checklists (their chunked structure is implicit in their bullet format)
+
+**Gate 1 — Definition.** Confirm with the user before any drafting:
+
+1. Document purpose (what is it for?)
+2. Audience (who reads it?)
+3. Outcome (what should the document produce or enable?)
+4. Length budget (target word count or page count)
+5. In/out of scope (which topics belong; which don't)
+
+User signs off on the definition before Gate 2. This makes the existing
+collaborative-definition gate (§8.0) explicit for prose; agents must not
+skip it on the assumption "the deliverable is obvious from context."
+
+**Gate 2 — Table of Contents.** Propose a high-level structure:
+
+1. Chapters or major sections (h1 or h2 level)
+2. Sub-chapters or sub-sections (h3 level), if warranted by the document's
+   length and complexity
+3. Each section title carries a one-line description of its content
+4. Each section title carries an approximate length budget (half-page,
+   one-page, two-page; or word-count target)
+
+User reviews and signs off on the TOC. Reordering, merging, splitting,
+adding, or dropping sections happens here, BEFORE any prose is drafted.
+This is the existing concept gate (§8.1) made specific to document
+structure rather than abstract concept approval.
+
+**Gate 3 — Chunked drafting.** The agent drafts ONE section at a time,
+in TOC order. After each section:
+
+1. The user reviews the section content in real time
+2. The user flags errors, requests revisions, or approves
+3. The agent proceeds to the NEXT section ONLY after the current section
+   is approved
+
+Chunk size is half-page to one-page of prose, or one TOC heading's worth
+of content, whichever is smaller. The user (NOT the agent) sets the
+chunk granularity; if the agent is unsure whether a section should split
+further, it asks: "Should I draft section X next for review before
+continuing?" Full-file Write or Edit at Gate 3 is reserved for the FINAL
+ASSEMBLY pass after all sections are individually approved.
+
+**Gate 4 — Run / Final Assembly.** Full-document review for cross-section
+consistency:
+
+1. Tone, vocabulary, and voice consistency
+2. Repetition or redundancy across sections
+3. Structural balance (no over-long or under-developed sections)
+4. References between sections that need reconciling now that the whole
+   document exists
+5. Format conversion (PDF, DOCX, slide deck) happens at this stage, NOT
+   before
+
+User signs off on the assembled document before any external delivery
+(email, submission, publication, PR, commit to a public-facing file).
+
+**Anti-pattern guard:**
+
+The failure mode this rule prevents is "Gate 2 outline approved → full-
+file Write at Gate 3." Variants of the same defect:
+
+- "The structure is clear, I'll just generate the whole thing"
+- "User approved the outline, that approval covers the prose"
+- "Section dependencies make chunking awkward, full-file is cleaner"
+- "Auto mode means I should fill in the prose without per-section pause"
+
+All four are §8.10 violations. Same guard family as §8.2.1 ("No counter-
+evidence found" without sources surveyed), §21.2 ("Risks: none known"),
+§21.3 ("all tests passed"), §8.6.1 ("silence from the skill is the
+skill's answer"), §8.9 ("Auto-mode active. Executing.").
+
+**Cross-references:**
+
+- §8 (parent: four-gate Pre-Generation Brief Protocol)
+- §8.0 / §8.1 / §8.2 / §8.3 (the four gates §8.10 specializes for prose)
+- §8.4 (each artifact gets its own gate cycle; for §8.10, each SECTION
+  is an artifact within Gate 3)
+- §8.9 (auto-mode boundaries; auto mode does NOT compress per-section
+  pauses, same logic as Gate 1 / Gate 3 carve-outs)
+- DSM_0.2 §15 (AI Collaboration Principles, "Take a Bite")
+- DSM_6.0 §1.4.2 Critical Thinking (preserves user inquiry surface across
+  the whole document; full-file generation collapses inquiry into
+  ship-or-no-ship)
+
+**Origin:** BL-430 (S207, derived from haystack-magic S8 wrap-up,
+2026-05-04). The R3 hiring challenge produced two structured documents
+(~2565 words and ~3519 words) generated by full-file Write after the
+Gate 2 outline was approved. The first carried a load-bearing factual
+error (misattributed deepset 5-Step Guide labels) that escaped into the
+SUBMITTED deliverable because per-section review never happened. Source-
+check question fired hours after submission. The user surfaced the
+meta-level failure: full-file generation of structured documents
+defeats the four-gate model's intent for prose, and DSM_0.2 was silent
+on the case. §8.10 closes that gap. The chunked-drafting feedback file
+that proposed this protocol was itself drafted using the protocol it
+proposes, recursive validation that the protocol works.
 
 ---
 
@@ -1361,6 +1671,7 @@ and updated automatically. Project-specific content lives outside the delimiters
 - Each gate requires explicit user approval; gates are independent
 - What/why/how thinking block: before Gate 1, answer what the artifact is, why it is needed, and how it will be built, in the session transcript thinking block
 - Skill self-reference: before claiming any behavior of a DSM skill (`/dsm-go`, `/dsm-wrap-up`, `/dsm-align`, etc.), read `scripts/commands/{skill-name}.md` or `~/.claude/commands/{skill-name}.md`. Do not answer "does skill X do Y?" from memory.
+- Chunked drafting for prose deliverables (per DSM_0.2 §8.10): for project plans, proposals, reports, research papers, blog posts, and similar structured prose, the four gates take a specific shape: Gate 1 confirms purpose / audience / outcome / length / scope; Gate 2 proposes a TOC with per-section length budgets; Gate 3 drafts ONE section at a time with per-section user review and approval before the next; Gate 4 reviews the full assembled document for consistency. Full-file Write at Gate 3 is reserved for final assembly after all sections are individually approved. Triggered by document type, not length.
 
 ### Inbox Lifecycle (reinforces inherited protocol)
 - After processing an inbox entry, move it to `_inbox/done/`
@@ -2146,6 +2457,7 @@ All module files are in the same directory as this core file.
 | CLAUDE.md Section Completeness Gate | New project setup, CLAUDE.md missing sections | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Sprint Plan Cross-Reference Before Completion | Work block done, sprint wrap-up, completion declaration | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Cloned-Mirror Kick-off Protocol | First session of a cloned mirror repo (detection: no self-as-central registry) | [A](DSM_0.2.A_Session_Lifecycle.md) |
+| Concurrent-Session Detection Protocol | Session start, second `/dsm-go` invocation while a prior session is unwrapped | [A](DSM_0.2.A_Session_Lifecycle.md) |
 | Composition Challenge Protocol | Producing a collection of 2+ discrete items | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Edit Explanation Stop Protocol | Multiple distinct edits to a single file | [B](DSM_0.2.B_Artifact_Creation.md) |
 | Enabling File Content Protocol | Working with backlog items, checkpoints, plans | [B](DSM_0.2.B_Artifact_Creation.md) |
