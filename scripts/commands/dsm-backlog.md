@@ -61,6 +61,41 @@ Conditions that must pass before the implementing branch merges to main:
 - [ ] [Specific, verifiable condition 1]
 - [ ] [Specific, verifiable condition 2]
 
+## Risks (per DSM_0.2 §21.2)
+
+<!-- MUST for any BL that modifies methodology files, skill files, hooks,
+     settings, or introduces new behavioral protocols. MAY (optional) for
+     mechanical status-update BLs (BL → done move, typo fix, version bump).
+     "Risks: none known" is NOT acceptable; if no material risks, write
+     "No material risks identified because [substantive reason]." -->
+
+- **[Failure mode 1]:** [mitigation, or stated acceptance]
+- **[Failure mode 2]:** [mitigation, or stated acceptance]
+
+## Test Execution Log (per DSM_0.2 §21.3)
+
+<!-- Filled by the implementer at close time, before proposing merge.
+     Each Test Plan item gets a per-item result line with concrete evidence
+     (command run + output captured, file path + line range, or behavioral
+     observation with citation). "All passed" without per-item evidence is
+     NOT acceptable closure.
+     For tests deferred by design (e.g., next-session validation), write
+     "T-N deferred: [trigger + verification plan]" and add to the Pending
+     Verification subsection below.
+     Trivial-BL exemption inherited from §21.2: mechanical status-update
+     BLs do not need a Test Execution Log if no behavior change. -->
+
+- T-1: [result + evidence]
+- T-2: [result + evidence]
+
+### Pending verification
+
+<!-- List any deferred tests here. Each item is propagated to the next
+     session's suggested work via the wrap-up handoff. Empty if all tests
+     ran in-session. -->
+
+- [ ] T-N: [what triggers verification, how to verify when triggered]
+
 ## Revert Procedure
 
 <!-- Include this section if the change touches untracked files.

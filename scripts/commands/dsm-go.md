@@ -49,30 +49,64 @@ Per **DSM_0.2.A §25** (Cloned-Mirror Kick-off Protocol). Detects whether the
 current repo is a freshly cloned DSM mirror that has not yet been kicked off,
 and invokes the Kick-off sequence from §25.2 if so.
 
-### 0.8a. Skip conditions (evaluate first)
+### 0.8a. Deterministic decision check
 
-Skip silently to Step 0 if **any** of these are true:
+Step 0.8 evaluates one of four states deterministically and reports a single
+token. Run the snippet, then act on the token per §0.8b. Do not narrate the
+evaluation; the snippet IS the evaluation.
 
-- `.claude/kickoff-done.txt` exists (Kick-off has already run on a prior session)
-- This repo is DSM Central (detection: `scripts/take-ai-bite-sync.txt` exists
-  at the repo root; Central is the source of mirrors, never a clone of one)
-- The repo is a spoke (detection: `.claude/dsm-ecosystem.md` exists AND has
-  a `dsm-central` row whose `Path` points to a DIFFERENT filesystem location
-  than the current repo root)
+**Decision table** (top to bottom, first match wins):
 
-### 0.8b. Detection signals
+| Condition | Output token |
+|-----------|--------------|
+| `.claude/kickoff-done.txt` exists at repo root | `KICKOFF_DONE` |
+| `scripts/take-ai-bite-sync.txt` exists at repo root | `CENTRAL` |
+| `.claude/dsm-ecosystem.md` exists AND has a `dsm-central` row whose `Path` (with `~` expansion and trailing-slash strip) differs from repo root | `SPOKE` |
+| `.claude/dsm-ecosystem.md` exists AND `dsm-central` row Path equals repo root | `KICKOFF_NEEDED` (self-registered without marker = incomplete prior Kick-off) |
+| `.claude/dsm-ecosystem.md` does not exist | `KICKOFF_NEEDED` |
 
-If none of the skip conditions match, evaluate Kick-off signals. Fire Kick-off
-when **either** is true:
+**Snippet** (run once; capture stdout to a variable):
 
-1. `.claude/dsm-ecosystem.md` does not exist in the repo root
-2. `.claude/dsm-ecosystem.md` exists but its Paths table does not contain a
-   row where `Name = dsm-central` and `Path = $(pwd)` (i.e., the clone has
-   not self-registered as its own local hub)
+```bash
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+if [ -f "$ROOT/.claude/kickoff-done.txt" ]; then
+  echo "KICKOFF_DONE"
+elif [ -f "$ROOT/scripts/take-ai-bite-sync.txt" ]; then
+  echo "CENTRAL"
+elif [ -f "$ROOT/.claude/dsm-ecosystem.md" ]; then
+  CENTRAL_PATH=$(awk -F'|' '/^\| *dsm-central *\|/ {gsub(/^ *| *$/,"",$3); print $3; exit}' "$ROOT/.claude/dsm-ecosystem.md")
+  CENTRAL_PATH_EXP="${CENTRAL_PATH/#\~/$HOME}"
+  CENTRAL_PATH_EXP="${CENTRAL_PATH_EXP%/}"
+  ROOT_NORM="${ROOT%/}"
+  if [ -n "$CENTRAL_PATH_EXP" ] && [ "$CENTRAL_PATH_EXP" != "$ROOT_NORM" ]; then
+    echo "SPOKE"
+  else
+    echo "KICKOFF_NEEDED"
+  fi
+else
+  echo "KICKOFF_NEEDED"
+fi
+```
 
-If neither signal fires, skip to Step 0. This handles the edge case where
-the user manually created `.claude/dsm-ecosystem.md` with correct self-
-registration but no `kickoff-done.txt` marker.
+This snippet matches the canonical version in DSM_0.2.A §25.1. If the two ever
+diverge, DSM_0.2.A §25.1 is authoritative.
+
+### 0.8b. Acting on the result
+
+| Token | Action | Boot report line |
+|-------|--------|------------------|
+| `KICKOFF_DONE` | Skip to Step 0 | `Step 0.8: KICKOFF_DONE (marker present)` |
+| `CENTRAL` | Skip to Step 0 | `Step 0.8: CENTRAL (this repo IS the hub)` |
+| `SPOKE` | Skip to Step 0 | `Step 0.8: SPOKE (ecosystem dsm-central → {path})` |
+| `KICKOFF_NEEDED` | Continue to §0.8c (Execute Kick-off sequence) | `Step 0.8: KICKOFF_NEEDED, invoking Kick-off` |
+
+**Narration suppression rule:** the agent's boot report contains exactly one
+line for Step 0.8, drawn from the table above. Multi-paragraph reasoning about
+which condition matched, which path was compared, or why a skip applies is a
+§22 violation (Earn Your Assertions: a deterministic check is earned by
+execution, not by narration). If the snippet exits non-zero or returns an
+unrecognized token, halt with: "Step 0.8 deterministic check failed: <output>.
+Inspect manually."
 
 ### 0.8c. Execute Kick-off sequence
 
@@ -281,6 +315,16 @@ chmod +x .claude/hooks/*.sh 2>/dev/null || true
 
 This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This step is the session guarantee that hooks are always executable, independent of whether `/dsm-align` runs. It replaces the previous dependency on `/dsm-align` Step 10b as the only source of `chmod +x`. The S180 failure mode (hooks present but not executable, align not run) is closed here.
 
+### 0f. Reset cross-repo write confirmation file (BL-391)
+
+Run unconditionally on every `/dsm-go`:
+
+```bash
+> .claude/cross-repo-writes-session.txt
+```
+
+The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-391, DSM_0.2.C §2 enforcement) is cleared at session start so confirmations from a prior session do not leak. The file is gitignored. The hook degrades gracefully if the file is absent; the reset is a defense-in-depth measure ensuring exactly the contents the user confirmed in this session, no more, no less.
+
 ## Steps
 
 1. **Read MEMORY.md:** Find and load this project's MEMORY.md from the auto memory directory to restore session context. **If MEMORY.md does not exist or fails to load**, continue to Step 2 but note that the agent is operating without prior session context, which increases the risk of applying generic rules to a project with specific overrides.
@@ -332,6 +376,10 @@ This is one command. If `.claude/hooks/` is absent or empty, it is a no-op. This
      - **Skip condition:** if `contributions-docs` is missing from the ecosystem registry, or the resolved `{target}/` path does not exist on the filesystem, warn "EC governance inbox resolution failed (contributions-docs registry entry missing OR {target} does not exist). Skipping EC inbox check, run `/dsm-align` to scaffold." and continue the session without halting
 
      **Processing (all project types, inbox lazy-load):** List filenames only at session start. Report: "Inbox: N pending entries: [filename list]. Read and process entries at user request." Do NOT read file contents during session start. The agent reads a specific entry only when the user explicitly requests inbox processing (e.g., "process the inbox" or "read the [name] entry"). This defers context cost to when the user actually acts on an entry. Exception: if a filename contains "urgent" or "critical", surface it as a note in the report.
+
+     **Enumerate-each-entry rule (per BL-421):** when N > 1, list every entry on its own line. Do NOT collapse N>1 to a single count, a top-entry summary, or "the most recent". The /dsm-align Step 12b notification (when present) is cognitively "fresh" because it was just observed in Step 1.8; pre-existing entries from prior sessions are cognitively "stale" but often more important. Enumeration is the guard against availability bias collapsing N>1 to 1. The rule is about completeness, not verbosity: a 1-entry inbox still gets one line; the rule prevents collapsing N>1, not collapsing 1 to 0.
+
+     **Filesystem-over-MEMORY rule (per BL-421):** MEMORY.md describes inbox state at the END of the previous session, not the START of the current one. New entries may have arrived between wrap-up and session start (cross-repo notifications, hub→spoke pushes). Trust the filesystem (`ls _inbox/`) over MEMORY narration. If MEMORY says "inbox cleared" but `ls` shows entries, report what `ls` shows; do not echo MEMORY's stale claim.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
 3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:

@@ -77,6 +77,13 @@ CLAUDE.md.
   that the agent has not written to before in this session. First writes to a
   new cross-repo target must be confirmed; subsequent writes to the same target
   in the same session do not require re-confirmation.
+  **Enforcement mechanism (BL-391):** `.claude/hooks/validate-cross-repo-write.sh`
+  fires on PreToolUse for `Write` and `Edit` calls. The hook canonicalizes the
+  target path, compares against `git rev-parse --show-toplevel`, and blocks
+  cross-repo writes that are not present in `.claude/cross-repo-writes-session.txt`
+  (cleared at `/dsm-go` Step 0f). Per-session cache means one confirmation per
+  cross-repo target, not per call. The doc rule above is authoritative; the hook
+  is the validation layer that catches doc-rule drift.
 - **Substantive file deletion:** Deleting any file with more than 10 lines of
   content. Empty files, stub files, and files with only boilerplate (headers,
   templates) may be deleted without confirmation.

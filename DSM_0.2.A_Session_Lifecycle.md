@@ -1965,6 +1965,10 @@ DSM_3 Section 6.4.3 (implement via BL workflow for substantive changes, defer, o
 
 **WARNING:** After processing, **move** the entry to `_inbox/done/`. Do not mark entries as "Status: Processed" or add completion markers while keeping the entry in place. Processed entries in `done/` preserve communication history and traceability; entries left in the inbox root cause stale re-processing in future sessions (observed in spoke project sessions).
 
+**Enumerate-each-entry rule (per BL-421):** at session start, when N > 1 entries exist, list every entry on its own line (filename + type + priority + source). Do not collapse N>1 to a single count or a top-entry summary. The `/dsm-align` Step 12b notification (when present) is cognitively "fresh" because the agent just observed it during Step 1.8; pre-existing entries from prior sessions are cognitively "stale" but often more important. Enumeration is the guard against availability bias collapsing N>1 to 1. The rule is about completeness, not verbosity: a 1-entry inbox still gets one line; the rule prevents collapsing N>1, not collapsing 1 to 0. Origin: portfolio S76 (2026-04-19), where 3 inbox entries were collapsed to 1 (the freshly-written /dsm-align entry) and the 2 pre-existing entries were caught ~20 minutes later when the user pivoted to inbox processing.
+
+**Filesystem-over-MEMORY rule (per BL-421):** MEMORY.md describes inbox state at the END of the previous session, not the START of the current one. New entries may arrive between wrap-up and session start (cross-repo notifications, hub→spoke pushes, async user pushes). Trust the filesystem (`ls _inbox/`) over MEMORY narration. If MEMORY says "inbox cleared" but `ls` shows entries, report what `ls` shows; do not echo MEMORY's stale claim. The pattern generalizes beyond inbox to any session-start state check, but this rule is scoped to inbox; broader generalization deferred to a follow-up BL.
+
 **External Contribution exception:** For External Contribution projects (identified
 by project type detection or explicit CLAUDE.md declaration), do NOT create `_inbox/`
 in the external repo. The external repo belongs to an upstream maintainer; only code
@@ -2386,20 +2390,66 @@ runtime copies of templates that ship as `.claude/*.template` files. This
 protocol defines the one-time Kick-off that bridges the mirror-ships state
 and the session-ready state.
 
-### 25.1. Detection Signals
+### 25.1. Deterministic Decision Check
 
-Kick-off fires on the current session when **at least one** of these signals
-is true:
+The Kick-off decision is deterministic: file-existence checks plus one path
+equality comparison. The agent runs a single snippet and acts on a one-token
+result. Narration of the evaluation is a §22 violation (the snippet IS the
+evaluation; explaining each condition in prose duplicates the work the snippet
+just did, surfaces protocol internals as user-facing reasoning, and risks
+divergent execution across sessions).
 
-1. `.claude/dsm-ecosystem.md` does not exist in the repo root
-2. `.claude/dsm-ecosystem.md` exists but its `Paths` table does not contain
-   a `dsm-central` row whose `Path` value equals the current repo root
+**Decision table** (top to bottom, first match wins):
 
-Kick-off is **skipped** (session proceeds normally) when:
+| Condition | Output token |
+|-----------|--------------|
+| `.claude/kickoff-done.txt` exists at repo root | `KICKOFF_DONE` |
+| `scripts/take-ai-bite-sync.txt` exists at repo root | `CENTRAL` |
+| `.claude/dsm-ecosystem.md` exists AND has a `dsm-central` row whose `Path` (with `~` expansion and trailing-slash strip) differs from repo root | `SPOKE` |
+| `.claude/dsm-ecosystem.md` exists AND `dsm-central` row Path equals repo root | `KICKOFF_NEEDED` (self-registered without marker = incomplete prior Kick-off) |
+| `.claude/dsm-ecosystem.md` does not exist | `KICKOFF_NEEDED` |
 
-- `.claude/kickoff-done.txt` exists (marker written at the end of a successful
-  Kick-off; a re-run would be idempotent but the marker saves the detection
-  cost on every session)
+**Snippet** (canonical; `/dsm-go` Step 0.8a carries the same text):
+
+```bash
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+if [ -f "$ROOT/.claude/kickoff-done.txt" ]; then
+  echo "KICKOFF_DONE"
+elif [ -f "$ROOT/scripts/take-ai-bite-sync.txt" ]; then
+  echo "CENTRAL"
+elif [ -f "$ROOT/.claude/dsm-ecosystem.md" ]; then
+  CENTRAL_PATH=$(awk -F'|' '/^\| *dsm-central *\|/ {gsub(/^ *| *$/,"",$3); print $3; exit}' "$ROOT/.claude/dsm-ecosystem.md")
+  CENTRAL_PATH_EXP="${CENTRAL_PATH/#\~/$HOME}"
+  CENTRAL_PATH_EXP="${CENTRAL_PATH_EXP%/}"
+  ROOT_NORM="${ROOT%/}"
+  if [ -n "$CENTRAL_PATH_EXP" ] && [ "$CENTRAL_PATH_EXP" != "$ROOT_NORM" ]; then
+    echo "SPOKE"
+  else
+    echo "KICKOFF_NEEDED"
+  fi
+else
+  echo "KICKOFF_NEEDED"
+fi
+```
+
+**Action mapping:**
+
+| Token | Action | Boot report line |
+|-------|--------|------------------|
+| `KICKOFF_DONE` | Skip Kick-off; session proceeds normally | `Step 0.8: KICKOFF_DONE (marker present)` |
+| `CENTRAL` | Skip Kick-off; this repo IS the hub | `Step 0.8: CENTRAL (this repo IS the hub)` |
+| `SPOKE` | Skip Kick-off; this is a spoke pointing to a different hub | `Step 0.8: SPOKE (ecosystem dsm-central → {path})` |
+| `KICKOFF_NEEDED` | Execute the 15-step Kick-off sequence in §25.2 | `Step 0.8: KICKOFF_NEEDED, invoking Kick-off` |
+
+**Narration suppression:** the agent's boot report contains exactly one line
+for the Step 0.8 decision. If the snippet exits non-zero or returns an
+unrecognized token, the agent halts with: "Step 0.8 deterministic check
+failed: <output>. Inspect manually."
+
+**Kick-off marker idempotency note:** `.claude/kickoff-done.txt` is written at
+the end of a successful Kick-off (§25.2 step 14). A re-run would be idempotent
+per §25.2's "already done, skip without error" rule, but the marker saves the
+detection cost on every session.
 
 ### 25.2. Kick-off Steps
 

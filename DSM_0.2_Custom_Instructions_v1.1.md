@@ -663,8 +663,8 @@ approval under the same gate-behavior rules as the rest of §8.
   skill-invocation granularity (per-invocation annotation for a skill).
   §8.7 applies the same per-invocation shape to Gate 1 config
   recommendations.
-- §8 Auto-Mode Boundaries governs whether the Gate 1 pause holds; §8.7
-  fits within whichever gate behavior the Auto-Mode Boundaries protocol has established for the
+- §8.9 Auto-Mode Boundaries governs whether the Gate 1 pause holds; §8.7
+  fits within whichever gate behavior §8.9 has established for the
   session.
 - §8.8 Parallel Offload Analysis is the complementary Gate 1 sub-section
   covering subagent orchestration. §8.7 decides the main-agent config;
@@ -736,7 +736,7 @@ approval.
 subagent spins without explicit per-task user approval. A general
 Gate 1 "y" does NOT approve offload; offload requires its own
 explicit per-task yes. This is the core user requirement behind
-the BL and is not waivable under any autonomy mode (see Auto-Mode Boundaries protocol).
+the BL and is not waivable under any autonomy mode (see §8.9 Auto-Mode Boundaries).
 
 **Fail-closed default:** if the user says "proceed" / "y" /
 "continue" to the Gate 1 brief without addressing the offload
@@ -819,6 +819,125 @@ user observed ad-hoc offload in earlier S198 turns and requested a
 protocol-level approval gate. The foundational principle DSM_6.0
 §1.12 was filed jointly with the §8.8 protocol; reading the
 principle before invoking §8.8 grounds the *why*.
+
+### 8.9. Auto-Mode Boundaries
+
+Claude Code's Auto mode widens default authorization for routine
+low-stakes and well-scoped artifacts. Its relationship to the four-gate
+model is governed by three rules: default behavior preserves Gate 1
+pauses, explicit user instruction may suspend them, and exception-
+detection remains active even under suspension.
+
+**Default auto-mode behavior** (no further instruction from the user):
+
+1. Auto mode does NOT override §8.4's "Each artifact gets its own gate
+   cycle" rule. A bulk directive like "file the 5 BLs" requires 5
+   separate Gate 1 briefs AND 5 separate opportunities for the user to
+   redirect, not one combined brief followed by batch execution.
+2. Auto mode does NOT collapse Gate 1 into Gate 2. The pause between
+   presenting a brief and beginning implementation is the user's
+   redirect window; removing it pushes all correction work to post-hoc
+   diff review, which is not equivalent.
+3. Auto mode DOES widen default authorization for: mechanical edits
+   (typo fixes, version bumps, status flips, BL moves to done/),
+   trivial artifacts (`.gitkeep`, minor config), and artifacts the
+   user explicitly authorized by name at the moment of request.
+4. Auto mode does NOT override Gate 3 destructive-action approvals
+   (§2 Destructive Action Protocol, §2.1 Default-Branch Verification,
+   §2.2 opt-in permission patterns). Those continue to require explicit
+   per-action confirmation.
+5. Auto mode does NOT compress §19 / §21.3 testing requirements
+   (Pre-Merge Test Plan Execution Rule). Auto mode is an approval-
+   friction lever, not a verification-discipline lever. The same
+   carve-out pattern §22's stop-condition uses for auto mode applies
+   here. Origin: S206 chain-implementation of BL-352/421/424 shipped
+   untested under auto mode; the user had to ask "were all tested?"
+   to surface the gap, which is itself the failure.
+
+**Explicit suspension (opt-in, full-speed mode):**
+
+The user MAY explicitly instruct the agent to suspend Gate 1 pauses
+with a directive that unambiguously names the suspension, such as:
+
+- "collaboration gates will not be needed"
+- "run without interruptions"
+- "skip the Gate 1 pauses for this work"
+- equivalent phrasing that names the suspension explicitly
+
+When the suspension is in effect:
+
+1. The agent MAY proceed from Gate 1 brief directly to execution
+   without waiting for explicit "y" on each sub-artifact.
+2. The agent STILL presents each Gate 1 brief (for traceability and
+   post-hoc review), but the brief is informational rather than a
+   pause-point.
+3. The suspension applies only to the scope the user named; it is NOT
+   standing across the whole session unless the user named session-
+   scope explicitly.
+4. The suspension does NOT extend to Gate 3 destructive actions or to
+   §19 / §21.3 testing requirements. Those continue to apply.
+
+**Suspension preconditions (clear work definition required):**
+
+Explicit suspension is valid only when the work definition is clear.
+Clear work definition means:
+
+1. The scope of each sub-artifact is determined by prior conversation,
+   BL file content, or unambiguous directive (not inferred).
+2. No contradictions are detected between the user's directive and the
+   source material (e.g., BL file scope, related protocols).
+
+**Exception-detection during suspended execution:**
+
+If the agent detects inconsistent or contradictory work definitions
+during suspended execution, the suspension lapses automatically for
+the affected artifact. The agent MUST halt before the affected
+artifact, surface the inconsistency to the user, and request
+clarification, even if the explicit suspension covered the broader
+batch. Triggering inconsistencies include:
+
+- BL file status says "Implemented" but the user directs "implement BL-X"
+- Two BLs in a batch declare overlapping scopes that would collide on
+  execution
+- Source material (BL file, inbox entry, related protocols) disagrees
+  with the user's directive on a substantive point
+- The work requires files or actions the user did not name in the
+  suspension scope (cross-repo writes, methodology section changes,
+  BLs not included in the batch)
+
+After the exception surfaces and the user clarifies, the suspension
+may resume at the user's discretion for the remaining work.
+
+**Anti-pattern guard:** The phrase "Auto-mode active. Executing." (or
+equivalent) is the marker of default-mode Gate 1 collapse, where the
+agent uses auto mode as justification for skipping the pause without
+explicit user suspension. The phrase itself is not the problem; using
+it to skip pauses without an explicit suspension directive IS the
+problem. Same guard shape as §8.2.1 ("No counter-evidence found"
+without sources surveyed) and §21.2 / §21.3 anti-pattern guards.
+
+**Cross-references:**
+
+- **§8.4 Gate Scope:** the per-artifact gate cycle rule §8.9 reinforces.
+- **§22 Protocol Violation Triage Response:** auto-mode-collapsed Gate
+  1 that ships incorrect work is a §22 violation; the §22 stop-
+  condition activates.
+- **§2 Destructive Action Protocol** and **§2.1 Default-Branch
+  Verification:** §8.9 explicitly does NOT extend suspension to these.
+- **§19 / §21.3:** §8.9 explicitly does NOT extend suspension to
+  testing requirements.
+- **CLAUDE.md protocol-precedence rule:** DSM_0.2 §8 (including §8.9)
+  takes precedence over Auto mode's general framing for gate behavior;
+  Auto mode's speed hints apply within the gate discipline, not above
+  it, unless the user has explicitly suspended via §8.9's opt-in
+  mechanism.
+
+**Origin:** BL-397. S195 self-observed pattern: across 4 BLs in one
+auto-mode session, Gate 1 pauses were collapsed without explicit user
+suspension while Gate 3 destructive actions were correctly held. S206
+extended the pattern: auto-mode collapse extended to Gate 3 testing
+discipline (§19) before §21.3 codified that testing is not compressible.
+§8.9 + §21.3 together close the auto-mode gate-collapse family.
 
 ---
 
@@ -1488,6 +1607,11 @@ test plan adds BL-specific verification on top of the minimum categories above.
 both the minimum verification above and the BL's Test Plan conditions before
 proposing merge. Never suggest "ready to merge" without a testing step.
 
+**Forcing function:** the per-item execution discipline that operationalizes
+this requirement is codified in §21.3 (Pre-Merge Test Plan Execution Rule).
+§19 defines what must be tested; §21.3 forces the agent to execute and
+record per-item evidence before merge.
+
 ---
 
 ## 20. Three-Level Branching Strategy
@@ -1652,6 +1776,166 @@ rename it.
 **Agent behavior:** When creating a BL, propose a title and verify it passes the
 test above. When reviewing existing BLs (e.g., during consolidation or triage),
 flag titles that fail the test and propose renames.
+
+### 21.2. Preemptive Risk Definition Rule
+
+Every non-trivial BL MUST include a Risks section that names the failure modes
+the writer foresees and either a mitigation or an explicit acceptance. The
+Success Criteria and Test Plan sections answer "what do we check to confirm it
+worked?" (positive). The Risks section answers "what could go wrong in ways the
+positive checks would not catch?" (negative). The two are not interchangeable
+and must not collapse into each other.
+
+**Format (minimal, preferred):** a bulleted list of 2-5 items. Each bullet
+names the failure mode and either a mitigation or a stated acceptance. A
+structured table (likelihood / impact / mitigation columns) is permitted when
+the BL warrants it, but the minimal format is sufficient and preferred for
+most BLs. Starting minimal is the explicit norm; structured-table BLs do not
+set a precedent that minimal BLs must follow.
+
+**Anti-pattern guard:** "Risks: none known" or "N/A" as the entire section is
+NOT acceptable. The rule's intent is to force the writer to engage the
+"what could go wrong" question; an empty section satisfies the form while
+violating the intent (same guard pattern as §8.2.1 Strongest Counter-Evidence
+"No counter-evidence found" anti-pattern). When a BL genuinely has no
+material risks, write: "No material risks identified because [substantive
+reason: trivial scope, mechanical edit, no behavioral change, etc.]." The
+reason is the test.
+
+**Trigger scope:**
+
+- **MUST** for any BL that modifies methodology files, skill files, hooks,
+  settings, or introduces new behavioral protocols
+- **MUST** for any BL whose implementation will edit code or templates
+- **MAY (optional)** for mechanical status-update BLs (BL → done move, typo
+  fix, version bump, README index update)
+
+**Trivial-BL exemption:** mechanical BLs whose entire scope is a status flip
+or a one-line correction may omit the Risks section. The exemption is
+content-based, not author-discretion-based: if the BL changes any user-
+facing or agent-visible behavior, it is not trivial regardless of how short
+the diff is.
+
+**Forward-only:** existing BLs in `dsm-docs/plans/` and `plan/backlog/` are
+NOT retrofitted. The rule applies to BLs filed after this rule lands. BLs
+already in flight at rule-landing time may be retrofitted at the implementer's
+discretion but are not required to be. Origin: BL-352 (S185 user request,
+implemented in S206); the forward-only decision is intentional and does not
+silently expand on later sessions.
+
+**Interaction with §21 (Scope Rule):** when the Risks section naturally
+separates into groups (the risks of sub-topic A are completely different
+from the risks of sub-topic B), this is a §21 split signal. Apply the §21
+multi-topic test and split the BL before implementation.
+
+**Interaction with §22 (Protocol Violation Triage Response):** §21.2 is a
+PREVENTIVE measure (surface failure modes at planning time). §22 is a
+REACTIVE measure (handle failure modes that surfaced during execution). The
+preventive layer does not replace the reactive one; both stay active.
+
+**Agent behavior:** when creating a BL, after drafting Success Criteria and
+Test Plan, draft a Risks section per the format above. When the BL exemption
+applies (trivial / mechanical), state explicitly in the BL file that the
+exemption applies and why. When the rule is unclear (borderline trivial),
+default to including the section.
+
+**Discoverability:** the rule lives canonically in this section (DSM_0.2 §21.2)
+and is referenced operationally by `scripts/commands/dsm-backlog.md` (the BL
+creation skill). Manually-created BLs that do not invoke the skill must still
+follow the rule; the skill is a convenience, not the source of authority.
+
+**Origin:** BL-352. The user observed in S185 that several BLs in the
+session had been designed without a "what could go wrong" analysis and
+asked to formalize a forcing function. First compliant examples: BL-351
+retrofit and BL-352 itself.
+
+### 21.3. Pre-Merge Test Plan Execution Rule
+
+The implementing agent MUST execute every Test Plan item from the BL spec
+before proposing merge to the parent branch. Each item gets a per-item
+result line in the implementation output with concrete evidence (command
+run + output captured, file path + line range, or behavioral observation
+with citation). "All passed" or "tested" without per-item evidence is NOT
+acceptable closure.
+
+§19 (Branch Testing Requirement) establishes that L3 branches must be
+tested. §21.3 is the agent forcing function that ensures §19 is executed
+rather than implicitly assumed. §21.2 surfaces failure modes at filing
+time; §21.3 verifies them at pre-merge time. Together they form the
+preventive layer before §22's reactive stop-condition fires.
+
+**Forcing function:** Test Plan items are not requirements documents to
+admire; they are checks to run. The implementer reads each item, runs the
+verification, and writes the result with evidence. The output reads as a
+checklist with results, not a paragraph claiming "tested."
+
+**Chain-implementation guard:** when implementing N BLs in sequence in
+one session, each BL gets its own complete cycle: Gate 1 brief → branch →
+implement → execute Test Plan → record results → close → merge. Testing
+is NOT amortized across the chain; the implementer cannot batch all
+implementations and then test all at once. The chain-pressure failure mode
+is "I'll test them all at the end" decaying into "I forgot to test them
+at all" because the user never asked for the gate. Origin: S206 chain of
+BL-352, BL-421, BL-424 was merged untested under auto mode; user's "were
+all tested?" surfaced the gap, which is itself the failure (the user
+should not need to ask).
+
+**Auto-mode does not compress testing:** auto mode reduces approval
+friction (Gate 1/2 round-trips per §8) but does NOT reduce testing
+requirements (Gate 3 / §19 / §21.3). This is the same explicit-in-
+protocol carve-out pattern that §22's stop-condition rule uses for auto
+mode: auto mode is an approval-friction lever, not a verification-
+discipline lever (reasoning lesson from S193, MEMORY).
+
+**Untestable-by-design carve-out:** some methodology rules cannot be
+tested in the implementing session (e.g., "next /dsm-go boot will read
+this rule"). For these, the implementer MUST:
+
+- Execute every test that CAN run in the implementing session
+  (structural: file present, regex matches, cross-refs resolve;
+  behavioral: snippet executes, command output captured)
+- For each deferred test, write "T-N deferred to [specific trigger]"
+  with a one-line verification plan
+- Add deferred items to the BL's "Pending verification" subsection
+- Propagate deferred items to the next `/dsm-go`'s suggested work via
+  the session checkpoint or wrap-up handoff (so the deferred item does
+  not silently die between sessions)
+
+**Anti-pattern guard:** "all tests passed" without per-item evidence is
+the failure mode this rule prevents. Same guard shape as §8.2.1 ("No
+counter-evidence found" without sources surveyed) and §21.2 ("Risks: none
+known" without substantive reasoning). The rule's intent is forcing
+per-item engagement; collapsed claims defeat the rule's letter and intent
+simultaneously.
+
+**Trivial-BL exemption:** mechanical status-update BLs (BL → done move,
+typo fix, version bump, README index update) inherit the §21.2 trivial-
+BL exemption. No Test Execution Log required if no behavior change. The
+exemption is content-based, not author-discretion-based: any BL that
+edits methodology files, skill files, hooks, settings, or templates is
+NOT trivial regardless of diff size.
+
+**Operational gate:** §8.4 Gate 3 (Run Approval) is the gate that §21.3
+enforces. §21.3 makes Gate 3 mandatory at pre-merge time for any L3
+branch implementation, even when auto mode has compressed Gate 1/2.
+
+**Discoverability:** the rule lives canonically in this section. Operational
+support: `scripts/commands/dsm-backlog.md` template includes a "Test
+Execution Log" section that the implementer fills at close time, between
+the filing-time Test Plan and the filing-time Risks sections.
+
+**Agent behavior:** before proposing a merge of an L3 branch to its
+parent, the agent reads the BL's Test Plan, executes each item, writes
+the per-item result with evidence, identifies any deferred items, and
+only then proposes the merge. The merge proposal includes the Test
+Execution Log inline so the user can see the evidence without reading
+the BL file separately.
+
+**Origin:** BL-429 (S206). User caught the chain-implementation testing
+failure with "were all tested? how do we know the implementations work?"
+after BL-352, BL-421, BL-424 shipped untested. Sibling preventive rule to
+§21.2 at the implementation lifecycle stage. First compliant example:
+BL-429 itself (recursive validation).
 
 ---
 
