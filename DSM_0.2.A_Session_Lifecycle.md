@@ -2687,3 +2687,138 @@ motivators of this protocol. Findings #11 (standalone incompatibility of
 (colon in archive filenames), #16 (review-only branching hazard), and #17
 (two MEMORY.md systems) are out of scope for this protocol and tracked
 separately.
+
+## 26. Concurrent-Session Detection Protocol
+
+DSM has historically had no mechanism to detect that another Claude Code
+conversation is already operating on the same project. Multiple sessions on
+the same branch produce silent data hazards: interleaved transcript entries,
+conflicting baseline files, race conditions on staged changes, and confused
+wrap-up flows. The single-session-per-window invariant is the assumption
+every other DSM protocol depends on (transcript continuity, baseline
+integrity, MEMORY pointer, branch state). This protocol enforces it via a
+session lockfile.
+
+### 26.1. Lockfile path and format
+
+**Path:** `.claude/session.lock`
+
+**Properties:**
+- Gitignored (entry in `.gitignore` independent of any broader `.claude/`
+  exclude rule, so the file is never committed even if `.claude/` exclusion
+  drifts)
+- Instance-local (each clone of the repo has its own lockfile state)
+- Session-scoped (written at session start, removed at wrap-up)
+
+**Contents:**
+
+```
+session: <N or N.Lk>
+started: <ISO 8601 with TZ>
+agent: <harness identifier>
+model: <model identifier>
+branch: <git branch>
+transcript_anchor: <md5 hash of session-transcript.md after Step 6 reset>
+pid: <Claude Code process PID, or "unknown" if unavailable>
+```
+
+The `transcript_anchor` field captures the post-reset transcript state. A
+wrap-up skill may use the anchor to verify integrity (the lockfile's anchor
+matches a recomputed hash, no foreign appends from a concurrent session).
+
+### 26.2. Lifecycle (mapped to skill steps)
+
+| Stage | Skill | Step | Action |
+|-------|-------|------|--------|
+| Detect | `/dsm-go` | 0.7 | Check `.claude/session.lock`; halt if present |
+| Write | `/dsm-go` | 6 | Write lockfile after transcript reset |
+| Remove | `/dsm-wrap-up` | 13 | `rm -f .claude/session.lock` |
+| Remove | `/dsm-light-wrap-up` | 8 | `rm -f .claude/session.lock` |
+| Remove | `/dsm-quick-wrap-up` | 9 | `rm -f .claude/session.lock` |
+
+### 26.3. Hard halt on concurrent detection
+
+When `/dsm-go` Step 0.7 finds an existing lockfile, it MUST hard-halt and
+display the lockfile contents to the user with three resolution options:
+
+1. **(w) Wrap up the existing session first** with `/dsm-wrap-up`,
+   `/dsm-light-wrap-up`, or `/dsm-quick-wrap-up`. The recommended path when
+   a real second window is operating the project.
+2. **(f) Force concurrent** via `--force-concurrent`. The existing lockfile
+   is removed and a fresh one is written. ONLY for crashed-session recovery
+   (the prior agent is no longer running), NOT for legitimate parallel
+   work.
+3. **(m) Manual recovery:** exit `/dsm-go`, run `rm .claude/session.lock`,
+   then retry. Functionally equivalent to (f); explicit version of the
+   same action.
+
+The halt is **non-suppressible** under auto mode (per DSM_0.2 §8.9.1).
+Auto mode's "minimize interruptions" framing does NOT permit
+silently auto-picking option (f), because the user's choice changes the
+agent's destination (wrap up the prior session vs continue here).
+
+### 26.4. Stale-lockfile recovery
+
+A "stale lockfile" is one whose owning agent is no longer running (Claude
+Code window closed without wrap-up, agent crashed, system rebooted). The
+recovery path is symmetric with option (f) above: `--force-concurrent` or
+manual `rm .claude/session.lock`. There is no shared-state corruption
+risk; the lockfile is purely local to this clone.
+
+The agent SHOULD NOT auto-detect staleness (e.g., "the lockfile is X
+minutes old, must be stale"). User judgment is the arbiter; the
+`--force-concurrent` flag is the explicit override.
+
+### 26.5. Parallel session protocol exemption
+
+`/dsm-parallel-session-go` (per **§7 Parallel Session Protocol** in this
+module) does NOT write or check `.claude/session.lock`. Parallel sessions
+are designed to share the session branch via the commit booking system;
+they are concurrent siblings by design, not the silent-hazard concurrent
+sessions §26 prevents. The lockfile mechanism is scoped to single-session-
+per-window invariant violations.
+
+A future BL may extend the lockfile to a sibling-aware schema (e.g., a
+`parallel_siblings:` field listing tolerated concurrent locks). For now,
+parallel sessions are out-of-band of this protocol.
+
+### 26.6. Light-mode continuation gap (known limitation)
+
+In light-mode chains, the gap between `/dsm-light-wrap-up` (which removes
+the lockfile per §26.2) and the next `/dsm-light-go` (which currently does
+NOT re-write the lockfile because it skips Step 6 transcript reset) leaves
+the project briefly unprotected. A second tab could `/dsm-go` during this
+gap and not detect the legitimate continuation user.
+
+Acceptable trade-off for v1 of this protocol. Light mode is for tight
+context-pressure same-day continuation where the user knows they are
+chaining; the lock-leakage risk is minimal. Tracked as a follow-up if the
+limitation surfaces in practice.
+
+### 26.7. Wrap-up integrity check (deferred)
+
+A wrap-up skill MAY use the lockfile's `transcript_anchor` field to verify
+no foreign appends happened during the session: recompute the md5 of
+`.claude/session-transcript.md` between the lockfile's anchor offset and
+EOF; if the hash diverges from a baseline computed at the lockfile write
+plus all subsequent agent appends, a concurrent session may have appended
+silently.
+
+This check is OUT of scope for the initial BL-431 implementation. It would
+require the agent to track its own appends over the session, which is
+substantial bookkeeping. Tracked as a future enhancement.
+
+### 26.8. Origin
+
+Heating-systems-conversational-ai S10.L2 (2026-04-29). Two Claude Code
+conversations were running in parallel against the same project on the
+same git branch (`session-10/2026-04-23`). Neither agent detected the
+other. Discovery happened only when `git status` and the shared
+`.claude/session-transcript.md` showed entries the active agent had not
+authored. One session ran `/dsm-align` v1.7.0 to v1.8.0 + drafted the
+Haystack upstream issue (T6) + closed BL-004; the parallel session ran T7
+(Phase 2 embedding-model selection) and made 3 edits to a shared sprint
+plan. Both sessions on the same branch, modifying the same working tree,
+appending to the same transcript, with no awareness of each other.
+
+Filed as BL-431 in DSM Central S207 (2026-05-05).

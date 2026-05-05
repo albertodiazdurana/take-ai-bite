@@ -406,10 +406,35 @@ Before starting alignment, check if git is initialized:
    - CLAUDE.md redundancy: [OK | N redundant section(s) found (list)]
    - CLAUDE.md paths: [OK | N stale path(s) found (list)]
    - .gitattributes: [OK | Created | Warning: missing LF enforcement | N/A (EC fast-path)]
-   - Command sync: [OK: N | Drifted: N | Missing: N, or "N/A (not DSM Central)"]
+   - Command sync: [conditional spec; see below]
    - Feedback pushed: [count of entries pushed to DSM Central, or "none pending"]
    - EC governance scaffold: [N/A (not EC) | OK (all folders present) | Created (list) | Skipped (reason)]
    ```
+
+   **`Command sync` conditional spec (per BL-434):**
+
+   The `Command sync` line emission depends entirely on whether Step 11
+   (Check command file drift) ran. Step 11 starts with "Skip this step if
+   the project is not DSM Central"; on spoke runs the step is skipped, and
+   the report MUST emit a fixed N/A sentinel rather than leave the field
+   to agent discretion.
+
+   - When Step 11 was SKIPPED (project is not DSM Central): emit
+     `Command sync: N/A (not DSM Central)` verbatim. Do NOT run any
+     adjacent check (e.g., `diff -q` on `~/.claude/commands/`) and do
+     NOT fold off-skill findings into this field. Per DSM_0.2 §8.6 (and
+     the §8.6 amendment under BL-435), silence from Step 11 IS the
+     skill's answer for this field.
+   - When Step 11 RAN (project is DSM Central): emit
+     `Command sync: OK: N | Drifted: N | Missing: N` populated from
+     Step 11's output (N counts as observed in the actual drift check).
+
+   The conditional binding closes the "blank field invites invention"
+   failure mode observed in heating-systems S10 (2026-04-23), where the
+   agent ran an out-of-scope `diff -q` on user-scope command files and
+   populated this field with `Drifted: 2` plus a fabricated spoke-action
+   recommendation. Cost of that detour: ~115 transcript lines of
+   correction.
 
 12a. **Write persistent alignment report:** After printing the report to conversation, write the full report to `.claude/last-align-report.md` (gitignored, overwritten each run). This is the durable audit record so the user, or a future session, can read what the last alignment found without re-running the skill.
 

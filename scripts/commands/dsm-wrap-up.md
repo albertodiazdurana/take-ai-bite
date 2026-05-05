@@ -260,6 +260,8 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
     type: full
     ```
 
+13. **Remove session lockfile (BL-431):** Run `rm -f .claude/session.lock`. The lockfile signals "session active" to a concurrent `/dsm-go` invocation; removing it after the wrap-up marker is written is the canonical "session inactive" signal. The `-f` flag tolerates a missing file (e.g., a session that pre-dated BL-431 and never wrote the lockfile). Per **DSM_0.2.A §26**, this is the locus of lockfile cleanup for full wrap-up.
+
 ## Notes
 
 - Do NOT clear or overwrite `.claude/session-transcript.md`; `/dsm-go` handles the reset at next session start
