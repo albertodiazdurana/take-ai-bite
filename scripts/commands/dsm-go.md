@@ -482,8 +482,9 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    **After reading, move the checkpoint to `done/`:**
    1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' dsm-docs/checkpoints/{filename}`
    2. `git mv dsm-docs/checkpoints/{filename} dsm-docs/checkpoints/done/{filename}`
-   3. Report: "Checkpoint {filename} moved to done/"
-   If multiple checkpoints exist in `dsm-docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation.
+   3. `git add dsm-docs/checkpoints/done/{filename}` , **restage post-annotation content (per BL-370/BL-444).** `git mv` stages the rename using the PRE-annotation content (the index copy from before step 1), so without this restage the commit ships the rename without the "Consumed at:" line AND the working-tree-vs-index divergence trips the BL-370 rename-staging hook, which can block a later commit in this repo OR a cross-repo parallel-session commit (observed S210). This step is git-path-only: when `GIT_AVAILABLE=false`, steps 1-2 use plain `mv` (no `git mv`) and this restage is skipped. The restage applies regardless of whether the annotation was made via `sed` or the Edit tool.
+   4. Report: "Checkpoint {filename} moved to done/"
+   If multiple checkpoints exist in `dsm-docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation (restaging each).
 3.6. **Sprint boundary gate:** If MEMORY.md or the checkpoint references a recently completed sprint (e.g., "Sprint N complete"), verify that boundary artifacts exist before suggesting new sprint work:
    - Checkpoint for the completed sprint in `dsm-docs/checkpoints/done/` (or just consumed in 3.5)
    - Blog journal entry in `dsm-docs/blog/journal.md` with a matching date

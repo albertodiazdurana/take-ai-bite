@@ -21,13 +21,25 @@
 
 set -e
 
-# Read JSON from stdin and extract file_path
+# Read JSON from stdin and extract the target path.
+# Defensive multi-key extraction (BL-440): different file-modifying tools
+# and Claude Code harness versions carry the target path under different
+# tool_input keys (Write/Edit use file_path; some edit variants use
+# target_file or path; NotebookEdit uses notebook_path). Reading only
+# file_path silently allowed any tool that named the field differently
+# (cross-repo write gate bypass). Try each known key, first non-empty wins.
 INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | python3 -c "
 import sys, json
 try:
-    data = json.load(sys.stdin)
-    print(data.get('tool_input', {}).get('file_path', ''))
+    ti = json.load(sys.stdin).get('tool_input', {})
+    for key in ('file_path', 'path', 'target_file', 'notebook_path'):
+        val = ti.get(key)
+        if val:
+            print(val)
+            break
+    else:
+        print('')
 except Exception:
     print('')
 " 2>/dev/null || echo "")
