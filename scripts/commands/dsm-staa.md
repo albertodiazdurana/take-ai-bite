@@ -33,32 +33,7 @@ When the `UserPromptSubmit` per-turn reminder hook fires and tells you to append
    **Format:** `- [STAA] S{N} [{scope}]: {lesson text}` (where N is the analyzed session number)
    **Scope classification:** For each lesson, assign a scope label per the Reasoning Lessons Protocol (DSM_0.2 Module A): `ecosystem` (applies to any DSM project), `pattern` (applies to same project type/pattern), or `project` (domain-specific). Present the scope assignment to the user for confirmation alongside the lesson text.
 7. **Prune if needed:** If `.claude/reasoning-lessons.md` exceeds 50 lines of entries (excluding headers and comments), suggest entries to promote to MEMORY.md or CLAUDE.md, and entries to remove (obvious, outdated, or already codified).
-8. **Regenerate compact reasoning-lessons mirror (per BL-433):** After Step 6's appends and any Step 7 prunes have landed in `.claude/reasoning-lessons.md`, regenerate `.claude/reasoning-lessons-compact.md` with a fresh header and source-mtime. The transform implements the same rule `/dsm-wrap-up` Step 0 describes in prose: skip the live file's guideline-lines header (everything before `## Categories`), preserve `### Category` headings verbatim, strip the `- [auto] S{N} [scope]: ` / `- [STAA] S{N} [scope]: ` prefix from matching entries, and pass other lines through (so `[STAA-2]` / `[claude]` / `[recovered]` entries and category comments are kept as-is). Plus a 7-line freshness header.
-
-   ```bash
-   NOW=$(date +%Y-%m-%dT%H:%M%:z)
-   SRC_MTIME=$(date -r .claude/reasoning-lessons.md +%Y-%m-%dT%H:%M%:z)
-   {
-     printf '%s\n' \
-       "# Reasoning Lessons (compact mirror)" "" \
-       "<!-- Do not edit; auto-generated from .claude/reasoning-lessons.md by /dsm-wrap-up Step 0 or /dsm-staa Step 8 -->" "" \
-       "**Source:** \`.claude/reasoning-lessons.md\`" \
-       "**Last regenerated:** $NOW" \
-       "**Source mtime at regeneration:** $SRC_MTIME" "" \
-       "---" ""
-     awk '
-       /^## Categories/ { found = 1; next }
-       !found { next }
-       /^### / { print; next }
-       /^- \[(auto|STAA)\] S[0-9]+ \[[^]]+\]: / {
-         sub(/^- \[(auto|STAA)\] S[0-9]+ \[[^]]+\]: /, "")
-         print "- " $0
-         next
-       }
-       { print }
-     ' .claude/reasoning-lessons.md
-   } > .claude/reasoning-lessons-compact.md
-   ```
+8. **Regenerate compact reasoning-lessons mirror (per BL-433, transform per BL-447):** After Step 6's appends and any Step 7 prunes have landed in `.claude/reasoning-lessons.md`, regenerate `.claude/reasoning-lessons-compact.md`. **Run the canonical regeneration transform defined in DSM_0.2.A §8.1 ("Canonical regeneration transform")**, then run the two post-generation sanity checks specified there. Do NOT re-inline a transform here: the canonical awk in §8.1 is the single source of truth (re-inlining a divergent copy was the BL-447 drift bug that silently emptied the mirror on flat-structured spoke files). The §8.1 transform is shape-tolerant (works whether or not the live file has a `## Categories` heading), strips the `[auto]`/`[STAA]` provenance prefix, preserves `### Category` headings, and fails loud (entry-count + size-floor warnings) instead of producing a silent header-only mirror.
 
    **Why:** /dsm-go Step 1.5 reads the compact mirror as the boot-time canonical context. /dsm-staa runs OUTSIDE the wrap-up flow, so its appends to the live file create staleness in the mirror that persists until the next /dsm-wrap-up (potentially 24+ hours later). Regenerating here closes the gap so the next session boot reads a fresh mirror.
 

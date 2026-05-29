@@ -922,7 +922,7 @@ content:
   ```markdown
   # Reasoning Lessons (compact mirror)
 
-  <!-- Do not edit; auto-generated from .claude/reasoning-lessons.md by /dsm-wrap-up Step 0 -->
+  <!-- Do not edit; auto-generated from .claude/reasoning-lessons.md by /dsm-wrap-up Step 0 or /dsm-staa Step 8 -->
 
   **Source:** `.claude/reasoning-lessons.md`
   **Last regenerated:** YYYY-MM-DDTHH:MM
@@ -932,6 +932,72 @@ content:
 Expected savings: ~25-30% versus the live file. Achieved deterministically
 without any external compression tool. Compression beyond trim-only is
 out of scope for §8.1 and tracked separately under BL-427 Step 5.
+
+**Canonical regeneration transform (BL-447, single source of truth):**
+
+The transform below is the ONE authoritative implementation of the trim rule.
+`/dsm-wrap-up` Step 0 and `/dsm-staa` Step 8 both reference this block; neither
+re-inlines its own copy (re-inlining is the drift mechanism that produced the
+silent-empty-mirror bug across three spokes — heating-systems S15,
+dsm-blog-poster S21, dsm-data-science-portfolio-working-folder S90/S91). If the
+rule changes, it changes HERE and both skills inherit it.
+
+The transform is **shape-tolerant**: it must work whether or not the live file
+has a `## Categories` heading. It does NOT gate on `## Categories` (the prior
+`/dsm-staa` awk did, which silently discarded every entry on flat-structured
+files that lack that heading). Instead it starts emitting at the first content
+line, identified as the first `### ` category heading OR the first
+`[auto]`/`[STAA]` entry line, whichever appears first. Everything before that
+(the guideline header, the `## Tagging Convention` bullets, the `## Categories`
+heading itself) is dropped.
+
+```bash
+NOW=$(date +%Y-%m-%dT%H:%M%:z)
+SRC_MTIME=$(date -r .claude/reasoning-lessons.md +%Y-%m-%dT%H:%M%:z)
+{
+  printf '%s\n' \
+    "# Reasoning Lessons (compact mirror)" "" \
+    "<!-- Do not edit; auto-generated from .claude/reasoning-lessons.md by /dsm-wrap-up Step 0 or /dsm-staa Step 8 -->" "" \
+    "**Source:** \`.claude/reasoning-lessons.md\`" \
+    "**Last regenerated:** $NOW" \
+    "**Source mtime at regeneration:** $SRC_MTIME" "" \
+    "---" ""
+  awk '
+    # Shape-tolerant: start on first category heading OR first entry line.
+    /^### / { found=1; print; next }
+    /^- \[(auto|STAA)\] S[0-9]+ \[[^]]+\]: / {
+      found=1
+      sub(/^- \[(auto|STAA)\] S[0-9]+ \[[^]]+\]: /, "")
+      print "- " $0
+      next
+    }
+    !found { next }                      # drop guideline header until first content
+    { print }                            # passthrough once started ([STAA-2]/[claude]/[recovered]/comments/sub-bullets)
+  ' .claude/reasoning-lessons.md
+} > .claude/reasoning-lessons-compact.md
+```
+
+**Post-generation sanity checks (BL-447, fail loud, never silent):** after
+regeneration, run both:
+
+```bash
+SRC_ENTRIES=$(grep -cE '^- \[(auto|STAA)\] S[0-9]+ \[[^]]+\]: ' .claude/reasoning-lessons.md)
+MIR_ENTRIES=$(grep -cE '^- ' .claude/reasoning-lessons-compact.md)
+LIVE_BYTES=$(wc -c < .claude/reasoning-lessons.md)
+MIR_BYTES=$(wc -c < .claude/reasoning-lessons-compact.md)
+# (1) entry-count floor: mirror dash-lines must be >= source entries
+#     (>= not ==, because passthrough sub-bullets add extra '- ' lines).
+[ "$MIR_ENTRIES" -ge "$SRC_ENTRIES" ] || echo "WARNING: compact mirror has $MIR_ENTRIES entries < $SRC_ENTRIES source entries , regeneration likely dropped content."
+# (2) size floor: a non-trivial live file must not yield a header-only mirror.
+{ [ "$LIVE_BYTES" -gt 30000 ] && [ "$MIR_BYTES" -lt 1024 ]; } && echo "WARNING: live file is ${LIVE_BYTES}B but compact mirror is only ${MIR_BYTES}B (header-only?) , regeneration likely failed silently." || true
+```
+
+**Heading convention (per §14 fix-the-input):** reasoning-lessons guideline
+header lines (Reference, Pruning cadence, File size target, Last pruned, Tagging
+Convention) MUST use `##` or bold, never `### ` , the `### ` prefix is reserved
+exclusively for category headings. The shape-tolerant transform starts emitting
+at the first `### `; a stray `### ` in the header region would cause it to
+over-capture. Reserving `### ` for categories keeps the input unambiguous.
 
 **Regeneration trigger:**
 

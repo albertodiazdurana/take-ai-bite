@@ -5,6 +5,26 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-05-29
+
+Three BLs implemented in S211 from a 5-spoke inbox triage, all silent-failure / filesystem-discipline hardening. Four sibling BLs filed for later implementation.
+
+### Fixed
+
+- **BL-440:** `validate-cross-repo-write.sh` now extracts the target path defensively from `file_path` / `path` / `target_file` / `notebook_path` (first non-empty) instead of `file_path` only. The hook silently allowed any file-modifying tool or harness version that carried the path under a different key (the BL's hypothesized Write/Edit branch did not exist; the real bug was single-key extraction, confirmed by diagnostic). **Spoke action:** No action required (hooks `chmod +x` runs unconditionally on `/dsm-go` Step 0e; the next `/dsm-go` in each spoke uses the fixed hook after mirror sync).
+- **BL-447:** the compact reasoning-lessons-mirror regenerator is now shape-tolerant and has a single canonical source. DSM_0.2.A §8.1 holds THE canonical awk (starts on the first `### ` heading or first `[auto]`/`[STAA]` entry, no `## Categories` gate) plus fail-loud entry-count + size-floor sanity checks; `/dsm-staa` Step 8 and `/dsm-wrap-up` Step 0 now reference §8.1 instead of re-inlining (re-inlining was the drift mechanism). Closes a 3-spoke silent boot-context-loss (header-only mirror → `/dsm-go` Step 1.5 boots with zero reasoning lessons). **Spoke action:** Run `sync-commands.sh --deploy` (command files changed); next `/dsm-align` picks up the DSM_0.2.A §8.1 change.
+
+### Changed
+
+- **BL-444:** `/dsm-go` Step 3.5 and `/dsm-light-go` Step 2 add a post-rename `git add` restage so the sed/Edit "Consumed at:" annotation is staged with the checkpoint `done/` rename, closing the BL-370 stale-rename hook block (which had blocked same-repo and cross-repo parallel-session commits). **Spoke action:** Run `sync-commands.sh --deploy`.
+
+### Spawned
+
+- **BL-448** (Medium): cross-repo writes must be write-only , no git operations in the target repo.
+- **BL-449** (Medium): forbid `replace_all` on `session-transcript.md` Edits + `validate-transcript-edit.sh` anomaly detection.
+- **BL-450** (Medium): `/dsm-wrap-up` Step 0.5 pre-confirm known cross-repo targets (avoid BL-391 hook fragmenting the wrap-up).
+- **BL-451** (Medium): inbox-done lifecycle , collision-safe dated `done/` filenames.
+
 ## [1.9.0] - 2026-05-05
 
 Six BLs landed in S207 from an inbox-derived backlog filing pass. Three new

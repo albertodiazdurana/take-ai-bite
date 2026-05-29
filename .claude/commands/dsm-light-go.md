@@ -96,8 +96,9 @@ and request user disambiguation rather than guessing a number.
    **After reading, move the checkpoint to `done/`:**
    1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' dsm-docs/checkpoints/{filename}`
    2. `git mv dsm-docs/checkpoints/{filename} dsm-docs/checkpoints/done/{filename}`
-   3. Report: "Checkpoint {filename} moved to done/"
-   If multiple checkpoints exist in `dsm-docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation. If no checkpoint exists, skip silently.
+   3. `git add dsm-docs/checkpoints/done/{filename}` , **restage post-annotation content (per BL-370/BL-444).** `git mv` stages the rename using the PRE-annotation content, so without this restage the commit drops the "Consumed at:" line and the working-tree-vs-index divergence trips the BL-370 rename-staging hook (which can block a later same-repo or cross-repo parallel-session commit, observed S210). Git-path-only: skip when `GIT_AVAILABLE=false` (plain `mv`). Applies whether the annotation used `sed` or the Edit tool.
+   4. Report: "Checkpoint {filename} moved to done/"
+   If multiple checkpoints exist in `dsm-docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation (restaging each). If no checkpoint exists, skip silently.
 3. **Git status:** Run `git status` to check for uncommitted changes.
 4. **Save session baseline:** Save a new baseline snapshot (same as full `/dsm-go` step 6), then append `mode: light` to preserve the chain for the next lightweight wrap-up.
 5. **Transcript boundary marker:** Append a session boundary marker to the existing `.claude/session-transcript.md` (do NOT archive or overwrite). The session number `{N}` MUST be the integer parsed from the current branch name per the Session Numbering rule above (e.g., branch `session-190/2026-04-14` → N=190). Do NOT increment, do NOT use archive count:
