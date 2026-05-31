@@ -104,6 +104,7 @@ deleted after processing.
 - Skip pushing at session end; ripe files that stay local lose timeliness
 - Push to inbox without also writing to the local feedback file; both destinations are required per the Immediate push rule
 - Overwrite an existing inbox file; the receiving project may not have processed earlier entries. Always **append** new entries to the existing file rather than replacing its contents
+- Run any git operation in the target repo (`git add`/`commit`/`mv`/`restore`, staging, branching). The inbox push is **write-only**: append the file and stop. The target repo owns its own git and commits the incoming file during its own session. Running git in the target can author commits on its active branch and bundle its staged work into a foreign commit (DSM_0.2.C §2 Write-only rule, BL-448)
 
 ---
 

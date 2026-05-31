@@ -15,6 +15,20 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    **Scope classification:** For each extracted lesson, assign a scope label per the Reasoning Lessons Protocol (DSM_0.2 Module A): `ecosystem`, `pattern`, or `project`. The agent assigns scope based on whether the lesson is domain-specific or generalizable.
    **STAA recommendation:** After extracting, assess whether this session warrants deeper STAA analysis. Recommend STAA when the session involved complex multi-option decisions, entered unfamiliar territory (new domain, tool, or pattern), the auto extraction felt incomplete (rich reasoning that resists summarization), or a course correction occurred that may represent a recurring pattern. Output: "STAA recommended: [yes/no]. [1-sentence reason]." **Invocation:** STAA must be run in a separate Claude Code conversation. Do not wrap it in `/dsm-go` or `/dsm-parallel-session-go`. Enter `/dsm-staa` directly.
    **Lesson push:** Deferred (no cross-repo writes in quick wrap-up). Classified lessons remain in `.claude/reasoning-lessons.md` for push via `/dsm-wrap-up` or `/dsm-align`.
+0.5. **Pre-confirm auto-memory target (BL-450):** Quick wrap-up's only cross-repo write is the auto-memory `MEMORY.md` (no feedback push). Pre-confirm just the auto-memory dir so the BL-391 hook (`validate-cross-repo-write.sh`) does not fire on the protocol-defined MEMORY.md update. The hook matches canonicalized path prefixes, so pre-confirm the directory. Session-scoped (`/dsm-go` Step 0f clears it). This is not a gate weakening: the gate still fires for any other cross-repo write.
+
+   ```bash
+   CONFIRM=.claude/cross-repo-writes-session.txt
+   # Derive the auto-memory dir deterministically from the project path slug
+   # (Claude Code names project dirs by replacing / with -). Do NOT
+   # `find ... | head -1`, which can return another project's MEMORY.md.
+   MEMDIR="$HOME/.claude/projects/$(pwd | sed 's#/#-#g')/memory"
+   if [ -d "$MEMDIR" ]; then
+     C=$(realpath -m "$MEMDIR" 2>/dev/null || echo "$MEMDIR")
+     grep -qxF "$C" "$CONFIRM" 2>/dev/null || echo "$C" >> "$CONFIRM"
+   fi
+   ```
+
 1. **Session summary:** MEMORY.md is already loaded via auto memory context. Do NOT re-read; update the version in the auto memory directory directly. Update:
    - Latest Session section: date, session number, brief description of what was done
    - Update any Pending Improvements or Open Developments that changed

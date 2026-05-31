@@ -84,6 +84,25 @@ CLAUDE.md.
   (cleared at `/dsm-go` Step 0f). Per-session cache means one confirmation per
   cross-repo target, not per call. The doc rule above is authoritative; the hook
   is the validation layer that catches doc-rule drift.
+  **Write-only rule (BL-448) — cross-repo writes must NOT run git in the target
+  repo.** A session writing to a path outside its own repo MUST limit itself to
+  creating or appending the file. It MUST NOT run any git operation (`git add`,
+  `git commit`, `git mv`, `git rm`, `git restore`, staging, branching) inside the
+  target repo. The target repo owns its own git history and commits its own
+  incoming files during its own session; the writing session's responsibility
+  ends at the file write, leaving the file untracked for the target session to
+  triage and commit. **Why (not just what):** a foreign session running git in
+  the target can (a) author commits the target did not make on the target's
+  *active* session branch, (b) sweep up the target's staged-but-uncommitted work
+  into the foreign commit, and (c) race with the target's in-flight branch work,
+  which the Concurrent-Session Detection Protocol (`/dsm-go` Step 0.7) cannot
+  catch because the foreign session never acquires the target's session lock.
+  Observed S211: a concurrent session committed `c9d4b83` on DSM Central's active
+  `session-211` branch and bundled Central's staged checkpoint move. The rule is
+  scoped to the TARGET repo of a cross-repo write; it does not constrain the
+  session's own git. (Mechanical hook enforcement is a deliberate follow-on, not
+  part of this rule; the rule converts a silent deviation into a named §22
+  violation, the prerequisite for detecting recurrence.)
 - **Substantive file deletion:** Deleting any file with more than 10 lines of
   content. Empty files, stub files, and files with only boilerplate (headers,
   templates) may be deleted without confirmation.

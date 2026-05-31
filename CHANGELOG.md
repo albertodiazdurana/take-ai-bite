@@ -5,6 +5,31 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-05-31
+
+Four sibling BLs filed in S211 implemented in S212 as a coherent silent-failure / filesystem-discipline hardening release. Each shipped with its own Gate 1/2/3 cycle and per-item Test Execution Log under default auto mode.
+
+### Added
+
+- **BL-448:** Cross-repo writes are write-only , a session writing to a path outside its own repo must NOT run git operations (`add`/`commit`/`mv`/`rm`/`restore`, staging, branching) in the target repo. The target owns its git and commits its own incoming files. Authoritative rule in DSM_0.2.C §2 (with rationale: foreign commits on the target's active branch + staged-work bundling + a race `/dsm-go` Step 0.7 cannot catch); reinforcements in DSM_0.2.A §1 Session-End Inbox Push and `/dsm-wrap-up` step 6. Hook enforcement is a deliberate §21 follow-on. Origin: S211 foreign commit `c9d4b83` on Central's active session branch.
+  **Spoke action:** Review DSM_0.2.C §2 for the write-only rule (behavioral change for any session that pushes cross-repo).
+- **BL-450:** `/dsm-wrap-up` Step 0.5 pre-confirms known cross-repo targets (auto-memory dir + ecosystem `_inbox` parents, registry-resolved, canonicalized prefixes) so the BL-391 hook does not fire per-target mid-flow on protocol-defined destinations. Minimal auto-memory-only Step 0.5 added to `/dsm-quick-wrap-up` and `/dsm-light-wrap-up`. Not a gate weakening: the gate still fires for any target outside the known list, and `/dsm-go` Step 0f clears the file at session start.
+  **Spoke action:** Run `sync-commands.sh --deploy` (command files changed).
+
+### Changed
+
+- **BL-451:** Inbox Lifecycle now moves a processed `_inbox/{source}.md` entry to `_inbox/done/YYYY-MM-DD_{source}.md` (dated) instead of the bare `_inbox/done/{source}.md`, making same-source collisions impossible by construction. Bare-name `done/` files are append-only rolling archives; `mv` onto an existing bare name silently overwrites (S211 incident: −323 lines). Forward-only; existing bare-name archives untouched. CLAUDE.md Inbox Lifecycle + DSM_0.2 §17.1 alignment template.
+  **Spoke action:** Run `/dsm-align` to update the reinforcement block.
+
+### Fixed
+
+- **BL-449:** Forbid Edit `replace_all: true` on `.claude/session-transcript.md`. The append-anchor rule assumes a unique last-line anchor; `replace_all` duplicates content at every match and explodes the file (IronCalc S17: 95 MB / 1.5M lines; blog-poster S22: Output block duplicated). `validate-transcript-edit.sh` gains a Check 0 that blocks the case before the anchor/append/delimiter checks, naming the `[RETROACTIVE]` Bash-heredoc recovery path. Prohibition added to DSM_0.2 §7 anti-patterns + §17.1 template + CLAUDE.md. Size-anomaly detection deferred per the BL risk note (deterministic `replace_all` block is the high-value guard).
+  **Spoke action:** Run `/dsm-align` (§7/§17.1 + hook); spokes re-`chmod` the synced hook at next `/dsm-go` Step 0e.
+
+### Spawned
+
+- None. The four BLs were filed in S211 (the prior release); S212 implemented them. Two §21 follow-on candidates noted but NOT filed: BL-449 size-anomaly hook detection, BL-448 cross-repo-git Bash-matcher hook (file only if recurrence observed).
+
 ## [1.10.0] - 2026-05-29
 
 Three BLs implemented in S211 from a 5-spoke inbox triage, all silent-failure / filesystem-discipline hardening. Four sibling BLs filed for later implementation.
