@@ -247,6 +247,7 @@ under §23 (Skill/Hook Collaboration Protocol).
 - Commit the transcript file; it is a session-scoped working artifact
 - Edit or rewrite past transcript entries; each entry reflects reasoning at the time it was written
 - Use Edit with `old_string` matching earlier content to insert entries mid-file; this causes out-of-order timestamps (observed in prior sessions). Use the mandatory append technique above
+- **Use Edit `replace_all: true` on `.claude/session-transcript.md`.** The append-anchor rule assumes a unique last-line anchor; `replace_all` duplicates the new content at every match and explodes the file (IronCalc S17: 95 MB / 1.5M lines; blog-poster S22: an Output block duplicated at every match). Recovery from a botched transcript Edit is a `[RETROACTIVE]` Bash-heredoc append, never a `replace_all` cleanup. The `validate-transcript-edit.sh` PreToolUse hook blocks this case (check 0/3)
 - Use reasoning delimiters in conversation text; VS Code collapses them after streaming
 - **Use single-quoted heredoc (`<< 'EOF'`) when appending to the transcript via Bash** if the content contains shell expansions like `$(date +%H:%M)`. Single-quoted heredocs suppress expansion and write the literal string `$(date +%H:%M)` into the transcript instead of the timestamp. Observed in portfolio S69. Correct form: capture the timestamp into a variable first and use an unquoted heredoc:
   ```bash
@@ -1636,6 +1637,12 @@ and updated automatically. Project-specific content lives outside the delimiters
 - HH:MM is 24-hour local time when the block begins; no end delimiter needed
 - Append technique: read last 3 lines, use last non-empty line as anchor.
   NEVER match earlier content for mid-file insertion.
+- NEVER use Edit `replace_all: true` on `.claude/session-transcript.md`. The
+  append-anchor rule assumes a unique last-line anchor; `replace_all` duplicates
+  content at every match and explodes the file (observed: IronCalc S17 reached
+  95 MB). Recovery from a botched transcript Edit is a `[RETROACTIVE]`
+  Bash-heredoc append, never a `replace_all` cleanup. The
+  `validate-transcript-edit.sh` hook blocks this case (check 0/3).
 - Per-turn enforcement: a `UserPromptSubmit` hook in `.claude/settings.json`
   injects a reminder every turn. The hook enforces *occurrence*; the
   existing `validate-transcript-edit.sh` PreToolUse hook enforces *shape*.
@@ -1674,7 +1681,7 @@ and updated automatically. Project-specific content lives outside the delimiters
 - Chunked drafting for prose deliverables (per DSM_0.2 §8.10): for project plans, proposals, reports, research papers, blog posts, and similar structured prose, the four gates take a specific shape: Gate 1 confirms purpose / audience / outcome / length / scope; Gate 2 proposes a TOC with per-section length budgets; Gate 3 drafts ONE section at a time with per-section user review and approval before the next; Gate 4 reviews the full assembled document for consistency. Full-file Write at Gate 3 is reserved for final assembly after all sections are individually approved. Triggered by document type, not length.
 
 ### Inbox Lifecycle (reinforces inherited protocol)
-- After processing an inbox entry, move it to `_inbox/done/`
+- After processing an inbox entry, move it to `_inbox/done/YYYY-MM-DD_{source}.md` (dated to avoid overwriting a prior cycle's archive of the same source). Bare `_inbox/done/{source}.md` names are append-only rolling archives; `mv`/`git mv` onto an existing bare name silently overwrites it (S211 incident: −323 lines). The date prefix makes same-source collisions impossible by construction. Forward-only: existing bare-name archives are left as-is.
 - Do not mark entries as "Status: Processed" while keeping them in place
 
 ### Actionable Work Items (reinforces DSM_3 planning pipeline)
@@ -1683,7 +1690,8 @@ and updated automatically. Project-specific content lives outside the delimiters
 - Before suggesting implementation of anything that looks like a plan, verify that a formal BL exists in `dsm-docs/plans/`. If not, route through research → formalize → plan first.
 
 ### Punctuation
-Use "," instead of "—" for connecting phrases in any language.
+Use comma "," instead of Em Dash "—" for connecting phrases in any language.
+Never use space coma space (" , "). The correct format is no spaces before the comma, and one space after: ", ".
 
 ### Code Output Standards (reinforces Earn Your Assertions)
 - Show actual values: shapes, metrics, counts, paths

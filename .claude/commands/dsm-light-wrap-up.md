@@ -30,6 +30,20 @@ Light wrap-up is for **same-day continuation only**. If the current session bran
 
 ## Steps
 
+0.5. **Pre-confirm auto-memory target (BL-450):** Light wrap-up's only cross-repo write is the auto-memory `MEMORY.md` (feedback push is a deferred checklist item, not executed here). Pre-confirm just the auto-memory dir so the BL-391 hook (`validate-cross-repo-write.sh`) does not fire on the protocol-defined MEMORY.md update. The hook matches canonicalized path prefixes, so pre-confirm the directory. Session-scoped (`/dsm-go` Step 0f clears it). Not a gate weakening: the gate still fires for any other cross-repo write.
+
+   ```bash
+   CONFIRM=.claude/cross-repo-writes-session.txt
+   # Derive the auto-memory dir deterministically from the project path slug
+   # (Claude Code names project dirs by replacing / with -). Do NOT
+   # `find ... | head -1`, which can return another project's MEMORY.md.
+   MEMDIR="$HOME/.claude/projects/$(pwd | sed 's#/#-#g')/memory"
+   if [ -d "$MEMDIR" ]; then
+     C=$(realpath -m "$MEMDIR" 2>/dev/null || echo "$MEMDIR")
+     grep -qxF "$C" "$CONFIRM" 2>/dev/null || echo "$C" >> "$CONFIRM"
+   fi
+   ```
+
 1. **Minimal MEMORY.md update:** Find and update this project's MEMORY.md in the auto memory directory. Update ONLY:
    - Latest Session line: date, session number, 1-line summary
    - Add "(lightweight wrap-up, work continues)" to the summary
