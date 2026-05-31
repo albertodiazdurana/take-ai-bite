@@ -215,6 +215,12 @@ rhythm for each file:
 **Build order:** imports → constants → one function → test → next function.
 **TDD (Beck, 2003):** Write tests in `tests/` alongside code.
 
+**Smoke tests:** After building each module, persist the per-item validation
+commands and their results to `dsm-docs/guides/smoke-tests.md` — the
+industry-standard smoke-test practice given a canonical location. See
+[DSM_4.0.A §7](DSM_4.0.A_Development_Quality.md#7-smoke-tests-as-per-item-verification-artifact)
+for the structure and the distinction from `/verify` and unit tests.
+
 **Anti-Patterns:** Do not batch-generate files, do not use AskUserQuestion for
 approvals, do not skip todo list updates between files. See DSM_0.2 for full list.
 

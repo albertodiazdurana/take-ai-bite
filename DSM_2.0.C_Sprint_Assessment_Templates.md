@@ -145,6 +145,7 @@ checked off. See DSM_0.2 Three-Level Branching Strategy for the full model.
 - [ ] Feedback files updated (backlogs, methodology)
 - [ ] Decision log updated with sprint decisions
 - [ ] Tests passing (DSM 4.0 projects)
+- [ ] dsm-docs/guides/smoke-tests.md current (or N/A if no smoke tests recorded this sprint)
 - [ ] Blog journal entry written
 - [ ] Blog publication tracker updated (`dsm-docs/blog/README.md`)
 - [ ] Repository README updated (status, results, structure)
