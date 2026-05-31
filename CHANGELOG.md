@@ -5,6 +5,15 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-05-31
+
+Names the per-item smoke-test practice as a DSM artifact (S213, BL-452, from the traveline-ds-project-skeleton S1 proposal). Single BL, three coordinated methodology edits, each its own Gate cycle with per-item Test Execution Log.
+
+### Added
+
+- **BL-452:** Smoke tests are now a named DSM artifact. New section **DSM_4.0.A §7 "Smoke Tests as Per-Item Verification Artifact"** specifies the canonical spoke location (`dsm-docs/guides/smoke-tests.md`, lazy + append-only), the per-item structure (per-file sections → numbered checks → command/Expected/Result + optional dated log section), and the distinctions from `/verify` and unit tests. Framed as the industry-standard smoke-test practice (McConnell *Code Complete* Ch. 22; Microsoft daily-build) given a repo home, not a DSM invention. DSM_4.0 §4.1 gains a one-paragraph pointer to the spec. DSM_2.0.C Sprint Boundary Checklist gains a soft `- [ ]` line (with N/A branch). Gate-1 grounding dropped the original proposal's DSM_0.1 §10 edit: §10 is a folder-level table with no per-filename slot, so the artifact's blessing lives in the DSM_4.0.A location spec instead.
+  **Spoke action:** Review DSM_4.0.A §7 for the smoke-test artifact (DSM 4.0 / software-engineering projects); optional `dsm-docs/guides/smoke-tests.md` is author-driven and lazy.
+
 ## [1.11.0] - 2026-05-31
 
 Four sibling BLs filed in S211 implemented in S212 as a coherent silent-failure / filesystem-discipline hardening release. Each shipped with its own Gate 1/2/3 cycle and per-item Test Execution Log under default auto mode.

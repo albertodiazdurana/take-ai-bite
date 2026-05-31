@@ -16,6 +16,7 @@ criteria.
 4. [PR Description Maintenance Protocol](#4-pr-description-maintenance-protocol)
 5. [Decision Log Adaptation for Software Projects](#5-decision-log-adaptation-for-software-projects)
 6. [Success Criteria Adaptation for Software Projects](#6-success-criteria-adaptation-for-software-projects)
+7. [Smoke Tests as Per-Item Verification Artifact](#7-smoke-tests-as-per-item-verification-artifact)
 
 ## Document Structure Index
 
@@ -27,6 +28,7 @@ criteria.
 | 4 | PR Description Maintenance Protocol | Keeping PR metadata current as scope expands |
 | 5 | Decision Log Adaptation for Software Projects | Architectural decision template for software projects |
 | 6 | Success Criteria Adaptation for Software Projects | Functional, code quality, testing, and documentation checklists |
+| 7 | Smoke Tests as Per-Item Verification Artifact | Per-item smoke-test logging: canonical location, structure, distinctions |
 
 ---
 
@@ -328,3 +330,68 @@ and the adapted criteria for application deliverables.
 - [ ] Working interactive demo (web UI/CLI)
 - [ ] Sample data included
 - [ ] Demo runs without external dependencies (or documents them)
+
+---
+
+## 7. Smoke Tests as Per-Item Verification Artifact
+
+A **smoke test** is a small, fast check run after a change to confirm the basic
+thing still works. The term originates in hardware engineering ("plug it in and
+see if it smokes") and was popularized for software by Microsoft's
+daily-build-and-smoke-test practice; it is documented in McConnell, *Code
+Complete* (Ch. 22). This section gives that established practice a canonical repo
+location and a per-item structure, applied as each file is built. It is not a
+DSM invention; it is the industry-standard practice given a home.
+
+This complements, and does not replace, the validation approaches in §1: unit
+tests answer "does this function work?" and capability experiments answer "does
+this feature achieve its goal?". Smoke tests answer "was this file seen working,
+from a shell, at the moment it was built?" and persist the evidence.
+
+### 7.1. Canonical location
+
+`dsm-docs/guides/smoke-tests.md` (the `guides/` folder is already canonical;
+see DSM_0.1 §10). The file is created lazily, only when there are smoke tests to
+record, and is append-only: one section per file or component validated. It is a
+spoke artifact; the DSM hub does not maintain its own.
+
+### 7.2. Structure
+
+````markdown
+# Smoke Tests
+
+[Optional intro: project context; what "smoke test" means in this repo.]
+
+[Optional dated narrative/log section, e.g. "## Retune log — YYYY-MM-DD",
+ for cross-cutting context not tied to a single file.]
+
+## <file_path> (Item N, if using item-numbered builds)
+
+### 1. <Property being verified>
+```bash
+<exact reproducible command, executable from repo root with venv activated>
+```
+**Expected:** <one-line description of expected output>
+
+**Result:** ✓ YYYY-MM-DD — <actual result>   (or ✗ + diagnostic)
+````
+
+Each entry pairs an exact, reproducible command with its expected output and the
+actual result, marked `✓ <ISO date>` or `✗` with a diagnostic. New items are
+appended as the build progresses.
+
+### 7.3. Distinction from /verify and unit tests
+
+- **`/verify`** runs the assembled app and observes behavior at a milestone — a
+  high-level integration check executed by the agent. Smoke tests are per-file,
+  per-item, recorded as commands a human runs from a shell. Complementary; this
+  artifact does not replace or alter `/verify`.
+- **Unit tests** run in CI and at sprint boundaries through pytest, exercising
+  functions in isolation. Smoke tests exercise the user-facing surface (CLI
+  args, install commands, error messages, integration paths) and are run by a
+  human from a shell. In scaffolding builds where `tests/` itself is still being
+  built, smoke tests cover early items immediately; pytest catches up once the
+  runner exists. The git log plus the smoke-test log together form a verifiable
+  build narrative.
+
+**Origin:** traveline-ds-project-skeleton S1 (2026-05-22); BACKLOG-452.
