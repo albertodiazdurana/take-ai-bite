@@ -354,6 +354,7 @@ Core Tools registry (branding, ecosystem-wide updates).
 - Political Parties: CHES 2019 dataset analysis
 - Loan Approval Prediction: ML classification
 - IronCalc: External contribution to open-source spreadsheet engine (Rust)
+- traveline-ds-project-skeleton: Interview-demo Python ML skeleton (src-layout, CI, Docker, MLflow), planted data-leakage-bug challenge (case study)
 
 ---
 
