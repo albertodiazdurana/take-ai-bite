@@ -5,6 +5,15 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-06-01
+
+Codifies the user-reframes-proposal handling pattern as a named operational sub-rule of Gate 0 (S215, BL-453, filed S214). Six data points (S180/S183/S200/S201/S203/S204) over four-plus months; the principle in §8.0 ("the conversation IS the collaboration") existed throughout but did not prevent agents defending their original framing, so §8.0.1 names the behavior the principle implies.
+
+### Added
+
+- **BL-453:** New section **DSM_0.2 §8.0.1 "User-Reframes-Proposal Handling"**. When the user responds to a proposal by reframing it rather than answering yes/no, the rule is to re-decompose, not defend: accept the reframing and re-run threads → dependencies → packaging. Two operational sub-rules (loose framing → ask "what threads do you see?" before proposing; a reframe that doubles as "this also explains why" is a diagnostic for a missed structural coupling). Cross-references four distinct sibling patterns (user-factual-question, pointer-as-implicit-correction, "why does this matter?" drop-signal, deliverable-portability scope-expansion) without absorbing them. Anti-pattern guard in the §8.x family shape.
+  **Spoke action:** Review DSM_0.2 §8.0.1 for the Gate 0 behavioral sub-rule (all project types; DSM_0.2 core is inherited via the `@` reference).
+
 ## [1.12.0] - 2026-05-31
 
 Names the per-item smoke-test practice as a DSM artifact (S213, BL-452, from the traveline-ds-project-skeleton S1 proposal). Single BL, three coordinated methodology edits, each its own Gate cycle with per-item Test Execution Log.

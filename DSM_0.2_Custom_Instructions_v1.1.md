@@ -413,6 +413,81 @@ that defines the work IS the collaboration, not a preamble to it.
 user's request, then recognized as the missing entry point to all
 collaboration.
 
+### 8.0.1. User-Reframes-Proposal Handling
+
+§8.0 establishes that the conversation defining the work IS the
+collaboration. That is the principle. §8.0.1 names the operational
+behavior the principle implies for one specific, recurring move: when the
+user responds to an agent's proposal by **reframing** it (re-decomposing,
+re-shaping the structure, changing the axis of the split) rather than
+answering yes/no. The principle in §8.0 ("the conversation IS the
+collaboration") does not by itself prevent the failure mode, agents
+defended their original framing across six separate recurrences spanning
+four-plus months while §8.0 was already in force. The gap between the
+principle and the behavior is what §8.0.1 closes.
+
+**The rule:** a user reframe is a signal to **re-decompose, not to
+defend**. Accept the reframing and re-run the threads → dependencies →
+packaging steps on the new framing. Do not relitigate the original
+framing, do not argue for why the first decomposition was correct, do not
+treat the reframe as a deviation to be negotiated back toward the
+original.
+
+**Two operational sub-rules:**
+
+1. **Loose framing → ask before proposing.** When the user's framing is
+   loose ("formalize as BL", "address this", "handle these"), ask "what
+   threads do you see?" *before* presenting a decomposition. Proposing a
+   pre-formed decomposition and inviting yes/no is the §8.0 anti-pattern;
+   when the framing is loose, the threads themselves are the collaboration
+   surface (S203 data point: a decomposition was reframed twice in twelve
+   minutes because it was proposed before the user's framing was elicited).
+
+2. **A reframe that doubles as a "this also explains why" is high-signal.**
+   When the user's reframe simultaneously fixes the proposal AND explains
+   why the original problem existed, the original framing missed a
+   structural coupling. Treat the "this also explains why..." moment as a
+   diagnostic: re-examine adjacent artifacts or protocols for the same
+   coupling, do not just apply the local fix (S201 data point: a
+   checkpoint-ordering reframe also explained why checkpoints had stopped
+   appearing).
+
+**Cross-reference, do NOT absorb, the distinct sibling patterns:**
+
+- **User-factual-question = wrong-framing signal** (S180/S183/S191): when
+  the user answers a proposal with a factual question ("isn't X already
+  true?") instead of yes/no, answer the question first, it usually
+  reveals a wrong assumption in the proposal's premise.
+- **User-pointer-as-implicit-correction** (S204): when the user replies to
+  a state-claim with a path or filename, the pointer IS the correction,
+  read the pointed-to source before responding.
+- **"Why does this matter?" = drop-signal** (S198): when the user
+  challenges an option with "why does this matter?", dismantle the
+  option's premise from scratch before defending it.
+- **Deliverable-portability-question = scope-expansion** (S204): a "how
+  does this transfer to the mirror/clone/spoke?" question during Gate 1 is
+  a scope-expansion signal, widen scope and re-confirm Gate 1 rather than
+  deferring to a follow-up BL.
+
+These siblings share a family resemblance (a non-yes/no user response that
+reveals a premise the agent should re-examine) but each has its own
+trigger and its own correct response, so they are referenced here rather
+than collapsed into one rule. Each may warrant its own future promotion.
+
+**Anti-pattern guard:** "The user reframed it, but my original
+decomposition was structurally cleaner, so I'll explain why before
+adopting theirs" is the exact rationalization §8.0.1 forbids. The reframe
+is not a proposal to be evaluated against the agent's; it is the
+collaboration redefining the work. Same guard family as §8.2.1 ("No
+counter-evidence found" without sources surveyed), §8.6.1 ("silence from
+the skill is the skill's answer"), §21.2 ("Risks: none known"), §21.3
+("all tests passed").
+
+**Origin:** BL-453 (S214 filing, S215 implementation). Promotion-ready
+with six data points (S180, S183, S200, S201, S203, S204) accumulated in
+`.claude/reasoning-lessons.md` and the MEMORY Key Patterns. Foundational
+anchor: §8.0 "We Need to Talk" (DSM_6.0 §1.10).
+
 ### 8.1. Gate 1: Concept Approval
 
 Explain:
