@@ -610,6 +610,60 @@ pass on-thread, burns Opus-scale tokens on Sonnet-scale work, and
 never surfaces the alternative to the human. §1.12 exists to make
 that failure visible.
 
+### 1.13 Introduce Once, Then Deepen
+
+**Introduce each concept once; let the body deepen it rather than repeat it.**
+
+In structured prose with a summary-then-body shape (an abstract, a summary, or
+an intro section that precedes detail sections), the default failure mode is to
+state a fact, metric, or framing in the summary and then restate it verbatim in
+the body. The reader meets the same concept two or three times with no added
+depth, and the prose reads as padded. The discipline is the opposite: each
+concept, metric, or claim is introduced in exactly one place and developed
+where it carries the most weight. The summary names what the body will deepen,
+or the body deepens what the summary named; neither echoes the other.
+
+Two facets follow from the same information-architecture instinct:
+
+- **Descriptive phrase before acronym.** In an introduction, lead with the
+  phrase that carries meaning and let the acronym or brand name attach second.
+  An acronym is a repeated-reference shorthand *within* a document, not the
+  primary handle for a first encounter ("a Deliberate Systematic Methodology"
+  before "DSM"). The descriptive phrase delivers the value; the acronym is the
+  compression the reader earns once the concept has been named.
+- **Refactor before humanize.** When a deliverable needs both a no-repetition
+  refactor and a humanizer pass, run the repetition refactor first and the
+  humanizer second. The reverse order wastes humanizer effort on prose about to
+  be cut, and leaves duplicated facts in place because repetition is not an AI
+  tell the humanizer is looking for.
+
+**Scope:** structured prose with a summary + body shape, project plans,
+proposals, reports, CVs and cover letters, public-facing copy, research files.
+The trigger is the summary-precedes-detail shape, not document length; a short
+proposal still qualifies. **Out of scope:** short-form text, reference tables,
+code, and checklists, where repetition is often structural rather than padding.
+
+Relationship to other principles and protocols:
+
+- **§1.1 Take a Bite.** Saying a thing once and letting it land is the
+  information-architecture form of right-sizing the delivery.
+- **§1.6 Match the Room.** Introduce-once governs a document's *internal*
+  structure; Match the Room governs register and scale relative to the
+  audience. They are orthogonal: one is about not repeating yourself, the other
+  about fitting the room.
+- **DSM_0.2 §8.10 (Chunked Drafting Protocol).** §8.10 operationalizes this
+  principle: Gate 4 final assembly checks for cross-section repetition and
+  applies the refactor-before-humanize ordering. §1.13 is the *why*; §8.10
+  Gate 4 is *where it is checked*.
+
+Evidence: the pattern stabilized across three deliverable types in a portfolio
+spoke, CV summaries, public-facing copy, and hiring-challenge deliverables,
+before promotion. The no-repetition audit (strip metrics duplicated between
+summary and body), the descriptive-phrase-first framing, and the
+refactor-before-humanize ordering each recurred independently across those
+deliverables, which is the signature of a writing discipline ready to be named
+rather than a one-off preference.
+
 ---
 
 ## 2. Guidelines
@@ -675,6 +729,7 @@ to existing DSM protocols and identifies the gaps that remain.
 | README Change Notification | DSM_0.2 | Know Your Context |
 | Hub-Spoke Inbox system | DSM_3, DSM_0.2 | Know Your Context |
 | Inclusive Language | DSM_0.2 | Match the Room, Understand/Review/Decide |
+| Chunked Drafting Gate 4 (cross-section repetition check, refactor-before-humanize order) | DSM_0.2 §8.10 | Introduce Once, Then Deepen |
 
 **Evolution**
 
@@ -784,4 +839,5 @@ patterns (emergent concepts like Ripple Effect and My Fork, My Rules).
 | 1.4 | 2026-03-01 | AI Collaboration Ethics (BACKLOG-124). Added Principle 1.7 "Own Your Process" (attribution/disclosure framework with decision table). Extended Principle 1.3 with accountability corollary. Added Guideline 2.3 "Environmental Awareness." Updated gap table with 3 ethics rows. Based on research: NIST AI RMF, EU AI Act, IEEE CertifAIEd, arXiv:2512.00867. |
 | 1.5 | 2026-03-12 | Critical Thinking restructure (BACKLOG-175). Renamed Section 1.4 "Understand, Review, Decide" to "Critical Thinking" with two subsections: 1.4.1 Understand, Review, Decide (preserved), 1.4.2 Challenge Myself to Reason (new). Grounded in Facione (1990) self-regulation concept. Added Composition Challenge and Edit Explanation Stop to protocol mapping. Updated protocol references from "Understand/Review/Decide" to "Critical Thinking." |
 | 1.6 | 2026-03-16 | Strategic Thinking Layer (BACKLOG-212). Added Principle 1.9 "Think Ahead" documenting the four-layer maturity progression (operational → philosophical → learning → strategic). Added 4 Evolution protocol mappings (Roadmap System, Phase-Gated Work, Backlog Scope Rule, Feature Branch Rule). Evidence: 83 features across 14 repos, 796 commits, backlog self-generation as maturity signal. |
+| 1.8 | 2026-06-01 | Introduce Once, Then Deepen (BACKLOG-454). Added Principle 1.13 codifying the concept-introduction / no-repetition writing discipline for structured prose: introduce each concept once and let the body deepen it, descriptive phrase before acronym in introductions, refactor before humanize. Operationalized in DSM_0.2 §8.10 Gate 4. Added Communication protocol mapping. Evidence: pattern stabilized across CV summaries, public-facing copy, and hiring deliverables in a portfolio spoke (S85/S86/S87). |
 | 1.7 | 2026-04-19 | Read the User's Manual (BACKLOG-344). Added Principle 1.11 establishing external-tool grounding as a prerequisite to collaboration design. Maps to PMP Procurement knowledge area. Evidence: F-094 (per-turn transcript hook 2.5 months broken due to index-mode `100644`), S180 (+x bug from same root cause), BL-342 (Claude Code platform research as corrective mitigation, Implemented 2026-04-12). Added protocol mappings in Session Management: Skill Self-Reference Protocol (DSM_0.2 §8.6) and Platform Research Backlog Items. |

@@ -1274,7 +1274,13 @@ ASSEMBLY pass after all sections are individually approved.
 consistency:
 
 1. Tone, vocabulary, and voice consistency
-2. Repetition or redundancy across sections
+2. Repetition or redundancy across sections, applying Introduce Once, Then
+   Deepen (DSM_6.0 §1.13): each concept, metric, or claim appears in exactly
+   one place, strip facts the summary and body state twice. When the document
+   also needs a humanizer pass, run this repetition refactor first and the
+   humanizer second, never the reverse (the reverse order wastes humanizer
+   effort on prose about to be cut, and repetition is not an AI tell the
+   humanizer catches)
 3. Structural balance (no over-long or under-developed sections)
 4. References between sections that need reconciling now that the whole
    document exists

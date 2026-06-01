@@ -5,6 +5,15 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2026-06-01
+
+Promotes the concept-introduction / no-repetition writing discipline from portfolio-spoke tribal knowledge to a named DSM principle (S216, BL-454, filed S215). The pattern stabilized across three deliverable types (CV summaries, public-facing copy, hiring deliverables) before promotion; S86 set the bar at "multiple deliverable types" and it was met.
+
+### Added
+
+- **BL-454:** New principle **DSM_6.0 §1.13 "Introduce Once, Then Deepen"**. In structured prose with a summary-then-body shape, each concept, metric, or claim is introduced in exactly one place and deepened where it carries the most weight, rather than restated verbatim between summary and body. Two facets: descriptive phrase before acronym in introductions, and refactor-before-humanize ordering. Operationalized in **DSM_0.2 §8.10 Gate 4**, where the cross-section repetition check now references the principle and carries the refactor-before-humanize ordering rule. Added a DSM_6.0 §2.1 Communication protocol mapping and a CLAUDE.md Humanizer Protocol ordering cross-ref. Scope: summary+body structured prose; out of scope: short-form text, reference tables, code, checklists.
+  **Spoke action:** Review DSM_6.0 §1.13 and DSM_0.2 §8.10 Gate 4 for the writing discipline (all project types; DSM_0.2 core is inherited via the `@` reference and DSM_6.0 is mirrored).
+
 ## [1.13.0] - 2026-06-01
 
 Codifies the user-reframes-proposal handling pattern as a named operational sub-rule of Gate 0 (S215, BL-453, filed S214). Six data points (S180/S183/S200/S201/S203/S204) over four-plus months; the principle in §8.0 ("the conversation IS the collaboration") existed throughout but did not prevent agents defending their original framing, so §8.0.1 names the behavior the principle implies.
