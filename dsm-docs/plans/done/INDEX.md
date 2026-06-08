@@ -345,6 +345,28 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-420 | Checkpoint Authoring Identifiers Rule | v1.8.0 | 2026-04-24 | DSM_0.2.A §10.2.1 |
 | BACKLOG-425 | Research Folder Index Maintenance with /dsm-research-add and /dsm-research-done Skills | — | 2026-04-29 | scripts/commands/dsm-research-add.md, scripts/commands/dsm-research-done.md |
 | BACKLOG-427 | Compact Reasoning-Lessons Mirror for Agent-Facing Session-Start Priming (Steps 1-4 trim-only; Step 5 deferred) | — | 2026-04-29 | DSM_0.2.A §8.1 |
+| BACKLOG-428 | /dsm-go Step 0.8 Cloned-Mirror Kick-off Check Should Be Deterministic, Not Narrated | v1.9.0 | 2026-05-05 | scripts/commands/dsm-go.md (Step 0.8) |
+| BACKLOG-429 | Pre-Merge Test Plan Execution Rule | v1.9.0 | 2026-05-05 | DSM_0.2 §21.3 |
+| BACKLOG-430 | Chunked Drafting Protocol for Structured Documents | v1.9.0 | 2026-05-05 | DSM_0.2 §8.10 |
+| BACKLOG-431 | Concurrent-Session Detection Lockfile | v1.9.0 | 2026-05-05 | DSM_0.2.A §26 |
+| BACKLOG-432 | Non-Suppressible Prompts Convention in Auto Mode | v1.9.0 | 2026-05-05 | DSM_0.2 §8.9.1 |
+| BACKLOG-433 | /dsm-staa Step 6.5 Regenerate Compact Reasoning-Lessons Mirror | v1.9.0 | 2026-05-05 | scripts/commands/dsm-staa.md (Step 8) |
+| BACKLOG-434 | /dsm-align Step 12 Explicit `N/A (not DSM Central)` for Command Sync on Spokes | v1.9.0 | 2026-05-05 | scripts/commands/dsm-align.md (Step 12) |
+| BACKLOG-435 | Skill Scope Is Authoritative Principle | v1.9.0 | 2026-05-05 | DSM_0.2 §8.6.1 |
+| BACKLOG-440 | validate-cross-repo-write.sh Edit/Write Asymmetry Bug | v1.10.0 | 2026-05-29 | .claude/hooks/validate-cross-repo-write.sh |
+| BACKLOG-444 | /dsm-go Step 3.5 Spec Fix, Add Post-Rename Restage | v1.10.0 | 2026-05-29 | scripts/commands/dsm-go.md (Step 3.5) |
+| BACKLOG-447 | Reconcile Compact-Mirror Regenerator Drift Between /dsm-staa and /dsm-wrap-up | v1.10.0 | 2026-05-29 | DSM_0.2.A §8.1 |
+| BACKLOG-448 | Cross-Repo Writes Must Be Write-Only, Never Run git in the Target Repo | v1.11.0 | 2026-05-31 | DSM_0.2.C §2 |
+| BACKLOG-449 | Forbid replace_all on Session-Transcript Edits + Hook Anomaly Detection | v1.11.0 | 2026-05-31 | DSM_0.2 §7 |
+| BACKLOG-450 | /dsm-wrap-up Step 0.5 Pre-Confirm Known Cross-Repo Targets | v1.11.0 | 2026-05-31 | scripts/commands/dsm-wrap-up.md (Step 0.5) |
+| BACKLOG-451 | Inbox-Done Lifecycle, Collision-Safe Dated Filenames | v1.11.0 | 2026-05-31 | DSM_0.2 §17.1 |
+| BACKLOG-452 | Adopt Smoke Tests as a Named DSM Artifact | v1.12.0 | 2026-05-31 | DSM_4.0.A §7 |
+| BACKLOG-453 | Codify User-Reframes-Proposal Handling in DSM_0.2 §8.0.1 | v1.13.0 | 2026-06-01 | DSM_0.2 §8.0.1 |
+| BACKLOG-454 | Concept-Introduction / No-Repetition Writing Principle for Structured Prose | v1.14.0 | 2026-06-01 | DSM_6.0 §1.13 |
+| BACKLOG-456 | Formalize the Parallel-Session Inbox-Note Carve-Out | — | 2026-06-08 | scripts/commands/dsm-parallel-session-go.md |
+| BACKLOG-457 | Refresh README Conceptual + Numeric Currency | — | 2026-06-08 | README.md |
+| BACKLOG-458 | Add Version-Bump README Conceptual-Currency Review to Version Update Workflow | — | 2026-06-08 | scripts/commands/dsm-version-update.md |
+| BACKLOG-459 | Backfill done/INDEX.md (428-454) + Fix the Index-Currency Root Cause | — | 2026-06-08 | scripts/commands/dsm-align.md (Step 11b) |
 
 ---
 

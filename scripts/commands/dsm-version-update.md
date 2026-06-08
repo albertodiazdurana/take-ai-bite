@@ -38,6 +38,32 @@ Walk through each step, showing the user what to do and waiting for confirmation
   - Update the "Current count" in the FEATURES.md header
 - New F-entries trigger blog-poster notification at wrap-up (DSM_0.2.A §2)
 
+### Step 2c: README Conceptual-Currency Review (DSM Central only)
+
+A version bump can carry conceptual or scope changes (a new chapter, a
+repositioning, a coverage claim) that the public README should reflect, not
+just the feature count. This is the proactive forcing function, distinct from
+the reactive notification in DSM_0.2.A §2 (which fires *after* the README
+already changed, to notify downstream consumers).
+
+Two tiers:
+
+1. **Numeric currency (always).** Compare the README feature count against
+   FEATURES.md "Current count" (just updated in Step 2b). If they differ, flag
+   and update the README count.
+2. **Conceptual currency (conditional).** If this version's CHANGELOG entry
+   (Step 2) is externally relevant per the DSM_0.2.A §2 relevance filter
+   (project description / scope / audience, a new chapter or section, a
+   repositioning, an external-facing coverage claim), surface the specific
+   deltas and ask the user whether the README's framing needs updating (the
+   "Recent Features" block, a scope sentence, a positioning claim). Do NOT
+   auto-rewrite; surface candidates and let the user decide and edit. Skip the
+   conceptual prompt for internal-only protocol patches, date/format fixes, and
+   refactors (same skip list as §2).
+
+Record the outcome inline (updated / reviewed-no-change / deferred-to-BL). If
+the README is edited here, it rides the Step 4 commit and the Step 9 mirror sync.
+
 ### Step 3: Update DSM_0
 - Update version number and date in the header
 - Update line counts if significant additions were made
