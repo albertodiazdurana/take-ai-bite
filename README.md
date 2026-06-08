@@ -44,7 +44,7 @@ This is what makes TAB unique to you own experience. Session transcripts capture
 
 Most prompt engineering focuses on crafting individual prompts. Take AI Bite operates at a different level: designing, versioning, and governing entire instruction systems across an ecosystem of projects.
 
-This is Systems Prompt Engineering, a discipline that applies project management rigor to AI instruction artifacts. DSM's instruction ecosystem covers 7 of 10 PMP knowledge areas (scope, schedule, cost, quality, communication, risk, and integration management) through version-controlled protocols, automated feedback loops, and cross-project propagation.
+This is Systems Prompt Engineering, a discipline that applies project management rigor to AI instruction artifacts. All ten PMP knowledge areas show up in DSM, framed as methodology governance rather than project management: communication management is the inbox and feedback channels, schedule management is the session lifecycle, risk management is the failure-mode taxonomy and violation-triage protocol. The extension worth naming is Stakeholder Management. DSM treats the AI agent as a second stakeholder alongside the human, and the instruction system that governs it is that stakeholder's management plan. See [Project Management for the Agentic Stakeholder](https://take-ai-bite.com/blog/2026-04-10-project-management-for-the-agentic-stakeholder/).
 
 The framework operates at three levels:
 
@@ -79,19 +79,19 @@ They are not theoretical; they emerged from daily practice with AI agents across
 <summary>Latest additions to the framework (click to expand)</summary>
 
 - **Systems Prompt Engineering (DSM_6.1)** — A full chapter naming the discipline: version-controlled instruction systems, failure mode taxonomy, practitioner maturity model, and PMP knowledge area mapping
+- **Chunked drafting for structured documents** — Project plans, proposals, reports, and other prose deliverables are drafted one section at a time with per-section review, not generated whole
+- **User-reframes-proposal handling** — When the human re-shapes a proposal instead of answering yes or no, the agent re-decomposes the work rather than defending its original framing
+- **Introduce Once, Then Deepen** — A writing principle for summary-plus-body prose: introduce each concept once and let the body deepen it, instead of restating it
+- **Non-suppressible safety prompts** — Certain session-start safety checks must be answered explicitly even under auto mode; speed settings cannot silently skip them
+- **Pre-merge test execution and preemptive risk definition** — Every backlog item names its failure modes up front and runs its test plan with per-item evidence before merging
+- **Concurrent-session detection** — A second session on the same project is detected and halted before it can corrupt shared state, and fresh mirror clones self-initialize on first run
+- **Compact reasoning-lessons mirror** — Accumulated cross-session reasoning lessons are distilled into a size-bounded file the agent reads at session start
 - **Document modularization** — All methodology documents split into slim cores with on-demand modules, reducing context consumption while preserving full coverage
-- **Dual licensing** — CC BY-SA 4.0 for methodology documentation, MIT for scripts and code
-- **Domain-neutrality audits** — All numbered DSM files reviewed and trimmed of domain-specific language, making the framework applicable to any project type
-- **Incomplete wrap-up recovery** — When a session ends unexpectedly, the next session detects the gap and reconstructs the missing summary from the archived transcript
-- **Session configuration recommendation** — Each session receives a tailored model and effort configuration based on planned work scope
-- **Mirror repo sync** — Methodology files are automatically copied to public distribution repos after changes
-- **Branch testing requirement** — Feature branches must be tested before merging, with specific test plans per backlog item
-- **Ecosystem Path Registry** — Cross-repo paths declared in a local registry, eliminating hardcoded filesystem paths
 - **Parallel session protocol** — Run isolated evaluation tasks on independent branches without interfering with the main session
 
 </details>
 
-See the full timeline of 84+ features → [FEATURES.md](FEATURES.md)
+See the full timeline of 135+ features → [FEATURES.md](FEATURES.md)
 
 ## What's Coming
 

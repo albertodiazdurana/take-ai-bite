@@ -157,7 +157,9 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
 
 2. **Load context:** Read this project's MEMORY.md from the auto memory directory.
    Read `.claude/CLAUDE.md` for project conventions. Do NOT read reasoning lessons,
-   inbox, or DSM_0.2. Do NOT archive or create session transcripts. Do NOT read,
+   inbox (creating a new dated `_inbox/` notification note is the one permitted
+   inbox action; see Behavioral Rules), or DSM_0.2. Do NOT archive or create
+   session transcripts. Do NOT read,
    write, edit, or append to `.claude/session-transcript.md` at any point in this
    session. Parallel sessions do not collect transcripts; the commit log is the
    audit trail.
@@ -280,16 +282,22 @@ Before every commit:
 
 ## Behavioral Rules (active for the entire parallel session)
 
-- **QA sessions:** Read any file. Writes allowed only to `.claude/` and
-  `dsm-docs/research/{date}_{topic}.md` (per §10). Never edit code, methodology
-  documents, BL files, or other tracked source-of-truth files.
+- **QA sessions:** Read any file. Writes allowed only to `.claude/`,
+  `dsm-docs/research/{date}_{topic}.md` (per §10), and new dated
+  `_inbox/{YYYY-MM-DD}_{topic}.md` notification notes (append-only; see the
+  inbox rule below). Never edit code, methodology documents, BL files, or
+  other tracked source-of-truth files.
 
 - **BL sessions:** Edit only files in the declared scope. Generated artifacts
   go into canonical folders (`dsm-docs/research/`, `dsm-docs/plans/`, etc.).
 - **Never modify shared or central files.** Determined from CLAUDE.md.
 - **No session transcript entries.** Do not append to `.claude/session-transcript.md`.
 - **No MEMORY.md updates.** Memory is read-only in parallel sessions.
-- **No inbox processing.** Inbox is main-session-only.
+- **Inbox: append-only.** A parallel session MAY create a new dated
+  `_inbox/{YYYY-MM-DD}_{topic}.md` note (e.g. a milestone/notification entry).
+  It must NOT edit, archive, move, or mark existing inbox entries, that is
+  inbox *processing*, which remains main-session-only. The main session
+  reads and lifecycles any note a parallel session drops.
 - **BL lifecycle:** Do NOT move the BL to `done/`. Update the BL status to
   `Implemented by parallel session #X.Y`. The main session validates and closes.
 - If work scope expands to require out-of-scope edits, STOP and warn:
@@ -308,6 +316,6 @@ Before every commit:
 ## Notes
 
 - No co-author lines in commits
-- Parallel sessions are intentionally minimal: no transcript, no memory writes, no inbox
+- Parallel sessions are intentionally minimal: no transcript, no memory writes, no inbox processing (a new dated _inbox/ notification note may be created, but existing entries are not processed)
 - The main session reviews all parallel session work before closing BLs
 - If the user provides $ARGUMENTS with a valid prefix, skip questions and proceed directly
