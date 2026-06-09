@@ -14,9 +14,11 @@ Take AI Bite is a set of principles for keeping the human genuinely present in A
 
 But it goes further than review sizing. Take AI Bite builds an agent ecosystem that retains your memory, experience, and decisions across sessions and projects. The ecosystem becomes your avatar: an extension of your professional self that grows with you, remembers what you learned, and carries your accumulated expertise into every new collaboration.
 
+Take AI Bite is the public face of DSM (Deliberate Systematic Methodology), authored and maintained by [Alberto Diaz Durana](https://www.linkedin.com/in/albertodiazdurana/). It is one practitioner's working methodology, refined through real projects and made public, not a generated template.
+
 ## The Principles
 
-Nine principles govern how humans and AI agents work together. Each addresses a specific failure mode in human-AI collaboration.
+Thirteen principles govern how humans and AI agents work together. Each addresses a specific failure mode in human-AI collaboration.
 
 | Principle | Core idea |
 |-----------|-----------|
@@ -29,6 +31,10 @@ Nine principles govern how humans and AI agents work together. Each addresses a 
 | **Own Your Process** | Disclose how the work was produced. Transparency about method is a professional obligation. |
 | **Know What You Own** | Verify licensing before deployment. Free tier does not mean free use. |
 | **Think Ahead** | Build the map before you walk the territory. Strategy emerges from operational maturity. |
+| **We Need to Talk** | The conversation that defines the work is the collaboration, not a preamble to it. |
+| **Read the User's Manual** | Ground the work on what the tool actually does, not on what you assume it does. |
+| **Don't be a Hero, Delegate the Effort** | Hand bounded, token-heavy, reasoning-light sub-tasks to a subagent instead of absorbing them. |
+| **Introduce Once, Then Deepen** | Introduce each concept once; let the body deepen it rather than repeat it. |
 
 For the full framework, see [`DSM_6.0_AI_Collaboration_Principles_v1.0.md`](DSM_6.0_AI_Collaboration_Principles_v1.0.md).
 
@@ -38,7 +44,7 @@ These principles are operationalized by DSM, a living, versioned methodology tha
 
 DSM is not a static document. It evolves through a hub-spoke feedback loop where every session, every project, and every practitioner's experience feeds back into the methodology. Protocols are tested, refined, and propagated across the ecosystem. What one project discovers improves every future project.
 
-This is what makes TAB unique to you own experience. Session transcripts capture reasoning. Checkpoints preserve milestones. Memory files retain context across sessions. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that accumulates your expertise, not just your files.
+This is what makes TAB unique to your own experience. Session transcripts capture reasoning. Checkpoints preserve milestones. Memory files retain context across sessions. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that accumulates your expertise, not just your files.
 
 ## Systems Prompt Engineering
 
@@ -60,18 +66,20 @@ For the full chapter, see [`DSM_6.1_Systems_Prompt_Engineering_v1.0.md`](DSM_6.1
 
 Read [`TAKE_AI_BITE.md`](TAKE_AI_BITE.md) for the short version of the founding principle. It takes two minutes and captures the core idea: someone offers you a bite of a cookie, you take a bite the size you will enjoy; too small and you won't taste the cookie, too much and it will cause a lot of issues.
 
+For the full picture, [`DSM_0.0_START_HERE_Complete_Guide.md`](DSM_0.0_START_HERE_Complete_Guide.md) is the guided entry point into the methodology. It maps the document set, so the volume of `DSM_*.md` files reads as deliberate architecture rather than sprawl.
+
 ## Field-Tested
 
 These principles were developed and validated across real projects spanning:
 
 - **Data science:** exploratory analysis, feature engineering, modeling pipelines
 - **Software engineering:** ML applications, production code, test-driven development
-- **Open source contribution:** external projects in unfamiliar technology domains (Android/Kotlin), with all contributions merged upstream
+- **Open source contribution:** external projects in unfamiliar technology domains, with contributions merged upstream
 - **Structured documentation:** complex, interconnected methodology systems with thousands of cross-referenced lines
 - **Research synthesis:** multi-source analysis, competitive landscape mapping, literature review
 - **Administrative processes:** financial documentation, regulatory compliance
 
-They are not theoretical; they emerged from daily practice with AI agents across these domains. Practitioners working on complex multi-session tasks independently recreate DSM patterns (checkpoint directories, session handoffs, decision logs) before encountering the framework. DSM formalizes behavior that emerges naturally from deliberate work.
+They are not theoretical; they emerged from daily practice with AI agents across these domains. The tested work, the spoke repositories and the merged open-source pull requests, lives on the author's GitHub: [github.com/albertodiazdurana](https://github.com/albertodiazdurana). Practitioners working on complex multi-session tasks independently recreate DSM patterns (checkpoint directories, session handoffs, decision logs) before encountering the framework. DSM formalizes behavior that emerges naturally from deliberate work.
 
 ## Recent Features
 
