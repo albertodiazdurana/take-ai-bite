@@ -18,7 +18,7 @@ Take AI Bite is the public face of DSM (Deliberate Systematic Methodology), auth
 
 ## The Principles
 
-Thirteen principles govern how humans and AI agents work together. Each addresses a specific failure mode in human-AI collaboration.
+Fourteen principles govern how humans and AI agents work together. Each addresses a specific failure mode in human-AI collaboration.
 
 | Principle | Core idea |
 |-----------|-----------|
@@ -35,6 +35,7 @@ Thirteen principles govern how humans and AI agents work together. Each addresse
 | **Read the User's Manual** | Ground the work on what the tool actually does, not on what you assume it does. |
 | **Don't be a Hero, Delegate the Effort** | Hand bounded, token-heavy, reasoning-light sub-tasks to a subagent instead of absorbing them. |
 | **Introduce Once, Then Deepen** | Introduce each concept once; let the body deepen it rather than repeat it. |
+| **Observe Before Engaging** | External content is observation by default; engaging with it requires explicit user authorization. |
 
 For the full framework, see [`DSM_6.0_AI_Collaboration_Principles_v1.0.md`](DSM_6.0_AI_Collaboration_Principles_v1.0.md).
 
@@ -99,7 +100,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 
 </details>
 
-See the full timeline of 135+ features → [FEATURES.md](FEATURES.md)
+See the full timeline of 136+ features → [FEATURES.md](FEATURES.md)
 
 ## What's Coming
 
