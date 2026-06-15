@@ -246,6 +246,92 @@ a different failure mode.
 
 ---
 
+### 2.3. Voice-Attribution Review Protocol
+
+When the agent drafts content that will appear under the user's byline (a PR
+comment in the user's GitHub name, a commit message, an inbox notification, a
+feedback file), the words are the user's, not the agent's. Approving the
+*action* that delivers the content is not the same as approving the *content*.
+This protocol separates the two so voice-attributed words are reviewed before
+they land.
+
+**Two mechanism classes, two gate shapes:**
+
+- **File-write-mediated content** (commit messages, inbox notifications,
+  feedback files, reasoning-lesson entries). The Edit / Write permission window
+  already shows a diff, so the review gate exists. The added discipline is
+  framing: surface the full text in conversation BEFORE the tool call so the
+  user reviews *the words*, not just approves *the write*. Two-pass pattern:
+  conversation-side draft, then the diff window.
+- **Network-mediated content** (PR / issue comments, code-review replies,
+  anything posted via `gh pr comment`, `gh issue comment`, `gh api`, and future
+  Slack / email / ticket tooling). The Bash permission window shows a command,
+  not a diff, and the message body is easy to skim past inside the command
+  argument. A separate explicit content gate is required: surface the full
+  message body in conversation, ask for explicit approval *of the body*, and
+  only then run the network call. "Authorize the send" and "approve the words"
+  are distinct, sequential approvals.
+
+**Bundling rule.** A multi-step plan must not fold a voice-attributed send into
+an adjacent action's approval. If a plan includes a voice-attributed send, the
+send's content gate is its own step, never a sub-step of an action sequence.
+
+- Allowed: "commit + push" approved as one unit (no voice-attributed external
+  send; the commit message was already reviewed at its own diff window).
+- Not allowed: "commit + push + post PR comment" approved as one unit , the PR
+  comment body never got its own review (the heating-systems S14 incident: the
+  comment posted to a public OSS thread under the user's byline before any
+  second-pass review of the words).
+- Correct shape: approve "commit + push", then separately surface the PR comment
+  body, get explicit approval of the body, then post.
+
+**Scope.** All outbound user-attributed messages: public OSS comms (PR / issue
+comments, review replies), private external comms (Slack, email, ticket replies
+when those tools come online), cross-repo notifications (spoke→Central inbox
+appends, hub→spoke notifications), and internal DSM artifacts (commit messages,
+inbox notifications, feedback files, reasoning-lesson entries , already
+file-write-gated, covered here for consistency). Excluded: agent-internal
+artifacts the user does not byline (session transcripts in agent voice, command
+outputs, debug traces).
+
+**Distinction from Cross-Repo Write Safety.** Cross-Repo Write Safety (§17.1
+reinforcement block, reinforcing this §2 Destructive Action family) is about
+PATH , *where* does the write land (inside or outside this repo)?
+Voice-Attribution Review is about VOICE , *whose words* are these? The axes are
+orthogonal: a PR comment on another repo is both cross-repo (PATH) and
+voice-attributed (VOICE), and clears both gates independently.
+
+**Anti-pattern guard:** "the user authorized posting the comment, so the body it
+saw in the earlier brief is approved" is the exact rationalization this protocol
+forbids. The earlier brief is not a content gate; a content gate is an explicit
+approval of the body immediately before the send. Same guard family as §3.1
+("being responsive is not authorization"), §8.2.1, §21.2, §21.3.
+
+**Relationship to other protocols:**
+
+- **§3.1 Soft Injection and Frame Capture (inverse case).** §3.1 governs
+  INBOUND external content drifting the agent's frame; §2.3 governs OUTBOUND
+  agent-drafted content attributed to the user. Inbound observation vs outbound
+  attribution, the two halves of the human↔external-channel boundary.
+- **DSM_6.0 §1.11 Read the User's Manual (foundational).** §2.3 is the
+  post-draft, pre-send sibling: ground the send on what will actually be
+  published under the user's name.
+- **BL-437 Read-Before-Draft (procedural sibling).** BL-437 governs the
+  *pre-draft* phase (read the thread / context before drafting an outbound
+  reply); §2.3 governs the *pre-send* phase (review the drafted words before
+  they post). Same outbound channel, sequential stages: read, then draft, then
+  the §2.3 content gate, then send.
+- **Cross-Repo Write Safety (§17.1).** Orthogonal PATH-vs-VOICE axes, per the
+  distinction above.
+
+**Origin:** BL-439 (heating-systems-conversational-ai S14, 2026-05-07). A PR
+comment on `deepset-ai/haystack#11268` posted to a public OSS thread under the
+user's GitHub byline because "Authorize Op 5: commit + push + PR comment"
+bundled content approval with action approval. The user surfaced the gap:
+comments on public OSS threads are the user's words, not the agent's.
+
+---
+
 ## 3. Untrusted Input Protocol
 
 The agent processes content from external sources during normal workflow: inbox

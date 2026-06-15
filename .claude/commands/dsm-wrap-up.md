@@ -223,6 +223,12 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 
    Then `git commit` and `git push` in sequence. If no session changes exist, skip the commit.
    After committing, delete `.claude/session-baseline.txt` (consumed).
+9.5. **Open-PR CI status check (per BL-441):** After the session push (Step 9) and BEFORE the merge-to-main (Step 10), if the session pushed commits to a branch with an open PR, verify CI is not silently red. If `GIT_AVAILABLE` is true AND `origin` points at GitHub AND `gh` is installed:
+   ```bash
+   PR_NUMBER=$(gh pr list --head "$(git branch --show-current)" --json number --jq '.[0].number' 2>/dev/null)
+   [ -n "$PR_NUMBER" ] && gh pr checks "$PR_NUMBER" 2>/dev/null
+   ```
+   If any check has `conclusion=failure`, **warn in conversation text** (not just the persistent report): "Wrap-up note: PR #{N} has K failing CI check(s): [names]. The session is ending with red CI on the working branch's PR." This is a **warn, not a block** , the user's redirect window between the warning and the actual session end is the enforcement mechanism; the wrap-up proceeds. **Anti-pattern guard:** a session must not end with the working branch's PR in a red CI state without the user being explicitly informed; the warning is the discharge of that obligation. **Skip silently if:** no `gh`, no GitHub remote, no open PR for the branch, or no commits pushed this session. `pending` checks are silent; only `conclusion=failure` warns. One `gh` call per wrap-up (rate-limit guard). Origin: IronCalc S14 ("wrap-up is too late to verify because this skill is running to finalize the session; we should have caught failed checks before ending the session"). Placed before Step 10 so red CI surfaces before the merge-to-main publication.
 10. **Merge session branch to main via PR:** If the current branch is a session branch (not main/master), merge it to main using a pull request. This is required because branch protection prevents direct pushes to main.
    a. Ensure the session branch is pushed: `git push -u origin {session-branch}` (may already be pushed from step 8)
    b. Create PR: `gh pr create --title "Session N: [brief summary]" --body "Session wrap-up merge." --base main --head {session-branch}`

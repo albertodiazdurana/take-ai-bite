@@ -5,6 +5,31 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.0] - 2026-06-15
+
+Batches four collaboration-and-lifecycle protocols implemented in S219 (Voice-Attribution Review, Read-Before-Draft for OSS contributions, Open-PR CI Status Check, STAA reminder logic) plus the mechanical-coherence and safety-hook fixes surfaced by the EXP-004 TAB user-lens audit (S220). The four protocols were implemented and merged on `session-219` and held implemented-not-released until this dedicated release session; release-under-pressure was deliberately avoided.
+
+### Added
+
+- **BL-439:** New section **DSM_0.2.C §2.3 "Voice-Attribution Review"** , content posted under the user's byline (PR/issue comments, commit messages, inbox notifications) is the user's words, so approving the *send* is not approving the *content*. Network-mediated sends (`gh pr comment`, `gh issue comment`, `gh api`) have no diff window, so the agent surfaces the full body in conversation and gets explicit approval of the body before the call. A bundling rule keeps a voice-attributed send as its own content gate, never a sub-step of an action sequence. Added to the §17.1 base template so spokes inherit it via `/dsm-align`.
+  **Spoke action:** Run `/dsm-align` to update the reinforcement block (the §17.1 alignment template changed; all project types).
+- **BL-437:** New section **DSM_0.2.D §9 "Read-Before-Draft for OSS Contributions"** , before drafting a PR/issue body for an external maintained repo, read the target's CONTRIBUTING.md (+ nested guides), `.github/pull_request_template.md`, PR-gate workflow files, and 1-2 recent merged PRs of similar shape, then draft against the resulting readiness checklist (title format, body structure, release-note requirement, required CI, CoC/CLA, test-evidence) rather than an internal default. Pre-draft hygiene that pairs with Voice-Attribution Review (post-draft, pre-send) on the same outbound channel. Added to the §17.1 base template.
+  **Spoke action:** Run `/dsm-align` to update the reinforcement block (the §17.1 alignment template changed; all project types).
+- **BL-441:** **Open-PR CI Status Check** in `/dsm-go` (Step 2a.7) and `/dsm-wrap-up` , when the current branch has an open GitHub PR, the boot report surfaces its CI status (failing checks enumerated, green collapsed to a summary line, pending silent) so a session never resumes on top of silently-failing CI. One `gh` call at boot, skipped silently when there is no `gh`, no GitHub remote, or no open PR. Origin: IronCalc S14, where PR #865's `lint-all` was red for 20 days while `/dsm-go` reported "awaiting re-review" from MEMORY.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy` (command files changed).
+- **BL-442:** **STAA reminder logic + off-by-one fix** in `/dsm-go` (Step 5.7) and `/dsm-staa` , the session-start STAA reminder now cross-references `.claude/last-staa.txt` and suppresses the reminder when `analyzed_session >= N` (the recommending session), eliminating the false-positive reminder that fired off the archived transcript text alone (portfolio S84). Missing `last-staa.txt` degrades to "remind" (conservative direction).
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy` (command files changed).
+
+### Changed
+
+- **EXP-004 (A2 audit):** five mechanical coherence fixes applied from the TAB user-lens coherence audit , Appendix A.10 heading level (H3→H2, DSM_1.0_Appendices), Module E H1 `DSM_3.0`→`DSM_3` (DSM_3.0.E), DSM_6.0 version-history row order, and two guide-file label fixes (`document-structure-standard.md`, `readme-sections-guide.md`). Single-deterministic-fix subset only; judgment-call findings remain in the BL queue.
+  **Spoke action:** None beyond mirror sync (DSM_1.0_Appendices, DSM_3.0.E, DSM_6.0 are mirrored).
+
+### Fixed
+
+- **EXP-004 (A3/D3 audit):** restored the executable bit (100644→100755) on `validate-cross-repo-write.sh` and `validate-rename-staging.sh` (F-094 class) , the two safety hooks were committed non-executable, so fresh clones and the TAB mirror inherited silently non-functional gates until a `/dsm-go` Step 0e chmod ran. A3-013 proposes a CI check to prevent recurrence.
+  **Spoke action:** Mirror sync re-delivers the hooks; `/dsm-align` re-`chmod +x` on spokes.
+
 ## [1.15.0] - 2026-06-09
 
 Adds a safety protocol for soft injection / frame capture: cooperative external content (a polite issue-thread comment, a tool-result suggestion, a third-party message) drifting the agent at the decision-framing layer without the user's authorization (S210 filing, S218 content, S219 release; BL-436, from heating-systems-conversational-ai S13). DSM_0.2.C §3 already gated syntactic injection (shell commands, suspicious patterns); §3.1 closes the framing-layer gap that no suspicion filter catches.

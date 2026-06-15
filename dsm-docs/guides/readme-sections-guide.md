@@ -20,7 +20,7 @@ The guide covers the project root README only. Directory-level READMEs
 | 1 | Universal Required Sections |
 | 2 | Data Science Projects (DSM 1.0) |
 | 3 | Application Projects (DSM 4.0) |
-| 4 | Hybrid Projects (DSM 1.0 + 4.0) |
+| 4 | Hybrid Projects (DSM 1.0 + DSM 4.0) |
 | 5 | Documentation Projects (DSM 5.0) |
 | 6 | External Contribution Projects |
 | 7 | Common README Anti-Patterns |

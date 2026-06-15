@@ -381,6 +381,22 @@ Before starting alignment, check if git is initialized:
    - Report drift summary in the report.
    - Reference: Command File Version Tracking protocol
 
+11b. **Check done/INDEX.md currency (DSM Central only):**
+   - Skip this step if the project is not DSM Central (no `scripts/commands/` directory).
+   - Collect the set of `BACKLOG-NNN` files in `dsm-docs/plans/done/` and the set of `BACKLOG-NNN` rows present in `dsm-docs/plans/done/INDEX.md`.
+   - If any `done/` BL has no INDEX row, **report as warning**: "done/INDEX.md is missing N row(s): [BL numbers]. These BLs were closed without `/dsm-backlog-done` Step 8 (typically a manual `git mv` to done/). Backfill the rows, deriving version/date/resolver from CHANGELOG.md."
+   - **Root cause this catches:** `/dsm-backlog-done` Step 8 updates the index, but a BL closed by manual `git mv` instead of the skill bypasses Step 8, so the index silently drifts behind `done/`.
+   - Do NOT auto-backfill; report for user action (version/date/resolver derivation needs a CHANGELOG cross-reference and judgment). For a large gap, a Sonnet subagent can generate the rows for review.
+   - Origin: BL-459 (S217). The index had drifted 27+ BLs behind because manual closes bypassed `/dsm-backlog-done`.
+
+11c. **Check feature-trail.md coverage currency (DSM Central only, informational):**
+   - Skip this step if `dsm-docs/blog/feature-trail.md` does not exist (hub-only artifact; this guard makes the check a no-op on spokes and mirrors, which have no feature trail).
+   - Read the highest `F-NNN` row present in `dsm-docs/blog/feature-trail.md` and the `**Current count:**` F-total in `FEATURES.md`.
+   - If the trail's highest covered F-number is behind the FEATURES count, **report as informational (NOT a warning)**: "feature-trail.md covers up to F-NNN; FEATURES.md is at F-MMM; K F-entries are not yet in a blog thread. Expected under the per-blog-thread model (BL-455): rows are populated when a blog thread covers a version, so a coverage gap is normal, not a defect."
+   - **Why informational, not a warning:** unlike done/INDEX (Step 11b), where a missing row is a real drift defect, a feature-trail coverage gap is by-design under the per-blog-thread model (most versions never get an individual blog post). Reporting it as a warning would be a permanent false-positive. The line exists so the lazy population stays *visible*, not to force backfill.
+   - Do NOT auto-populate and do NOT recommend a hand-backfill; the trail is populated at blog-writing time.
+   - Origin: BL-455 (S218). The per-blog-thread reconciliation needed a visibility mechanism so the soft "populate lazily" rule does not silently rot; this informational line is that mechanism.
+
 12. **Report** results in this format. The report header indicates whether changes were applied:
    - **Post-change report** (when any fixes were applied: folders created, `@` reference fixed, alignment section regenerated, files created): header reads `/dsm-align post-change report:` and all items reflect the **completed state**, not the pre-change assessment.
    - **Check-only report** (when no changes were needed, all items already correct): header reads `/dsm-align check-only report:`

@@ -1,4 +1,4 @@
-# DSM_3.0 Implementation Guide - Module E: Participation Patterns
+# DSM_3 Implementation Guide - Module E: Participation Patterns
 
 This module covers the three participation patterns for DSM projects: spoke
 initialization (the mechanical setup checklist), the private project pattern
