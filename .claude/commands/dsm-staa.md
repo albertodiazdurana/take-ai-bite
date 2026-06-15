@@ -15,6 +15,7 @@ When the `UserPromptSubmit` per-turn reminder hook fires and tells you to append
 
 1. **List available transcripts:** List files in `.claude/transcripts/` sorted chronologically. Display each filename with the session number and date extracted from the file header.
 2. **Select transcript:** If $ARGUMENTS specifies a transcript (filename, session number, or "latest"), use that. Otherwise, default to the most recent transcript.
+   **Off-by-one warning (per BL-442):** when defaulting to the latest archived transcript, the wrap-up that just ran does NOT archive its own transcript (only the next `/dsm-go` Step 5.5 does), so "latest archived" is the session BEFORE the one the user most recently wrapped up. If `.claude/last-wrap-up.txt` exists and its `session:` value is greater than the session number parsed from the latest archived transcript's `# Session N Transcript` header, surface (conversation text, non-halting): "Defaulting to {filename} (S{N}). Note: you most recently wrapped up S{N+1}, whose transcript is not yet archived (the next `/dsm-go` archives it). To analyze S{N+1} now, pass its live transcript explicitly; otherwise proceeding with the latest archived S{N}." Proceed with the latest-archived default unless the user redirects. The warning fires only in this specific off-by-one window, not on every default invocation.
 3. **Read the transcript:** Read the selected transcript file in full.
    **Delimiter-based parsing:** Transcripts use typed delimiters (`<------------Start Thinking / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`) to mark block boundaries. Use these to segment the transcript into typed, timestamped blocks before analysis.
 4. **Analyze for reasoning patterns:** Examine the transcript systematically for:
@@ -40,11 +41,23 @@ When the `UserPromptSubmit` per-turn reminder hook fires and tells you to append
    **Cross-reference:** /dsm-wrap-up Step 0 owns the same rule. If the rule changes (new entry-prefix tag, category-heading shape, freshness-header drift), both /dsm-wrap-up Step 0 and /dsm-staa Step 8 must update together. See **DSM_0.2.A Reasoning Lessons Protocol** for the canonical specification. The auto-generated comment in the mirror header references both regenerators ("/dsm-wrap-up Step 0 or /dsm-staa Step 8") so provenance is honest.
 
    **Origin:** BL-433 (S207, derived from haystack-magic S7 STAA continuation 2026-05-02). After /dsm-staa appended 6 [STAA] entries and pruned 2 [auto] entries at ~22:17, the compact mirror remained at its 22:04 state from S7 wrap-up, 13 min stale, missing 6 lessons and including 2 pruned ones. The agent regenerated inline manually; this step makes the regeneration a normative part of /dsm-staa.
+9. **Write `last-staa.txt` (per BL-442):** After the analysis lands, write `.claude/last-staa.txt` so `/dsm-go` Step 5.7 can suppress the STAA reminder for sessions already analyzed. Parse the analyzed session number `N` from the subject transcript's `# Session N Transcript` header (not the filename). Schema:
+
+   ```
+   # Last /dsm-staa run
+   date: YYYY-MM-DD
+   analyzed_session: N
+   analyzed_transcript: .claude/transcripts/{file}
+   appended_lessons: M
+   pruned_lessons: K
+   ```
+
+   `M` is the count appended in Step 6, `K` the count pruned in Step 7 (0 if none). The marker is gitignored and local-only; on a missing marker `/dsm-go` Step 5.7 degrades to "remind" (the conservative direction). Multi-pass STAA on the same session overwrites the marker (it tracks "last analyzed", not "ever analyzed"). This is the one project-file write STAA performs beyond `.claude/reasoning-lessons.md` and its compact mirror.
 
 ## Notes
 
 - This agent produces NO session transcript. The IMPORTANT block at the top of this file explains the two files involved (archived subject vs live reasoning log) and the meta-recursion concern. Do not re-derive the rationale; read the IMPORTANT block.
-- This agent does NOT modify any project files except `.claude/reasoning-lessons.md`
+- This agent does NOT modify any project files except `.claude/reasoning-lessons.md`, its compact mirror `.claude/reasoning-lessons-compact.md` (Step 8), and `.claude/last-staa.txt` (Step 9). All three are gitignored local-only artifacts; none is committed.
 - The analysis session is lightweight; no git commits, no wrap-up needed
 - If the transcript is very long (500+ lines), warn about context budget and offer to analyze in sections
 - Cross-reference findings with existing MEMORY.md entries to avoid redundancy

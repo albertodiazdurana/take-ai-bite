@@ -190,7 +190,7 @@ modularized into a core file plus modules.
 |-----------|---------|---------|
 | Core | `DSM_X.Y_Title_vN.M.md` | `DSM_6.1_Systems_Prompt_Engineering_v1.0.md` |
 | Module A | `DSM_X.Y.A_Module_Title.md` | `DSM_6.1.A_Operational_Channels.md` |
-| Module B | `DSM_X.Y.B_Module_Title.md` | `DSM_6.1.B_Instruction_Design.md` |
+| Module B | `DSM_X.Y.B_Module_Title.md` | `DSM_6.1.B_Instruction_Design_Patterns.md` |
 
 Module letters are assigned sequentially (A, B, C, D). Each module file name
 includes a descriptive suffix that communicates the module's scope without

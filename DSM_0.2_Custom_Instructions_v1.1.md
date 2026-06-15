@@ -1797,6 +1797,17 @@ Never use space coma space (" , "). The correct format is no spaces before the c
 - Present the content and target path before writing; do not write cross-repo silently
 - Subsequent writes to the same cross-repo target in the same session do not need re-confirmation
 
+### Voice-Attribution Review (reinforces Destructive Action Protocol, per DSM_0.2.C §2.3)
+- Content posted under the user's byline (PR/issue comments, commit messages, inbox notifications) is the user's words; approving the *send* is not approving the *content*
+- Network-mediated sends (`gh pr comment`, `gh issue comment`, `gh api`) have no diff window: surface the full body in conversation, get explicit approval of the body, then run the call
+- Bundling rule: a voice-attributed send is its own content gate, never a sub-step of an action sequence ("commit + push + post comment" must split the comment into its own approval)
+- Cross-Repo Write Safety is about PATH (where the write lands); Voice-Attribution is about VOICE (whose words). A PR comment on another repo clears both
+
+### Read-Before-Draft for OSS Contributions (reinforces Read the User's Manual, per DSM_0.2.D §9)
+- Before drafting a PR/issue body for an external maintained repo, read the target's CONTRIBUTING.md (+ nested guides), `.github/pull_request_template.md`, PR-gate workflow files, and 1-2 recent merged PRs of similar shape
+- Draft against the resulting readiness checklist (title format, body structure, release-note requirement, required CI, CoC/CLA, test-evidence), not an internal default; surface the checklist in the Pre-Generation Brief Gate 0
+- Pre-draft hygiene; pairs with Voice-Attribution Review (post-draft, pre-send) on the same outbound channel
+
 ### Plan Mode for Significant Changes (reinforces Earn Your Assertions)
 - Before implementing significant features: explore codebase, identify patterns, present plan
 - Do not write or edit files until the plan is approved by the user
@@ -2570,3 +2581,4 @@ All module files are in the same directory as this core file.
 | First Session Prompt for New Projects | New spoke project scaffolded | [D](DSM_0.2.D_Research_Onboarding.md) |
 | Phase-to-DSM-Section Mapping | Sprint planning, phase type identification | [D](DSM_0.2.D_Research_Onboarding.md) |
 | Command File Version Tracking | Modifying DSM command files | [D](DSM_0.2.D_Research_Onboarding.md) |
+| Read-Before-Draft for OSS Contributions | Opening a PR/issue against an external maintained repo | [D](DSM_0.2.D_Research_Onboarding.md) |

@@ -247,9 +247,11 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-269 | Modularize DSM_3.0 Implementation Guide into Slim Core and Modules | v1.4.0 | 2026-03-26 | — (needs review) |
 | BACKLOG-270 | Modularize DSM_4.0 Software Engineering Adaptation into Slim Core and Modules | v1.4.0 | 2026-03-26 | — (needs review) |
 | BACKLOG-271 | Structural Compliance Retrofit for DSM Files | — | 2026-03-29 | §1 |
+| BACKLOG-272 | Use Git Worktrees for Parallel Session Branch Isolation | v1.4.0 | 2026-03-28 | superseded by BL-276 |
 | BACKLOG-273 | Implement `/dsm-finalize-project` Skill (BL-161) | v1.4.0 | 2026-03-26 | — (needs review) |
 | BACKLOG-274 | Add Version Bump Check to Session Wrap-Up and Decouple Mirror Sync | — | 2026-03-29 | DSM_2.0.D §7.4 |
 | BACKLOG-276 | Replace Parallel Session Worktree Model with Shared Branch Model | — | 2026-04-13 | §20.3 |
+| BACKLOG-277 | Investigate Session Tab Naming for DSM Session Commands | — | 2026-04-14 | closed: won't do |
 | BACKLOG-278 | Add Scaffold-First Behavior to /dsm-go for New Projects | — | 2026-03-29 | — (implementation-only) |
 | BACKLOG-279 | README Required Sections Guide by Project Type | — | 2026-03-30 | DSM_3.0.E §6.7 |
 | BACKLOG-280 | Phase 0 BL Status Audit and Closure | — | 2026-03-30 | §9 |
@@ -271,6 +273,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-297 | FEATURES.md Maintenance Triggered by CHANGELOG Updates | — | 2026-04-04 | DSM_0.2.A §2 |
 | BACKLOG-298 | Template Drift Auto-Trigger on DSM Version Change | — | 2026-04-04 | DSM_0.2 §2 |
 | BACKLOG-299 | DSM_0.2 Core Slimming via Stub-and-Move | v1.4.1 | 2026-04-01 | §1 |
+| BACKLOG-300 | Measure DSM_0.2 Core Slimming Context Impact | — | 2026-04-14 | — (implementation-only, measurement) |
 | BACKLOG-303 | DSM Navigation Architecture Vision (Cross-Experiment Analysis) | — | 2026-04-03 | — (needs review) |
 | BACKLOG-304 | Add Path Validation to /dsm-align for CLAUDE.md Content | — | 2026-04-04 | DSM_0.2 §17 |
 | BACKLOG-305 | Feedback-to-CLAUDE.md Escalation Protocol | — | 2026-04-04 | §17 |
@@ -313,8 +316,10 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-349 | /dsm-go EC governance inbox check | v1.5.1 | 2026-04-11 | — (needs review) |
 | BACKLOG-350 | DSM_0.2 §22 stop-condition amendment for protocol violations | v1.4.16 | 2026-04-11 | DSM_0.2 §22 |
 | BACKLOG-351 | DSM_0.2 §7 STAA exception clause and dsm-staa.md recursion rationale clarification | v1.4.17 | 2026-04-12 | DSM_0.2 §7 |
+| BACKLOG-352 | Preemptive Risk Definition Required for All BLs | v1.9.0 | 2026-05-05 | DSM_0.2 §21.2 |
 | BACKLOG-353 | Claude Code Platform Alignment Protocol | v1.6.2 | 2026-04-20 | — (needs review) |
 | BACKLOG-355 | Deep Research External Repos for DSM and Graph Explorer Relevance | v1.4.18 | — | DSM_0.2 §10 |
+| BACKLOG-356 | MEMORY.md Hygiene and Line Budget Optimization | v1.4.18 | 2026-04-13 | /dsm-wrap-up Step 2 (MEMORY budget) |
 | BACKLOG-358 | Reasoning Lessons Archive Extraction | — | 2026-04-14 | DSM_0.2.A §8 |
 | BACKLOG-367 | Research Knowledge-Summary Format: validate key:value or identify line-efficient alternatives | — | 2026-04-14 | DSM_0.2 §8.5 |
 | BACKLOG-370 | Git-mv + Unstaged Content Change Pre-Commit Warning Hook | v1.5.1 | 2026-04-16 | — (needs review) |
@@ -330,11 +335,16 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-385 | Pre-Generation Brief Gate 2 Counter-Evidence Surfacing | v1.6.0 | 2026-04-18 | DSM_0.2 §8.2 |
 | BACKLOG-386 | Default-Branch Verification at Session-Start and PR-Create | v1.6.0 | 2026-04-18 | DSM_0.2.C §2.1 |
 | BACKLOG-387 | Permission-System Parity for Push-to-Main vs PR-Merge-to-Main | v1.6.0 | 2026-04-18 | the §2 |
+| BACKLOG-391 | Enforce Cross-Repo Write Confirmation via PreToolUse Hook on Write/Edit | v1.9.0 | 2026-05-05 | validate-cross-repo-write.sh (DSM_0.2.C §2) |
+| BACKLOG-397 | Codify Auto-Mode Boundaries in Pre-Generation Brief Gate Protocol | v1.9.0 | 2026-05-05 | DSM_0.2 §8.9 |
+| BACKLOG-398 | AI Platform Documentation Template Structure Research (BL-345 Phase 2) | v1.6.1 | 2026-04-20 | DSM_7.0 (BL-345 Phase 2) |
+| BACKLOG-399 | TAB/DSM-Exclusive Claude Patterns Audit (BL-345 Phase 3) | v1.6.1 | 2026-04-20 | DSM_7.0 (BL-345 Phase 3) |
 | BACKLOG-400 | DSM_7.0 §2.1 Claude Code Filled Instance (BL-345 Phase 4) | v1.6.1 | 2026-04-20 | DSM_7.0 §2.1 |
 | BACKLOG-401 | DSM_7.0 §3 Template Generalization and Cross-Reference Application (BL-345 Phase 5) | v1.6.1 | 2026-04-20 | DSM_7.0 §2.1 |
 | BACKLOG-402 | Gate 1 Token-Minimizing Config Recommendation | v1.6.1 | 2026-04-20 | DSM_6.0 §2.3 |
 | BACKLOG-405 | /dsm-go Step 0c disambiguation for closed-session recovery branches | v1.7.0 | 2026-04-21 | §22 |
 | BACKLOG-406 | Stale-active garbage collection for parallel-sessions registry | v1.7.0 | 2026-04-21 | — (needs review) |
+| BACKLOG-407 | Prevent Central from committing notification files into mirror _inbox/ | v1.7.0 | 2026-04-21 | /dsm-wrap-up Step 8d/9 (mirror inbox guard) |
 | BACKLOG-408 | Hello-world welcome inbox entry for fresh mirror clones | v1.7.0 | 2026-04-21 | DSM_0.2.A §25.2 |
 | BACKLOG-409 | Gate 1 Parallel Offload Analysis — user-approved subagent delegation plan | v1.7.0 | 2026-04-21 | DSM_0.2 §8.8 |
 | BACKLOG-410 | Register agent + model identity in session-transcript header | v1.7.0 | 2026-04-21 | DSM_6.0 §2.3 |
@@ -343,6 +353,8 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-418 | Scrub BL References from Mirrored Methodology | v1.8.0 | 2026-04-24 | — (implementation-only) |
 | BACKLOG-419 | BL Lookup Index | v1.8.0 | 2026-04-24 | dsm-docs/plans/done/INDEX.md |
 | BACKLOG-420 | Checkpoint Authoring Identifiers Rule | v1.8.0 | 2026-04-24 | DSM_0.2.A §10.2.1 |
+| BACKLOG-421 | /dsm-go Step 2b Enumerate Inbox Entries Rule | v1.9.0 | 2026-05-05 | /dsm-go Step 2b |
+| BACKLOG-424 | /dsm-wrap-up Step 1 missing blog-poster notification path on FEATURES.md change | v1.9.0 | 2026-05-05 | /dsm-wrap-up Step 1 |
 | BACKLOG-425 | Research Folder Index Maintenance with /dsm-research-add and /dsm-research-done Skills | — | 2026-04-29 | scripts/commands/dsm-research-add.md, scripts/commands/dsm-research-done.md |
 | BACKLOG-427 | Compact Reasoning-Lessons Mirror for Agent-Facing Session-Start Priming (Steps 1-4 trim-only; Step 5 deferred) | — | 2026-04-29 | DSM_0.2.A §8.1 |
 | BACKLOG-428 | /dsm-go Step 0.8 Cloned-Mirror Kick-off Check Should Be Deterministic, Not Narrated | v1.9.0 | 2026-05-05 | scripts/commands/dsm-go.md (Step 0.8) |
@@ -353,7 +365,12 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-433 | /dsm-staa Step 6.5 Regenerate Compact Reasoning-Lessons Mirror | v1.9.0 | 2026-05-05 | scripts/commands/dsm-staa.md (Step 8) |
 | BACKLOG-434 | /dsm-align Step 12 Explicit `N/A (not DSM Central)` for Command Sync on Spokes | v1.9.0 | 2026-05-05 | scripts/commands/dsm-align.md (Step 12) |
 | BACKLOG-435 | Skill Scope Is Authoritative Principle | v1.9.0 | 2026-05-05 | DSM_0.2 §8.6.1 |
+| BACKLOG-436 | Soft Injection / Frame Capture Protocol | v1.15.0 | 2026-06-09 | DSM_0.2.C §3.1 + DSM_6.0 §1.14 |
+| BACKLOG-437 | Read-Before-Draft for OSS Contributions | v1.16.0 | 2026-06-15 | DSM_0.2.D §9 |
+| BACKLOG-439 | Voice-Attribution Review Protocol (Mechanism-Aware) | v1.16.0 | 2026-06-15 | DSM_0.2.C §2.3 |
 | BACKLOG-440 | validate-cross-repo-write.sh Edit/Write Asymmetry Bug | v1.10.0 | 2026-05-29 | .claude/hooks/validate-cross-repo-write.sh |
+| BACKLOG-441 | /dsm-go + /dsm-wrap-up Open-PR CI Status Check | v1.16.0 | 2026-06-15 | scripts/commands/dsm-go.md (Step 2a.7) |
+| BACKLOG-442 | STAA Reminder Logic + /dsm-staa Default Off-By-One | v1.16.0 | 2026-06-15 | scripts/commands/dsm-go.md (Step 5.7) |
 | BACKLOG-444 | /dsm-go Step 3.5 Spec Fix, Add Post-Rename Restage | v1.10.0 | 2026-05-29 | scripts/commands/dsm-go.md (Step 3.5) |
 | BACKLOG-447 | Reconcile Compact-Mirror Regenerator Drift Between /dsm-staa and /dsm-wrap-up | v1.10.0 | 2026-05-29 | DSM_0.2.A §8.1 |
 | BACKLOG-448 | Cross-Repo Writes Must Be Write-Only, Never Run git in the Target Repo | v1.11.0 | 2026-05-31 | DSM_0.2.C §2 |
@@ -363,6 +380,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-452 | Adopt Smoke Tests as a Named DSM Artifact | v1.12.0 | 2026-05-31 | DSM_4.0.A §7 |
 | BACKLOG-453 | Codify User-Reframes-Proposal Handling in DSM_0.2 §8.0.1 | v1.13.0 | 2026-06-01 | DSM_0.2 §8.0.1 |
 | BACKLOG-454 | Concept-Introduction / No-Repetition Writing Principle for Structured Prose | v1.14.0 | 2026-06-01 | DSM_6.0 §1.13 |
+| BACKLOG-455 | Reconcile Feature-Trail Population Rule to Per-Blog-Thread Practice | — | 2026-06-08 | scripts/commands/dsm-align.md (Step 11c) |
 | BACKLOG-456 | Formalize the Parallel-Session Inbox-Note Carve-Out | — | 2026-06-08 | scripts/commands/dsm-parallel-session-go.md |
 | BACKLOG-457 | Refresh README Conceptual + Numeric Currency | — | 2026-06-08 | README.md |
 | BACKLOG-458 | Add Version-Bump README Conceptual-Currency Review to Version Update Workflow | — | 2026-06-08 | scripts/commands/dsm-version-update.md |

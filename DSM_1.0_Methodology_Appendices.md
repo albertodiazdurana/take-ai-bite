@@ -382,7 +382,7 @@ filesystem context, so use WSL paths.
 
 Cross-reference: Section 2.1 (Environment Setup), Appendix A.7 (Environment Tool Selection)
 
-### A.10. External API Portability
+## A.10. External API Portability
 
 When projects depend on external APIs for data download (Kaggle, HuggingFace, cloud
 storage), authentication and access methods can change without notice. Plan for

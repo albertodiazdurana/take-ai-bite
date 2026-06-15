@@ -22,6 +22,7 @@ protocol listed in the dispatch table is needed.
 6. [First Session Prompt for New Projects](#6-first-session-prompt-for-new-projects)
 7. [Phase-to-DSM-Section Mapping](#7-phase-to-dsm-section-mapping)
 8. [Command File Version Tracking](#8-command-file-version-tracking)
+9. [Read-Before-Draft for OSS Contributions](#9-read-before-draft-for-oss-contributions)
 
 ---
 
@@ -503,3 +504,82 @@ to see drift details without modifying files.
 - Commit project-level runtime copies; they are gitignored deployment artifacts
 
 Reference: BACKLOG-130 (Phase A), BACKLOG-131 (Phase B)
+
+---
+
+## 9. Read-Before-Draft for OSS Contributions
+
+Heavily-maintained public OSS projects encode their Definition of Ready in
+`CONTRIBUTING.md`, `.github/pull_request_template.md`, and CI workflow files.
+Cross-Repo Write Safety gates *that* the agent presents content before writing;
+it does not gate *what the agent should know about the target's contribution
+requirements* before drafting. Read-Before-Draft closes that gap: the agent
+reads the target's stated requirements before drafting a PR body, then drafts
+against them rather than against an internal default. This is "Read the User's
+Manual" (DSM_6.0 §1.11) applied to an OSS contribution target.
+
+**When to apply:** opening (or substantially editing) a pull request or issue
+against an external repository the user does not own, especially a maintained
+project with formal contribution machinery. Skip for repos with no
+contribution guidance, or trivial typo-fix PRs where the target's full
+machinery does not apply.
+
+**Four sources to read before drafting** (fetch and inspect):
+
+1. `<target-repo>/CONTRIBUTING.md` and any nested contribution guides (e.g.,
+   `<target>/docs-website/CONTRIBUTING.md`)
+2. `<target-repo>/.github/pull_request_template.md`, if present
+3. `<target-repo>/.github/workflows/*.yml` whose names suggest PR gates
+   (`test-*`, `lint-*`, `check-*`, `*required*`)
+4. 1-2 recent merged PRs of similar shape, to observe the maintainer's actual
+   taste (not just the stated rules)
+
+**Six-category readiness checklist** (the agent applies this during drafting):
+
+- [ ] PR title format (conventional commits / required prefixes)
+- [ ] PR body structure (free-form vs templated; if templated, the exact
+  section list)
+- [ ] Release-note / changelog requirement, and how to generate one
+- [ ] Required CI checks the PR will face
+- [ ] Code-of-conduct / CLA requirements
+- [ ] Test-evidence expectations
+
+**Integration with the Pre-Generation Brief Protocol.** Read-Before-Draft fires
+at Gate 0 (collaborative definition), before the PR body is drafted. The agent
+presents the checklist as part of the Pre-Generation Brief; the PR body is then
+drafted *against* the checklist. The user sees the target's requirements before
+approving the draft, not after the PR is opened.
+
+**Per-target caching (hint, policy deferred).** The checklist for a given target
+can be saved as a per-target artifact (e.g., in the spoke's
+`dsm-docs/research/`) and reused for subsequent PRs to the same target. Refresh
+cadence and cache-management policy are deferred to a follow-on BL; the first
+version produces the checklist per-PR.
+
+**Optional `/dsm-pr-readiness` skill (deferred).** A skill could automate the
+four fetches and emit the checklist. The protocol works without it (the four
+reads are manual), so the skill is a convenience deferred to a follow-on BL.
+The checklist *application* stays human-in-the-loop per the Pre-Generation
+Brief Protocol regardless.
+
+**Relationship to other protocols:**
+
+- **DSM_6.0 §1.11 Read the User's Manual (foundational).** Read-Before-Draft is
+  §1.11 applied to OSS contribution targets: ground on what the target actually
+  requires before building the contribution.
+- **DSM_0.2.C §2.3 Voice-Attribution Review (post-draft sibling).** §9 is
+  pre-draft hygiene (read the target's rules before drafting); §2.3 is
+  post-draft, pre-send hygiene (review the drafted words before they post).
+  Sequential stages on the same outbound channel: read, draft, content-gate,
+  send.
+- **DSM_0.2.C §3.1 Soft Injection and Frame Capture (cluster sibling).** Part of
+  the same "user-caught silent gap" cluster (heating-systems S13/S14); §3.1 is
+  inbound frame capture, §2.3 is outbound voice attribution, §9 is pre-draft
+  target grounding.
+
+**Origin:** BL-437 (heating-systems-conversational-ai S13, 2026-05-07). Three
+OSS PRs were opened against repos with formal contribution requirements
+(`deepset` CONTRIBUTING.md mandating a release-note YAML, a 5-section PR
+template, a `release-notes-required` CI check) that the spoke never read before
+drafting; the user's session-close audit ("what was our Definition of Ready?")
+surfaced the gap. Retroactive fix cost ~25 minutes vs ~10 minutes preemptive.
