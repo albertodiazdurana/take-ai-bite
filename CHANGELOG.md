@@ -5,6 +5,15 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.0] - 2026-06-18
+
+Refines the §8.10 chunked-drafting protocol for structured prose: a document-co-development model validated live on a portfolio spoke (S106).
+
+### Changed
+
+- **BL-465:** **DSM_0.2 §8.10 Gate 3 (chunked drafting)** refined , the review unit changes from "section" to **subchapter** (or a single paragraph when the subchapter is long, so a long subchapter is delivered as several paragraph-bites), and prose is now delivered **file-first**: each bite is written to an editable draft file the user edits in place, not pasted as a conversation block that cannot be edited there. Explicitly analogized to the Notebook Collaboration Protocol. The "full-file Write reserved for assembly" rule is reconciled so incremental per-bite file writes are permitted while whole-document generation stays the prohibited anti-pattern; Gate 4 remains the cross-section consistency pass. Mirrored into the §17.1 base template + hub alignment block. Origin: Data Science Portfolio S106, live-validated on a 4-part blog series.
+  **Spoke action:** Run `/dsm-align` to update the chunked-drafting reinforcement bullet (the §17.1 alignment template changed; all project types).
+
 ## [1.16.0] - 2026-06-15
 
 Batches four collaboration-and-lifecycle protocols implemented in S219 (Voice-Attribution Review, Read-Before-Draft for OSS contributions, Open-PR CI Status Check, STAA reminder logic) plus the mechanical-coherence and safety-hook fixes surfaced by the EXP-004 TAB user-lens audit (S220). The four protocols were implemented and merged on `session-219` and held implemented-not-released until this dedicated release session; release-under-pressure was deliberately avoided.
