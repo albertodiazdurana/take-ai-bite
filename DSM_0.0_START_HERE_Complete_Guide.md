@@ -114,7 +114,7 @@ documents) and cannot use git or share artifacts externally. Private projects:
 
 ### External Contribution
 
-When you contribute to someone else's open-source project, you maintain DSM
+When you contribute to someone else's project (open-source or proprietary code base, documentation or file system), you maintain DSM
 governance in your own ecosystem while the code contributions go to the external
 repository. This pattern:
 - Keeps governance artifacts (decisions, feedback, plans) in your DSM storage
@@ -166,19 +166,41 @@ repositories, professional portfolios, knowledge bases, technical writing.
 
 ### Prerequisites
 
-- **VS Code** with the **Claude Code** extension installed
-- A folder for your project (new or existing)
-- Access to DSM Central (this repository) on your local machine
+Before you start, you need:
 
-### Your First Session
+- A **GitHub account** and **git** installed
+- **VS Code** with the **Claude Code** extension
+- A **Claude account** (the agent runs inside Claude Code)
 
-1. Open your project folder in VS Code
-2. Type `/dsm-go` in the Claude Code panel
-3. The agent sets up the project structure, identifies what kind of project it is,
-   and asks what you want to work on
+### Quick Start
 
-The agent handles the rest: creating folders, loading context, and guiding you
-through your first session step by step.
+1. Pick a parent folder to hold the methodology and your projects side by side.
+2. Inside it, clone the methodology:
+   `git clone https://github.com/albertodiazdurana/take-ai-bite`
+3. Open the `take-ai-bite` folder in VS Code. In the **Claude Code chat window**
+   (where you type to chat with Claude), type `/dsm-go`. This loads DSM.
+4. Tell the agent what you want to build and where to put it (for example, a new
+   folder next to `take-ai-bite`). The agent creates your project folder and links
+   it to the methodology, the wiring beginners usually get wrong by hand.
+5. To help the agent understand your work, describe it in the chat, or create a
+   `_preliminary_plan/preliminary_plan.md` file describing:
+   - what you want to do;
+   - whether you are building **code**, a **Jupyter notebook**, or
+     **documentation** (markdown only);
+   - if it is a **private** project (sensitive data, no git), say so;
+   - if you are **contributing to an external project**, how you want to
+     contribute and the folder where that project lives or will be cloned.
+
+   The agent reads this, works out the project type, and asks if anything is unclear.
+6. Open your new project folder in VS Code and type `/dsm-go` to start working
+   there. From now on, you work inside your project.
+
+**Already have files elsewhere?** If your project builds on files that already
+exist somewhere on your machine, set up the project folder and its
+`preliminary_plan.md` first, then, from inside your project, ask the agent to
+read or import the relevant files. Tell it where they are and it brings them in.
+
+For full setup (configuration, ecosystem wiring, folder conventions), see **DSM_3.0**.
 
 ### What Happens During `/dsm-go`
 
@@ -194,13 +216,26 @@ before it is created.
 
 ### When the Session Ends
 
-Type `/dsm-wrap-up`. The agent:
+End a session when your context window is getting full (around half full is a good
+moment), when you are done for the day, or whenever you want to pause. The agent
+saves what was done and what is still pending, so nothing is lost.
+
+**Finishing a piece of work, or done for the day?** Type `/dsm-wrap-up`. The agent:
 - Saves session context to memory
 - Commits and pushes your work
 - Creates a handoff document if there is complex pending work
 - Merges your session branch back to main
 
-Next session, `/dsm-go` picks up exactly where you left off.
+**Pausing mid-task and continuing shortly (same day)?** Use the lightweight pair
+instead:
+- `/dsm-light-wrap-up` saves only the essential state and skips the heavier steps,
+  so you keep context budget for the continuation.
+- Next time, `/dsm-light-go` resumes fast, loading only what the ongoing task needs.
+
+The light pair is for same-day continuation of the *same* work. When you finish the
+work or the day ends, use the full `/dsm-wrap-up` so your branch merges back to main.
+
+Next session, `/dsm-go` (or `/dsm-light-go`) picks up exactly where you left off.
 
 ---
 
@@ -228,6 +263,30 @@ about changes, and how spokes send observations back.
 
 You do not need to manage this manually. The agent handles inbox processing at
 session start and feedback generation at session end.
+
+### Learning From a Session
+
+At the end of a session, `/dsm-wrap-up` sometimes tells you *"STAA recommended:
+yes."* STAA (Session Transcript Analysis Agent) is a look back at the reasoning
+behind a session: where choices were made, where the approach changed direction,
+what worked, and what slowed things down.
+
+**Why it matters:** Every session's reasoning is recorded in a transcript. STAA
+reads that record and pulls out durable lessons, so the agent improves at working
+with you over time instead of repeating the same detours. The feedback cycle
+sharpens the methodology. STAA sharpens the reasoning.
+
+**When to run it:** When the wrap-up recommends it, usually after a session with
+tricky decisions, a new kind of task, or a course correction worth remembering.
+
+**How to run it:** Open a **new, separate** Claude Code conversation and type
+`/dsm-staa`. Do not run it inside `/dsm-go` or a wrap-up; it is its own kind of
+session.
+
+**What to expect:** STAA reads the previous session's transcript, shows you its
+findings grouped by theme (decisions, course corrections, efficiency, recurring
+patterns), and, once you approve, saves the useful ones as lessons the agent reads
+at the start of future sessions.
 
 ---
 
