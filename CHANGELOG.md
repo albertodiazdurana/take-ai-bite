@@ -5,6 +5,15 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.1] - 2026-07-09
+
+Clarifies the §17.1 Punctuation rule so the em-dash replacement is stated as a direct, one-step transform.
+
+### Changed
+
+- **BL-469:** **DSM_0.2 §17.1 Punctuation rule** reworded to state the target directly: an em dash becomes a comma in the form `", "` (no space before the comma, one space after) in one step. The prior two-part framing ("use a comma instead of an em dash", then "never space-comma-space") led agents to produce the `" , "` intermediate and rely on the second clause as cleanup. The prescribed output (`", "`) is unchanged, so no existing compliant content needs editing. Mirrored into the hub alignment block.
+  **Spoke action:** Run `/dsm-align` to update the Punctuation reinforcement bullet (the §17.1 alignment template changed; all project types).
+
 ## [1.17.0] - 2026-06-18
 
 Refines the §8.10 chunked-drafting protocol for structured prose: a document-co-development model validated live on a portfolio spoke (S106).
