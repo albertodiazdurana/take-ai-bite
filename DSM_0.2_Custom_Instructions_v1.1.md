@@ -1786,8 +1786,7 @@ and updated automatically. Project-specific content lives outside the delimiters
 - Before suggesting implementation of anything that looks like a plan, verify that a formal BL exists in `dsm-docs/plans/`. If not, route through research → formalize → plan first.
 
 ### Punctuation
-Use comma "," instead of Em Dash "—" for connecting phrases in any language.
-Never use space coma space (" , "). The correct format is no spaces before the comma, and one space after: ", ".
+When an em dash ("—") connects phrases, replace it directly with a comma in the form ", " (no space before the comma, one space after). Produce this form in one step; never write the intermediate " , " (space before the comma). Applies in any language.
 
 ### Code Output Standards (reinforces Earn Your Assertions)
 - Show actual values: shapes, metrics, counts, paths
