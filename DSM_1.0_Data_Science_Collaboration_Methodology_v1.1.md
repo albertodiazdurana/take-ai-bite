@@ -61,7 +61,7 @@ If your primary deliverable is a working application (not analytical insights), 
 #### 1.3.1. Communication Style
 - **Concise responses**: Direct answers without unnecessary elaboration
 - **Clarifying questions first**: Before generating artifacts or lengthy outputs, confirm understanding
-- **Token monitoring**: Track conversation length and warn at 95% capacity for session summary
+- **Token monitoring**: Track remaining context and alert proactively (below ~40% remaining) to plan session summary, per the two-tier Context Budget Protocol (DSM_1.0.D §6.1.1)
 - **Text conventions**:
   - Use "WARNING:" instead of warning emoji
   - Use "OK:" instead of checkmark

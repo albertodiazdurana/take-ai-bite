@@ -337,10 +337,10 @@ Every DSM spoke project uses these exact folder names under `dsm-docs/`:
 | `dsm-docs/blog/` | Blog materials, drafts, posts | Yes |
 | `dsm-docs/checkpoints/` | Milestone snapshots | Yes |
 | `dsm-docs/decisions/` | Decision log entries (DEC-NNN) | No (permanent) |
-| `dsm-docs/feedback-to-dsm/` | Methodology, backlog, and technical feedback | No (append-only) |
+| `dsm-docs/feedback-to-dsm/` | Methodology, backlog, and technical feedback | Yes (per-session backlogs/methodology → done/; `technical.md` append-only) |
 | `dsm-docs/guides/` | Reference guides, user docs | No (permanent) |
 | `dsm-docs/handoffs/` | Session continuity documents | Yes |
-| `_inbox/` | Hub-spoke communication transit (project root) | No (entries deleted) |
+| `_inbox/` | Hub-spoke communication transit (project root) | Yes (entries move to done/) |
 | `dsm-docs/plans/` | Sprint and project planning | Yes |
 | `dsm-docs/research/` | Research documents and findings | Yes |
 
@@ -361,16 +361,19 @@ move it to `done/` within that folder and update its header:
 | `blog/` | Post published (URL confirmed) |
 | `plans/` | Plan completed or superseded |
 
-**Feedback files:** `dsm-docs/feedback-to-dsm/` contains exactly three files: `backlogs.md`,
-`methodology.md`, and `technical.md`. All session observations are appended as
-dated entries within these files, not created as separate per-session files. Mark
-individual entries with `**Pushed:** YYYY-MM-DD` when sent to DSM Central's inbox.
-See DSM_0.2 Technical Progress Reporting for the `technical.md` template and
-routing protocol.
+**Feedback files:** `dsm-docs/feedback-to-dsm/` uses the **per-session** model
+defined authoritatively in DSM_0.2.A §4 (DSM Feedback Tracking): each session
+writes its own `YYYY-MM-DD_sN_backlogs.md` / `YYYY-MM-DD_sN_methodology.md` file,
+which moves to `done/` once DSM Central processes it. `technical.md` is the one
+append-only file (sprint-boundary cadence); see DSM_0.2 Technical Progress
+Reporting for its template and routing protocol. Refer to DSM_0.2.A §4 for the
+full create → notify → process → done lifecycle.
 
-**Anti-pattern:** Do not create `dsm-docs/feedback-to-dsm/YYYY-MM-DD_backlogs.md` or
-similar dated files. The canonical files are the single source of truth;
-per-session files fragment the record and leave the canonical files empty.
+DSM 1.0 data-science projects additionally maintain project-lifecycle
+`backlogs.md` / `methodology.md` deliverables (bare names, finalized at project
+end with section scoring) per DSM_1.0.D §6.4.5; these are distinct in granularity
+from the per-session session-feedback files above and coexist with them (dated
+per-session names vs bare project-long names).
 
 ---
 

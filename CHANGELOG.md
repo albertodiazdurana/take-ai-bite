@@ -5,6 +5,31 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.18.0] - 2026-07-12
+
+Adds the "Forward the Why" collaboration principle (DSM_6.0 §1.13) and reconciles four internal-coherence findings from the EXP-004 TAB audit. The mis-classified "Introduce Once, Then Deepen" principle is relocated to a DSM_0.2 §8.10 writing discipline and renamed "Present Once, Then Deepen".
+
+### Added
+
+- **BL-473:** New collaboration principle **DSM_6.0 §1.13 "Forward the Why"**. When knowledge or a decision flows forward (to a later BL, session, or step), encode the causal link at its source so the receiver inherits the *why*, not just the *what*, instead of reverse-engineering it. The anti-pattern it names is backward reconstruction. Names three faces (Registering, Delegating, Planning), with the Downstream Impact Map and Causal Handoff mechanisms as adoptable instances (spawned BLs). Origin: meter-to-cash spoke S6-S7.
+  **Spoke action:** Review DSM_6.0 §1.13 (new principle; DSM_6.0 is mirrored).
+
+### Changed
+
+- **BL-473:** "Introduce Once, Then Deepen" is no longer a DSM_6.0 §1.x principle. It governs a document's internal structure (an artifact property), not the collaboration, so it was reclassified as a **DSM_0.2 §8.10 writing discipline** (self-contained in Gate 4) and **renamed "Present Once, Then Deepen"** ("introduce + deepen" can connote inserting content not in the source). DSM_6.0 §1.14 (Observe Before Engaging) is unchanged, not renumbered. FEATURES F-135 reclassified; the four historical records that shipped the old name are preserved with renaming notes.
+  **Spoke action:** Review DSM_0.2 §8.10 Gate 4 (now self-sources the writing discipline; DSM_0.2 core is inherited via the `@` reference).
+- **BL-471:** Added a mirror-sync carve-out to the **DSM_0.2.C §2** write-only rule (A2-028): mirror sync (copying methodology files into a `mirror: true` repo, plus the sync commit/push and protected-branch sub-protocol) is the one sanctioned cross-repo git case; history-rewriting and destructive git in the mirror stay forbidden. Resolves the contradiction with §18.
+  **Spoke action:** Review DSM_0.2.C §2 (safety-rule change; inherited via the `@` reference).
+- **BL-472:** Reconciled the feedback-file model to the canonical **per-session** model (A2-027): **DSM_0.1 §10** no longer states "exactly three append-only files" or forbids per-session dated files (it defers to DSM_0.2.A §4); **DSM_1.0.D §6.4.5** is scoped as the distinct DSM-1.0 project-lifecycle feedback deliverable.
+  **Spoke action:** Review DSM_0.1 §10 + DSM_1.0.D §6.4.5 (mirrored).
+- **BL-470:** Reconciled four A2-audit Q4 doc-vs-doc contradictions (S232): inbox move-to-`done/` lifecycle (DSM_0.2.A / DSM_0.1 / DSM_3.0.E / DSM_3.0.B), private-project local-git plus manual sanitized feedback (DSM_0.0 + FAQ), the context-budget two-tier percentage model (DSM_1.0.D §6.1 + DSM_1.0), and conditional handoff creation (DSM_1.0.D).
+  **Spoke action:** Review inbox-lifecycle / context-budget / handoff guidance (mirrored).
+
+### Spawned
+
+- **Downstream Impact Map** (BL to file): a BL-template section for registering cross-BL coupling at the upstream source (Forward the Why Registering face; meter-to-cash S6).
+- **Causal Handoff** (BL to file): a causal-forward checkpoint "pending" format plus `/dsm-checkpoint` authoring change (Forward the Why Delegating face; meter-to-cash S7).
+
 ## [1.17.1] - 2026-07-09
 
 Clarifies the §17.1 Punctuation rule so the em-dash replacement is stated as a direct, one-step transform.
@@ -65,7 +90,7 @@ Promotes the concept-introduction / no-repetition writing discipline from portfo
 
 ### Added
 
-- **BL-454:** New principle **DSM_6.0 §1.13 "Introduce Once, Then Deepen"**. In structured prose with a summary-then-body shape, each concept, metric, or claim is introduced in exactly one place and deepened where it carries the most weight, rather than restated verbatim between summary and body. Two facets: descriptive phrase before acronym in introductions, and refactor-before-humanize ordering. Operationalized in **DSM_0.2 §8.10 Gate 4**, where the cross-section repetition check now references the principle and carries the refactor-before-humanize ordering rule. Added a DSM_6.0 §2.1 Communication protocol mapping and a CLAUDE.md Humanizer Protocol ordering cross-ref. Scope: summary+body structured prose; out of scope: short-form text, reference tables, code, checklists.
+- **BL-454:** New principle **DSM_6.0 §1.13 "Present Once, Then Deepen"**. In structured prose with a summary-then-body shape, each concept, metric, or claim is presented in exactly one place and deepened where it carries the most weight, rather than restated verbatim between summary and body. Two facets: descriptive phrase before acronym in introductions, and refactor-before-humanize ordering. Operationalized in **DSM_0.2 §8.10 Gate 4**, where the cross-section repetition check now references the principle and carries the refactor-before-humanize ordering rule. Added a DSM_6.0 §2.1 Communication protocol mapping and a CLAUDE.md Humanizer Protocol ordering cross-ref. Scope: summary+body structured prose; out of scope: short-form text, reference tables, code, checklists.
   **Spoke action:** Review DSM_6.0 §1.13 and DSM_0.2 §8.10 Gate 4 for the writing discipline (all project types; DSM_0.2 core is inherited via the `@` reference and DSM_6.0 is mirrored).
 
 ## [1.13.0] - 2026-06-01

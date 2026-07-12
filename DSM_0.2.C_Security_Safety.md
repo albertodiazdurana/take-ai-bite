@@ -103,6 +103,22 @@ CLAUDE.md.
   session's own git. (Mechanical hook enforcement is a deliberate follow-on, not
   part of this rule; the rule converts a silent deviation into a named §22
   violation, the prerequisite for detecting recurrence.)
+  **Mirror-sync carve-out (BL-471), the one sanctioned cross-repo git case.**
+  The write-only rule above continues to govern cross-repo *notification* writes
+  (inbox pushes, README notifications) to any repo, including a mirror's own
+  `_inbox/`. The sole exception is **mirror sync**: copying changed methodology
+  files into a repo declared `mirror: true` in `.claude/dsm-ecosystem.md`,
+  followed by the sync `git commit` and `git push` specified by DSM_0.2 §18
+  (Mirror repos) and the CLAUDE.md Version Update Workflow Step 9, including that
+  step's protected-branch sub-protocol (sync branch, PR, merge). The exception
+  is scoped to the sync commit + push and the sub-protocol's branch + PR **only**;
+  it does NOT sanction history-rewriting or destructive git in the mirror
+  (`git reset --hard`, `git rebase`, `git branch -D`, force-push, history edits),
+  which remain governed by the Destructive Command Protocol. **Why the exception
+  is safe:** a mirror is a hub-owned deliverable whose maintenance mechanism *is*
+  committing, categorically different from a foreign session injecting commits
+  into a peer's independent history, the failure mode the write-only rule
+  prevents.
 - **Substantive file deletion:** Deleting any file with more than 10 lines of
   content. Empty files, stub files, and files with only boilerplate (headers,
   templates) may be deleted without confirmation.

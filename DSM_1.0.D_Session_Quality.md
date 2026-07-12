@@ -12,26 +12,26 @@
 ### 6.1.1. Token Monitoring
 
 **Why It Matters:**
-- The agent has conversation length limits (~190K tokens)
+- The agent has a finite context window (size varies by model)
 - Long sessions degrade context quality
 - Important to plan handoffs before hitting limits
 
-**Monitoring Guidelines:**
-- Check token usage periodically
-- Alert at 90% capacity (~171K tokens)
-- Plan handoff at 95% capacity (~180K tokens)
-- Don't wait until 100% – context gets truncated
+**Monitoring Guidelines (two-tier, per DSM_0.2.A Context Budget Protocol):**
+- Check remaining context periodically
+- **Tier 1 (proactive alert):** when estimated remaining context drops below ~40%, alert the user and suggest wrap-up or scope reduction; do not wait for the system warning
+- **Tier 2 (hard handoff):** prepare a handoff as you approach the context limit, before truncation
+- Express thresholds as a percentage of the context window, not absolute token counts (window sizes vary by model)
 
 **How to Monitor:**
 - Ask the agent: "What's our current token usage?"
-- The agent will report: "Currently X/190K tokens (Y% used)"
+- The agent will report: "Currently Y% of the context window used"
 - Plan accordingly
 
 ### 6.1.2. Session Handoff Templates
 
 **When to Create Handoff:**
-- Approaching token limit (90-95%)
-- End of work session (even if tokens remaining)
+- Approaching the context limit (Tier 2, see Monitoring Guidelines above)
+- End of a work session that leaves complex pending work
 - Major phase transition
 - Before pivoting direction
 
@@ -41,7 +41,7 @@
 
 **Date:** YYYY-MM-DD
 **Session:** [Number/Description]
-**Token Usage:** [X/190K tokens (Y% used)]
+**Token Usage:** [Y% of context window used]
 **DSM Version:** [e.g., v1.3.7]
 
 ## Current Status
@@ -272,7 +272,7 @@ In addition to the universal checklist:
 
 **Quick Reference:**
 - "Wrap up" trigger: user says "wrap up" or session is ending
-- Minimum: commit, push, handoff (steps 1-3)
+- Minimum: commit + push (steps 1-2); add a handoff (step 3) only if complex work remains pending
 - Full: all applicable steps for hub or spoke context
 
 ---
@@ -644,6 +644,18 @@ At project start, create two feedback files in `dsm-docs/feedback-to-dsm/`. Thes
 are maintained throughout execution and finalized at project completion. The
 methodology file integrates section-level scoring (previously in the standalone
 Validation Tracker, Appendix E.12) directly into the feedback system.
+
+**Relationship to per-session feedback (DSM_0.2.A §4):** the two files below are
+the DSM-1.0 **project-lifecycle** feedback deliverables, maintained across the
+whole project and finalized at completion with section-level scoring. They are
+distinct in granularity from the **per-session** session-feedback files defined
+in DSM_0.2.A §4 (DSM Feedback Tracking), which capture and push each session's
+observations (`YYYY-MM-DD_sN_*.md`, moved to `done/` once processed). The two
+coexist by filename: per-session files are dated, these project-lifecycle
+deliverables keep the bare `backlogs.md` / `methodology.md` names. Use the
+per-session pipeline for ongoing session feedback; use these files for the
+project-completion feedback deliverable. See DSM_0.2.A §4 for the per-session
+lifecycle.
 
 **Required Feedback Files:**
 

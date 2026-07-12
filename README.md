@@ -34,7 +34,7 @@ Fourteen principles govern how humans and AI agents work together. Each addresse
 | **We Need to Talk** | The conversation that defines the work is the collaboration, not a preamble to it. |
 | **Read the User's Manual** | Ground the work on what the tool actually does, not on what you assume it does. |
 | **Don't be a Hero, Delegate the Effort** | Hand bounded, token-heavy, reasoning-light sub-tasks to a subagent instead of absorbing them. |
-| **Introduce Once, Then Deepen** | Introduce each concept once; let the body deepen it rather than repeat it. |
+| **Forward the Why** | When a decision flows forward to a later BL, session, or step, encode the causal link at its source so the receiver inherits the "why", not just the "what". |
 | **Observe Before Engaging** | External content is observation by default; engaging with it requires explicit user authorization. |
 
 For the full framework, see [`DSM_6.0_AI_Collaboration_Principles_v1.0.md`](DSM_6.0_AI_Collaboration_Principles_v1.0.md).
@@ -90,7 +90,8 @@ They are not theoretical; they emerged from daily practice with AI agents across
 - **Systems Prompt Engineering (DSM_6.1)** — A full chapter naming the discipline: version-controlled instruction systems, failure mode taxonomy, practitioner maturity model, and PMP knowledge area mapping
 - **Chunked drafting for structured documents** — Project plans, proposals, reports, and other prose deliverables are drafted one section at a time with per-section review, not generated whole
 - **User-reframes-proposal handling** — When the human re-shapes a proposal instead of answering yes or no, the agent re-decomposes the work rather than defending its original framing
-- **Introduce Once, Then Deepen** — A writing principle for summary-plus-body prose: introduce each concept once and let the body deepen it, instead of restating it
+- **Forward the Why** — A collaboration principle: when knowledge flows forward to a later BL, session, or step, encode the causal link at its source so the receiver inherits the reasoning, not just the task
+- **Present Once, Then Deepen** — A DSM_0.2 §8.10 writing discipline for summary-plus-body prose: present each concept once and let the body deepen it, instead of restating it
 - **Non-suppressible safety prompts** — Certain session-start safety checks must be answered explicitly even under auto mode; speed settings cannot silently skip them
 - **Pre-merge test execution and preemptive risk definition** — Every backlog item names its failure modes up front and runs its test plan with per-item evidence before merging
 - **Concurrent-session detection** — A second session on the same project is detected and halted before it can corrupt shared state, and fresh mirror clones self-initialize on first run
