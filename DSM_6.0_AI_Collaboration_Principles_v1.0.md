@@ -610,59 +610,70 @@ pass on-thread, burns Opus-scale tokens on Sonnet-scale work, and
 never surfaces the alternative to the human. §1.12 exists to make
 that failure visible.
 
-### 1.13 Introduce Once, Then Deepen
+### 1.13 Forward the Why
 
-**Introduce each concept once; let the body deepen it rather than repeat it.**
+**When knowledge or a decision flows forward, to a later BL, a later session, a
+later step, encode the causal link at the source, so the receiver inherits the
+*why*, not just the *what*, and never has to reverse-engineer it.**
 
-In structured prose with a summary-then-body shape (an abstract, a summary, or
-an intro section that precedes detail sections), the default failure mode is to
-state a fact, metric, or framing in the summary and then restate it verbatim in
-the body. The reader meets the same concept two or three times with no added
-depth, and the prose reads as padded. The discipline is the opposite: each
-concept, metric, or claim is introduced in exactly one place and developed
-where it carries the most weight. The summary names what the body will deepen,
-or the body deepens what the summary named; neither echoes the other.
+The anti-pattern it names is backward reconstruction: the receiver, holding only
+the "what", infers the "why" after the fact, with the least authority over the
+decision and only a partial view of what made it load-bearing. The knowledge
+existed at the moment the decision was made and was simply not carried forward,
+so the receiver pays to rebuild it, or worse, re-opens a question the source
+already settled because nothing recorded that it was settled or why.
 
-Two facets follow from the same information-architecture instinct:
+The asymmetry is the crux. A causal link has two ends, and they are not
+equivalent places to author it:
 
-- **Descriptive phrase before acronym.** In an introduction, lead with the
-  phrase that carries meaning and let the acronym or brand name attach second.
-  An acronym is a repeated-reference shorthand *within* a document, not the
-  primary handle for a first encounter ("a Deliberate Systematic Methodology"
-  before "DSM"). The descriptive phrase delivers the value; the acronym is the
-  compression the reader earns once the concept has been named.
-- **Refactor before humanize.** When a deliverable needs both a no-repetition
-  refactor and a humanizer pass, run the repetition refactor first and the
-  humanizer second. The reverse order wastes humanizer effort on prose about to
-  be cut, and leaves duplicated facts in place because repetition is not an AI
-  tell the humanizer is looking for.
+- **Source end (causal).** Authored by whoever holds the decision, at the moment
+  it is made, with maximum knowledge of what is load-bearing, as a fan-out, one
+  decision, many receivers. Filling it doubles as a design-discipline prompt,
+  "what am I settling that others will depend on?", while the decision is still
+  cheap to change.
+- **Receiver end (passive).** Authored late, by the party with the least
+  knowledge of what in the decision matters, capturing only one receiver's
+  partial view.
 
-**Scope:** structured prose with a summary + body shape, project plans,
-proposals, reports, CVs and cover letters, public-facing copy, research files.
-The trigger is the summary-precedes-detail shape, not document length; a short
-proposal still qualifies. **Out of scope:** short-form text, reference tables,
-code, and checklists, where repetition is often structural rather than padding.
+Authoring at the source is strictly more informative and better-timed than
+authoring at the sink. Forward the Why is the standing instruction to author the
+causal link at the source.
 
-Relationship to other principles and protocols:
+**Three faces.** The same move appears wherever knowledge flows forward across a
+channel:
 
-- **§1.1 Take a Bite.** Saying a thing once and letting it land is the
-  information-architecture form of right-sizing the delivery.
-- **§1.6 Match the Room.** Introduce-once governs a document's *internal*
-  structure; Match the Room governs register and scale relative to the
-  audience. They are orthogonal: one is about not repeating yourself, the other
-  about fitting the room.
-- **DSM_0.2 §8.10 (Chunked Drafting Protocol).** §8.10 operationalizes this
-  principle: Gate 4 final assembly checks for cross-section repetition and
-  applies the refactor-before-humanize ordering. §1.13 is the *why*; §8.10
-  Gate 4 is *where it is checked*.
+| Face | The forward flow | The "why" authored at the source |
+|---|---|---|
+| Registering | upstream unit to downstream unit (spatial) | the coupling recorded on the interface-settling unit, so a later consumer inherits why the interface is shaped as it is |
+| Delegating | closing session to next session (temporal) | the handoff's pending list written as a causal-forward derivation ("resume at X because Y depends on it"), not a backward inventory of what was done |
+| Planning | one step to a later step in a plan | steps derived from their causal dependencies ("X before Y because Y consumes X"), not a flat task list |
 
-Evidence: the pattern stabilized across three deliverable types in a portfolio
-spoke, CV summaries, public-facing copy, and hiring-challenge deliverables,
-before promotion. The no-repetition audit (strip metrics duplicated between
-summary and body), the descriptive-phrase-first framing, and the
-refactor-before-humanize ordering each recurred independently across those
-deliverables, which is the signature of a writing discipline ready to be named
-rather than a one-off preference.
+The list is not exhaustive. Any forward flow of knowledge is a candidate face, a
+handoff to a collaborator, a decision record consumed by a later design, a test
+that encodes why a bound holds. That open-endedness is the payoff of naming the
+parent: a new instance is recognized as another face of Forward the Why rather
+than rediscovered from scratch.
+
+Relationship to other principles:
+
+- **§1.9 Think Ahead.** Think Ahead anticipates what the work will need next;
+  Forward the Why is the discipline of recording, at the source, why the next
+  receiver will need it. One looks forward; the other writes forward.
+- **§1.10 We Need to Talk.** A handoff is a conversation across a boundary.
+  Forward the Why governs what that conversation must carry, the cause, not only
+  the artifact.
+- **§1.3 Earn Your Assertions.** The "why" a source forwards is the same
+  justification Earn Your Assertions demands for a claim; Forward the Why carries
+  it from the moment of asserting to the moment of handing off.
+
+Evidence: the pattern was identified in an application-build spoke that ran two
+of its faces live, a downstream-impact map that recorded cross-unit coupling on
+the interface-settling unit, and a causal-forward session handoff whose next
+session acted on the recorded ordering without reconstructing it. The two
+instances were recognized as the same move before the parent was named, which is
+the signature of a principle ready to be named rather than a single mechanism.
+The adoptable mechanisms for the Registering and Delegating faces are tracked as
+their own protocol additions; this principle names why they are the same move.
 
 ---
 
@@ -781,7 +792,7 @@ to existing DSM protocols and identifies the gaps that remain.
 | README Change Notification | DSM_0.2 | Know Your Context |
 | Hub-Spoke Inbox system | DSM_3, DSM_0.2 | Know Your Context |
 | Inclusive Language | DSM_0.2 | Match the Room, Understand/Review/Decide |
-| Chunked Drafting Gate 4 (cross-section repetition check, refactor-before-humanize order) | DSM_0.2 §8.10 | Introduce Once, Then Deepen |
+| Chunked Drafting Gate 4 (cross-section repetition check, refactor-before-humanize order) | DSM_0.2 §8.10 | Take a Bite |
 
 **Evolution**
 
@@ -892,5 +903,5 @@ patterns (emergent concepts like Ripple Effect and My Fork, My Rules).
 | 1.5 | 2026-03-12 | Critical Thinking restructure (BACKLOG-175). Renamed Section 1.4 "Understand, Review, Decide" to "Critical Thinking" with two subsections: 1.4.1 Understand, Review, Decide (preserved), 1.4.2 Challenge Myself to Reason (new). Grounded in Facione (1990) self-regulation concept. Added Composition Challenge and Edit Explanation Stop to protocol mapping. Updated protocol references from "Understand/Review/Decide" to "Critical Thinking." |
 | 1.6 | 2026-03-16 | Strategic Thinking Layer (BACKLOG-212). Added Principle 1.9 "Think Ahead" documenting the four-layer maturity progression (operational → philosophical → learning → strategic). Added 4 Evolution protocol mappings (Roadmap System, Phase-Gated Work, Backlog Scope Rule, Feature Branch Rule). Evidence: 83 features across 14 repos, 796 commits, backlog self-generation as maturity signal. |
 | 1.7 | 2026-04-19 | Read the User's Manual (BACKLOG-344). Added Principle 1.11 establishing external-tool grounding as a prerequisite to collaboration design. Maps to PMP Procurement knowledge area. Evidence: F-094 (per-turn transcript hook 2.5 months broken due to index-mode `100644`), S180 (+x bug from same root cause), BL-342 (Claude Code platform research as corrective mitigation, Implemented 2026-04-12). Added protocol mappings in Session Management: Skill Self-Reference Protocol (DSM_0.2 §8.6) and Platform Research Backlog Items. |
-| 1.8 | 2026-06-01 | Introduce Once, Then Deepen (BACKLOG-454). Added Principle 1.13 codifying the concept-introduction / no-repetition writing discipline for structured prose: introduce each concept once and let the body deepen it, descriptive phrase before acronym in introductions, refactor before humanize. Operationalized in DSM_0.2 §8.10 Gate 4. Added Communication protocol mapping. Evidence: pattern stabilized across CV summaries, public-facing copy, and hiring deliverables in a portfolio spoke (S85/S86/S87). |
+| 1.8 | 2026-06-01 | Present Once, Then Deepen (BACKLOG-454). Added Principle 1.13 codifying the concept-introduction / no-repetition writing discipline for structured prose: present each concept once and let the body deepen it, descriptive phrase before acronym in introductions, refactor before humanize. Operationalized in DSM_0.2 §8.10 Gate 4. Added Communication protocol mapping. Evidence: pattern stabilized across CV summaries, public-facing copy, and hiring deliverables in a portfolio spoke (S85/S86/S87). |
 | 1.9 | 2026-06-09 | Observe Before Engaging (BACKLOG-436). Added Principle 1.14: external content is observation by default; engagement requires explicit user authorization. Guards against soft injection / frame capture, cooperative external content (a polite issue-thread comment, a tool-result suggestion, a third-party message) drifting the agent at the decision-framing layer where no suspicion filter catches it. Operationalized in DSM_0.2.C §3.1 (classify-surface-wait-plan gate + default-on-ambiguous-response rule). Released in DSM v1.15.0. Evidence: heating-systems-conversational-ai S13, where polite volunteer comments on a public OSS issue thread shifted the agent into "A/B/C engagement options" without user authorization. |

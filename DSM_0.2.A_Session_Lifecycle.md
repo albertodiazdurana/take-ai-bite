@@ -93,8 +93,8 @@ apply identically; only the file location changes.
 **source of truth**: it contains the full evidence, verbatim quotes, and
 structured analysis. The inbox entry is a **notification**: it summarizes what
 was observed and points to the feedback file for the complete record. Never place
-primary evidence in the inbox alone; the inbox is transient and entries are
-deleted after processing.
+primary evidence in the inbox alone; the inbox is a transit point and processed
+entries are moved to `_inbox/done/` (dated archive per DSM_0.2 §17.1), not deleted.
 
 **Anti-Patterns:**
 

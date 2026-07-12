@@ -1,8 +1,8 @@
 # Deliberate Systematic Methodology (DSM) - Start Here
 **A gentle introduction to working with AI on real projects**
 
-**Version:** 1.17.1
-**Last Updated:** 2026-07-09
+**Version:** 1.18.0
+**Last Updated:** 2026-07-12
 
 ---
 
@@ -106,9 +106,9 @@ after methodology changes, used for public distribution.
 ### Private Project
 
 Some projects contain sensitive data (financial records, medical data, personal
-documents) and cannot use git or share artifacts externally. Private projects:
-- Follow DSM methodology locally, without a git repository
-- Do not send feedback to Central or other projects
+documents) and must not share artifacts externally. Private projects:
+- Follow DSM methodology locally, using local git only (`git init` with no remote configured)
+- Send feedback only manually, after user sanitization (never automatic push)
 - Keep all artifacts on the local filesystem
 - Receive methodology updates by reading Central directly
 
@@ -327,9 +327,10 @@ Explore other documents only when you are curious or need specific guidance.
 Run `/dsm-go` in that folder. The agent detects existing structure and adapts.
 It will not overwrite your files.
 
-**Can I use DSM without git?**
-Yes. Private projects work without a git repository. You lose branching and version
-history, but session management and methodology guidance still apply.
+**Can I use DSM without a git remote?**
+Yes. Private projects use local git only (`git init` with no remote configured): you
+keep branching and version history locally, nothing is pushed externally. Session
+management and methodology guidance apply fully.
 
 **What is the difference between DSM and Take AI Bite?**
 Take AI Bite is the philosophy (work in small, reviewable pieces). DSM is the

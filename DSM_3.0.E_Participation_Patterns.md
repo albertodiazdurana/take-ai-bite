@@ -56,7 +56,7 @@ The canonical `dsm-docs/` structure (Step 7) contains 9 subdirectories per DSM_0
 
 Send this as an inbox entry to the spoke's `_inbox/`, not as a handoff document.
 It is a hub-to-spoke action item: it arrives, gets processed in the first session,
-and gets deleted.
+and is then moved to `_inbox/done/`.
 
 ```markdown
 ### [YYYY-MM-DD] First session: project initialization

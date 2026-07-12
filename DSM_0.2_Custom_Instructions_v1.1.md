@@ -799,7 +799,7 @@ artifact's content. The computational decision comes before the content
 decision.
 
 **User options:** accept the recommendation, override with a different
-config, or skip and keep the baseline. §8.7 does not introduce a new gate
+config, or skip and keep the baseline. §8.7 does not present a new gate
 pause; the recommendation lives inside the Gate 1 brief and shares its
 approval under the same gate-behavior rules as the rest of §8.
 
@@ -1288,13 +1288,13 @@ cross-section consistency pass happens at Gate 4.
 consistency:
 
 1. Tone, vocabulary, and voice consistency
-2. Repetition or redundancy across sections, applying Introduce Once, Then
-   Deepen (DSM_6.0 §1.13): each concept, metric, or claim appears in exactly
-   one place, strip facts the summary and body state twice. When the document
-   also needs a humanizer pass, run this repetition refactor first and the
-   humanizer second, never the reverse (the reverse order wastes humanizer
-   effort on prose about to be cut, and repetition is not an AI tell the
-   humanizer catches)
+2. Repetition or redundancy across sections, applying the Present Once, Then
+   Deepen writing discipline (stated in full below this list): each concept,
+   metric, or claim appears in exactly one place, strip facts the summary and
+   body state twice. When the document also needs a humanizer pass, run this
+   repetition refactor first and the humanizer second, never the reverse (the
+   reverse order wastes humanizer effort on prose about to be cut, and
+   repetition is not an AI tell the humanizer catches)
 3. Structural balance (no over-long or under-developed sections)
 4. References between sections that need reconciling now that the whole
    document exists
@@ -1303,6 +1303,33 @@ consistency:
 
 User signs off on the assembled document before any external delivery
 (email, submission, publication, PR, commit to a public-facing file).
+
+**Present Once, Then Deepen (writing discipline).** The Gate 4 cross-section
+repetition check applies a self-contained writing discipline: present each
+concept, metric, or claim in exactly one place and develop it where it carries
+the most weight. In structured prose with a summary-then-body shape, the default
+failure mode is to state a fact in the summary and restate it verbatim in the
+body, so the reader meets the same concept twice with no added depth and the
+prose reads as padded. The summary names what the body will deepen, or the body
+deepens what the summary named; neither echoes the other. Two facets follow from
+the same information-architecture instinct:
+
+- **Descriptive phrase before acronym.** In an introduction, lead with the
+  phrase that carries meaning and let the acronym or brand name attach second
+  ("a Deliberate Systematic Methodology" before "DSM"). An acronym is a
+  repeated-reference shorthand within a document, not the primary handle for a
+  first encounter.
+- **Refactor before humanize.** When a deliverable needs both a no-repetition
+  refactor and a humanizer pass, run the repetition refactor first and the
+  humanizer second. The reverse wastes humanizer effort on prose about to be
+  cut, and leaves duplicated facts in place because repetition is not an AI tell
+  the humanizer catches.
+
+**Scope:** structured prose with a summary + body shape (project plans,
+proposals, reports, CVs and cover letters, public-facing copy, research files).
+The trigger is the summary-precedes-detail shape, not document length; a short
+proposal still qualifies. **Out of scope:** short-form text, reference tables,
+code, and checklists, where repetition is often structural rather than padding.
 
 **Anti-pattern guard:**
 

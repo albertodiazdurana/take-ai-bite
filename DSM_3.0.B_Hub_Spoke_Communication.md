@@ -333,7 +333,7 @@ notify all affected projects. This subsection defines the spoke-side handling.
 2. Update the Protocol Applicability table in `.claude/CLAUDE.md`:
    - Add the new protocol with `Yes`, `No`, or `Partially` and a rationale
    - If the protocol does not apply, document why (e.g., "No notebooks in this project")
-3. Delete the inbox entry after updating the table
+3. Move the inbox entry to `_inbox/done/` after updating the table
 
 **Grace period enforcement (agent behavior):**
 
