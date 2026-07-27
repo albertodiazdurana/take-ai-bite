@@ -212,8 +212,8 @@ rhythm for each file:
 4. If yes, create file via Write/Edit, stop (user reviews diff)
 5. Show updated todo list, repeat from step 2
 
-**Build order:** imports → constants → one function → test → next function.
-**TDD (Beck, 2003):** Write tests in `tests/` alongside code.
+**Build order:** imports → constants → one test → the function it drives → next test.
+**TDD (Beck, 2003):** Tests are written first, and live in `tests/` alongside the code. The test defines the bite boundary (DSM_6.0 §1.1).
 
 **Smoke tests:** After building each module, persist the per-item validation
 commands and their results to `dsm-docs/guides/smoke-tests.md` — the

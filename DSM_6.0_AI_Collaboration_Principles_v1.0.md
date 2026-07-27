@@ -39,6 +39,22 @@ it's 500 lines of dense logic. Three files can be fine if they're small and
 self-explanatory. The test is cognitive: can the reviewer read it, understand
 it, form an opinion, and redirect if needed?
 
+**The invariant: a bite is the smallest increment the reviewer can verify.**
+The size is medium-specific; the rule behind it never changes. "Smallest
+verifiable" is not "smallest possible", so several trivial functions covered by
+one test are a single bite. Verification sets the boundary, not line count.
+
+| Medium | One bite is | The reviewer's unit of verification |
+|--------|-------------|-------------------------------------|
+| Prose, documentation | a short passage, one paragraph or a few | read the passage, approve it |
+| Notebook | one cell producing one output | inspect the output, approve the cell |
+| Code | one testable function, written test-first. Where a single test requires several functions, the bite is exactly those functions. | read or run the test and the function(s), approve |
+
+Because the size is medium-specific, cadence follows the medium of the artifact
+in hand rather than the rhythm of the previous one. An agent that has been
+drafting prose in large chunks does not carry that chunk size into code. Where
+two media meet, the finer gate wins.
+
 When the delivery exceeds that threshold, the collaboration silently degrades.
 The human stops reviewing and starts approving. The "human in the loop"
 becomes decorative. The spark goes missing from the work.
@@ -672,8 +688,15 @@ the interface-settling unit, and a causal-forward session handoff whose next
 session acted on the recorded ordering without reconstructing it. The two
 instances were recognized as the same move before the parent was named, which is
 the signature of a principle ready to be named rather than a single mechanism.
-The adoptable mechanisms for the Registering and Delegating faces are tracked as
-their own protocol additions; this principle names why they are the same move.
+The adoptable mechanism for the Registering face is the **Downstream Impact Map**,
+an optional BL-template section in which the interface-settling unit records what
+it fixes that later units consume, validated on reconcile-back against what those
+units actually consumed. The adoptable mechanism for the Delegating face is the
+**causal-forward handoff**, in which a session-boundary checkpoint's pending list
+states, per item, what the continuation requires and why, what it depends on, what
+order the dependencies force, and what breaks if it is skipped, so the receiving
+session acts on the ordering instead of reconstructing it. This principle names why
+the two are the same move.
 
 ---
 

@@ -14,6 +14,12 @@ Create a new DSM backlog item.
      (user-level commands in `~/.claude/commands/`, gitignored files in `.claude/`,
      cross-repo artifacts). If yes, the backlog item MUST include a Revert Procedure
      section per the Revert Safeguards Protocol in DSM_0.2.
+   - **Downstream consumption:** Does this BL settle something a later BL will
+     consume (a schema, vocabulary, shared surface, record shape, or reusable
+     mechanism)? Ask only when the BL plausibly settles an interface; skip the
+     question for leaf and terminal BLs. If yes, fill the Downstream Impact Map
+     section (Registering face of Forward the Why, DSM_6.0 §1.13). If no, delete
+     the section from the generated file rather than leaving it empty.
 2.5. **Sprint-plan detection:** check the title and flags for sprint-plan intent. Sprint intent is detected when EITHER:
    - The title matches `^Sprint\s+\d+\b` (case-insensitive, e.g., "Sprint 5: RAG pipeline"), OR
    - The user passed `--sprint` as an argument.
@@ -44,6 +50,30 @@ Create a new DSM backlog item.
 ## Proposed Solution
 
 [Outline the approach]
+
+## Downstream Impact Map
+
+<!-- Optional. Records what THIS BL settles that later BLs will consume,
+     the source end of a dependency edge, authored while the interface is
+     still cheap to change. Registering face of Forward the Why
+     (DSM_6.0 §1.13).
+     Applicability guard: include it only if the answer to "does this BL
+     settle something a later BL consumes?" is yes, schemas, vocabularies,
+     shared surfaces, record shapes, reusable mechanisms. Leaf and terminal
+     BLs omit the section entirely; an empty map is not the goal. The
+     trigger is downstream consumption, not BL size.
+     Reconcile-back: when a consuming BL is actually built, validate that
+     row against what happened. The output is the mismatch, and each edge
+     resolves on its own schedule rather than all at once:
+       - unforecast: consumed but never mapped (highest signal, a design
+         blind spot that otherwise surfaces as downstream breakage)
+       - unrealized: mapped but never consumed, or descoped (over-forecasting)
+       - drifted: consumed with a different shape or blast radius than mapped
+     Applies forward-only; existing BLs are not retrofitted. -->
+
+| Decision / interface settled here | Propagates to | Nature of the coupling |
+|---|---|---|
+| [what this BL fixes that others build on] | BL-x, BL-y | [what the consumer inherits, and what breaks if it changes] |
 
 ## Success Criteria
 

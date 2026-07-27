@@ -90,11 +90,36 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    [1-3 line summary drawn from session transcript Output blocks and git log]
 
    ## Pending next session
-   [items that require human decision or cannot be derived from backlog/inbox/git]
+   [items that require human decision or cannot be derived from backlog/inbox/git.
+    Author each item causal-forward: what the continuation requires, why, what it
+    depends on, what order the dependencies force, and what breaks if it is skipped.
+    Not a flat task list.]
 
    ## Open branches
    [any open Level 3 branches not yet merged; "none" if clean]
    ```
+
+   **Causal-forward authoring (Delegating face of Forward the Why, DSM_6.0 §1.13).**
+   A checkpoint is a handoff across a session boundary: the closing session holds the
+   state and the intent, the next session inherits only this document. A flat list
+   forwards the "what" and strands the "why", so the receiver either re-derives the
+   reasoning or re-opens a decision this session already settled, because nothing
+   recorded that it was settled. Write each item so it can be acted on without that
+   reconstruction:
+
+   | Backward inventory (anti-pattern) | Causal-forward handoff |
+   |---|---|
+   | "Done: rules module. Next: schema change, endpoint, workflow." | "Resume at the schema change, because `create_all` will not ALTER, so the stack must be up and the table recreated first; the endpoint and workflow follow because both consume the new columns." |
+
+   The causal-forward form is not longer for its own sake. It is longer by exactly
+   the causal links the receiver would otherwise have to rebuild. If an item has no
+   dependency, ordering constraint, or consequence-if-skipped, state it plainly and
+   move on; padding a self-evident item with invented rationale is the failure mode
+   this guidance guards against, not a way of satisfying it.
+
+   The selection criterion above is unchanged: this section still holds only items
+   that need human decision or cannot be derived from backlog/inbox/git. Causal-forward
+   governs how a qualifying item is written, not which items qualify.
 
    **If git is unavailable (GIT_AVAILABLE=false):** omit Branch and Last commit fields; write the content fields only.
 

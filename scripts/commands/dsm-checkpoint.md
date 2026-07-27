@@ -43,12 +43,40 @@ Use this structure:
 
 ## Next Steps
 
-[What should be done next. Use resolvable identifiers per DSM_0.2.A §10.2.1:
-§X.Y, protocol/concept names, session/file references. Not bare BL numbers.]
+[What should be done next, authored causal-forward: for each item state what the
+continuation requires and why, what it depends on, what order the dependencies
+force, and what breaks if it is skipped. Not a flat task list.
+Use resolvable identifiers per DSM_0.2.A §10.2.1: §X.Y, protocol/concept names,
+session/file references. Not bare BL numbers.]
 
 ## Key Decisions
 
 [Any decisions made during this session. Same identifier convention as above.]
 ```
+
+## Causal-Forward Next Steps (Delegating face of Forward the Why, DSM_6.0 §1.13)
+
+A checkpoint's Next Steps are read by a session that inherits only this document.
+A flat list forwards the "what" and strands the "why", so the receiver re-derives
+reasoning this session already holds, or re-opens a decision already settled
+because nothing recorded that it was settled.
+
+| Backward inventory (anti-pattern) | Causal-forward |
+|---|---|
+| "Done: rules module. Next: schema change, endpoint, workflow." | "Resume at the schema change, because `create_all` will not ALTER, so the stack must be up and the table recreated first; the endpoint and workflow follow because both consume the new columns." |
+
+The form is longer by exactly the causal links the receiver would otherwise
+rebuild, and no longer. An item with no dependency, ordering constraint, or
+consequence-if-skipped is stated plainly; inventing rationale to satisfy the shape
+is the failure mode, not compliance with it.
+
+**Composition with the Step 2.5 identifier convention.** The two rules operate on
+different axes and do not conflict: the identifier convention governs how a
+dependency is *named*, causal-forward governs whether the dependency is *stated at
+all*. Express the causal link and name its target with a resolvable identifier, a
+concept or protocol name, a `§X.Y` reference, or a file or session reference,
+rather than a bare BL number. "Do the template change before the cadence rule,
+because the cadence rule describes the template" satisfies both; "BL-477 after
+BL-474" satisfies neither cleanly.
 
 5. After creating the file, stage it with `git add` but do NOT commit (let the user decide when to commit)

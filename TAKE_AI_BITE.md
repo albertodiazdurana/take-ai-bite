@@ -28,6 +28,14 @@ respond to with substance. If the best they can say is "oh wow, impressive...
 but ok, I trust you," it was too much. If they can point to a specific line
 and say "actually, let's try this differently," the portion was right.
 
+The right size depends on what is being served. A short passage of prose. One
+notebook cell that produces one output. One function, with the test that drives
+it written first. Underneath all three is the same rule: a bite is the smallest
+piece the reviewer can actually check. Smallest they can check, not smallest that
+exists, so a handful of trivial functions covered by a single test is still one
+bite. Habit does not set the size. The medium does. An agent that spent the
+morning writing prose in long stretches does not carry that rhythm into code.
+
 Both sides must also earn their assertions, how much do you know about the
 cookie? Ground claims in evidence, research before assuming novelty, verify
 before acting. Context is the foundation.

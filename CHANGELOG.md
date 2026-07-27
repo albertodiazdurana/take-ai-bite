@@ -5,6 +5,32 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.19.0] - 2026-07-28
+
+Ships the two adoptable mechanisms for the "Forward the Why" principle that v1.18.0 named but left unimplemented, a consent gate for fan-out actions that can exhaust a usage window, and a corrected definition of what counts as a bite.
+
+### Added
+
+- **BL-476:** New **DSM_0.2 §8.9.2 High-Token-Cost Action Gate**. Before launching an action that fans one invocation out into many independent full-LLM calls on the same rate-limit pool, the agent must present a five-part consent contract: the structural shape of the fan-out, an order-of-magnitude token estimate, the model tier, the rolling-window risk (exhaustion forces a hard stop that can truncate in-flight work), and cheaper alternatives as first-class options. Classified non-suppressible per §8.9.1, so auto mode does not bypass it and a general Gate 1 "proceed" does not clear it. Carries an explicit over-firing guard: the trigger is fan-out, not cost-in-the-abstract and not duration, because a gate that fires on ordinary work trains reflexive acceptance and leaves the user worse off than no gate. Origin: a session that spent roughly 3.0M tokens across two research passes on the most expensive tier, exhausted the window, and returned a partial deliverable after the second pass died mid-run.
+  **Spoke action:** Review DSM_0.2 §8.9.2 for behavioural changes.
+- **BL-474:** New optional **`## Downstream Impact Map`** section in the BL template (`scripts/commands/dsm-backlog.md`), the adoptable mechanism for the **Registering** face of Forward the Why (DSM_6.0 §1.13). An interface-settling BL records what it fixes that later BLs consume, at the moment it settles it, rather than leaving the coupling to be reconstructed by the downstream author later. The applicability guard is phrased as a question ("does this BL settle something a later BL consumes?") rather than a category list, and the skill's Step 2 prompt instructs deletion of the section when the answer is no, so leaf BLs never carry an empty map. Reconcile-back semantics are documented alongside: when a consuming BL is built, the map is validated and the output is the mismatch set (unforecast / unrealized / drifted). Forward-only; existing BLs are not retrofitted.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy` to pick up the changed BL template.
+- **BL-475:** **Causal-forward handoff** requirement on session-boundary pending lists, the adoptable mechanism for the **Delegating** face of Forward the Why. Each pending item states what the continuation requires and why, what it depends on, what order the dependencies force, and what breaks if it is skipped, so the receiving session acts on the ordering instead of reconstructing it. Applied to `/dsm-wrap-up` Step 2.5 and `/dsm-quick-wrap-up` Step 1.5 (which author "Pending next session" inline from identical templates) and to `/dsm-checkpoint`'s Next Steps, with an explicit statement of how the requirement composes with the §10.2.1 identifier convention it sits beside. `/dsm-go` Step 3.5 needs no change: the *why* travels inside the format. Carries an anti-padding clause, the form is longer by exactly the causal links the receiver would otherwise rebuild, and no longer.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy` to pick up the three changed wrap-up and checkpoint skills.
+
+### Changed
+
+- **BL-478:** **A bite is the smallest increment the user can verify.** Corrected across DSM_6.0 §1.1, DSM_0.2.B §6.1, DSM_4.0, and the DSM_0.2 §17.1 App-Development template that spokes receive. Test-first is now stated as a standing rule rather than a per-BL detail, and the build order in all three documents was corrected accordingly; any future text reintroducing "one function, test, next function" is a regression. The weak framing that treated the IDE permission window as the collaboration gate was removed: the permission window approves a write, never the concept, including when writes are auto-approved.
+  **Spoke action:** Run `/dsm-align` to update the reinforcement block.
+
+### Note on the two deploy actions
+
+Two bullets above ask spokes to run `scripts/sync-commands.sh --deploy`. The `--check` mode that would tell a spoke whether it needs to is currently unreliable: it aborts partway through whenever any single file's diff exceeds 20 lines, skips every later file, and exits with the same status as a completed run (see Spawned, BL-479). Until that is fixed, run `--deploy` rather than relying on `--check` to decide whether it is needed; deploying when already in sync is a no-op.
+
+### Spawned
+
+- **BL-479** (High): `scripts/sync-commands.sh --check` aborts silently on large diffs and reports it as success. `set -euo pipefail` plus a `diff | head -20` pipeline makes SIGPIPE fatal mid-loop, so files after the first large drift are never compared, the summary never prints, and the exit code is indistinguishable from a completed run that found drift. Found while grounding this version's work, where the truncated output nearly produced a false "only one file drifted" conclusion.
+
 ## [1.18.0] - 2026-07-12
 
 Adds the "Forward the Why" collaboration principle (DSM_6.0 §1.13) and reconciles four internal-coherence findings from the EXP-004 TAB audit. The mis-classified "Introduce Once, Then Deepen" principle is relocated to a DSM_0.2 §8.10 writing discipline and renamed "Present Once, Then Deepen".
