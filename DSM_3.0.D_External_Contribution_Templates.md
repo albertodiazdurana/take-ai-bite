@@ -98,7 +98,7 @@ When in doubt: follow {project} conventions first, then DSM protocols.
 
 ## Protocol Reinforcements (from inherited DSM_0.2)
 - **Pre-Generation Brief:** Explain what/why/structure before generating any artifact
-- **App Development Protocol:** Guide step by step, user approves via permission window
+- **App Development Protocol:** One bite per stop, a bite being the smallest increment the user can verify (one testable function, test-first); concept approval happens in conversation before the write, the permission window is not the gate
 {Add or remove reinforcements based on Protocol Applicability table above}
 
 ## Environment

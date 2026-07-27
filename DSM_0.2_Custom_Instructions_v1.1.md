@@ -1126,6 +1126,10 @@ response before the agent proceeds, regardless of:
 4. Any future `/dsm-go` step or skill where the user's choice changes
    the agent's destination skill or alters the agent's branch /
    filesystem trajectory
+5. The High-Token-Cost Action Gate (§8.9.2). Its consent prompt is
+   non-suppressible by the same logic: skipping it removes a choice the
+   user cannot make for themselves, since only the agent knows the shape
+   of the fan-out it is about to launch
 
 **Auto-mode obligation:**
 
@@ -1197,6 +1201,130 @@ unilaterally pressed past it. The user was never given the choice §5.9
 mandates. Combined with the absence of a concurrent-session safety net
 (BL-431 closed that gap), §5.9 was the only existing user-facing
 safeguard, and it was swallowed by auto-mode rationalization.
+
+### 8.9.2. High-Token-Cost Action Gate
+
+§8.9.1 protects prompts whose suppression would take a choice away from the
+user. This section covers a different loss of choice: an action the user
+authorized without being told what it would cost. Some actions consume a large
+share of a shared, finite, time-boxed token budget, and when that budget runs
+out mid-run the harness stops, leaving in-flight work truncated. Consent given
+without a cost figure is not informed consent, and the user cannot supply the
+figure because only the agent knows the shape of the fan-out it is about to
+launch.
+
+**Gate name:** "high-token-cost actions." Before launching one, the agent MUST
+present the consent contract below and obtain an explicit acceptance.
+
+**Trigger set (positive definition):** the gate fires when a single invocation
+spawns **many independent full-LLM calls drawing on the same rate-limit pool**.
+Concretely:
+
+1. Multi-agent orchestration of any kind (a `Workflow`, a fan-out of subagents,
+   a parallel sweep) where one call becomes N model calls.
+2. Harnesses that fan out internally, whether or not the fan-out is visible in
+   the invocation. A research harness that scopes, searches, fetches, verifies,
+   and synthesizes is one call to the user and hundreds of calls to the pool.
+3. A **repeat** fan-out within the same session. The pool is shared and already
+   partly spent, so the second fan-out carries a higher risk than the first even
+   when it is identical in size. Re-prompt; do not treat the first acceptance as
+   standing.
+
+**Over-firing guard (what the gate must NOT fire on):** ordinary single-agent
+tool calls, file reads of any size, long-running commands, large diffs, and
+expensive-looking work that is nonetheless one model doing one thing. The
+trigger is fan-out, not cost-in-the-abstract and not duration. A gate that fires
+on ordinary work trains the user to accept reflexively, which leaves them worse
+off than no gate at all, because a reflex-accepted gate still reads as
+protection. Breadth of firing is the failure mode to guard, not narrowness.
+
+**The consent contract (five required disclosures):** the prompt states, in
+plain terms:
+
+1. **What the action does structurally**, in fan-out terms, e.g. "spawns roughly
+   110 subagents, each a full model call, many carrying fetched web pages."
+2. **An order-of-magnitude token estimate**, e.g. "on the order of 1-2M tokens."
+   State it as an estimate and do not manufacture precision the agent does not
+   have. A confidently wrong low figure under-warns and reproduces the failure
+   this gate exists to prevent.
+3. **The model tier** the fan-out will run on, since tier drives cost as much as
+   count.
+4. **The rolling-window risk, categorically:** that this may consume a large
+   share of the usage window, and that exhausting it forces a hard stop which
+   can truncate in-flight work. This statement holds regardless of estimate
+   accuracy, which is why it is separate from disclosure 2.
+5. **Cheaper alternatives as first-class options**, not as a footnote: a
+   narrower scope, fewer agents, a cheaper tier for subagents, or doing the work
+   on-thread.
+
+**Subscription awareness.** Where `~/.claude/claude-subscription.md` exists, read
+it and sharpen disclosure 4 with the actual pool structure and reset cadence.
+Where it does not, the categorical warning still fires; the file sharpens the
+numbers, it is not a precondition for the gate.
+
+**Non-suppressible classification.** This gate is a non-suppressible prompt per
+§8.9.1. Auto mode does not bypass it, and an explicit §8.9 suspension does not
+extend to it. A general "proceed" on a Gate 1 brief does not clear it either;
+the acceptance must follow the estimate.
+
+**Supporting mitigations (recommended defaults, not blocking):**
+
+- Default fan-out subagents to a cheaper tier and reserve the expensive tier for
+  explicit opt-in. Most search, fetch, and verify subtasks do not need the top
+  tier.
+- Track approximate cumulative spend within a session and say so before a second
+  fan-out ("the first pass used roughly 2M tokens; a second risks the window").
+- Offer a smaller default agent count and escalate on request rather than
+  starting wide.
+- Keep large reference dumps out of the main thread; prefer summarized loads to
+  reading full multi-tens-of-K tool outputs into context.
+
+**Relationship to §8.8 (Parallel Offload Analysis).** These are two gates on
+adjacent surfaces and they do not duplicate each other:
+
+| | §8.8 | §8.9.2 |
+|---|---|---|
+| Question answered | *Whether* to delegate this sub-task | *What* the fan-out will cost |
+| Initiated by | The agent, inside a Gate 1 brief | Any path, including a user-invoked harness |
+| Content | Net savings, risk, per-task approval | The five cost disclosures |
+
+When a fan-out is proposed inside a Gate 1 brief, satisfy both in one prompt:
+the §8.8 per-task recommendation carries the §8.9.2 disclosures alongside it,
+and a single explicit acceptance clears both. Do not prompt twice for the same
+launch. When a fan-out originates outside a Gate 1 brief, §8.9.2 fires alone.
+
+**Anti-pattern guard:** "The user asked for deep research, so they accepted the
+cost" is the exact rationalization this section forbids. Variants of the same
+defect:
+
+- "They have used this harness before, they know what it costs"
+- "I cannot estimate the token count precisely, so stating nothing is more honest"
+- "Surfacing cost would be nagging about something they already decided"
+- "The first pass was approved, so the second is covered"
+
+All are §8.9.2 violations. Same guard family as §8.9.1 ("User implied yes by
+typing `/dsm-go`"), §8.2.1 ("No counter-evidence found" without sources
+surveyed), §21.2 ("Risks: none known"), §21.3 ("all tests passed").
+
+**Detection mechanism:** prose and convention only; no hook enforces this. The
+rule plus the user's redirect window are the enforcement, matching the posture
+of §8.9, §8.9.1, §21.2, and §21.3.
+
+**Cross-references:**
+
+- §8.9.1 (sibling: non-suppressible prompts; this gate is one)
+- §8.8 (Parallel Offload Analysis; interaction table above)
+- §8.9 (parent: auto-mode boundaries)
+- Module A §14 (Session Configuration Recommendation; session-level cost posture)
+- §22 (Protocol Violation Triage Response when this gate is skipped)
+
+**Origin:** BL-476, from a live incident. One session ran two research passes
+that together spent 1,979,437 subagent tokens across 113 agents and 1,032,040
+across 110 agents, roughly 3.0M tokens on the most expensive tier. The window
+was exhausted, the second pass died mid-run, and it skipped its synthesis step
+and about 15 of its 25 verifications, so the deliverable came back partial. The
+user had opted into "deep, web-sourced" research and was never told the choice
+carried that cost.
 
 ### 8.10. Chunked Drafting Protocol for Structured Documents
 
@@ -1677,7 +1805,7 @@ The `@` reference imports protocols as background context, but agents may deprio
 | Protocol | Reinforce When | Key Rule to Restate |
 |----------|---------------|---------------------|
 | Notebook Collaboration Protocol | DSM 1.0 or Hybrid projects | "User copies each cell; output ONE cell at a time as a fenced code block; wait for output" |
-| App Development Protocol | DSM 4.0 projects | "Guide step by step, user approves via permission window" |
+| App Development Protocol | DSM 4.0 projects | "One bite per stop, a bite being the smallest increment the user can verify (one testable function, test-first); concept approval happens in conversation before the write, the permission window is not the gate" |
 | Pre-Generation Brief Protocol | All projects | "Four-gate model: collaborative definition (confirm threads → dependencies → packaging) → concept (explain) → implementation (diff review) → run (when applicable); each gate = explicit stop" |
 | Session Transcript Protocol | All projects | "Append thinking to .claude/session-transcript.md BEFORE acting; output AFTER; conversation text = results only; use Session Transcript Delimiter Format: `<------------Start Thinking / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`" |
 
@@ -1880,9 +2008,13 @@ When an em dash ("—") connects phrases, replace it directly with a comma in th
 ```markdown
 ### App Development Protocol (reinforces inherited protocol)
 - Explain why before each action
-- Create files via Write/Edit tools; user approves via permission window
-- Wait for user confirmation before proceeding to next step
-- Build incrementally: imports → constants → one function → test → next function
+- A bite is the smallest increment the user can verify (DSM_6.0 §1.1): one testable function for code (test-first), one cell producing one output for notebooks, a short passage for prose
+- Describe the file and get concept approval in conversation BEFORE creating it. The permission window approves a write, not the concept, and never substitutes for the description stop, including when write permissions are auto-approved
+- Approving a build sequence or file list authorizes starting, not authoring every file in it. Each file gets its own description stop
+- One bite per stop: author exactly one bite, then stop for review, regardless of how many were planned
+- Cadence follows the artifact's medium, not the previous artifact's rhythm. Where media differ, the finer gate wins
+- Code is test-first: write and agree the test before the implementation it drives
+- Build incrementally: imports → constants → one test → the function it drives → next test
 ```
 
 **Hybrid (DSM 1.0 + DSM 4.0) addition:**

@@ -314,8 +314,28 @@ For each file to be created or modified:
 6. **Show updated todo list:** Mark the completed file, show the next file as in_progress.
 7. **Repeat from step 2** for the next file.
 
-**Build order:** imports, constants, one function, test, next function.
-**TDD:** Write tests in `tests/` alongside code.
+**Build order:** imports, constants, one test, the function that test drives, next test.
+**TDD:** Tests are written first, and live in `tests/` alongside the code.
+
+**Bite boundary rules.** The File Creation Loop sets the rhythm; these rules
+define what one turn of it may contain. A bite is the smallest increment the
+user can verify (DSM_6.0 §1.1).
+
+1. **Concept approval is separate from the write permission.** Step 2 approves
+   what the file will be; the diff window in step 4 approves what it says. The
+   permission window is not the collaboration gate and never substitutes for the
+   description stop, including when write permissions are auto-approved.
+2. **Approving a plan is not approving its artifacts.** Agreement on a build
+   sequence, a file list, or a design decision authorizes starting, not
+   authoring every file it names. Each file still enters the loop at step 2.
+3. **Cadence follows the artifact's medium, not the previous artifact's
+   rhythm.** A session that was drafting prose in large chunks drops to the code
+   bite when it starts code. Where media differ, the finer gate wins.
+4. **One bite per stop.** Author exactly one bite, then stop for review,
+   regardless of how many were planned. Do not run ahead into the next one.
+5. **Code is test-first.** The test is written and agreed before the
+   implementation it drives, and it defines the bite boundary: the bite is
+   exactly the function or functions that test requires.
 
 ### 6.2. Write Call Size Rule
 
@@ -343,6 +363,9 @@ this rule controls within-file granularity (one logical unit at a time).
 - Proceed after diff approval without showing the updated todo list, breaks the rhythm
 - Combine description + file creation in one step, user must review the explanation before the file is created
 - Generate a 300+ line file in a single Write call; build incrementally per the Write Call Size Rule
+- Treat approval of a build sequence or file list as approval of the files themselves, each file still needs its own description stop
+- Write the implementation before the test that drives it, the test defines the bite boundary
+- Carry a coarser cadence from a previous artifact into a finer medium (prose chunk sizes into code), the finer gate wins
 
 ### 6.4. User Shortcuts
 
