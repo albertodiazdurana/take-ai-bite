@@ -25,11 +25,11 @@ Ships the two adoptable mechanisms for the "Forward the Why" principle that v1.1
 
 ### Note on the two deploy actions
 
-Two bullets above ask spokes to run `scripts/sync-commands.sh --deploy`. The `--check` mode that would tell a spoke whether it needs to is currently unreliable: it aborts partway through whenever any single file's diff exceeds 20 lines, skips every later file, and exits with the same status as a completed run (see Spawned, BL-479). Until that is fixed, run `--deploy` rather than relying on `--check` to decide whether it is needed; deploying when already in sync is a no-op.
+Two bullets above ask spokes to run `scripts/sync-commands.sh --deploy`. The `--check` mode that would tell a spoke whether it needs to is currently unreliable: it aborts at the first drifted file, whatever the size of that file's diff, skips every later file, and exits with the same status as a completed run (see Spawned, BL-479). Until that is fixed, run `--deploy` rather than relying on `--check` to decide whether it is needed; deploying when already in sync is a no-op.
 
 ### Spawned
 
-- **BL-479** (High): `scripts/sync-commands.sh --check` aborts silently on large diffs and reports it as success. `set -euo pipefail` plus a `diff | head -20` pipeline makes SIGPIPE fatal mid-loop, so files after the first large drift are never compared, the summary never prints, and the exit code is indistinguishable from a completed run that found drift. Found while grounding this version's work, where the truncated output nearly produced a false "only one file drifted" conclusion.
+- **BL-479** (High): `scripts/sync-commands.sh --check` aborts at the first drifted file and reports it as success. `set -euo pipefail` plus a `diff | head -20` pipeline makes `diff`'s normal exit 1 ("files differ") fatal mid-loop, so files after the first drift are never compared, the summary never prints, and the exit code is indistinguishable from a completed run that found drift. Found while grounding this version's work, where the truncated output nearly produced a false "only one file drifted" conclusion.
 
 ## [1.18.0] - 2026-07-12
 
