@@ -18,7 +18,7 @@ The user provides the project path (e.g., `~/sql-query-agent-ollama`).
 
 For each proposal in `backlogs.md`:
 
-1. **Check for duplicates:** Search `plan/backlog/` (all subdirectories including `done/`) for existing items that address the same issue
+1. **Check for duplicates:** Search **both** backlog trees for existing items that address the same issue, `dsm-docs/plans/` (including `done/`) and `plan/backlog/` (all subdirectories including `done/`). Searching the legacy tree alone misses every item filed since the migration and reports a genuine duplicate as novel
 2. **Decide:**
    - **Accept:** Create a new BACKLOG-XXX file using the `/dsm-backlog` template
    - **Reject:** Note the reason (already addressed, out of scope, insufficient evidence)
