@@ -2793,6 +2793,30 @@ The `transcript_anchor` field captures the post-reset transcript state. A
 wrap-up skill may use the anchor to verify integrity (the lockfile's anchor
 matches a recomputed hash, no foreign appends from a concurrent session).
 
+**The `pid` field is load-bearing (BL-487).** It is the only input to the §26.3
+liveness probe, so a lockfile that records `unknown` disables the probe and forces
+the agent back to inferring a verdict from timestamps. Populate it from
+`CLAUDE_PID`, falling back to the parent-chain walk used elsewhere in this module
+(§7) and by `dsm-parallel-session-go`:
+
+```bash
+LOCK_PID="${CLAUDE_PID}"
+if [ -z "$LOCK_PID" ]; then
+  pid=$$
+  for _ in $(seq 1 10); do
+    read ppid comm < <(ps -o ppid=,comm= -p "$pid" 2>/dev/null)
+    [ -z "$ppid" ] && break
+    if [ "$comm" = "claude" ]; then LOCK_PID=$pid; break; fi
+    pid=$ppid
+    [ "$pid" = "1" ] && break
+  done
+fi
+```
+
+Never `CLAUDE_CODE_PID`. That variable is not exported by the Claude Code harness,
+so a `${CLAUDE_CODE_PID:-unknown}` fallback always yields the literal `unknown`,
+which is what every lockfile written before BL-487 contained.
+
 ### 26.2. Lifecycle (mapped to skill steps)
 
 | Stage | Skill | Step | Action |
@@ -2805,8 +2829,49 @@ matches a recomputed hash, no foreign appends from a concurrent session).
 
 ### 26.3. Hard halt on concurrent detection
 
-When `/dsm-go` Step 0.7 finds an existing lockfile, it MUST hard-halt and
-display the lockfile contents to the user with three resolution options:
+When `/dsm-go` Step 0.7 finds an existing lockfile, it MUST hard-halt, compute the
+liveness verdict below, and display the lockfile contents **and the verdict** to
+the user with three resolution options.
+
+**Liveness probe (BL-487).** The lockfile alone cannot distinguish a lock held by a
+running agent from one left by a crashed window, and an agent given no signal
+supplies one by inference. Probe the recorded pid:
+
+```bash
+LOCK_PID=$(awk '/^pid:/ {print $2}' .claude/session.lock)
+case "$LOCK_PID" in
+  ''|unknown|*[!0-9]*) echo "VERDICT=UNKNOWN" ;;
+  *) if kill -0 "$LOCK_PID" 2>/dev/null && ps -p "$LOCK_PID" -o comm= 2>/dev/null | grep -q claude
+     then echo "VERDICT=LIVE"; else echo "VERDICT=STALE"; fi ;;
+esac
+```
+
+The verdict is **echoed as a token**, matching the `LOCK_PRESENT` / `LOCK_ABSENT`
+tokens of the same snippet, so the agent reads a result rather than inspecting shell
+state. Skill and spec carry this block byte-identically on purpose; storing the same
+logic in two forms is what let BL-483's version comparison silently never match.
+
+The `ps` conjunct is the PID-reuse guard: after a crash the recorded pid may have
+been reassigned, and `kill -0` alone would report that as LIVE.
+
+Three outcomes, none of which is a recommendation:
+
+| Verdict | Meaning | What it does NOT mean |
+|---------|---------|-----------------------|
+| `LIVE` | The recorded process is running and is a `claude` process. | , |
+| `STALE` | The recorded process is gone, or its pid now belongs to something else. | That the prior session's work is finished, merged, or safe to discard. |
+| `UNKNOWN` | No usable pid (a legacy lock, or detection failed). | That the lock is stale. An unprobeable lock is not an absent one. |
+
+Transcript mtime may be reported as a weak secondary signal and MUST NOT be
+converted into a verdict: a long-cold transcript is equally consistent with a
+crashed window and with one that idled and resumed.
+
+**Never probe by process count.** Subagents and the harness itself match a name
+pattern, so a count returns double digits in a session with no sibling and the gate
+fires on ordinary work , the over-firing failure DSM_0.2 §8.9.2 names.
+
+The halt remains non-suppressible under DSM_0.2 §8.9.1 in all three verdict states.
+A `STALE` verdict does not pre-select the force option.
 
 1. **(w) Wrap up the existing session first** with `/dsm-wrap-up`,
    `/dsm-light-wrap-up`, or `/dsm-quick-wrap-up`. The recommended path when

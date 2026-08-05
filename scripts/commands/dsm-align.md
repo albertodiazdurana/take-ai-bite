@@ -460,7 +460,7 @@ Before starting alignment, check if git is initialized:
    # /dsm-align persistent report
 
    **Timestamp:** {ISO 8601 with timezone}
-   **DSM version:** vX.Y.Z (from {dsm-central}/CHANGELOG.md latest heading)
+   **DSM version:** X.Y.Z (from {dsm-central}/CHANGELOG.md latest heading, no `v` prefix per BL-483)
    **Run mode:** post-change | check-only
    **Project:** {project name}
    **Project type:** {active type} {override annotation, if any , see Step 12 shapes}
@@ -525,7 +525,7 @@ Before starting alignment, check if git is initialized:
    - The notification references `.claude/last-align-report.md` rather than duplicating its contents; the persistent file is the source of truth for what was found.
    - If `_inbox/` does not exist (External Contribution projects), skip this step silently.
 
-13. **Write status marker (with spoke-action surfacing):** Before writing, read the existing `.claude/last-align.txt` to capture the previous `dsm-version` value. Then resolve the current DSM version from `{dsm-central}/CHANGELOG.md` (latest `## [vX.Y.Z]` heading). Compare old vs new version:
+13. **Write status marker (with spoke-action surfacing):** Before writing, read the existing `.claude/last-align.txt` to capture the previous `dsm-version` value. Then resolve the current DSM version from `{dsm-central}/CHANGELOG.md` (latest `## [X.Y.Z]` heading, **no `v` prefix**, per BL-483; `grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md`). When reading the previous marker value, strip a leading `v` if present, markers written before BL-483 carry one. Compare old vs new version:
 
    **If versions differ (or no previous marker exists):**
    1. Read CHANGELOG entries between the old and new versions
@@ -543,13 +543,14 @@ Before starting alignment, check if git is initialized:
    ```
    # Last /dsm-align run
    date: YYYY-MM-DD
-   dsm-version: vX.Y.Z
+   dsm-version: X.Y.Z
    result: pass | warnings | critical
    warnings: N
    critical: N
    ```
    - `result` is `pass` if no warnings or critical issues, `warnings` if only warnings, `critical` if any critical issues were found
    - `dsm-version`: CHANGELOG is the source of truth for version numbers; do not guess or use other files
+   - `dsm-version` is written **without** a `v` prefix (BL-483), matching the CHANGELOG's own heading format. `/dsm-go` Step 1.8 compares this value against the CHANGELOG heading; if the two are stored in different formats the comparison can never match and the conditional-align optimisation silently never fires. Both sides of that comparison changed together in BL-483 and must continue to move together
 
    **Origin:** Previously, spoke-action surfacing lived in `/dsm-go` Step 2c, which read `last-align.txt` after `/dsm-align` Step 13 had already overwritten it. The old version was lost, so 2c always saw "versions match" and never surfaced spoke actions. Moving surfacing into Step 13 (read-before-write) fixes the ordering bug.
 

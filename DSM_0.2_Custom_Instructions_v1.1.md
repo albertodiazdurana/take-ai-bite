@@ -2181,6 +2181,86 @@ of testing is low; the cost of a broken merge is high.
 - Structural integrity: files exist, expected line counts, no truncation
 - Cross-references: all internal references resolve (dispatch table entries match module headers, section references point to existing sections)
 - Spoke compatibility: `@` reference still resolves, no new dependencies on features spokes cannot access
+- Published snippets: any runnable snippet added or modified in a skill file has been executed against its real input, in the real harness (see §19.1)
+
+### 19.1. Published Snippets Are Run Before They Ship
+
+A runnable snippet published in a skill file is an assertion about two things it
+never states: the shape of its input, and the environment it runs in. Neither is
+verified at authoring time. Both BL-482 and BL-483 are what that looks like in
+practice, and they are the same defect wearing different clothes:
+
+| | BL-482 | BL-483 |
+|---|---|---|
+| Mismatch between | snippet and execution environment | spec and its own source file |
+| Exit code | 0 | 1 |
+| Silence is at | execution , a complete-looking baseline with an empty section | effect , a correct-looking align run that never skips |
+| Caught by | reading tool output instead of the exit code | comparing the spec to the file it names |
+
+Both shipped, both survived months of sessions, and both were found by spoke
+projects rather than by the hub that authored them. **One execution would have
+caught both.**
+
+**Trigger.** Any commit that adds or modifies, inside `scripts/commands/*.md`,
+either of:
+
+1. **A fenced runnable block** (`bash`, `sh`, or an unlabelled block containing
+   shell), or
+2. **A prose specification that names a pattern, path, field or heading shape to
+   be matched against a real file.** "Extract the latest `## [vX.Y.Z]` heading",
+   "read `dsm-version: vX.Y.Z`", "count entries matching `^- \*\*F-`" are all
+   assertions about a file's actual contents, and they are checkable the same way
+   a fenced snippet is.
+
+Excluded: illustrative pseudo-code, output-format templates the skill prints
+rather than executes, and blocks explicitly marked as examples of what NOT to do.
+
+The second form is not an afterthought. **BL-483's defect lived entirely in
+prose**, never inside a fence, and a fenced-blocks-only trigger would have missed
+it, which is precisely what this rule's own T-4 walkthrough found before it
+shipped. An instruction to match something against a file is a runnable claim
+whether or not anyone wrapped it in backticks.
+
+**Obligation.** Run it. Against the real file or real command output it names,
+not a synthetic stand-in, and in a Claude Code Bash session rather than as a
+reasoned claim about what GNU tools would do. Capture the output as Test
+Execution Log evidence per §21.3.
+
+**The two questions the run must answer:**
+
+1. Does it produce the intended output on real input?
+2. **Would a wrong result look different from a right one?** This is the question
+   BL-482 failed. An empty checksum section and a populated one both looked like
+   success, and the pipeline exited 0 either way. A snippet whose failure is
+   indistinguishable from its success needs a different snippet, not a closer
+   reading.
+
+**Unrunnable snippets.** Some published commands are destructive, or need state
+the authoring session lacks (`gh pr merge`, a spoke's filesystem, a released
+tag). These inherit §21.3's untestable-by-design carve-out: run every part that
+can run, then record "deferred to [specific trigger]" with a one-line
+verification plan, and add it to the BL's Pending verification. The carve-out is
+not a general exemption; it applies per snippet, with the reason named.
+
+**Anti-pattern guard.** "The snippet is obviously correct" and "it is the same
+pattern used elsewhere in the file" are the two rationalizations this rule
+forbids. BL-482's snippet was obviously correct under GNU grep, and had been for
+months. BL-483's was consistent with three sibling sites, all of which named the
+same non-existent heading shape. Consistency with neighbours is evidence about
+the neighbours, not about the input. Same guard family as §8.2.1 ("No
+counter-evidence found" without sources surveyed), §21.2 ("Risks: none known"),
+§21.3 ("all tests passed"), §8.6.1 ("silence from the skill is the skill's
+answer").
+
+**Not proposed:** an automated snippet extractor or CI runner. That is a tooling
+project with its own design surface, and a rule that must wait for tooling is a
+rule that does not exist yet. If the convention holds in practice, mechanizing it
+is a later BL.
+
+**Origin:** BL-485 (S238), the §22 prevent half for BL-482 and BL-483. Both
+defects were reported independently by `dsm-blog-poster` (S33) and
+`dsm-data-science-portfolio-working-folder` (S134), and both reproduced at DSM
+Central's own boot in the session that fixed them.
 
 **BL-specific test plan:** Each backlog item that requires a feature branch must
 include a Test Plan section with specific, verifiable conditions. These conditions

@@ -3,12 +3,18 @@
 A chronological record of capabilities added to the Deliberate Systematic
 Methodology (DSM), the human-AI collaboration framework behind
 [Take AI Bite](https://github.com/albertodiazdurana/dsm-take-ai-bite). Each
-feature is numbered for easy reference (F-001 is the first, newest entries
+feature is numbered for easy reference (F-000 is the first, newest entries
 appear at the top).
 
-**Current count:** 146 features across 11 capability domains.
+**Current count:** 150 features across 11 capability domains.
 
 ---
+
+## August 2026
+
+- **F-149 (2026-08-05) Concurrent-session liveness verdict instead of an impression (BL-487, DSM_0.2.A §26)** — When a session start finds another session's lockfile, it now probes whether that session's process is actually running and reports `LIVE`, `STALE`, or `UNKNOWN`, rather than leaving the agent to guess from how long ago the transcript was written. `UNKNOWN` is a real answer, not a failure: a lock that cannot be probed is not an absent one, and transcript age is a weak hint that must never be promoted into a verdict. The probe informs the choice and never makes it , the halt still stops and asks in all three states, and a `STALE` reading does not pre-select "force". Origin: a session that halted on a live sibling's lock, read it as stale, and continued, producing interleaved transcripts and five duplicated reasoning entries.
+- **F-148 (2026-08-05) Cross-repo write guard covers shell file operations (BL-484, DSM_0.2.C)** — The rule against writing outside the repo without confirmation was stated tool-agnostically but enforced on two tools only, so every `cp`, `mv`, `>`, `>>`, `tee` and `rsync` reached any path with nothing in the way. Shell commands now reach the guard too. It warns rather than blocks, on purpose: a shell command's write targets have to be inferred from the text, and a gate that blocks on a guess fires on ordinary work and teaches you to dismiss it, which is worse than no gate because a dismissed gate still looks like protection. The documentation now states what the check does and does not see, so it reads as a floor rather than a guarantee. Origin: a spoke lost 181 reasoning-lesson entries to a single redirect and got them back from git by luck of timing.
+- **F-147 (2026-08-05) Published snippets are run before they ship (BL-485, DSM_0.2 §19.1)** — A command published inside a skill file is a claim about two things it never states: what its input looks like and what environment it runs in. Neither is checked when it is written, so the rule now requires running it against the real file, in the real harness, before the change merges, and capturing the output as evidence. It asks a second question beyond "did it work": would a wrong result have looked any different from a right one. The trigger covers prose specifications as well as fenced code, because one of the two defects that motivated the rule lived entirely in a sentence and never sat inside a code block , found by the rule's own acceptance test, which was written to walk both original defects through the draft and fail if either slipped past. Origin: three such defects were live at once, all reported by spoke projects rather than by the hub that wrote them, and two reproduced during the boots of the sessions that fixed them.
 
 ## July 2026
 
