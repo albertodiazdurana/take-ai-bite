@@ -5,6 +5,46 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.0] - 2026-08-05
+
+Closes a class of defect the hub had been shipping to every spoke: runnable snippets published inside skill files that had never been executed against their real input. Three of them were live simultaneously, all found by spokes rather than by Central, and two reproduced during the boots of the sessions that fixed them. Adds the standing rule that would have caught all three, extends the cross-repo write guard to Bash operations after a spoke lost work to an ungated redirect, and reduces backlog tracking from three layers to two.
+
+### Added
+
+- **BL-485:** New **DSM_0.2 §19.1 Published Snippets Are Run Before They Ship**. A runnable snippet published in a skill file is an assertion about two things it never states: the shape of its input and the environment it runs in, and neither is verified at authoring time. The rule adds a fourth category to §19's minimum pre-merge verification and carries two trigger forms , a fenced runnable block, and a prose specification naming a pattern, path or heading shape to be matched against a real file. The second form is not decorative: BL-483's defect lived entirely in prose and never sat inside a fence, so a fenced-blocks-only rule would have shipped catching one of the two defects it exists to prevent. That was found by the rule's own acceptance test, which was written at filing time to walk both origin incidents through the draft and declare the rule underspecified if either survived. Also requires the run to answer a second question beyond "does it work": would a wrong result look different from a right one. Anti-pattern guard names the two rationalisations it forbids , "the snippet is obviously correct" and "it is the same pattern used elsewhere in the file" , because BL-482's snippet was obviously correct under GNU grep for months and BL-483's was consistent with three sibling sites that all named the same non-existent heading.
+  **Spoke action:** Review DSM_0.2 §19.1 before your next skill-file edit; any BL that changes a runnable snippet now owes its captured output in the Test Execution Log.
+
+- **BL-487:** New **DSM_0.2.A §26 concurrent-session liveness probe**. `/dsm-go` Step 0.7 now computes an explicit `LIVE` / `STALE` / `UNKNOWN` verdict against the lockfile's recorded pid instead of leaving the agent to infer one from a timestamp, and Step 6 writes a pid that can actually be probed. `UNKNOWN` is a first-class outcome rather than a failure: an unprobeable lock is not an absent one, and transcript age is a weak secondary signal that must not be converted into a verdict. The verdict informs the user's choice and never makes it; the halt stays non-suppressible in all three states.
+  **Spoke action:** None required. The next `/dsm-go` writes a probeable lockfile automatically; every lockfile written before this release carries `pid: unknown` and will correctly report `UNKNOWN`.
+
+### Changed
+
+- **BL-484:** The cross-repo write guard now covers **Bash** file operations, not just `Write` and `Edit`. `DSM_0.2.C` stated the rule tool-agnostically while `validate-cross-repo-write.sh` was registered on two matchers only, so every `cp`, `mv`, `>`, `>>`, `tee` and `rsync` reached any path ungated , in the deployed spoke template as well as Central's own settings. A spoke lost 181 reasoning-lessons entries to an `awk >` redirect and recovered from git by timing rather than by any control. The Bash branch **warns rather than blocks**, deliberately: shell write targets must be inferred from the command string, and a parser that blocks on a guess produces false blocks on ordinary commands, which trains dismissal , and a reflex-dismissed gate still reads as protection. `DSM_0.2.C` now states the per-matcher coverage and its limits explicitly, so the prose no longer over-claims: the branch is a floor, not a proof, and does not see variable-constructed paths, `eval`, or writes made by an invoked program.
+  **Spoke action:** Run `/dsm-align` to receive the new `Bash` matcher in `settings-hooks.json`. Until it lands, Bash file operations in your spoke remain ungated.
+
+- **BL-483:** The DSM version is now stored **without** a `v` prefix on both sides of the `/dsm-go` Step 1.8 comparison, matching Keep a Changelog, which this file's own header cites. `/dsm-go` and `/dsm-align` specified reading `## [vX.Y.Z]` while real headings read `## [1.19.0]`, and the marker template wrote `dsm-version: vX.Y.Z`, so the two sides were stored in different formats and the conditional-align skip could never fire. The failure was invisible in the expensive direction: `/dsm-align` ran, found no drift, reported a healthy `check-only`, and paid the full context cost the step exists to avoid. A legacy-tolerance strip means an existing `v`-prefixed marker still compares correctly, so no spoke pays a needless align. Step 1.8 also gains the missing decision branch for an empty version read, which its own spec produced and its table did not cover.
+  **Spoke action:** None required , the legacy strip handles existing markers. Your `last-align.txt` will be written without the `v` at the next `/dsm-align`.
+
+- **BL-486:** Backlog tracking is now a **two-layer** architecture (`plan/roadmap.md` + BL markdown files). [GitHub Project #2](https://github.com/users/albertodiazdurana/projects/2) is **decommissioned, not deleted**: retained read-only as a historical record and no longer updated. It sampled the backlog rather than mirroring it (8 items in the 4xx range against 63 active BL files) and its loop was broken at close rather than at open. The edit removed the *instructions* to use the board and demoted the *links* to archival , different treatments a keyword sweep cannot distinguish, and stripping the links would have made the retained record undiscoverable. `DSM_0.2.A`'s external issue-intake step is deliberately untouched: it governs triage of issues filed by outside contributors, a separate concern from internal roadmap tracking.
+  **Spoke action:** None. Central-local tracking change.
+
+### Fixed
+
+- **BL-482:** `/dsm-go` Step 5's baseline checksum lines now use a bracket expression. In a Claude Code Bash session `grep` is a shell function that execs the harness binary as `ugrep -G`, which rejects `^\?` as a quantifier applied to an unquantifiable `^`; GNU grep reads it as a literal `?`, so the defect was invisible outside the harness. Both lines emitted nothing and the pipeline still **exited 0**, leaving the `# Checksums` header with nothing under it while the step reported success. `/dsm-wrap-up` Step 9 uses those checksums to tell pre-existing uncommitted files apart from session work, so every baseline written under this harness was missing them.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy` to pick up the corrected snippet.
+
+- **BL-488:** `/dsm-go` Step 5's baseline reads the **last** porcelain field rather than field 2. A staged rename emits `R  <old> -> <new>`, so field 2 is the old path, which no longer exists; `md5sum` errored and the file dropped out of the checksum set. Not an edge case: Step 3.5 `git mv`s the consumed checkpoint into `done/` two steps earlier, so a staged rename is guaranteed present on every full boot that consumes a checkpoint. Verified live on this release's own boot.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+
+- **BL-489:** `/dsm-go` Step 0c counts unmerged commits before choosing a base branch. The four closed-session-leftover detection signals were correct; the remedy was not , it assumed the leftover branch held incidental post-wrap commits whose substance already reached main, and branched off main regardless. When a branch is open *by decision*, that strands everything the previous session did, and forks the files being edited when the session's own targets live only on that branch. `git log main..branch` is a fact about the repository needing no interpretation, unlike the wrap-up marker's free-text note, which is read too late and whose prose is what made signal 4 unreliable. Four recorded instances preceded this fix, each caught only because the agent noticed. Verified live on this release's own boot, which found 23 commits at stake.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+
+- **BL-479:** `scripts/sync-commands.sh --check` no longer aborts at the first drifted file and reports it as success. `set -euo pipefail` plus a `diff | head` pipeline made `diff`'s normal exit 1 fatal mid-loop, so files after the first drift were never compared, the summary never printed, and the exit code was indistinguishable from a completed run. An `ERR` trap now announces an abort with a distinct exit code.
+  **Spoke action:** v1.19.0's `### Note on the two deploy actions` told spokes not to trust `--check` and to run `--deploy` instead. **That instruction is now obsolete** , `--check` is reliable again.
+
+- **BL-481:** The backlog skills point at the active `dsm-docs/plans/` tree rather than the legacy `plan/backlog/` tree.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+
 ## [1.19.0] - 2026-07-28
 
 Ships the two adoptable mechanisms for the "Forward the Why" principle that v1.18.0 named but left unimplemented, a consent gate for fan-out actions that can exhaust a usage window, and a corrected definition of what counts as a bite.
@@ -25,11 +65,11 @@ Ships the two adoptable mechanisms for the "Forward the Why" principle that v1.1
 
 ### Note on the two deploy actions
 
-Two bullets above ask spokes to run `scripts/sync-commands.sh --deploy`. The `--check` mode that would tell a spoke whether it needs to is currently unreliable: it aborts partway through whenever any single file's diff exceeds 20 lines, skips every later file, and exits with the same status as a completed run (see Spawned, BL-479). Until that is fixed, run `--deploy` rather than relying on `--check` to decide whether it is needed; deploying when already in sync is a no-op.
+Two bullets above ask spokes to run `scripts/sync-commands.sh --deploy`. The `--check` mode that would tell a spoke whether it needs to is currently unreliable: it aborts at the first drifted file, whatever the size of that file's diff, skips every later file, and exits with the same status as a completed run (see Spawned, BL-479). Until that is fixed, run `--deploy` rather than relying on `--check` to decide whether it is needed; deploying when already in sync is a no-op.
 
 ### Spawned
 
-- **BL-479** (High): `scripts/sync-commands.sh --check` aborts silently on large diffs and reports it as success. `set -euo pipefail` plus a `diff | head -20` pipeline makes SIGPIPE fatal mid-loop, so files after the first large drift are never compared, the summary never prints, and the exit code is indistinguishable from a completed run that found drift. Found while grounding this version's work, where the truncated output nearly produced a false "only one file drifted" conclusion.
+- **BL-479** (High): `scripts/sync-commands.sh --check` aborts at the first drifted file and reports it as success. `set -euo pipefail` plus a `diff | head -20` pipeline makes `diff`'s normal exit 1 ("files differ") fatal mid-loop, so files after the first drift are never compared, the summary never prints, and the exit code is indistinguishable from a completed run that found drift. Found while grounding this version's work, where the truncated output nearly produced a false "only one file drifted" conclusion.
 
 ## [1.18.0] - 2026-07-12
 

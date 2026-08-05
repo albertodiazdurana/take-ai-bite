@@ -4,7 +4,7 @@ Create a new DSM backlog item.
 
 ## Steps
 
-1. Find the highest existing BACKLOG number by listing files in `plan/backlog/developments/`, `plan/backlog/improvements/`, and `plan/backlog/done/`
+1. Find the highest existing BACKLOG number across **both** trees, the active one and the legacy one. Union, not either/or: `dsm-docs/plans/`, `dsm-docs/plans/done/`, `plan/backlog/developments/`, `plan/backlog/improvements/`, `plan/backlog/done/`, `plan/backlog/deferred/`. Scanning the legacy tree alone yields a number that already exists (its maximum is far below the active tree's); scanning the active tree alone re-uses numbers already spent in the legacy tree
 2. Ask the user for:
    - **Title:** Short description
    - **Priority:** High / Medium / Low
@@ -28,7 +28,7 @@ Create a new DSM backlog item.
 
    The detection regex requires a digit after "Sprint" so titles like "Sprint Boundary Checklist tooling" do not falsely trigger injection. Origin: sprint-plan template injection, paired with the sprint-plan structural audit at `/dsm-align`.
 3. Generate the next BACKLOG number (highest + 1)
-4. Create the file at `plan/backlog/{developments|improvements}/BACKLOG-XXX_short-description.md`
+4. Create the file at `dsm-docs/plans/BACKLOG-XXX_short-description.md`. New items always go here; the legacy `plan/backlog/` tree receives no new files
 
 ## Backlog Template
 
@@ -113,7 +113,13 @@ Conditions that must pass before the implementing branch merges to main:
      "T-N deferred: [trigger + verification plan]" and add to the Pending
      Verification subsection below.
      Trivial-BL exemption inherited from §21.2: mechanical status-update
-     BLs do not need a Test Execution Log if no behavior change. -->
+     BLs do not need a Test Execution Log if no behavior change.
+     Published snippets (DSM_0.2 §19.1): if this BL adds or modifies a
+     runnable snippet in scripts/commands/*.md, that snippet MUST have been
+     executed against its real input in the real harness before merge, and
+     the captured output belongs here. Answer both questions §19.1 names:
+     does it produce the intended output, and would a wrong result look
+     different from a right one? -->
 
 - T-1: [result + evidence]
 - T-2: [result + evidence]
@@ -230,7 +236,7 @@ Conditions that must pass before the sprint is declared complete:
 **Author:** {author} (with AI assistance)
 ```
 
-5. Update the README in the target directory (`plan/backlog/{developments|improvements}/README.md`):
-   - Add a new row to the **Active Items** table with the BL#, title, priority, status ("Proposed"), and today's date
-   - Insert the row in priority order (High before Medium before Low), then by date within the same priority
+5. Update the consolidated index at `dsm-docs/plans/README.md`:
+   - Add a new row with the BL#, the title as a link to the file, and the priority. These three are the whole row: CLAUDE.md defines the plans README as a directory index, not a status tracker, and says in terms not to add Status, Complexity or Created columns
+   - Insert the row in the position the surrounding table already uses; do not impose an ordering the file does not follow
 6. Confirm the file was created, show the path, and note the README was updated. If the Sprint Plan Template Scaffold was used, also note "Sprint Plan template injected; fill the scaffold sections per DSM_2.0.C §1 Template 8."

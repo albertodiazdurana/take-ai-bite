@@ -77,13 +77,43 @@ CLAUDE.md.
   that the agent has not written to before in this session. First writes to a
   new cross-repo target must be confirmed; subsequent writes to the same target
   in the same session do not require re-confirmation.
-  **Enforcement mechanism (BL-391):** `.claude/hooks/validate-cross-repo-write.sh`
-  fires on PreToolUse for `Write` and `Edit` calls. The hook canonicalizes the
-  target path, compares against `git rev-parse --show-toplevel`, and blocks
-  cross-repo writes that are not present in `.claude/cross-repo-writes-session.txt`
-  (cleared at `/dsm-go` Step 0f). Per-session cache means one confirmation per
-  cross-repo target, not per call. The doc rule above is authoritative; the hook
-  is the validation layer that catches doc-rule drift.
+  **Enforcement mechanism (BL-391, extended by BL-484):**
+  `.claude/hooks/validate-cross-repo-write.sh` fires on PreToolUse for `Write`,
+  `Edit` and `Bash` calls. The hook canonicalizes the target path, compares
+  against `git rev-parse --show-toplevel`, and consults
+  `.claude/cross-repo-writes-session.txt` (cleared at `/dsm-go` Step 0f).
+  Per-session cache means one confirmation per cross-repo target, not per call.
+  The doc rule above is authoritative; the hook is the validation layer that
+  catches doc-rule drift.
+
+  **Coverage and its limits (BL-484).** The two matchers behave differently on
+  purpose, and the difference is a property of what each tool call reveals:
+
+  | Matcher | Behaviour | Why |
+  |---|---|---|
+  | `Write`, `Edit` | **Blocks** (exit 2) | The target path is a declared field of the tool call, so it is known exactly |
+  | `Bash` | **Warns** (exit 1, non-blocking) | Shell write targets must be inferred from the command string, and a parser that blocks on a guess produces false blocks on ordinary commands |
+
+  The `Bash` branch detects the common write forms , `>`, `>>`, `tee`, and the
+  destination argument of `cp`, `mv`, `rsync`, `install` , and allowlists
+  `/dev/*` and `/tmp/*` (the harness scratchpad and ordinary scratch space are
+  outside the repo by design and are not repositories).
+
+  **This branch is a floor, not a proof.** It does not detect variable-constructed
+  paths, `eval`, computed here-doc targets, or writes performed by a program the
+  command invokes. Treat it as a reminder, never as a guarantee that an ungated
+  cross-repo write cannot happen. The agent's own discipline remains the primary
+  control; the hook narrows the gap rather than closing it.
+
+  A warning that fired on ordinary work would be worse than no warning, because a
+  reflex-dismissed gate still reads as protection. That is why the `Bash` branch
+  warns rather than blocks and why the allowlist exists.
+
+  **Origin:** before BL-484 the hook was registered on `Write` and `Edit` only,
+  so every Bash file operation reached any path ungated while this section
+  described the rule tool-agnostically. A spoke lost 181 reasoning-lessons
+  entries to an `awk >` redirect and recovered from git within seconds; the
+  recovery was timing, not a control.
   **Write-only rule (BL-448) — cross-repo writes must NOT run git in the target
   repo.** A session writing to a path outside its own repo MUST limit itself to
   creating or appending the file. It MUST NOT run any git operation (`git add`,
