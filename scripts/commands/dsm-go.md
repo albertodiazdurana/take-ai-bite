@@ -671,7 +671,48 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    ```
    If the transcript has no `**Started:**` line (corrupted or empty), skip archiving. Report the archived filename in the session report.
 5.7. **STAA reminder:** If a transcript was archived in Step 5.5, check whether the previous session's wrap-up included a STAA recommendation. If the archived transcript's final entries contain "STAA recommended: yes", check `.claude/last-staa.txt` before reminding (per BL-442): parse the recommending session number `N` from the archived transcript's `# Session N Transcript` header, then **suppress the reminder when `last-staa.txt` exists AND its `analyzed_session` value is `>= N`** (STAA already covered that session or a later one). Otherwise (no `last-staa.txt`, or `analyzed_session < N`) remind the user: "Previous session recommended STAA analysis. Run `/dsm-staa` in a separate Claude Code conversation (do not wrap in `/dsm-go` or `/dsm-parallel-session-go`)." If no transcript was archived, or if the previous session recommended "STAA: no", skip this step silently. The cross-reference prevents the false-positive reminder (portfolio S84: STAA had already run, but the reminder fired off the archived transcript text alone). Missing `last-staa.txt` degrades to "remind" (conservative direction).
-5.8. **Incomplete wrap-up recovery:** Detect whether the previous session ended without a full wrap-up by comparing MEMORY.md's "Latest Session" number against the current branch session number (extracted from the branch name, e.g., `session-139/...` → 139). If the branch number > MEMORY number, the previous session had an incomplete wrap-up.
+5.8. **Incomplete wrap-up recovery:** Detect whether the previous session ended without a full wrap-up.
+
+   **The signal is `.claude/last-wrap-up.txt`, not the session-number comparison (BL-493).**
+   Read it before deciding:
+
+   ```bash
+   WRAP_SESSION=$(awk '/^session:/ {print $2; exit}' .claude/last-wrap-up.txt 2>/dev/null)
+   WRAP_TYPE=$(awk '/^type:/ {print $2; exit}' .claude/last-wrap-up.txt 2>/dev/null)
+   echo "WRAP_SESSION=${WRAP_SESSION:-none} WRAP_TYPE=${WRAP_TYPE:-none}"
+   ```
+
+   **Anchored patterns with `exit`, not a bare `grep` (BL-493).** The marker's `note:`
+   field is multi-line free text that routinely contains the words `session` and `type`
+   in prose. `^`-anchoring plus `exit` takes the first field-position match and stops;
+   an unanchored match can return a word from the note body instead.
+
+   Let `N` be the current branch's session number (from the branch name, e.g.
+   `session-139/...` → 139). The previous session is `N-1`.
+
+   | Marker state | Verdict | Action |
+   |---|---|---|
+   | `WRAP_SESSION` >= `N-1` and `WRAP_TYPE` is `full` / `light` / `quick` | Wrap-up ran | **Skip silently** |
+   | `WRAP_SESSION` < `N-1` | A session in between never wrapped | **Fire** the recovery below |
+   | File absent, or either field empty | **Cannot determine** | Do NOT assert an incomplete wrap-up. Report "no wrap-up marker found, cannot determine whether session {N-1} wrapped" and show only the step 4 action-suggestion checklist |
+
+   **Why not the session-number comparison.** The previous rule was "if branch number >
+   MEMORY number, the previous session had an incomplete wrap-up". Step 0a defines the new
+   session number as `max(archive count, MEMORY session, remote count) + 1`, so branch
+   number is MEMORY number + 1 **by construction** and the condition was true on every
+   fresh boot. The check fired every session and was silent on nothing; agents skipped it
+   by reading context the step never mentioned. A gate that fires on ordinary work trains
+   dismissal, and a reflex-dismissed gate still reads as protection (DSM_0.2 §8.9.2's
+   over-firing guard). Same ordering defect BL-489 fixed at Step 0c: the artifact
+   recording intent existed, and the step that needed it ran first.
+
+   MEMORY's "Latest Session" number MAY still be used as a corroborating signal, but it is
+   not sufficient alone and must never be the trigger.
+
+   **Step 5.9 reads this same file for its own purpose.** Each step performs its own read;
+   do not thread a variable from 5.8 into 5.9, and do not double-prompt the user , 5.8
+   decides recovery, 5.9 decides the resume-mode question.
+
    **If detected:**
    1. Inform the user: "Session {N} ended without full wrap-up. Archived transcript available at `.claude/transcripts/{archived-filename}`."
    2. Offer content reconstruction: "Reconstruct MEMORY update and reasoning lessons from the archived transcript? (y/n)"
@@ -688,7 +729,7 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
       c. Check if feedback files in `dsm-docs/feedback-to-dsm/` were created during the incomplete session but not pushed to spokes (compare file dates against last inbox push); suggest feedback push if pending
       d. Suggest contributor profile review if the reconstructed work involved new skill areas
       e. Present as a checklist: "Missing wrap-up actions from Session {N}: [ ] Merge session branch to main [ ] Push to remote [ ] Push feedback to spokes [ ] Review contributor profile"
-   **If not detected (MEMORY is current):** Skip silently.
+   **If not detected (marker shows the previous session wrapped):** Skip silently.
    **If no archived transcript exists:** Warn "Incomplete wrap-up detected but no archived transcript found. MEMORY update must be done manually." Still show action suggestions.
 5.9. **Wrap-up type guidance:** Read `.claude/last-wrap-up.txt` if it exists. Extract the `type` field.
    - **If `type: light`:** **Non-suppressible (per DSM_0.2 §8.9.1):** the prompt below MUST display and MUST receive an explicit user response (y or n). Auto mode does NOT bypass this prompt regardless of explicit suspension; the user's choice changes the agent's destination skill (`/dsm-go` vs `/dsm-light-go`). The previous session ended with a light wrap-up, signaling continuation. Prompt the user: "Last session ended with a light wrap-up (continuation expected). Switch to `/dsm-light-go` for a faster resume? (y = switch to light-go, n = continue with full go)". If the user accepts, stop `/dsm-go` and invoke `/dsm-light-go` instead. If the user declines, continue with full `/dsm-go`.
