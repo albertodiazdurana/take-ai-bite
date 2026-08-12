@@ -347,12 +347,25 @@ Before starting alignment, check if git is initialized:
    e. **Merge hook entries idempotently.** For each top-level hook event in the template (`PreToolUse`, `UserPromptSubmit`, etc.):
       - Ensure `settings.hooks[event]` exists as a list
       - For each entry in `template.hooks[event]`:
-        - Extract the set of `command` values from the entry's `hooks[*].command` field
-        - Scan existing `settings.hooks[event][*].hooks[*].command` for any of those values
-        - If ANY command from the template entry is already present in `settings.hooks[event]`, skip appending this entry (idempotency: match on command, not object equality)
+        - Extract the entry's `matcher` value and the set of `command` values from its `hooks[*].command` field
+        - Scan ONLY those existing `settings.hooks[event][*]` whose `matcher` equals the template entry's `matcher`, and look for any of those command values among their `hooks[*].command`
+        - If ANY command from the template entry is already present **under the same matcher**, skip appending this entry (idempotency key: the `(matcher, command)` pair, not the command alone and not object equality)
         - Otherwise, append the entry as-is
+
       - Track: `settings_merged` (true if any entry was appended), `settings_already_ok` (true if all template entries were already present)
       - **Never** remove or modify entries that did not come from the template; preserve user-added hooks, permissions, and all other fields
+
+      **Why the key is a pair, not a command (BL-503).** One command legitimately
+      appears under several matchers: `settings-hooks.json` registers
+      `.claude/hooks/validate-cross-repo-write.sh` under `Write`, `Edit` AND `Bash`,
+      because those are three different tool surfaces to gate. Keyed on command
+      alone, the first entry is appended and the remaining two match the skip
+      condition and are silently dropped, so BL-484's `Bash` coverage never reaches
+      any spoke while step 10g still reports `settings.json: already ok`. A correct
+      run and a two-thirds-dropped run emit the same line. Do not re-collapse this
+      key to the command; the multi-matcher case is the reason it is a pair. Object
+      equality is not the alternative either , it fails the other way, appending a
+      duplicate whenever a template entry gains a cosmetic field.
 
    f. **Write settings.json.** If merge changed anything, write back pretty-printed (2-space indent). Otherwise leave the file untouched.
 
@@ -366,7 +379,7 @@ Before starting alignment, check if git is initialized:
    # sub-steps b-f implemented as pure Python
    PY
    ```
-   The step is idempotent by construction: the second run sees byte-identical hooks and matched commands, so it reports `already_ok` on everything with zero file writes.
+   The step is idempotent by construction: the second run sees byte-identical hooks and matched `(matcher, command)` pairs, so it reports `already_ok` on everything with zero file writes.
 
    **Origin:** Closes the gap between DSM_0.2 §7 per-turn enforcement docs (shipped v1.4.9) and the hook mechanism that enforces them (previously local-only in each Central instance). Evidence: portfolio S69 and blog-poster S17 both ran with zero transcript appends because the hook was absent.
 

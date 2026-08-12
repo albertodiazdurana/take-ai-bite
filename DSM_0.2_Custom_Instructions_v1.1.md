@@ -1624,6 +1624,34 @@ deliverable with phantom citations and unconfirmed assumptions.
   failure mode from S6 (cached PDFs mismatched to citations). The "actually
   present at the cited URL" wording in the Source row is deliberate
 
+**Status labels may not exceed their pass (research files only).** Within
+`dsm-docs/research/`, two clauses:
+
+1. **Enumerate the scope.** A recorded pass states *which* items it covered,
+   not only how many, as an explicit list of identifiers or a pointer to one
+   elsewhere in the file. "10 of 13 confirmed" does not say which 13, so a
+   later reader cannot tell whether a given entry fell inside the checked set.
+   A bare count is not an auditable claim.
+2. **Labels may not exceed the pass.** A status label over a set of sources
+   (`confirmed`, `verified`, `primary`) asserts no more verification than the
+   enumerated scope supports. Where a set is partly checked, the label
+   separates the checked part from the rest.
+
+**Pass log versus index**, stated once because it is what makes "may I edit
+this?" answerable: a **pass log** records what a pass found at a point in time
+and is never rewritten; an **index** asserts present status and is corrected
+when it becomes wrong. Conflating them is why the question feels ambiguous.
+
+Forward-only; existing research files are not retrofitted. Both shapes live in
+`dsm-docs/research/2026-08-11_llm-as-judge-robustness.md`: §8 enumerates its
+scope and complies, §4 states "10 of 13" without enumeration and does not ,
+left standing, because it is a log.
+
+**Origin:** BL-501 (S243). That file's §7 labelled 25 entries "Primary,
+confirmed" over a §4 pass covering 13, and a wrong pointer survived inside the
+over-claim. Evidence base is one incident, stated as thin rather than dressed
+as a pattern.
+
 ---
 
 ## 11. Context Budget Protocol

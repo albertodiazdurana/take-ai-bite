@@ -39,10 +39,12 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
      grep -qxF "$c" "$CONFIRM" 2>/dev/null || echo "$c" >> "$CONFIRM"
    }
    # Auto-memory dir (holds this project's MEMORY.md). Derive deterministically
-   # from the project path slug (Claude Code names project dirs by replacing /
-   # with -); do NOT `find ... | head -1`, which non-deterministically returns
-   # some OTHER project's MEMORY.md.
-   add_target "$HOME/.claude/projects/$(pwd | sed 's#/#-#g')/memory"
+   # from the project path slug. Claude Code maps BOTH `/` and `_` to `-`, so
+   # /home/berto/_projects/foo becomes -home-berto--projects-foo with a DOUBLE
+   # dash (BL-504); a `/`-only substitution yields a path that does not exist and
+   # the pre-confirm then silently no-ops. Do NOT `find ... | head -1` either,
+   # which non-deterministically returns some OTHER project's MEMORY.md.
+   add_target "$HOME/.claude/projects/$(pwd | sed 's#[/_]#-#g')/memory"
    # Ecosystem _inbox parents (registry-resolved; absent entries skipped by add_target)
    for name in dsm-central portfolio blog-poster contributions-docs; do
      path=$(awk -F'|' -v n="$name" '$0 ~ "\\| *"n" *\\|" {gsub(/^ *| *$/,"",$3); print $3; exit}' .claude/dsm-ecosystem.md 2>/dev/null)
