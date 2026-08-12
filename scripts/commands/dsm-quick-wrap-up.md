@@ -19,10 +19,12 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
 
    ```bash
    CONFIRM=.claude/cross-repo-writes-session.txt
-   # Derive the auto-memory dir deterministically from the project path slug
-   # (Claude Code names project dirs by replacing / with -). Do NOT
-   # `find ... | head -1`, which can return another project's MEMORY.md.
-   MEMDIR="$HOME/.claude/projects/$(pwd | sed 's#/#-#g')/memory"
+   # Derive the auto-memory dir deterministically from the project path slug.
+   # Claude Code maps BOTH `/` and `_` to `-` (BL-504), so a `/`-only
+   # substitution yields a non-existent path and the `-d` guard below then
+   # skips silently. Do NOT `find ... | head -1` either, which can return
+   # another project's MEMORY.md.
+   MEMDIR="$HOME/.claude/projects/$(pwd | sed 's#[/_]#-#g')/memory"
    if [ -d "$MEMDIR" ]; then
      C=$(realpath -m "$MEMDIR" 2>/dev/null || echo "$MEMDIR")
      grep -qxF "$C" "$CONFIRM" 2>/dev/null || echo "$C" >> "$CONFIRM"

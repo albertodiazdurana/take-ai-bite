@@ -5,6 +5,27 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.0] - 2026-08-12
+
+### Added
+
+- **DSM_0.2 §10.1: research-file status labels may not exceed their verification pass (BL-501).** Two clauses scoped to `dsm-docs/research/`: a recorded pass states *which* items it covered, not only how many, and a status label (`confirmed`, `verified`, `primary`) asserts no more verification than that enumerated scope supports. Carries a companion definition DSM stated nowhere , a **pass log** records what a pass found and is never rewritten, an **index** asserts present status and is corrected when wrong , which is what makes "may I edit this artifact?" answerable. Forward-only.
+  **Spoke action:** Review DSM_0.2 §10.1 if the project keeps research files under `dsm-docs/research/`. No action otherwise; the rule is inherited via the `@` chain and changes no session flow.
+
+### Fixed
+
+- **`/dsm-align` installed only one of three hook matchers, and reported success (BL-503).** Sub-step 10e keyed merge idempotency on the command string alone, while `scripts/templates/settings-hooks.json` registers `validate-cross-repo-write.sh` under `Write`, `Edit` **and** `Bash`. The first entry landed, the other two matched the skip condition and were dropped, so **BL-484's `Bash` coverage could never reach any spoke** while the step reported `settings.json: already ok`. A correct run and a two-thirds-dropped run emitted the same line. The key is now the `(matcher, command)` pair. Reported by `dsm-blog-poster` S34.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`, then `/dsm-align`. The run will install the `Bash` matcher that has never landed on any spoke; expect `settings.json: merged` rather than `already ok`.
+- **Auto-memory directory was derived with a slug rule that drops underscores (BL-504).** `/dsm-wrap-up`, `/dsm-light-wrap-up` and `/dsm-quick-wrap-up` all ran `pwd | sed 's#/#-#g'`, but Claude Code maps **both** `/` and `_` to `-`. For any project under a path containing an underscore the derived directory does not exist, so `/dsm-wrap-up` Step 0.5 never pre-confirmed the auto-memory target (letting the BL-391 cross-repo hook fire mid-wrap-up, the exact interruption Step 0.5 exists to prevent) and the two light variants skipped on their `-d` guard. Central's own path has no underscore, which is why the hub that owned the file could not observe the defect. Reported by `ai-project-management` S1 against one file; a corpus sweep found all three.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`. Projects under a path containing `_` (e.g. `~/_projects/`) were silently affected and are fixed by the deploy.
+- **`/dsm-go` Step 5.8 fired on every fresh session by construction (BL-493).** Implemented in S241 and unreleased until now. The check compared the branch session number against MEMORY's, but Step 0a *defines* the new number as MEMORY's + 1, so the condition was true at every boot and silent on nothing. It now reads `.claude/last-wrap-up.txt`, the artifact that actually records whether the previous session wrapped, and reports "cannot determine" when the marker is absent rather than asserting an incomplete wrap-up.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+
+### Changed
+
+- **`plan/roadmap.md` is curated by decision, and the criterion is written down (BL-502).** The roadmap's header simultaneously claimed to map "active backlog items" (coverage) and to provide "strategic context, not operational status" (curation); at 27% coverage both could not be true. Resolved as **curated**: a BL earns a row when it depends on other work landing first, other work is gated on it, or it is a multi-deliverable programme , not merely because it is large, High priority, or unfinished. Both contradictory sentences were rewritten rather than a third added beneath them. Rows are applied **on touch, never as a sweep**, and pre-criterion rows are removed when their BL completes, so the legacy population decays without any new periodic obligation , deliberately, since a carrier-less obligation is what degraded the original rule to 27%. `.claude/CLAUDE.md` now routes "What's in the pipeline?" to `dsm-docs/plans/README.md` instead.
+  **Spoke action:** None. `plan/roadmap.md` is Central-only.
+
 ## [1.20.0] - 2026-08-05
 
 Closes a class of defect the hub had been shipping to every spoke: runnable snippets published inside skill files that had never been executed against their real input. Three of them were live simultaneously, all found by spokes rather than by Central, and two reproduced during the boots of the sessions that fixed them. Adds the standing rule that would have caught all three, extends the cross-repo write guard to Bash operations after a spoke lost work to an ungated redirect, and reduces backlog tracking from three layers to two.
