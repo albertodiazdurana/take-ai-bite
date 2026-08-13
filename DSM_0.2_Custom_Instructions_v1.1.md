@@ -1971,6 +1971,12 @@ and updated automatically. Project-specific content lives outside the delimiters
 ### Punctuation
 When an em dash ("—") connects phrases, replace it directly with a comma in the form ", " (no space before the comma, one space after). Produce this form in one step; never write the intermediate " , " (space before the comma). Applies in any language.
 
+**Scope.** The rule governs files that reach a public repository. For a project with a public mirror, that is the set the mirror-sync manifest carries; for a project that is itself public, it is every tracked file. Files that live only inside a private repository, and gitignored files anywhere, are exempt. In a private project that covers `.claude/` runtime artifacts, session transcripts, reasoning-lessons files, backlog items, checkpoints and research files.
+
+The predicate is readership, not agent consumption. `agent-consumed` does not discriminate, because published methodology documents are read by agents too.
+
+Exempt is not forbidden. An exempt file may be normalized as a one-time tidy; the rule simply does not require it.
+
 ### Code Output Standards (reinforces Earn Your Assertions)
 - Show actual values: shapes, metrics, counts, paths
 - No generic confirmations: avoid "Done!", "Success!", "Data loaded successfully!"

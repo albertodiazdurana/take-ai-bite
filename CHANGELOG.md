@@ -5,6 +5,17 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.1] - 2026-08-13
+
+### Changed
+
+- **DSM_0.2 §17.1: the punctuation rule now states which files it governs (BL-505).** The em-dash-to-comma rule applied everywhere by default, which put session transcripts, reasoning-lessons files and other private runtime artifacts under the same obligation as published methodology. Scope is now keyed on **readership**: the rule governs files that reach a public repository, which for a project with a public mirror is the set the mirror-sync manifest carries, and for a project that is itself public is every tracked file. Files living only inside a private repository, and gitignored files anywhere, are exempt. The predicate is deliberately readership rather than `agent-consumed`, because published methodology documents are read by agents too and that test fails to discriminate. Exempt is not forbidden: an exempt file may still be normalized as a one-time tidy.
+  **Spoke action:** Run `/dsm-align` to pick up the revised §17.1 alignment block.
+
+### Fixed
+
+- **FEATURES.md: five entries cleared their owed editing pass (F-147 through F-151).** Repetition refactor first, humanizer second, per §8.10 Gate 4. F-150's origin material moved out of the entry body into its trailing `Origin:` sentence rather than being restated; F-147 lost a dangling modifier inside a 60-word sentence; F-151 was reordered capability-first to match the convention its neighbours follow. Both v1.21.0 entries had dropped the trailing `Origin:` label the older entries carry, and both carried the space-before-comma form the punctuation rule forbids; those were the only two occurrences in the file.
+
 ## [1.21.0] - 2026-08-12
 
 ### Added

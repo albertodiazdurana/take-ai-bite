@@ -4,7 +4,7 @@
 **Last Updated:** 2026-03-25
 **Companion to:** DSM_6.0 AI Collaboration Principles
 
-DSM_6.0 defines the philosophy: nine principles that govern how humans and AI
+DSM_6.0 defines the philosophy: principles that govern how humans and AI
 collaborate. DSM_6.1 names the discipline: the recognition that every protocol,
 template, feedback loop, and session command in the DSM ecosystem constitutes
 prompt engineering at system scale. DSM_6.0 is the "why"; DSM_6.1 is the "what"

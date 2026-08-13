@@ -99,6 +99,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-096 | AI Contribution Guidelines Pattern | v1.3.33 | 2026-02-13 | — (needs review) |
 | BACKLOG-097 | docs/guides/ Subfolder Standard | v1.3.28 | 2026-02-10 | — (needs review) |
 | BACKLOG-098 | Mermaid Diagram Recommendation for Blog Posts | v1.3.28 | 2026-02-10 | — (implementation-only) |
+| BACKLOG-100 | DSM Ecosystem Containerization | — | — | — (needs review) |
 | BACKLOG-101 | Merge Blog Journal and Materials into Single File Per Post | v1.3.28 | 2026-02-10 | — (needs review) |
 | BACKLOG-102 | Inbox Propagation and Spoke Confirmation Test | — | 2026-02-10 | — (needs review) |
 | BACKLOG-103 | Document Structure Metrics Tracking | — | 2026-02-10 | — (needs review) |
@@ -135,8 +136,11 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-136 | Agent Security Protocol, Phase 3 | — | 2026-03-01 | — (needs review) |
 | BACKLOG-137 | Information Lifecycle Management | v1.3.56 | 2026-03-01 | — (needs review) |
 | BACKLOG-138 | Technical Progress Reporting | v1.3.51 | 2026-02-19 | — (needs review) |
+| BACKLOG-139 | Context Explorer and Library | — | — | — (needs review) |
 | BACKLOG-140 | Continuous Learning Protocol | v1.3.54 | 2026-02-19 | — (needs review) |
 | BACKLOG-141 | Phase 0.5 Research Hardening (OBS-007, OBS-008) | v1.3.52 | 2026-02-19 | — (implementation-only) |
+| BACKLOG-142 | Kilo Code / Spec-Driven Development Exploration | — | — | — (needs review) |
+| BACKLOG-143 | Picobot Agent Architecture Exploration | — | — | — (needs review) |
 | BACKLOG-145 | Spoke Project Initialization Checklist | — | 2026-03-01 | — (needs review) |
 | BACKLOG-147 | External Contribution Onboarding Workflow | — | 2026-03-01 | — (needs review) |
 | BACKLOG-148 | Research Re-Validation Gate | — | 2026-03-05 | — (implementation-only) |
@@ -149,10 +153,12 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-155 | Debug Disambiguation and PR Description Staleness | v1.3.43 | 2026-03-14 | — (needs review) |
 | BACKLOG-156 | DSM Rebranding Research and Repositioning Strategy | v1.3.38 | 2026-03-18 | — (implementation-only) |
 | BACKLOG-157 | Project Initialization Quality Gate | v1.3.53 | 2026-03-14 | — (needs review) |
+| BACKLOG-160 | External Ecosystem Awareness and Competitive Positioning | — | — | — (needs review) |
 | BACKLOG-161 | Project Finalization Protocol (`/dsm-finalize-project`) | — | 2026-03-29 | — (needs review) |
 | BACKLOG-162 | DSM Private Project Pattern | v1.3.60 | 2026-03-10 | — (needs review) |
 | BACKLOG-163 | Research Gate, Scale-Aware Planning Protocol | v1.3.52 | 2026-03-14 | — (implementation-only) |
 | BACKLOG-164 | DSM Vocabulary, Formalized Term Registry | v1.3.49 | 2026-03-14 | — (needs review) |
+| BACKLOG-165 | Finalization Feedback Protocol (Epoch/Project Completion) | — | — | — (needs review) |
 | BACKLOG-166 | Third-Party Asset Due Diligence | v1.3.37 | 2026-03-10 | — (needs review) |
 | BACKLOG-167 | dsm-align Consumption Directory Enforcement | v1.3.64 | 2026-03-15 | — (needs review) |
 | BACKLOG-168 | DSM Core Tools Registry | v1.3.47 | 2026-03-14 | — (needs review) |
@@ -212,8 +218,11 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-228 | Experiment Operationalization Checklist | — | 2026-03-19 | — (needs review) |
 | BACKLOG-229 | Heading Parsability Convention for DSM Documents | — | 2026-03-19 | — (needs review) |
 | BACKLOG-230 | DSM Document Reachability Experiment | — | 2026-04-02 | DSM_1.0 §6.4 |
+| BACKLOG-231 | Real-Time Form Guidance Pattern for Documentation Projects | — | — | — (needs review) |
 | BACKLOG-233 | Rename docs/ to dsm-docs/ for Namespace Clarity | — | 2026-03-19 | — (implementation-only) |
 | BACKLOG-234 | Web Research Capture Protocol for Traceability | — | 2026-03-19 | — (implementation-only) |
+| BACKLOG-235 | Take-AI-Bite Public Readiness Fixes | — | — | — (needs review) |
+| BACKLOG-236 | Take-AI-Bite Standalone (multi-part, directory) | v1.6.0 | 2026-04-19 | — (needs review) |
 | BACKLOG-237 | Transcript-Based Wrap-Up Recovery Protocol | — | 2026-03-20 | — (needs review) |
 | BACKLOG-238 | Public Feature Inventory and Distribution Pipeline | — | 2026-03-20 | — (needs review) |
 | BACKLOG-239 | DSM Vocabulary Comprehensive Update and Spoke Propagation | v1.6.3 | 2026-04-20 | — (needs review) |
@@ -385,6 +394,32 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-457 | Refresh README Conceptual + Numeric Currency | — | 2026-06-08 | README.md |
 | BACKLOG-458 | Add Version-Bump README Conceptual-Currency Review to Version Update Workflow | — | 2026-06-08 | scripts/commands/dsm-version-update.md |
 | BACKLOG-459 | Backfill done/INDEX.md (428-454) + Fix the Index-Currency Root Cause | — | 2026-06-08 | scripts/commands/dsm-align.md (Step 11b) |
+| BACKLOG-465 | Refine DSM_0.2 §8.10 Chunked Drafting — bite granularity + file-first editable delivery | v1.17.0 | 2026-06-18 | — (needs review) |
+| BACKLOG-469 | State the Punctuation Rule as a Direct Em-Dash-to-", " Replacement (One Step) | v1.17.1 | 2026-07-09 | — (needs review) |
+| BACKLOG-470 | Reconcile A2 audit Q4 doc-vs-doc contradictions | v1.18.0 | 2026-07-12 | — (needs review) |
+| BACKLOG-471 | Add mirror-sync carve-out to Destructive Action write-only rule | v1.18.0 | 2026-07-12 | — (needs review) |
+| BACKLOG-472 | Reconcile feedback-file model across DSM_0.1 / DSM_1.0.D with DSM_0.2.A §4 | v1.18.0 | 2026-07-12 | — (needs review) |
+| BACKLOG-473 | Replace DSM_6.0 §1.13 with "Forward the Why"; relocate "Present Once" to DSM_0.2 §8.10 | v1.18.0 | 2026-07-12 | — (needs review) |
+| BACKLOG-474 | Downstream Impact Map (register cross-BL coupling at the upstream source) | v1.19.0 | 2026-07-28 | — (needs review) |
+| BACKLOG-475 | Causal Handoff (author the checkpoint's pending list causal-forward) | v1.19.0 | 2026-07-28 | — (needs review) |
+| BACKLOG-476 | High-Token-Cost Action Gate (informed consent before fan-out actions) | v1.19.0 | 2026-07-28 | DSM_0.2 §8.9.2 |
+| BACKLOG-478 | Bite-size is the smallest human-verifiable increment | v1.19.0 | 2026-07-28 | — (needs review) |
+| BACKLOG-479 | Drift checker aborts at the first drifted file and reports it as success | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-481 | /dsm-backlog computes the next BL number from a directory tree it outgrew | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-482 | /dsm-go baseline checksum lines fail under the harness grep | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-483 | Version marker and CHANGELOG store the version in different formats | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-484 | Cross-repo write guard registered on Write and Edit only, Bash bypasses it | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-485 | A snippet published in a skill must be run against its real input before it ships | v1.20.0 | 2026-08-05 | DSM_0.2 §19.1 |
+| BACKLOG-486 | Decommission the GitHub Project tracking layer (two-layer backlog architecture) | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-487 | The concurrent-session halt offers its options with no liveness signal | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-488 | The session baseline drops renamed files from its checksum set | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-489 | The closed-session-leftover remedy strands the leftover branch's commits | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-493 | /dsm-go Step 5.8's incomplete-wrap-up detection fires on every fresh session | v1.21.0 | 2026-08-05 | /dsm-go Step 5.8 |
+| BACKLOG-501 | Research-file status labels may not exceed their verification pass | v1.21.0 | 2026-08-12 | DSM_0.2 §10.1 |
+| BACKLOG-502 | The roadmap covers 26% of the backlog it claims to map, and work selection is routed through it | v1.21.0 | 2026-08-12 | plan/roadmap.md curation criterion |
+| BACKLOG-503 | /dsm-align hook merge keys idempotency on command alone, so multi-matcher hooks never reach spokes | v1.21.0 | 2026-08-12 | /dsm-align sub-step 10e |
+| BACKLOG-504 | Auto-memory slug derivation drops underscores, silently skipping the pre-confirm for every project under a path containing one | v1.21.0 | 2026-08-12 | wrap-up skills, auto-memory slug derivation |
+| BACKLOG-505 | Scope the punctuation rule to files that reach a public repository | — (unreleased) | 2026-08-13 | DSM_0.2 §17.1 ### Punctuation, Scope paragraph |
 
 ---
 
