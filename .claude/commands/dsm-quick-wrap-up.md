@@ -15,14 +15,17 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    **Scope classification:** For each extracted lesson, assign a scope label per the Reasoning Lessons Protocol (DSM_0.2 Module A): `ecosystem`, `pattern`, or `project`. The agent assigns scope based on whether the lesson is domain-specific or generalizable.
    **STAA recommendation:** After extracting, assess whether this session warrants deeper STAA analysis. Recommend STAA when the session involved complex multi-option decisions, entered unfamiliar territory (new domain, tool, or pattern), the auto extraction felt incomplete (rich reasoning that resists summarization), or a course correction occurred that may represent a recurring pattern. Output: "STAA recommended: [yes/no]. [1-sentence reason]." **Invocation:** STAA must be run in a separate Claude Code conversation. Do not wrap it in `/dsm-go` or `/dsm-parallel-session-go`. Enter `/dsm-staa` directly.
    **Lesson push:** Deferred (no cross-repo writes in quick wrap-up). Classified lessons remain in `.claude/reasoning-lessons.md` for push via `/dsm-wrap-up` or `/dsm-align`.
+   **Provenance header update (per BL-510; canonical rule in DSM_0.2.A §8.1):** After the appends above have landed, update the live file's `**Last appended:**` line, and `**Last pruned:**` when entries were removed, with this run's identifier, date, counts and a one-line note. Three properties, all three required. **Chain, never replace:** move the superseded value behind `Prior:` (the form the file already uses) rather than overwriting it. **No-op when nothing changed:** if nothing was appended and nothing pruned, make no header change. **Same run, not the next one:** do it here, not in a later step or a later skill, because deferring is the structure that produced the gap. This step is NOT deferred the way the lesson push is: the header is a local write to a file this step already edits, so skipping it here leaves the staleness for a later skill to inherit rather than to fix.
 0.5. **Pre-confirm auto-memory target (BL-450):** Quick wrap-up's only cross-repo write is the auto-memory `MEMORY.md` (no feedback push). Pre-confirm just the auto-memory dir so the BL-391 hook (`validate-cross-repo-write.sh`) does not fire on the protocol-defined MEMORY.md update. The hook matches canonicalized path prefixes, so pre-confirm the directory. Session-scoped (`/dsm-go` Step 0f clears it). This is not a gate weakening: the gate still fires for any other cross-repo write.
 
    ```bash
    CONFIRM=.claude/cross-repo-writes-session.txt
-   # Derive the auto-memory dir deterministically from the project path slug
-   # (Claude Code names project dirs by replacing / with -). Do NOT
-   # `find ... | head -1`, which can return another project's MEMORY.md.
-   MEMDIR="$HOME/.claude/projects/$(pwd | sed 's#/#-#g')/memory"
+   # Derive the auto-memory dir deterministically from the project path slug.
+   # Claude Code maps BOTH `/` and `_` to `-` (BL-504), so a `/`-only
+   # substitution yields a non-existent path and the `-d` guard below then
+   # skips silently. Do NOT `find ... | head -1` either, which can return
+   # another project's MEMORY.md.
+   MEMDIR="$HOME/.claude/projects/$(pwd | sed 's#[/_]#-#g')/memory"
    if [ -d "$MEMDIR" ]; then
      C=$(realpath -m "$MEMDIR" 2>/dev/null || echo "$MEMDIR")
      grep -qxF "$C" "$CONFIRM" 2>/dev/null || echo "$C" >> "$CONFIRM"
@@ -124,7 +127,7 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    Exclude `dsm-docs/blog/done/`. If any human-facing files changed, run
    `/humanizer` on each one and stage the resulting edits. If no human-facing
    files changed, skip this step silently.
-7. **Git (session-scoped):** Run `git status --porcelain` and compare against `.claude/session-baseline.txt` (saved by `/dsm-go` at session start). Identify session changes:
+7. **Git (session-scoped):** Run `git status --porcelain -uall` and compare against `.claude/session-baseline.txt` (saved by `/dsm-go` at session start). **`-uall` is load-bearing (BL-512):** without it a wholly-untracked directory collapses to one entry ending in a slash, so no file beneath it can be matched against a baseline entry and the three-way classification below silently cannot run for that subtree. `/dsm-go` Step 5 writes the baseline with the same flag; the two must agree or the comparison comes apart. Identify session changes:
    - Files not in the baseline = new this session (stage them)
    - Files in the baseline whose content changed (compare `md5sum` against baseline checksums) = modified further this session (stage them)
    - Files in the baseline with unchanged checksums = pre-existing, not touched this session (skip them)

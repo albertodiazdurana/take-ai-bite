@@ -578,10 +578,18 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
      **Filesystem-over-MEMORY rule (per BL-421):** MEMORY.md describes inbox state at the END of the previous session, not the START of the current one. New entries may have arrived between wrap-up and session start (cross-repo notifications, hub→spoke pushes). Trust the filesystem (`ls _inbox/`) over MEMORY narration. If MEMORY says "inbox cleared" but `ls` shows entries, report what `ls` shows; do not echo MEMORY's stale claim.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
-3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:
-   - Move the file to `dsm-docs/handoffs/done/`
-   - Add `**Date Completed:** YYYY-MM-DD` and `**Outcome Reference:** Consumed at session N start` to the file header
-   - Report each moved file in the session report
+3. **Handoff consumption and lifecycle:** Check `dsm-docs/handoffs/` for handoffs awaiting consumption. Any handoff file (not in `done/`) that predates this session was written FOR this session. **This step is its consumer.** Read, surface, then archive, in that order:
+   - **Read the file in full, before any move.** Handoffs are authored by `/dsm-wrap-up` Step 5 and `/dsm-quick-wrap-up` Step 4 only when there is "complex pending work that requires detailed context for the next session", and `dsm-docs/handoffs/README.md` says the same. DSM_0.2.A §18 goes further and parses a DSM version field out of the most recent handoff at session start, which is a read no other step performs.
+   - **Surface its pending items in the session report** (Step 8), alongside the checkpoint's from Step 3.5, **labelled by source** so the user can see which artifact each item came from. Where a handoff item and a checkpoint item describe the same work, reconcile them into one line saying both carry it, rather than listing it twice.
+   - Where the two sources **disagree** on a next step, surface the disagreement rather than silently preferring either. There is deliberately no adjudication rule here; the user decides.
+   - **Then** annotate and move: add `**Date Completed:** YYYY-MM-DD` and `**Outcome Reference:** Consumed at session N start` to the file header, and move the file to `dsm-docs/handoffs/done/`.
+   - **Report the read, not just the move.** "Handoff {filename}: {N} pending items surfaced, moved to done/" when one existed; stay silent when none did. A bare "moved to done/" line does not distinguish a handoff that was read from one that was filed unread, and those must not look alike in the report.
+
+   **Read precedes move, in the same step (BL-511).** Do not split the read into a separate step. The archiving half already existed and would survive a split alone, which reintroduces the defect in a new shape.
+
+   **What this step used to say, and why it changed.** The prior wording opened "Any handoff file that predates this session **has been consumed** and should be moved", which stated an assumption as fact: nothing had consumed it. The step annotated the file, moved it, and reported the move, so the session report emitted a clean success line on every occurrence and there was no state in which it said "a handoff existed and was not read". Meanwhile Step 3.5 directly below **does** read its artifact in full and feeds it into the report. One artifact's content reached the user; the sibling's reached `done/`. Found in S246 by an agent that read a handoff against the step's instruction, having been told to by the handoff itself; the handoff documented a `/dsm-staa` run, which writes no transcript, so its pending items existed in exactly one place.
+
+   **`/dsm-light-go` is deliberately different, not defective.** It states "Do NOT check handoff lifecycle (deferred)", which is an honest, explicit skip appropriate to a lightweight continuation boot. Do not propagate this change there.
 3.5. **Checkpoint check:** List `dsm-docs/checkpoints/` (excluding `done/`). If a checkpoint exists from the most recent session (matching the session number or date in MEMORY.md), read it in full; it contains consolidated state that supplements MEMORY.md (pending work details, branch state, decision context). Extract pending items and next steps from the checkpoint; these become **suggested work items** in the session report (Step 8). If no recent checkpoint exists, skip silently.
    **After reading, move the checkpoint to `done/`:**
    1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' dsm-docs/checkpoints/{filename}`
@@ -634,7 +642,7 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    git status --porcelain >> .claude/session-baseline.txt
    echo "# Checksums" >> .claude/session-baseline.txt
    git status --porcelain | grep -v '^[?]' | awk '{print $NF}' | xargs -r md5sum >> .claude/session-baseline.txt
-   git status --porcelain | grep '^[?]' | awk '{print $NF}' | xargs -r md5sum >> .claude/session-baseline.txt
+   git status --porcelain -uall | grep '^[?]' | awk '{print $NF}' | xargs -r md5sum >> .claude/session-baseline.txt
    ```
    **Last field, not `$2` (BL-488).** `git status --porcelain` has two path shapes.
    A modified or untracked entry is `<code> <path>`, where the path is field 2. A
@@ -657,6 +665,35 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    it while this step reports success. `/dsm-wrap-up` Step 9 uses these checksums to
    tell pre-existing uncommitted files apart from session work. `[?]` is read
    identically by both engines.
+   **`-uall` on the untracked line only (BL-512).** `git status --porcelain`
+   collapses a wholly-untracked directory to a single entry ending in a slash
+   rather than listing its contents, so `$NF` hands `md5sum` a directory,
+   `md5sum` refuses it, and **every file beneath that directory is absent from
+   the checksum set**. Same silent shape as BL-482: the error is on stderr,
+   mid-pipeline, with no `pipefail`, so the step reports success over an
+   incomplete record. Measured on a repo with one loose file and one untracked
+   directory holding two files at two depths: without `-uall`, 1 of 3 files
+   checksummed plus `md5sum: untracked_dir/: Is a directory`; with `-uall`,
+   3 of 3 at exit 0. Unreachable at DSM Central, where `_inbox/`, `.claude/`
+   and `dsm-docs/` all hold tracked members and therefore never collapse, which
+   is why a spoke reported it.
+   **Do NOT propagate `-uall` to the neighbouring lines.** The corpus holds
+   **eight** `git status --porcelain` invocations. **Three** enumerate and need
+   the flag: this line, `/dsm-wrap-up` Step 9, `/dsm-quick-wrap-up` Step 7.
+   **Five** are correct as written: the `# Working tree` summary two lines
+   above (collapsing is what makes it readable), the tracked line directly
+   above (tracked paths are always listed individually, so a directory never
+   appears), `/dsm-finalize-project`'s emptiness test (a collapsed entry is
+   still non-empty, so the verdict is right), and the display-only calls in
+   `/dsm-parallel-session-go` and `/dsm-safe-go`. Applying the flag uniformly
+   looks like completing the fix and is a regression. Counts stated because
+   the first draft of this paragraph said "four" while listing five, caught by
+   this BL's own T-3.
+   **The three BL-482 / BL-488 / BL-512 defects are one family**, all in these
+   four lines, all silent at execution, all found by spokes rather than here.
+   The unfixed fourth member: no variant survives a path containing a space,
+   and `-uall` does not change that. A `-z` NUL-delimited rewrite is the real
+   fix for the whole family if it ever bites.
    **External Contribution note:** For External Contribution projects, session artifacts (baseline, transcript) are written to `.claude/` inside the external repo. These files are hidden from git by Claude Code's `.git/info/exclude` rule (which adds `.claude/`), not by DSM or the project's `.gitignore`. This is an acceptable trade-off: the files are invisible to `git status` and cannot leak into upstream PRs, but the safety net depends on Claude Code's infrastructure. If working with a different AI tool that does not exclude `.claude/`, these files would be visible.
 5.5. **Archive previous transcript:** If `.claude/session-transcript.md` exists and contains content beyond a blank header, archive it before overwriting. Extract the timestamp from the `**Started:**` line in the transcript header, then move the file:
    ```bash
