@@ -1063,20 +1063,54 @@ created either.
    protocol amendment): fall back to the legacy 10-line peek and warn that
    compact regeneration is pending.
 
-**Soft size cap (advisory):**
+**Size bound (canonical; this is the only site that states the number):**
 
-The compact mirror is bounded by the live file's size minus the trim
-overhead. Empirical measurement during BL-427 implementation: a 113-entry
-live file at 51 KB produced a 48 KB compact mirror, ~5% savings. The
-trim-only path's savings depend heavily on entry verbosity, not entry
-count; compression beyond trim-only (BL-427 Step 5, gated on BL-426) is
-where larger gains live.
+The bound on `.claude/reasoning-lessons-compact.md` is **61,440 B (60 KB)**.
+One number, stated once, here. `/dsm-go` Step 1.5 and `/dsm-wrap-up` Step 0
+reference this paragraph rather than restating the value.
 
-The advisory cap is `max(60 KB, 1.2 × live file size)`. If the regenerated
-mirror exceeds the cap, warn "Compact reasoning-lessons mirror is approaching
-the size at which agents typically degrade (>60 KB priming load). Consider
-pruning the live file or promoting older lessons to MEMORY.md before the
-next wrap-up." It still writes the file; the cap is advisory, not blocking.
+The bound is not a preference and not the file's current size. Two independent
+instruments put it in the same place, which is why it is 60 KB and not a round
+number chosen for tidiness:
+
+1. This section's own prose already named >60 KB as the point where agents
+   degrade under priming load, derived before any tool measurement.
+2. A single `Read` call against the mirror returns roughly 62,494 B before
+   truncating at the harness token cap (measured 2026-08-20, S248, on a
+   105,855 B mirror: lines 1-91 of 151 returned, 43,361 B not returned).
+
+The two agree within 1.7%. So the bound is the size at which the file stops
+being readable in one call AND stops being cheap to prime with, and those turn
+out to be the same size.
+
+**What a breach must look like (per DSM_0.2 §19.1's second question).** A
+regeneration that exceeds the bound MUST produce an observable different from
+one that does not:
+
+- Regeneration (`/dsm-wrap-up` Step 0, `/dsm-staa` Step 8) reports the measured
+  size, the bound, and the ratio, e.g. `mirror 105,855 B / bound 61,440 B /
+  1.72x OVER`. A passing regeneration reports the same three quantities with
+  `within bound`. Both report; only the verdict differs.
+- The bound is advisory at write time: the file is still written. Advisory means
+  non-blocking, never silent.
+
+**The superseded form, recorded because it is the defect, not the history.**
+This paragraph previously read `max(60 KB, 1.2 × live file size)`. That cap was
+**unreachable by construction**: the mirror is produced by a strict trim of the
+live file, so `mirror < live < 1.2 × live` always holds and the second term can
+never bind. Measured at the moment of the fix: computed cap 166,344 B against a
+105,855 B mirror, verdict `NO BREACH`, while the same file sat at 1.72x the
+degrade threshold this same section names. The check passed identically whether
+the file was healthy or 12.9x the value `/dsm-go` Step 1.5 was advertising. A
+check that cannot fail reports "within" forever, which is why the replacement is
+specified by its observable above rather than only by its number.
+
+Trim economics, retained because the bound depends on them: the trim-only path's
+savings depend on entry verbosity rather than entry count, and have been measured
+between ~5% (BL-427, a 113-entry 51 KB live file) and 23.6% (S248, a 138,620 B
+live file). Trim alone therefore cannot hold a growing file under the bound
+indefinitely; compression beyond trim-only is BL-427 Step 5, gated on BL-426, and
+is deliberately out of scope here.
 
 **Three-layer awareness:**
 

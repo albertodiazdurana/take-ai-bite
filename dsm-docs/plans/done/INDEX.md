@@ -419,7 +419,13 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-502 | The roadmap covers 26% of the backlog it claims to map, and work selection is routed through it | v1.21.0 | 2026-08-12 | plan/roadmap.md curation criterion |
 | BACKLOG-503 | /dsm-align hook merge keys idempotency on command alone, so multi-matcher hooks never reach spokes | v1.21.0 | 2026-08-12 | /dsm-align sub-step 10e |
 | BACKLOG-504 | Auto-memory slug derivation drops underscores, silently skipping the pre-confirm for every project under a path containing one | v1.21.0 | 2026-08-12 | wrap-up skills, auto-memory slug derivation |
-| BACKLOG-505 | Scope the punctuation rule to files that reach a public repository | — (unreleased) | 2026-08-13 | DSM_0.2 §17.1 ### Punctuation, Scope paragraph |
+| BACKLOG-505 | Scope the punctuation rule to files that reach a public repository | v1.21.1 | 2026-08-13 | DSM_0.2 §17.1 ### Punctuation, Scope paragraph |
+| BACKLOG-507 | Wrap-up F-entry counter reports edited entries as new | v1.21.2 | 2026-08-19 | /dsm-wrap-up Step 1e, F-entry set difference |
+| BACKLOG-509 | /dsm-staa Step 2 defaults to the wrong subject and has no already-analysed check | v1.21.2 | 2026-08-19 | /dsm-staa Step 2, unanalysed-candidate selection |
+| BACKLOG-510 | The reasoning-lessons provenance header has no writer, so it goes stale without any signal | v1.21.2 | 2026-08-19 | DSM_0.2.A §8.1 provenance header ownership |
+| BACKLOG-511 | Handoffs are archived unread by the session they were written for | v1.21.2 | 2026-08-19 | /dsm-go Step 3 |
+| BACKLOG-512 | Baseline checksums drop every file inside an untracked directory | v1.21.2 | 2026-08-19 | /dsm-go Step 5, /dsm-wrap-up Step 9, /dsm-quick-wrap-up Step 7 |
+| BACKLOG-513 | The punctuation scope predicate under-covers document-delivery projects | v1.21.2 | 2026-08-19 | DSM_0.2 §17.1 ### Punctuation, Scope paragraph |
 
 ---
 
