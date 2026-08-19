@@ -5,6 +5,33 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.2] - 2026-08-19
+
+### Added
+
+- **DSM_0.2.A §8.1: the reasoning-lessons provenance header has an owner (BL-510).** The live `.claude/reasoning-lessons.md` carries `**Last pruned:**` and `**Last appended:**` lines recording which run last modified it, and no skill step updated them. The failure was worse than a plain gap: `/dsm-staa` Step 9 writes `.claude/last-staa.txt` unconditionally, so a run that skipped the header left two artifacts making opposite claims, the marker asserting a run happened while the file it operated on still named the previous run. The S244-STAA run pruned 28 entries into exactly that state and it stood for a full day. §8.1 now states the rule once and three steps reference it: `/dsm-wrap-up` Step 0, `/dsm-quick-wrap-up` Step 0 and `/dsm-staa` Step 7. Chain the superseded value behind `Prior:` rather than overwriting, no-op when nothing was appended and nothing pruned, and update in the same run. `/dsm-light-wrap-up` writes no lessons and is confirmed out of scope. The fix is prevention rather than detection, which the BL's Risks section accepted and its Test Execution Log records as a measured negative.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+
+### Fixed
+
+- **`/dsm-go` Step 3 archived handoffs without reading them (BL-511).** The step opened by asserting that any handoff predating the session "has been consumed", which stated an assumption as fact, then annotated the file, moved it to `done/` and reported the move. Handoffs are written only when there is complex pending work, so a session's own inheritance reached `done/` instead of the reader, and the report emitted a clean success line either way. Step 3 now reads the file in full, surfaces its pending items in the session report alongside the checkpoint's and labelled by source, and only then archives. Where a handoff and a checkpoint disagree on a next step the disagreement is surfaced rather than silently resolved. The report separates a read handoff from a filed one, which were previously byte-identical lines. `/dsm-light-go` deliberately skips handoff lifecycle and is unchanged.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+- **Session-baseline checksums dropped every file inside an untracked directory (BL-512).** `git status --porcelain` collapses a wholly-untracked directory to a single entry ending in a slash rather than listing its contents, so `$NF` handed `md5sum` a directory and every file beneath it vanished from the baseline. Same silent shape as the two defects before it in the same four lines: the error is on stderr, mid-pipeline, with no `pipefail`, so the step reported success over an incomplete record. Fixed at three enumerating sites (`/dsm-go` Step 5, `/dsm-wrap-up` Step 9, `/dsm-quick-wrap-up` Step 7) with `-uall` on the untracked line only. Five further `git status --porcelain` calls are named in the BL as correct as written, so a later uniform sweep reads as a regression rather than as completing the fix. Reported by the `invoice-triage` spoke against one site; re-deriving the census rather than transcribing the report widened it to three, including the two wrap-up sites the reporter had flagged as uninvestigated.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`. A baseline written with `-uall` and compared without it comes apart as badly as the original bug, so deploy all three files together.
+- **`/dsm-staa` Step 2 defaulted to a subject it could not tell was already analysed (BL-509).** Two defects in one step. The off-by-one default was overridden on six consecutive runs, because the window it warns about is the normal shape of the workflow rather than an edge case, and a default taken zero times out of six is the wrong default. And Step 2 never consulted `.claude/last-staa.txt`, so a run could re-analyse a spent subject, append duplicate lessons, and let Step 9 overwrite a real marker with a record of a null run. Step 2 now selects on how many candidate subjects are unanalysed: zero halts before Step 4 and skips Steps 6 to 9, one is the default, two asks. The halt reports the marker values that drove it, so a wrong halt is diagnosable in one read. BACKLOG-442's superseded mitigation carries a pointer to this entry.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+- **The wrap-up F-entry counter reported edited entries as new (BL-507).** Implemented in S245 and unreleased until now. The count came from a `+`-line count over the diff, which cannot distinguish an added entry from an edited one, so an editing pass over existing entries inflated the blog-poster notification. It is now computed as a set difference over F-numbers.
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`.
+
+### Changed
+
+- **DSM_0.2 §17.1: the punctuation rule is scoped by outside readership, not by repository (BL-513).** BL-505 shipped six days earlier stating the predicate is readership and implementing it as "reaches a public repository". The two coincide at Central, where every outside reader arrives through the public mirror, and diverge in a private project whose deliverables leave as `.docx` attachments: a CV sent to an employer has an outside reader and was marked exempt by the rule that most needs to govern it. The scope now reads "reaches a reader outside the project, by any channel", with publication to a public repository named as the most common instance rather than the definition. The same revision adds the deliberate-application caveat a corpus grep confirmed existed nowhere: an em dash joining two independent clauses usually wants a period or a semicolon, since a comma there produces a splice, and an em dash used as a numeric range separator must never become a comma, because in a decimal-comma locale `30—40 Sek.` becomes `30,40 Sek.` and reads as a decimal. Reported by the portfolio spoke.
+  **Spoke action:** Run `/dsm-align` to pick up the revised §17.1 alignment block.
+
+### Spawned
+
+- **BACKLOG-514** (Low): `/dsm-quick-wrap-up` appends lessons but has no compact-mirror regeneration sub-step, while `/dsm-wrap-up` Step 0 and `/dsm-staa` Step 8 both do. Found while enumerating the writers for BL-510. Filed at Low because `/dsm-go` Step 1.5's staleness check already recovers the gap on every known clone; what survives is that the cost lands on the boot path instead of the wrap-up path, and that the asymmetry between three sibling steps is unexplained.
+
 ## [1.21.1] - 2026-08-13
 
 ### Changed

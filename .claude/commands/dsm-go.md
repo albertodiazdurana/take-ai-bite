@@ -64,24 +64,64 @@ ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 if [ -f "$ROOT/.claude/session.lock" ]; then
   echo "LOCK_PRESENT"
   cat "$ROOT/.claude/session.lock"
+  # Liveness probe (BL-487): is the recording process still running?
+  LOCK_PID=$(awk '/^pid:/ {print $2}' "$ROOT/.claude/session.lock")
+  case "$LOCK_PID" in
+    ''|unknown|*[!0-9]*) echo "VERDICT=UNKNOWN" ;;
+    *) if kill -0 "$LOCK_PID" 2>/dev/null && ps -p "$LOCK_PID" -o comm= 2>/dev/null | grep -q claude
+       then echo "VERDICT=LIVE"; else echo "VERDICT=STALE"; fi ;;
+  esac
+  echo "TRANSCRIPT_AGE_MIN=$(( ( $(date +%s) - $(stat -c %Y "$ROOT/.claude/session-transcript.md" 2>/dev/null || date +%s) ) / 60 ))"
 else
   echo "LOCK_ABSENT"
 fi
 ```
+
+**The `ps` conjunct is the PID-reuse guard, not decoration.** After a crash the
+recorded pid may have been reassigned to an unrelated process, and `kill -0` alone
+would report that as LIVE. Do not simplify it away.
+
+**Never probe by process count.** `pgrep -fc 'native-binary/claude'` returns
+double digits in a session with no sibling at all, because subagents and the
+harness itself match. A count-based gate reports "concurrent session live" every
+time, which is the over-firing failure DSM_0.2 §8.9.2 names: a gate that fires on
+ordinary work trains dismissal, and a reflex-dismissed gate still reads as
+protection. The probe is `kill -0` against the ONE recorded pid.
 
 ### 0.7b. Acting on the result
 
 | Token | Action |
 |-------|--------|
 | `LOCK_ABSENT` | Continue to Step 0.8 (Kick-off check). The lockfile will be written by Step 6 (transcript reset) after all gating completes. |
-| `LOCK_PRESENT` | Hard halt. Display the lockfile contents to the user and prompt for resolution per §0.7c. |
+| `LOCK_PRESENT` | Hard halt. Display the lockfile contents AND the verdict to the user, then prompt for resolution per §0.7c. |
+
+The verdict is a **finding to relay, never a recommendation to act on**. Report it
+as computed and let §0.7c's prompt stand:
+
+| Verdict | Meaning | What it does NOT mean |
+|---------|---------|-----------------------|
+| `LIVE` | The recorded process is running and is a `claude` process. | , |
+| `STALE` | The recorded process is gone, or the pid now belongs to something else. | That the prior session's work is finished, merged, or safe to discard. |
+| `UNKNOWN` | The lockfile records no usable pid (a legacy lock written before BL-487, or a harness where detection failed). | That the lock is stale. An unprobeable lock is not an absent one. |
+
+`UNKNOWN` is a first-class outcome, not a failure: say the verdict could not be
+computed, give `TRANSCRIPT_AGE_MIN` as a weak secondary signal, and let the user
+decide. Do **not** convert age into a verdict. A 24-hour-cold transcript is equally
+consistent with a crashed window and with one that idled overnight and resumed;
+reading it as "almost certainly stale" is the exact inference that produced this
+rule's origin incident.
 
 ### 0.7c. Halt prompt (non-suppressible)
 
 When the lockfile is present, display:
 
-> "Concurrent session detected. Existing lock from session {N} started at
-> {timestamp} (agent {agent}, model {model}, branch {branch}).
+> "Concurrent session detected. Liveness probe: **{VERDICT}**{, pid {LOCK_PID}
+> is running / , the recorded process is gone / , the lock records no usable
+> pid, so this could not be determined}.
+>
+> Existing lock from session {N} started at {timestamp} (agent {agent}, model
+> {model}, branch {branch}). Transcript last written {TRANSCRIPT_AGE_MIN}
+> minutes ago.
 >
 > Two parallel `/dsm-go` invocations on the same project produce silent
 > data hazards (interleaved transcripts, conflicting baselines, race
@@ -101,6 +141,13 @@ Wait for the user's response. Do not proceed past Step 0.7 without explicit
 input. Do NOT auto-pick (f) under auto mode; the user's choice changes the
 agent's destination (wrap up the prior session vs continue here), which
 qualifies as a non-suppressible prompt under BL-432.
+
+**The verdict informs the choice; it never makes it.** A `STALE` verdict does not
+pre-select (f), and the halt stays non-suppressible under DSM_0.2 §8.9.1 in all
+three verdict states. `STALE` means only that the recording process is gone, so
+the prompt still recommends inspecting the branch and transcript before forcing.
+And do not editorialise past what the probe returned: if the verdict is `UNKNOWN`,
+say so, rather than supplying a confident reading the evidence does not carry.
 
 ### 0.7d. Stale-lockfile recovery
 
@@ -338,18 +385,54 @@ Detect using four signals — all four must be true:
 
 If all four are true:
 - Treat as **close-out reconciliation**, not resumption
-- Do NOT check out the leftover branch; stay on main (or whichever branch
-  Step 0 is running from)
+- Do NOT check out the leftover branch
 - The session number arithmetic in Step 0a already produces N+1 correctly
   once the leftover branch is not resumed — proceed with that N+1
 - Run Steps 5.5 (archive transcript) and 6 (transcript reset) normally;
   the leftover branch's state does not block these steps
-- Create new `session-{N+1}/{YYYY-MM-DD}` branch off main (standard path)
-- After Step 8 report, surface the leftover branch to the user:
-  "Leftover branch `{branch}` has commits from post-wrap work in session N.
-   Merge into main, continue work on it this session, or discard? (m/c/d)"
+- **Determine the base branch by the unmerged-commit count (BL-487 sibling,
+  BL-489)** — do NOT assume main:
+
+  ```bash
+  MAIN=$(git rev-parse --verify --quiet main >/dev/null && echo main || echo master)
+  UNMERGED=$(git log "$MAIN".."$LEFTOVER_BRANCH" --oneline 2>/dev/null | wc -l)
+  ```
+
+  | `UNMERGED` | Base for the new session branch | Why |
+  |---|---|---|
+  | `0` | `$MAIN` (standard path, unchanged) | The leftover branch's work is already in main; it is a genuine leftover. |
+  | `> 0` | **`$LEFTOVER_BRANCH`** | Branching off main would silently strand `$UNMERGED` commits. |
+
+- Create `session-{N+1}/{YYYY-MM-DD}` off whichever base the table selects
+- After Step 8 report, surface the leftover branch **with the count**:
+  "Leftover branch `{branch}` has {UNMERGED} commits not in {MAIN}.
+   The new session branch was created off it so nothing is stranded.
+   Merge into {MAIN}, continue work on it this session, or discard? (m/c/d)"
+  When `UNMERGED` is 0, use the original wording; there is nothing at stake.
 
 If fewer than four signals match, fall through to the standard resumption path below.
+
+**Why a commit count and not the marker's prose (BL-489).** The four signals are
+*correct*; the remedy was not. It assumes the leftover branch holds incidental
+post-wrap commits whose substance already reached main. When the branch is open **by
+decision**, branching off main starts the session on a base missing everything the
+previous session did — and, when the session's own edit targets live on that branch,
+forks the files being edited.
+
+`.claude/last-wrap-up.txt` records the intent unambiguously in its `note` field, but
+it is read at Step 5.9, long after this decision. Reading it earlier was considered
+and rejected: the `note` is free text, and parsing prose for intent is how signal 4
+became unreliable in the first place (a light wrap-up satisfied it with its own
+phrasing). `git log main..branch` is a fact about the repository, needs no
+interpretation, and resolves every recorded instance without knowing why the branch
+was held.
+
+Four recorded instances before this rule existed, each caught only because the agent
+noticed: S235 (`session-234/*` held open with two implemented BLs), S237 (6 unmerged
+commits behind an open PR), S237 again (the light wrap-up's own MEMORY phrasing
+self-tripping signal 4, with 10 commits at stake), and S239 (14 commits, plus the
+session's edit targets living only on that branch). Four manual saves is a missing
+guard, not a working one.
 
 **Note:** This case is the inverse complement of Step 5.8 (Incomplete wrap-up
 recovery). Step 5.8 fires when the branch session number is HIGHER than MEMORY's
@@ -425,12 +508,27 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    **Fallback:** if `.claude/reasoning-lessons-compact.md` does not exist (e.g., the project has not run a `/dsm-wrap-up` since the §8.1 protocol amendment), but `.claude/reasoning-lessons.md` does exist: fall back to reading the first 10 lines of the live file (header + category names) and warn "Compact reasoning-lessons mirror missing; running /dsm-wrap-up regenerates it." If neither file exists, skip this step silently.
 1.8. **Run /dsm-align if DSM version changed (§1.8 conditional-align rule):** Check whether the DSM version has changed since last alignment before invoking `/dsm-align`.
 
+   **Version format (BL-483).** The version is stored **without** a `v` prefix, as
+   `X.Y.Z`, on both sides of the comparison. This matches Keep a Changelog, which the
+   CHANGELOG's own header cites, and real headings read `## [1.19.0] - 2026-07-28`.
+   Earlier revisions of this step specified `## [vX.Y.Z]` while the marker template
+   wrote `dsm-version: vX.Y.Z`; the two sides were stored in different formats, so a
+   literal comparison found them different every session and the skip below could
+   never fire. The failure was invisible because an agent competent enough to
+   normalise the prefix silently got the intended behaviour, and one that did not
+   paid a full needless `/dsm-align` while reporting a healthy `check-only` run.
+   Do not reintroduce the `v` on either side.
+
    **Version check procedure:**
-   1. Read `.claude/last-align.txt` → extract `dsm-version: vX.Y.Z`. If the file does not exist, treat as version mismatch (force align).
+   1. Read `.claude/last-align.txt` → extract `dsm-version: X.Y.Z`. If the file does not exist, treat as version mismatch (force align). **Legacy tolerance:** markers written before BL-483 carry a `v` prefix (`dsm-version: v1.19.0`); strip a leading `v` on read so a pre-BL-483 spoke degrades to one extra `/dsm-align` rather than an error.
    2. Resolve DSM Central path: read `dsm-central` from `.claude/dsm-ecosystem.md`, or fall back to the path in the `@` reference of `.claude/CLAUDE.md`. If Central cannot be resolved, fall back to running `/dsm-align` (safe degradation).
-   3. Read `{dsm-central}/CHANGELOG.md` → extract the latest `## [vX.Y.Z]` heading (first match).
-   4. **If versions match:** skip `/dsm-align`. Report: "Skip /dsm-align: last-align version (vX.Y.Z) matches current DSM version. Hook chmod covered by Step 0e."
-   5. **If versions differ:** run `/dsm-align`. Report: "Running /dsm-align: DSM updated from vA.B.C to vX.Y.Z." After `/dsm-align` completes, re-read `.claude/last-align.txt` to confirm the marker is current.
+   3. Read `{dsm-central}/CHANGELOG.md` → extract the latest `## [X.Y.Z]` heading (first match). A pattern that works against the real file:
+      ```bash
+      grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md
+      ```
+   4. **If the version read returns nothing** (no matching heading, unreadable file, empty result): treat as version mismatch and run `/dsm-align`. Report: "Version read from CHANGELOG returned nothing; forcing /dsm-align." An empty read is not a match and must never fall through to the skip branch.
+   5. **If versions match:** skip `/dsm-align`. Report: "Skip /dsm-align: last-align version (X.Y.Z) matches current DSM version. Hook chmod covered by Step 0e."
+   6. **If versions differ:** run `/dsm-align`. Report: "Running /dsm-align: DSM updated from A.B.C to X.Y.Z." After `/dsm-align` completes, re-read `.claude/last-align.txt` to confirm the marker is current.
 
    **Why conditional:** The previous unconditional run (S180 §22 hardening) was necessary because `/dsm-align` was the sole source of `chmod +x` on hooks. Step 0e now owns that guarantee unconditionally. The remaining reasons to run `/dsm-align` — scaffold drift, CLAUDE.md alignment block drift, broken `@` reference — are all caused by DSM version updates that change templates or protocols. A version match means no template changed since last alignment; running `/dsm-align` in that case only reads files without making changes. The context cost (~30-40% on Sonnet) is not justified by the safety value when the version is unchanged.
 
@@ -480,10 +578,18 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
      **Filesystem-over-MEMORY rule (per BL-421):** MEMORY.md describes inbox state at the END of the previous session, not the START of the current one. New entries may have arrived between wrap-up and session start (cross-repo notifications, hub→spoke pushes). Trust the filesystem (`ls _inbox/`) over MEMORY narration. If MEMORY says "inbox cleared" but `ls` shows entries, report what `ls` shows; do not echo MEMORY's stale claim.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
    - Any other session-start protocols added to DSM_0.2 in the future
-3. **Handoff lifecycle:** Check `dsm-docs/handoffs/` for consumed handoffs. Any handoff file (not in `done/`) that predates this session has been consumed and should be moved:
-   - Move the file to `dsm-docs/handoffs/done/`
-   - Add `**Date Completed:** YYYY-MM-DD` and `**Outcome Reference:** Consumed at session N start` to the file header
-   - Report each moved file in the session report
+3. **Handoff consumption and lifecycle:** Check `dsm-docs/handoffs/` for handoffs awaiting consumption. Any handoff file (not in `done/`) that predates this session was written FOR this session. **This step is its consumer.** Read, surface, then archive, in that order:
+   - **Read the file in full, before any move.** Handoffs are authored by `/dsm-wrap-up` Step 5 and `/dsm-quick-wrap-up` Step 4 only when there is "complex pending work that requires detailed context for the next session", and `dsm-docs/handoffs/README.md` says the same. DSM_0.2.A §18 goes further and parses a DSM version field out of the most recent handoff at session start, which is a read no other step performs.
+   - **Surface its pending items in the session report** (Step 8), alongside the checkpoint's from Step 3.5, **labelled by source** so the user can see which artifact each item came from. Where a handoff item and a checkpoint item describe the same work, reconcile them into one line saying both carry it, rather than listing it twice.
+   - Where the two sources **disagree** on a next step, surface the disagreement rather than silently preferring either. There is deliberately no adjudication rule here; the user decides.
+   - **Then** annotate and move: add `**Date Completed:** YYYY-MM-DD` and `**Outcome Reference:** Consumed at session N start` to the file header, and move the file to `dsm-docs/handoffs/done/`.
+   - **Report the read, not just the move.** "Handoff {filename}: {N} pending items surfaced, moved to done/" when one existed; stay silent when none did. A bare "moved to done/" line does not distinguish a handoff that was read from one that was filed unread, and those must not look alike in the report.
+
+   **Read precedes move, in the same step (BL-511).** Do not split the read into a separate step. The archiving half already existed and would survive a split alone, which reintroduces the defect in a new shape.
+
+   **What this step used to say, and why it changed.** The prior wording opened "Any handoff file that predates this session **has been consumed** and should be moved", which stated an assumption as fact: nothing had consumed it. The step annotated the file, moved it, and reported the move, so the session report emitted a clean success line on every occurrence and there was no state in which it said "a handoff existed and was not read". Meanwhile Step 3.5 directly below **does** read its artifact in full and feeds it into the report. One artifact's content reached the user; the sibling's reached `done/`. Found in S246 by an agent that read a handoff against the step's instruction, having been told to by the handoff itself; the handoff documented a `/dsm-staa` run, which writes no transcript, so its pending items existed in exactly one place.
+
+   **`/dsm-light-go` is deliberately different, not defective.** It states "Do NOT check handoff lifecycle (deferred)", which is an honest, explicit skip appropriate to a lightweight continuation boot. Do not propagate this change there.
 3.5. **Checkpoint check:** List `dsm-docs/checkpoints/` (excluding `done/`). If a checkpoint exists from the most recent session (matching the session number or date in MEMORY.md), read it in full; it contains consolidated state that supplements MEMORY.md (pending work details, branch state, decision context). Extract pending items and next steps from the checkpoint; these become **suggested work items** in the session report (Step 8). If no recent checkpoint exists, skip silently.
    **After reading, move the checkpoint to `done/`:**
    1. `sed -i '1i **Consumed at:** Session N start (YYYY-MM-DD)\n' dsm-docs/checkpoints/{filename}`
@@ -535,9 +641,59 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    echo "# Working tree" >> .claude/session-baseline.txt
    git status --porcelain >> .claude/session-baseline.txt
    echo "# Checksums" >> .claude/session-baseline.txt
-   git status --porcelain | grep -v '^\?' | awk '{print $2}' | xargs -r md5sum >> .claude/session-baseline.txt
-   git status --porcelain | grep '^\?' | awk '{print $2}' | xargs -r md5sum >> .claude/session-baseline.txt
+   git status --porcelain | grep -v '^[?]' | awk '{print $NF}' | xargs -r md5sum >> .claude/session-baseline.txt
+   git status --porcelain -uall | grep '^[?]' | awk '{print $NF}' | xargs -r md5sum >> .claude/session-baseline.txt
    ```
+   **Last field, not `$2` (BL-488).** `git status --porcelain` has two path shapes.
+   A modified or untracked entry is `<code> <path>`, where the path is field 2. A
+   staged rename is `R  <old> -> <new>`, where field 2 is the **old** path, which no
+   longer exists on disk; `md5sum` then errors and the file is dropped from the
+   checksum set. `$NF` is the destination path for a rename and the only path for
+   every other shape, so it is correct for both. This is not an edge case: Step 3.5
+   `git mv`s the consumed checkpoint into `done/` two steps earlier, so a staged
+   rename is **guaranteed present** on every full boot that consumes a checkpoint.
+   Neither `$2` nor `$NF` survives a path containing a space; that limitation is
+   pre-existing and unchanged, and a `-z` NUL-delimited rewrite is the real fix if it
+   ever bites.
+   **Bracket expression, not `\?` (BL-482).** The two lines above split tracked from
+   untracked entries and MUST use `[?]`, never `'^\?'`. In a Claude Code Bash session
+   `grep` is a shell function that execs the harness binary as `ugrep -G`, and ugrep
+   rejects `^\?` as a quantifier applied to an unquantifiable `^`. GNU grep reads the
+   same expression as a literal `?`, so the defect is invisible outside the harness.
+   Both lines emit nothing, and because the failure is mid-pipeline with no `pipefail`
+   the pipeline still **exits 0**, leaving the `# Checksums` header with nothing under
+   it while this step reports success. `/dsm-wrap-up` Step 9 uses these checksums to
+   tell pre-existing uncommitted files apart from session work. `[?]` is read
+   identically by both engines.
+   **`-uall` on the untracked line only (BL-512).** `git status --porcelain`
+   collapses a wholly-untracked directory to a single entry ending in a slash
+   rather than listing its contents, so `$NF` hands `md5sum` a directory,
+   `md5sum` refuses it, and **every file beneath that directory is absent from
+   the checksum set**. Same silent shape as BL-482: the error is on stderr,
+   mid-pipeline, with no `pipefail`, so the step reports success over an
+   incomplete record. Measured on a repo with one loose file and one untracked
+   directory holding two files at two depths: without `-uall`, 1 of 3 files
+   checksummed plus `md5sum: untracked_dir/: Is a directory`; with `-uall`,
+   3 of 3 at exit 0. Unreachable at DSM Central, where `_inbox/`, `.claude/`
+   and `dsm-docs/` all hold tracked members and therefore never collapse, which
+   is why a spoke reported it.
+   **Do NOT propagate `-uall` to the neighbouring lines.** The corpus holds
+   **eight** `git status --porcelain` invocations. **Three** enumerate and need
+   the flag: this line, `/dsm-wrap-up` Step 9, `/dsm-quick-wrap-up` Step 7.
+   **Five** are correct as written: the `# Working tree` summary two lines
+   above (collapsing is what makes it readable), the tracked line directly
+   above (tracked paths are always listed individually, so a directory never
+   appears), `/dsm-finalize-project`'s emptiness test (a collapsed entry is
+   still non-empty, so the verdict is right), and the display-only calls in
+   `/dsm-parallel-session-go` and `/dsm-safe-go`. Applying the flag uniformly
+   looks like completing the fix and is a regression. Counts stated because
+   the first draft of this paragraph said "four" while listing five, caught by
+   this BL's own T-3.
+   **The three BL-482 / BL-488 / BL-512 defects are one family**, all in these
+   four lines, all silent at execution, all found by spokes rather than here.
+   The unfixed fourth member: no variant survives a path containing a space,
+   and `-uall` does not change that. A `-z` NUL-delimited rewrite is the real
+   fix for the whole family if it ever bites.
    **External Contribution note:** For External Contribution projects, session artifacts (baseline, transcript) are written to `.claude/` inside the external repo. These files are hidden from git by Claude Code's `.git/info/exclude` rule (which adds `.claude/`), not by DSM or the project's `.gitignore`. This is an acceptable trade-off: the files are invisible to `git status` and cannot leak into upstream PRs, but the safety net depends on Claude Code's infrastructure. If working with a different AI tool that does not exclude `.claude/`, these files would be visible.
 5.5. **Archive previous transcript:** If `.claude/session-transcript.md` exists and contains content beyond a blank header, archive it before overwriting. Extract the timestamp from the `**Started:**` line in the transcript header, then move the file:
    ```bash
@@ -552,7 +708,48 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    ```
    If the transcript has no `**Started:**` line (corrupted or empty), skip archiving. Report the archived filename in the session report.
 5.7. **STAA reminder:** If a transcript was archived in Step 5.5, check whether the previous session's wrap-up included a STAA recommendation. If the archived transcript's final entries contain "STAA recommended: yes", check `.claude/last-staa.txt` before reminding (per BL-442): parse the recommending session number `N` from the archived transcript's `# Session N Transcript` header, then **suppress the reminder when `last-staa.txt` exists AND its `analyzed_session` value is `>= N`** (STAA already covered that session or a later one). Otherwise (no `last-staa.txt`, or `analyzed_session < N`) remind the user: "Previous session recommended STAA analysis. Run `/dsm-staa` in a separate Claude Code conversation (do not wrap in `/dsm-go` or `/dsm-parallel-session-go`)." If no transcript was archived, or if the previous session recommended "STAA: no", skip this step silently. The cross-reference prevents the false-positive reminder (portfolio S84: STAA had already run, but the reminder fired off the archived transcript text alone). Missing `last-staa.txt` degrades to "remind" (conservative direction).
-5.8. **Incomplete wrap-up recovery:** Detect whether the previous session ended without a full wrap-up by comparing MEMORY.md's "Latest Session" number against the current branch session number (extracted from the branch name, e.g., `session-139/...` → 139). If the branch number > MEMORY number, the previous session had an incomplete wrap-up.
+5.8. **Incomplete wrap-up recovery:** Detect whether the previous session ended without a full wrap-up.
+
+   **The signal is `.claude/last-wrap-up.txt`, not the session-number comparison (BL-493).**
+   Read it before deciding:
+
+   ```bash
+   WRAP_SESSION=$(awk '/^session:/ {print $2; exit}' .claude/last-wrap-up.txt 2>/dev/null)
+   WRAP_TYPE=$(awk '/^type:/ {print $2; exit}' .claude/last-wrap-up.txt 2>/dev/null)
+   echo "WRAP_SESSION=${WRAP_SESSION:-none} WRAP_TYPE=${WRAP_TYPE:-none}"
+   ```
+
+   **Anchored patterns with `exit`, not a bare `grep` (BL-493).** The marker's `note:`
+   field is multi-line free text that routinely contains the words `session` and `type`
+   in prose. `^`-anchoring plus `exit` takes the first field-position match and stops;
+   an unanchored match can return a word from the note body instead.
+
+   Let `N` be the current branch's session number (from the branch name, e.g.
+   `session-139/...` → 139). The previous session is `N-1`.
+
+   | Marker state | Verdict | Action |
+   |---|---|---|
+   | `WRAP_SESSION` >= `N-1` and `WRAP_TYPE` is `full` / `light` / `quick` | Wrap-up ran | **Skip silently** |
+   | `WRAP_SESSION` < `N-1` | A session in between never wrapped | **Fire** the recovery below |
+   | File absent, or either field empty | **Cannot determine** | Do NOT assert an incomplete wrap-up. Report "no wrap-up marker found, cannot determine whether session {N-1} wrapped" and show only the step 4 action-suggestion checklist |
+
+   **Why not the session-number comparison.** The previous rule was "if branch number >
+   MEMORY number, the previous session had an incomplete wrap-up". Step 0a defines the new
+   session number as `max(archive count, MEMORY session, remote count) + 1`, so branch
+   number is MEMORY number + 1 **by construction** and the condition was true on every
+   fresh boot. The check fired every session and was silent on nothing; agents skipped it
+   by reading context the step never mentioned. A gate that fires on ordinary work trains
+   dismissal, and a reflex-dismissed gate still reads as protection (DSM_0.2 §8.9.2's
+   over-firing guard). Same ordering defect BL-489 fixed at Step 0c: the artifact
+   recording intent existed, and the step that needed it ran first.
+
+   MEMORY's "Latest Session" number MAY still be used as a corroborating signal, but it is
+   not sufficient alone and must never be the trigger.
+
+   **Step 5.9 reads this same file for its own purpose.** Each step performs its own read;
+   do not thread a variable from 5.8 into 5.9, and do not double-prompt the user , 5.8
+   decides recovery, 5.9 decides the resume-mode question.
+
    **If detected:**
    1. Inform the user: "Session {N} ended without full wrap-up. Archived transcript available at `.claude/transcripts/{archived-filename}`."
    2. Offer content reconstruction: "Reconstruct MEMORY update and reasoning lessons from the archived transcript? (y/n)"
@@ -569,7 +766,7 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
       c. Check if feedback files in `dsm-docs/feedback-to-dsm/` were created during the incomplete session but not pushed to spokes (compare file dates against last inbox push); suggest feedback push if pending
       d. Suggest contributor profile review if the reconstructed work involved new skill areas
       e. Present as a checklist: "Missing wrap-up actions from Session {N}: [ ] Merge session branch to main [ ] Push to remote [ ] Push feedback to spokes [ ] Review contributor profile"
-   **If not detected (MEMORY is current):** Skip silently.
+   **If not detected (marker shows the previous session wrapped):** Skip silently.
    **If no archived transcript exists:** Warn "Incomplete wrap-up detected but no archived transcript found. MEMORY update must be done manually." Still show action suggestions.
 5.9. **Wrap-up type guidance:** Read `.claude/last-wrap-up.txt` if it exists. Extract the `type` field.
    - **If `type: light`:** **Non-suppressible (per DSM_0.2 §8.9.1):** the prompt below MUST display and MUST receive an explicit user response (y or n). Auto mode does NOT bypass this prompt regardless of explicit suspension; the user's choice changes the agent's destination skill (`/dsm-go` vs `/dsm-light-go`). The previous session ended with a light wrap-up, signaling continuation. Prompt the user: "Last session ended with a light wrap-up (continuation expected). Switch to `/dsm-light-go` for a faster resume? (y = switch to light-go, n = continue with full go)". If the user accepts, stop `/dsm-go` and invoke `/dsm-light-go` instead. If the user declines, continue with full `/dsm-go`.
@@ -636,6 +833,18 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    ```bash
    ANCHOR=$(md5sum .claude/session-transcript.md | awk '{print $1}')
    BRANCH=$(git branch --show-current 2>/dev/null || echo "no-git")
+   # Owning PID: env fast path, else the parent-chain walk used corpus-wide.
+   LOCK_PID="${CLAUDE_PID}"
+   if [ -z "$LOCK_PID" ]; then
+     pid=$$
+     for _ in $(seq 1 10); do
+       read ppid comm < <(ps -o ppid=,comm= -p "$pid" 2>/dev/null)
+       [ -z "$ppid" ] && break
+       if [ "$comm" = "claude" ]; then LOCK_PID=$pid; break; fi
+       pid=$ppid
+       [ "$pid" = "1" ] && break
+     done
+   fi
    cat > .claude/session.lock << EOF
    session: ${SESSION_NUMBER}
    started: $(date -Iseconds)
@@ -643,14 +852,28 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    model: ${MODEL_ID:-claude-opus-4-7}
    branch: ${BRANCH}
    transcript_anchor: ${ANCHOR}
-   pid: ${CLAUDE_CODE_PID:-unknown}
+   pid: ${LOCK_PID:-unknown}
    EOF
    ```
 
    `${SESSION_NUMBER}` is from Step 0a. `${MODEL_ID}` is the agent's
-   self-reported model (from the transcript header). `${CLAUDE_CODE_PID}` is
-   optional; emit `unknown` if unavailable. The lockfile is removed by every
-   wrap-up skill (full / light / quick) at the end of its final step.
+   self-reported model (from the transcript header). The lockfile is removed by
+   every wrap-up skill (full / light / quick) at the end of its final step.
+
+   **`CLAUDE_PID`, never `CLAUDE_CODE_PID` (BL-487).** This field is what §0.7a
+   probes to decide whether a detected lock is LIVE or STALE, so an unpopulated
+   `pid` disables the probe entirely and the agent falls back to inferring a
+   verdict from the timestamp. Earlier revisions read `${CLAUDE_CODE_PID}`, which
+   this harness does not export; the fallback therefore always produced the literal
+   string `unknown`, and every lockfile ever written carried it. `CLAUDE_CODE_*` is
+   the prefix on most exported `CLAUDE*` variables, which is why the wrong name
+   read as plausible. The rest of the corpus , `dsm-parallel-session-go.md`,
+   `dsm-parallel-session-wrap-up.md`, `transcript-reminder.sh`, DSM_0.2.A §7 , has
+   always used `CLAUDE_PID` and derives it by the parent-chain walk reproduced
+   above. Two independent mechanisms are kept deliberately: the env var is exact
+   and free when present, the walk works from `ps` alone if the variable is ever
+   renamed or withdrawn, and `unknown` remains the terminal fallback so the field
+   is never empty.
 
 7. **Recent history:** Run `git log --oneline -5` to show recent commits
 8. **Report:** Summarize in this format:

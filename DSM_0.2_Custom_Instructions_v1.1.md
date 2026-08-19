@@ -1971,9 +1971,11 @@ and updated automatically. Project-specific content lives outside the delimiters
 ### Punctuation
 When an em dash ("—") connects phrases, replace it directly with a comma in the form ", " (no space before the comma, one space after). Produce this form in one step; never write the intermediate " , " (space before the comma). Applies in any language.
 
-**Scope.** The rule governs files that reach a public repository. For a project with a public mirror, that is the set the mirror-sync manifest carries; for a project that is itself public, it is every tracked file. Files that live only inside a private repository, and gitignored files anywhere, are exempt. In a private project that covers `.claude/` runtime artifacts, session transcripts, reasoning-lessons files, backlog items, checkpoints and research files.
+Apply the replacement deliberately, not as a blanket substitution of the "—" character. Two cases take a different form. An em dash joining two independent clauses usually wants a period or a semicolon, since a comma there produces a splice. And an em dash used as a numeric range separator ("30—40 Sek.") must never become a comma: in a decimal-comma locale "30,40 Sek." reads as a decimal, so the range is destroyed and the result is still plausible prose.
 
-The predicate is readership, not agent consumption. `agent-consumed` does not discriminate, because published methodology documents are read by agents too.
+**Scope.** The rule governs files that reach a reader outside the project, by any channel. Publication to a public repository is the most common instance, not the definition: a document delivered by email, as an attachment, as a PDF or .docx, or through any other channel has an outside reader and is governed. For a project with a public mirror, the mirror-sync manifest's set is governed; for a project that is itself public, every tracked file is. Working state is exempt wherever it lives: `.claude/` runtime artifacts, session transcripts, reasoning-lessons files, backlog items, checkpoints, research files, and gitignored files anywhere. Cross-repo governance traffic (inbox entries, feedback files) is transmitted working state rather than a delivered document, and is exempt on the same ground.
+
+The predicate is readership, not agent consumption. `agent-consumed` does not discriminate, because published methodology documents are read by agents too. Nor is it repository visibility: a private project whose deliverables are documents sent to outside readers is governed for those documents, and a public repository's working state is still exempt.
 
 Exempt is not forbidden. An exempt file may be normalized as a one-time tidy; the rule simply does not require it.
 

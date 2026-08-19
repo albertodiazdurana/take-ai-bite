@@ -895,12 +895,52 @@ same lesson content.
 
 | File | Purpose | Edited by | Read by |
 |------|---------|-----------|---------|
-| `.claude/reasoning-lessons.md` | Source of truth: full lessons + guidelines + provenance | Humans, `/dsm-wrap-up` Step 0 (`[auto]`), `/dsm-staa` (`[STAA]`) | `/dsm-staa`, humans |
-| `.claude/reasoning-lessons-compact.md` | Derived agent-facing mirror, regenerated from the live file | `/dsm-wrap-up` Step 0 (regeneration sub-step) only , never edited by hand | `/dsm-go` Step 1.5 |
+| `.claude/reasoning-lessons.md` | Source of truth: full lessons + guidelines + provenance | Humans, `/dsm-wrap-up` Step 0 (`[auto]`), `/dsm-quick-wrap-up` Step 0 (`[auto]`), `/dsm-staa` Steps 6-7 (`[STAA]` + prunes) | `/dsm-staa`, humans |
+| `.claude/reasoning-lessons-compact.md` | Derived agent-facing mirror, regenerated from the live file | `/dsm-wrap-up` Step 0 and `/dsm-staa` Step 8 (regeneration sub-steps) only, never edited by hand | `/dsm-go` Step 1.5 |
 
 The compact mirror file is gitignored (same as the live file) and includes
 a header comment "Do not edit; auto-generated from `reasoning-lessons.md` by
 `/dsm-wrap-up` Step 0."
+
+**Provenance header ownership (BL-510).** The live file's `**Last pruned:**` and
+`**Last appended:**` lines record which run last modified it. Every step that
+appends to or prunes `.claude/reasoning-lessons.md` owns those lines, and there
+are exactly three: `/dsm-wrap-up` Step 0, `/dsm-quick-wrap-up` Step 0, and
+`/dsm-staa` Step 7. `/dsm-light-wrap-up` writes no lessons and is correctly out
+of scope. This paragraph is the canonical statement; the three steps reference it
+rather than restating it, the same single-source posture the regeneration
+transform below uses.
+
+Three properties, each earned from an observed defect:
+
+1. **Chain, never replace.** The header's value is the backwards chain, so a
+   superseded value moves behind `Prior:` (the form the file already uses)
+   rather than being overwritten. A replace-in-place edit destroys the audit
+   trail, the same hazard as replacing rather than inserting above a versioned
+   index section.
+2. **No-op when nothing changed.** A run that appended nothing and pruned
+   nothing makes no header change. Touching the header anyway is a false
+   provenance claim in the other direction.
+3. **Same run, not the next one.** The update belongs to the step that made the
+   change. Deferring it to a later step or a later skill is precisely the
+   structure that produced the gap.
+
+**Why this is not solved by deleting the header.** The obvious cheap resolution
+is to drop the convention, since the transform below discards these lines from
+the mirror anyway. It does not survive contact with how the file is used: the
+header carries the pruning-cadence state (which scheduled prune is owed or was
+carried) and the decided entry-count target with its authority, and both are
+load-bearing reads by agents at prune time. The mirror's readers and the header's
+readers are different audiences at different moments.
+
+**The failure shape this closes.** `/dsm-staa` Step 9 writes `.claude/last-staa.txt`
+unconditionally, so a run that skipped the header leaves two artifacts making
+opposite claims: the marker asserts a run happened, and the file it operated on
+still names the previous run as its last writer. A silence that a second artifact
+fills with a confident opposite claim is worse than a plain gap, because a reader
+who checks one artifact gets a clean answer and no reason to check the other.
+Recorded instance: the S244-STAA run pruned 28 entries and wrote its marker while
+the header still claimed S243-STAA, undetected for a full day.
 
 **Compact format (trim-only):**
 
@@ -1980,7 +2020,7 @@ not signal-weakness.
 
 > **Core reference:** DSM_0.2 §2. Moved here from core to reduce always-loaded context.
 
-At session start in spoke projects, compare the DSM version in the header above against the version recorded in the most recent handoff (`dsm-docs/handoffs/`). If the versions differ:
+At session start in spoke projects, compare the DSM version in the header above against the version recorded in the most recent handoff (`dsm-docs/handoffs/`). The handoff is read by `/dsm-go` Step 3, which consumes it before archiving it (BL-511); this comparison depends on that read having happened. If the versions differ:
 1. Note the update: "DSM updated from vX.Y.Z to vA.B.C since last session"
 2. Check the DSM CHANGELOG for changes between those versions
 3. Extract any `**Spoke action:**` annotations from new CHANGELOG entries
