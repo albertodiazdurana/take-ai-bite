@@ -508,7 +508,16 @@ Before starting alignment, check if git is initialized:
    - Step 7b skipped: no valid @ reference (Step 7 reported missing)}
    ```
 
-   - Write on **every** run, both post-change and check-only. Idempotence: if nothing changed between runs, the report content (excluding the timestamp line) is identical.
+   - Write on **every** run, both post-change and check-only. Idempotence: if nothing
+     changed between runs, the report **body** is identical , that is, everything below
+     the `---` separator that closes the header block. **The header block, not just the
+     timestamp line (BL-527).** The header carries five fields and three of them can
+     legitimately differ between two runs over an unchanged project: `**Timestamp:**`
+     always, `**DSM version:**` on any release, and `**Run mode:**` between a post-change
+     run and a check-only run. Only `**Project:**` and `**Project type:**` are stable.
+     Stating the invariant over the timestamp alone made a conforming run look like a
+     violation, which is why the boundary is the `---` separator the report already
+     writes rather than a field list that would drift as fields are added.
    - The file is gitignored via the existing `.claude/` rule; no `.gitignore` change required.
    - This step is mandatory; it must not be skipped even when the conversation report is short.
 

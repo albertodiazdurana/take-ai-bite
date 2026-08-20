@@ -656,6 +656,17 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    git status --porcelain | grep -v '^[?]' | awk '{print $NF}' | xargs -r md5sum >> .claude/session-baseline.txt
    git status --porcelain -uall | grep '^[?]' | awk '{print $NF}' | xargs -r md5sum >> .claude/session-baseline.txt
    ```
+   **`# Working tree` is a summary, NOT the comparison surface (BL-523).** The block
+   written by the plain `git status --porcelain` above is for a human reading the
+   baseline. It collapses a wholly-untracked directory to a single entry, so it is an
+   incomplete record of untracked files by design. The `# Checksums` block below is the
+   complete one, and it is what `/dsm-wrap-up` Step 9 and `/dsm-quick-wrap-up` Step 7
+   test membership against. Stated here, at the write site, because the two blocks
+   disagree by construction and nothing downstream can tell which one an agent consulted:
+   measured on a baseline with one loose file and one untracked directory holding two
+   files at two depths, the `# Working tree` reading classifies both nested files as
+   new-this-session while the `# Checksums` reading classifies them as pre-existing.
+
    **Last field, not `$2` (BL-488).** `git status --porcelain` has two path shapes.
    A modified or untracked entry is `<code> <path>`, where the path is field 2. A
    staged rename is `R  <old> -> <new>`, where field 2 is the **old** path, which no

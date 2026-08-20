@@ -100,7 +100,7 @@ and request user disambiguation rather than guessing a number.
    4. Report: "Checkpoint {filename} moved to done/"
    If multiple checkpoints exist in `dsm-docs/checkpoints/` (excluding `done/`), read the most recent for context, then move **all** of them to `done/` with the same annotation (restaging each). If no checkpoint exists, skip silently.
 3. **Git status:** Run `git status` to check for uncommitted changes.
-4. **Save session baseline:** Save a new baseline snapshot (same as full `/dsm-go` step 6), then append `mode: light` to preserve the chain for the next lightweight wrap-up.
+4. **Save session baseline:** Save a new baseline snapshot (same as full `/dsm-go` **step 5**; step 6 is the transcript reset , cross-reference corrected per BL-523 T-6), then append `mode: light` to preserve the chain for the next lightweight wrap-up. Because this step defers to `/dsm-go` Step 5 rather than restating the commands, it inherits BL-482's `[?]`, BL-488's `$NF`, BL-512's `-uall` and BL-523's comparison-surface note automatically; do not inline a copy of them here.
 5. **Transcript boundary marker:** Append a session boundary marker to the existing `.claude/session-transcript.md` (do NOT archive or overwrite). The session number `{N}` MUST be the integer parsed from the current branch name per the Session Numbering rule above (e.g., branch `session-190/2026-04-14` → N=190). Do NOT increment, do NOT use archive count:
    ```markdown
 

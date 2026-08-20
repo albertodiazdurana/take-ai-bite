@@ -87,6 +87,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 <details>
 <summary>Latest additions to the framework (click to expand)</summary>
 
+- **Commands reach every project, not just the one that ships them** — Five slash commands were installed where only the hub could see them, so other projects loaded copies nothing had updated in months; the drift check reported all clear the whole time because it was looking at the wrong folder
 - **Checks now test the command you actually ran** — Piping a command into another hides its exit status, so a rejected push could still report success; the rule names both ways this fails and the checks that work
 - **Systems Prompt Engineering (DSM_6.1)** — A full chapter naming the discipline: version-controlled instruction systems, failure mode taxonomy, practitioner maturity model, and PMP knowledge area mapping
 - **Chunked drafting for structured documents** — Project plans, proposals, reports, and other prose deliverables are drafted one section at a time with per-section review, not generated whole
