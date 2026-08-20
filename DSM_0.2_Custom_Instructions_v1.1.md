@@ -2478,6 +2478,47 @@ checkpoints, feedback), parallel session commits (via commit booking).
 after merging to their parent branch. Exception: consolidation branches are
 deleted only when all referenced BLs are resolved.
 
+**A PR is built from the remote ref, so verify the branch is fully pushed before
+opening one (BL-516).** `gh pr create` and every equivalent describe the branch as
+it exists **on the remote**. A commit made after the last push is absent from the
+PR, absent from the merge, and then destroyed when `--delete-branch` removes the
+only copy holding it. Every step reports success.
+
+Before creating **or merging** a PR, assert:
+
+```bash
+git fetch -q origin
+UNPUSHED=$(git rev-list @{u}..HEAD --count)
+```
+
+`UNPUSHED` must be `0`. If it is not, halt and report the count and the commit
+subjects rather than pushing silently , an unpushed commit at PR time usually means
+the branch state is not what the author believes, and that is worth surfacing. This
+is a fact about the repository requiring no interpretation, in the same spirit as
+BL-489 replacing prose-signal detection with `git log main..branch`.
+
+**Git already implements this guard and `gh` bypasses it.** Measured 2026-08-20:
+`git branch -d` on a branch holding a commit not in its base **refuses**, exit 1,
+with "The branch is not fully merged"; `git branch -D` force-deletes. Because
+`gh pr merge --delete-branch` does delete such branches, it uses force semantics.
+So the check must sit **before** the `gh` call and can never rely on the tool
+declining , the tool will not decline.
+
+**A stronger post-create assertion**, when the PR already exists: compare the PR's
+head SHA against local `HEAD`. They must be equal.
+
+```bash
+gh pr view "$PR" --json headRefOid --jq .headRefOid   # must equal git rev-parse HEAD
+```
+
+**Origin:** S248 committed a README fix after pushing its session branch, opened a
+PR from the stale remote ref, merged it, and `--delete-branch` destroyed the commit.
+Recovered by `git cherry-pick` from the reflog, and detected only because a later
+step diffed the file and found no change where there plainly should have been one.
+The ordering in `/dsm-wrap-up` (push at Step 9, merge at Step 10) is adjacent by
+design and would have prevented it; the failure was hand-execution pushing early as
+a progress checkpoint. Do not "fix" the skill's step order for this.
+
 ### 20.5. Session-Start Branch Resumption Protocol
 
 At session start (`/dsm-go`, `/dsm-light-go`), the agent checks for open

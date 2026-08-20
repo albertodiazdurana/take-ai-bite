@@ -52,10 +52,31 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SOURCE_DIR="${SCRIPT_DIR}/commands"
 USER_TARGET="${HOME}/.claude/commands"
-PROJECT_TARGET="${REPO_DIR}/.claude/commands"
 
-# Commands that deploy to project-level .claude/commands/
-PROJECT_COMMANDS="dsm-backlog.md dsm-backlog-done.md dsm-checkpoint.md dsm-review-feedback.md dsm-version-update.md"
+# Legacy project-level location. NOTHING deploys here any more (BL-518); it is
+# retained only so --check can report copies left behind by the old split, which
+# SHADOW the user-level ones and would otherwise go stale invisibly.
+LEGACY_PROJECT_TARGET="${REPO_DIR}/.claude/commands"
+
+# ALL commands deploy to USER_TARGET (BL-518, option A, decided 2026-08-20).
+#
+# WHY, because the next reader will otherwise re-derive the question: these
+# commands are used in ALL projects, so "project command" was never a real
+# category here. Five of them (dsm-backlog, dsm-backlog-done, dsm-checkpoint,
+# dsm-review-feedback, dsm-version-update) used to deploy to
+# "${REPO_DIR}/.claude/commands", which only a session running inside Central can
+# resolve. A spoke fell through to the user-level copy that NO code path wrote,
+# so those copies sat four months stale (measured 2026-08-20: mtimes 2026-03-20
+# and 2026-04-22, all five differing from source). The spoke-visible
+# /dsm-backlog had ZERO occurrences of "Risks" and "Test Execution Log" against
+# two each in source, so spokes filed backlog items violating DSM_0.2 §21.2 and
+# §21.3 while believing they had followed the skill.
+#
+# --check reported "20/20 | OK: 20" throughout, truthfully: it compared each
+# command against its OWN designated target, and for those five that target was
+# Central's folder, which was current. The file a spoke actually loads was
+# outside the comparison. That is the property the orphan report below exists to
+# close.
 
 if [ ! -d "$SOURCE_DIR" ]; then
     echo "ERROR: Source directory not found: $SOURCE_DIR"
@@ -63,20 +84,37 @@ if [ ! -d "$SOURCE_DIR" ]; then
 fi
 
 mkdir -p "$USER_TARGET"
-mkdir -p "$PROJECT_TARGET"
-
-is_project_command() {
-    local name="$1"
-    echo "$PROJECT_COMMANDS" | grep -qw "$name"
-}
 
 get_target() {
-    local name="$1"
-    if is_project_command "$name"; then
-        echo "${PROJECT_TARGET}/${name}"
-    else
-        echo "${USER_TARGET}/${name}"
-    fi
+    echo "${USER_TARGET}/$1"
+}
+
+# Report copies at the legacy project-level path that nothing writes any more.
+# A project-level command SHADOWS the user-level one, so a leftover here is not
+# inert: it is what the agent actually loads, frozen at whatever it said when
+# the split was removed. Reported, never deleted , removing files with
+# substantive content is a user decision (Destructive Action Protocol).
+report_orphans() {
+    [ -d "$LEGACY_PROJECT_TARGET" ] || return 0
+    local -a orphans=()
+    local f name
+    for f in "$LEGACY_PROJECT_TARGET"/*.md; do
+        [ -e "$f" ] || continue
+        name="$(basename "$f")"
+        orphans+=( "$name" )
+    done
+    [ ${#orphans[@]} -eq 0 ] && return 0
+    echo ""
+    echo "ORPHANED project-level copies in ${LEGACY_PROJECT_TARGET}:"
+    for name in "${orphans[@]}"; do
+        if [ -f "${SOURCE_DIR}/${name}" ] && diff -q "${SOURCE_DIR}/${name}" "${LEGACY_PROJECT_TARGET}/${name}" > /dev/null 2>&1; then
+            echo "  - ${name} (currently matches source, but nothing keeps it current)"
+        else
+            echo "  - ${name} (DIFFERS from source; this is the copy an agent here loads)"
+        fi
+    done
+    echo "  These shadow the user-level copies. Nothing deploys to this path any"
+    echo "  more (BL-518). Delete them once you have confirmed nothing needs them."
 }
 
 check_drift() {
@@ -134,6 +172,7 @@ check_drift() {
 
     echo "---"
     echo "Checked: $checked/$total | OK: $ok | Drifted: $drifted | Missing: $missing"
+    report_orphans
 
     if [ $drifted -gt 0 ] || [ $missing -gt 0 ]; then
         echo "Run 'scripts/sync-commands.sh --deploy' to sync tracked -> runtime"
@@ -146,21 +185,14 @@ check_drift() {
 
 deploy() {
     local user_count=0
-    local project_count=0
     for src in "$SOURCE_DIR"/*.md; do
         local name
         name="$(basename "$src")"
-        local tgt
-        tgt="$(get_target "$name")"
-        cp "$src" "$tgt"
-        if is_project_command "$name"; then
-            project_count=$((project_count + 1))
-        else
-            user_count=$((user_count + 1))
-        fi
+        cp "$src" "$(get_target "$name")"
+        user_count=$((user_count + 1))
     done
     echo "Deployed $user_count user-level commands to $USER_TARGET"
-    echo "Deployed $project_count project-level commands to $PROJECT_TARGET"
+    report_orphans
 }
 
 case "${1:---check}" in

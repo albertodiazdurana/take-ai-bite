@@ -911,7 +911,7 @@ of scope. This paragraph is the canonical statement; the three steps reference i
 rather than restating it, the same single-source posture the regeneration
 transform below uses.
 
-Three properties, each earned from an observed defect:
+Four properties, each earned from an observed defect:
 
 1. **Chain, never replace.** The header's value is the backwards chain, so a
    superseded value moves behind `Prior:` (the form the file already uses)
@@ -924,6 +924,19 @@ Three properties, each earned from an observed defect:
 3. **Same run, not the next one.** The update belongs to the step that made the
    change. Deferring it to a later step or a later skill is precisely the
    structure that produced the gap.
+4. **Create when absent, and say so in the line (BL-526).** Properties 1 to 3 are
+   all update-shaped and presuppose the line exists: there is no superseded value
+   to chain on a first run, and the one stated skip condition is about content
+   rather than about the line's absence. Where `**Last appended:**` is absent, the
+   run **creates** it, and states within the line that it was created by this run
+   and that earlier appends predate the header , so its date is not later misread
+   as the file's first write. Absence is not a reason to skip, and it is not a
+   reason to write either: property 2 still governs, so a run that appended and
+   pruned nothing makes no header change even when the line is missing. The gap is
+   not hypothetical, BL-510 post-dates many spokes' last structural edit to the
+   file, so a spoke whose file has not been restructured since then has no header
+   at all, and an agent meeting that had three readings (create, skip, error) with
+   nothing here to choose between them.
 
 **Why this is not solved by deleting the header.** The obvious cheap resolution
 is to drop the convention, since the transform below discards these lines from
