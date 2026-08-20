@@ -414,6 +414,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-487 | The concurrent-session halt offers its options with no liveness signal | v1.20.0 | 2026-08-05 | — (needs review) |
 | BACKLOG-488 | The session baseline drops renamed files from its checksum set | v1.20.0 | 2026-08-05 | — (needs review) |
 | BACKLOG-489 | The closed-session-leftover remedy strands the leftover branch's commits | v1.20.0 | 2026-08-05 | — (needs review) |
+| BACKLOG-491 | Both stated byte caps on the reasoning-lessons compact mirror are unenforceable | v1.22.0 | 2026-08-20 | DSM_0.2.A §8.1 Size bound + /dsm-go Step 1.5 |
 | BACKLOG-493 | /dsm-go Step 5.8's incomplete-wrap-up detection fires on every fresh session | v1.21.0 | 2026-08-05 | /dsm-go Step 5.8 |
 | BACKLOG-501 | Research-file status labels may not exceed their verification pass | v1.21.0 | 2026-08-12 | DSM_0.2 §10.1 |
 | BACKLOG-502 | The roadmap covers 26% of the backlog it claims to map, and work selection is routed through it | v1.21.0 | 2026-08-12 | plan/roadmap.md curation criterion |
@@ -426,6 +427,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-511 | Handoffs are archived unread by the session they were written for | v1.21.2 | 2026-08-19 | /dsm-go Step 3 |
 | BACKLOG-512 | Baseline checksums drop every file inside an untracked directory | v1.21.2 | 2026-08-19 | /dsm-go Step 5, /dsm-wrap-up Step 9, /dsm-quick-wrap-up Step 7 |
 | BACKLOG-513 | The punctuation scope predicate under-covers document-delivery projects | v1.21.2 | 2026-08-19 | DSM_0.2 §17.1 ### Punctuation, Scope paragraph |
+| BACKLOG-515 | A pipeline's exit status belongs to its last command | v1.22.0 | 2026-08-20 | DSM_0.2 §19.2 |
 
 ---
 
