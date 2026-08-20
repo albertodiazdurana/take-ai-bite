@@ -2218,6 +2218,7 @@ of testing is low; the cost of a broken merge is high.
 - Cross-references: all internal references resolve (dispatch table entries match module headers, section references point to existing sections)
 - Spoke compatibility: `@` reference still resolves, no new dependencies on features spokes cannot access
 - Published snippets: any runnable snippet added or modified in a skill file has been executed against its real input, in the real harness (see §19.1)
+- Verification commands: no check in this list is trusted on the strength of a pipeline's exit status or a status line a pipeline printed (see §19.2)
 
 ### 19.1. Published Snippets Are Run Before They Ship
 
@@ -2298,6 +2299,10 @@ defects were reported independently by `dsm-blog-poster` (S33) and
 `dsm-data-science-portfolio-working-folder` (S134), and both reproduced at DSM
 Central's own boot in the session that fixed them.
 
+**Sibling:** §19.2 applies the same second question to the ad-hoc verification
+commands an agent composes in the moment, which this section does not reach
+because they are never published anywhere to be reviewed.
+
 **BL-specific test plan:** Each backlog item that requires a feature branch must
 include a Test Plan section with specific, verifiable conditions. These conditions
 are defined at BL creation time and checked off on the branch before merge. The
@@ -2313,6 +2318,106 @@ this requirement is codified in §21.3 (Pre-Merge Test Plan Execution Rule).
 record per-item evidence before merge.
 
 ---
+
+### 19.2. A Pipeline's Exit Status Belongs To Its Last Command
+
+§19.1 governs snippets **published** in skill files. This governs the ad-hoc
+verification commands an agent composes in the moment, which appear in no file
+and are reviewed by nobody. Same second question, different trigger.
+
+A shell pipeline exits with the status of its **last** command. So in
+
+```bash
+some_command | tail -1 && echo "ok"
+some_command | wc -l  || echo "none found"
+```
+
+the `&&` and the `||` are testing `tail` and `wc`. Those essentially always
+succeed. The status of the command actually under test is discarded before
+anything looks at it.
+
+**It fails in both directions, and they look nothing alike:**
+
+| Direction | Shape | What it makes you believe |
+|---|---|---|
+| **False success** | `cmd \| tail && echo "done"` | The action worked. It did not. |
+| **False emptiness** | `cmd \| wc -l \|\| echo "none"` | The fallback stays silent, and its silence reads as "ran fine, found something". |
+
+Measured in a Claude Code Bash session, 2026-08-20, per §19.1's obligation:
+`false | tail -1 && echo ok` prints `ok` at exit 0; `false | wc -l || echo none`
+prints `0` and never fires the fallback; and a `git` command against a
+nonexistent repo, which exits 128, prints `REPORTED: pushed to main` at
+pipeline exit 0.
+
+**The three correct forms**, each verified to surface that 128:
+
+1. Run the command alone, then check `$?`.
+2. `set -o pipefail` before the pipeline.
+3. Read `${PIPESTATUS[0]}` after it.
+
+**Never use `| tail` as a success probe.** Displaying output through `tail` is
+fine and this rule does not touch it; the prohibition is on letting a pipeline's
+status, or a line it happened to print, stand as evidence that the command
+succeeded.
+
+**The display carve-out covers the pipe, NOT a later `$?`.** This is the crack
+the rule fell through on its first day, so it is stated separately rather than
+left implied. Bounding a command's output with `| tail -25` or `| head -40` is a
+legitimate display choice; reading `$?` **after** that pipe is the same defect as
+using the pipe to probe, because the status is `tail`'s either way. The
+disguise is what makes it dangerous: the intent felt like "I am only truncating
+noisy output", and the truncation genuinely was innocent , the status read
+that followed it was not.
+
+If you bounded the output and you also need the status, you have three
+choices and all of them are cheap: run the command again with its output
+discarded and read `$?`, capture `${PIPESTATUS[0]}` on the same line as the
+pipeline, or set `pipefail` before it. What you may not do is bound the output
+and then trust `$?`.
+
+**A status line a pipeline printed is not a status.** The corollary that costs
+the most: when a pipeline prints something reassuring, the reassurance came from
+whichever command ran last, not from the one whose success you care about.
+
+**Anti-pattern guard.** "The command obviously worked, the output looks right" is
+the rationalisation this rule forbids. Variants:
+
+- "I saw the expected text in the output"
+- "It would have errored if it failed"
+- "The fallback did not fire, so there was nothing to report"
+- "I have used this form for months"
+
+The last one is the load-bearing one. This rule exists **because knowing the
+shell semantics did not prevent the defect**: S247 ran `git push | tail && echo
+pushed` and reported "pushed to main" on a push the protected branch had
+REJECTED, in a session whose own transcript already carried the rule as a
+reasoning lesson. Recurrence under active awareness is what promoted it from a
+lesson to a rule. Same guard family as §19.1 ("the snippet is obviously
+correct"), §8.2.1, §21.2 and §21.3.
+
+**Enforcement.** Prose and convention only; no hook detects the defective form
+at write time. Same defence-in-depth posture as §19.1, §8.9.1, §21.2 and §21.3.
+A PreToolUse matcher is conceivable and is deliberately not proposed here, since
+it needs its own false-positive design pass and a rule that waits for tooling is
+a rule that does not exist yet.
+
+**Origin:** BL-515 (S248), promoted from MEMORY's Key Patterns on three recorded
+occurrences across two consecutive sessions: S246's `git tag --merged main |
+tail -1` naming an older release as the latest (which also sorts lexically, so
+`v1.9.0` outranks `v1.21.1`), S247's rejected push reported as pushed, and
+S247's grep spanning two record formats in one stream reporting a false
+divergence across ten identical files.
+
+**Fourth occurrence, inside the release that shipped this section.** Less than an
+hour after §19.2 was written, the same session ran the mirror-sync content
+scanner as `./scripts/check-mirror-sync-content.sh ... | tail -25` and reported
+"scanner exit: 0". The scanner had exited **1** and its own output said "Mirror
+sync should stop"; `$?` belonged to `tail`. Re-run correctly, `${PIPESTATUS[0]}`
+was 1 while `$?` was 0, on the same command. This is recorded here rather than
+quietly fixed because it is the strongest available evidence for the section's
+own thesis: authoring the rule, stating its origin, and executing four
+demonstrations of it did not prevent the author from committing it within the
+hour. The display carve-out above is the specific clause that gap produced.
 
 ## 20. Three-Level Branching Strategy
 

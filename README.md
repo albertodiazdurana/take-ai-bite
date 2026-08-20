@@ -87,6 +87,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 <details>
 <summary>Latest additions to the framework (click to expand)</summary>
 
+- **Checks now test the command you actually ran** — Piping a command into another hides its exit status, so a rejected push could still report success; the rule names both ways this fails and the checks that work
 - **Systems Prompt Engineering (DSM_6.1)** — A full chapter naming the discipline: version-controlled instruction systems, failure mode taxonomy, practitioner maturity model, and PMP knowledge area mapping
 - **Chunked drafting for structured documents** — Project plans, proposals, reports, and other prose deliverables are drafted one section at a time with per-section review, not generated whole
 - **User-reframes-proposal handling** — When the human re-shapes a proposal instead of answering yes or no, the agent re-decomposes the work rather than defending its original framing
@@ -95,7 +96,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 - **Non-suppressible safety prompts** — Certain session-start safety checks must be answered explicitly even under auto mode; speed settings cannot silently skip them
 - **Pre-merge test execution and preemptive risk definition** — Every backlog item names its failure modes up front and runs its test plan with per-item evidence before merging
 - **Concurrent-session detection** — A second session on the same project is detected and halted before it can corrupt shared state, and fresh mirror clones self-initialize on first run
-- **Compact reasoning-lessons mirror** — Accumulated cross-session reasoning lessons are distilled into a size-bounded file the agent reads at session start
+- **Compact reasoning-lessons mirror** — Accumulated cross-session reasoning lessons are distilled into a file the agent reads at session start, under a size limit the tooling enforces; if the file outgrows it, the session says so rather than quietly reading less
 - **Document modularization** — All methodology documents split into slim cores with on-demand modules, reducing context consumption while preserving full coverage
 - **Parallel session protocol** — Run isolated evaluation tasks on independent branches without interfering with the main session
 
