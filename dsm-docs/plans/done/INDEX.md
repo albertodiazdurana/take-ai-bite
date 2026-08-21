@@ -428,6 +428,17 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-512 | Baseline checksums drop every file inside an untracked directory | v1.21.2 | 2026-08-19 | /dsm-go Step 5, /dsm-wrap-up Step 9, /dsm-quick-wrap-up Step 7 |
 | BACKLOG-513 | The punctuation scope predicate under-covers document-delivery projects | v1.21.2 | 2026-08-19 | DSM_0.2 §17.1 ### Punctuation, Scope paragraph |
 | BACKLOG-515 | A pipeline's exit status belongs to its last command | v1.22.0 | 2026-08-20 | DSM_0.2 §19.2 |
+| BACKLOG-516 | PR creation does not verify the branch is fully pushed | v1.23.0 | 2026-08-20 | DSM_0.2 §20.4, /dsm-wrap-up Step 9.4 |
+| BACKLOG-518 | sync-commands deploys five commands where no spoke can see them | v1.23.0 | 2026-08-20 | scripts/sync-commands.sh, mirror-sync-manifest category 6 |
+| BACKLOG-523 | Wrap-up Step 9 does not say which baseline block it compares against | v1.23.0 | 2026-08-20 | /dsm-go Step 5, /dsm-wrap-up Step 9, /dsm-quick-wrap-up Step 7 |
+| BACKLOG-526 | The provenance-header rule has no create case | v1.23.0 | 2026-08-20 | DSM_0.2.A §8.1 provenance header, property 4 |
+| BACKLOG-527 | /dsm-align's report idempotence invariant is narrower than written | v1.23.0 | 2026-08-20 | /dsm-align persistent report invariant |
+| BACKLOG-514 | /dsm-quick-wrap-up appends lessons without regenerating the compact mirror | — | 2026-08-20 | /dsm-quick-wrap-up Step 0, DSM_0.2.A §8.1 |
+| BACKLOG-530 | The FEATURES notification is diff-driven with no reconciliation | — | 2026-08-21 | /dsm-go Step 2e |
+| BACKLOG-521 | Two Sprint Boundary Checklist items name paths no scaffold creates | — | 2026-08-21 | DSM_2.0.C Template 8, /dsm-align Step 3 |
+| BACKLOG-522 | dsm-docs/guides/ has no index and no trigger-gated convention | — | 2026-08-21 | dsm-docs/guides/README.md |
+| BACKLOG-524 | Cost gate misses recursive delegation; trigger wording ambiguous | — | 2026-08-21 | DSM_0.2 §8.9.2 |
+| BACKLOG-517 | Transcript delimiter timestamps are never checked against the wall clock | — | 2026-08-21 | validate-transcript-edit.sh check 4/4, DSM_0.2 §7 |
 
 ---
 

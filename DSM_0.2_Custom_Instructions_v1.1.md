@@ -247,7 +247,7 @@ under §23 (Skill/Hook Collaboration Protocol).
 - Commit the transcript file; it is a session-scoped working artifact
 - Edit or rewrite past transcript entries; each entry reflects reasoning at the time it was written
 - Use Edit with `old_string` matching earlier content to insert entries mid-file; this causes out-of-order timestamps (observed in prior sessions). Use the mandatory append technique above
-- **Use Edit `replace_all: true` on `.claude/session-transcript.md`.** The append-anchor rule assumes a unique last-line anchor; `replace_all` duplicates the new content at every match and explodes the file (IronCalc S17: 95 MB / 1.5M lines; blog-poster S22: an Output block duplicated at every match). Recovery from a botched transcript Edit is a `[RETROACTIVE]` Bash-heredoc append, never a `replace_all` cleanup. The `validate-transcript-edit.sh` PreToolUse hook blocks this case (check 0/3)
+- **Use Edit `replace_all: true` on `.claude/session-transcript.md`.** The append-anchor rule assumes a unique last-line anchor; `replace_all` duplicates the new content at every match and explodes the file (IronCalc S17: 95 MB / 1.5M lines; blog-poster S22: an Output block duplicated at every match). Recovery from a botched transcript Edit is a `[RETROACTIVE]` Bash-heredoc append, never a `replace_all` cleanup. The `validate-transcript-edit.sh` PreToolUse hook blocks this case (check 0/4)
 - Use reasoning delimiters in conversation text; VS Code collapses them after streaming
 - **Use single-quoted heredoc (`<< 'EOF'`) when appending to the transcript via Bash** if the content contains shell expansions like `$(date +%H:%M)`. Single-quoted heredocs suppress expansion and write the literal string `$(date +%H:%M)` into the transcript instead of the timestamp. Observed in portfolio S69. Correct form: capture the timestamp into a variable first and use an unquoted heredoc:
   ```bash
@@ -268,7 +268,23 @@ The reliable enforcement layer is a `UserPromptSubmit` hook in
 `.claude/settings.json` that injects a per-turn reminder. Two hooks form a
 complementary pair: the `UserPromptSubmit` hook enforces *occurrence* (an
 append must happen this turn), and `validate-transcript-edit.sh` (PreToolUse
-on Edit) enforces *shape* (anchor, append-only, delimiter). Neither IDE
+on Edit) enforces *shape* (anchor, append-only, delimiter) and, since BL-517,
+*value* , check 4/4 compares the delimiter's `HH:MM` against the wall clock and
+**warns** above a 5-minute tolerance.
+
+Check 4 warns rather than blocks, and the asymmetry is deliberate. Checks 0-3
+guard against an append that would damage the file, so vetoing them is
+proportionate. A drifted timestamp damages nothing; it mislabels a log entry.
+Blocking an append over it would wedge the protocol the hook exists to keep
+running, and a gate the user learns to dismiss is worse than no gate. The
+non-blocking channel is exit 1, the same convention
+`validate-cross-repo-write.sh` uses. `[RETROACTIVE]` delimiters get **no**
+exemption: §7 requires them to carry the current time, so they are checked like
+any other. Origin: three recorded drift incidents , roughly 13 hours, 8 hours
+27 minutes, and a non-monotone 132-minute swing in both directions , none of
+which any check detected, because until BL-517 nothing read the number.
+
+Neither IDE
 monitoring nor session-start "behavioral activation" is the enforcement
 mechanism; both are user-facing affordances that document intent without
 requiring it. The hook is the mechanism.
@@ -1217,8 +1233,9 @@ launch.
 present the consent contract below and obtain an explicit acceptance.
 
 **Trigger set (positive definition):** the gate fires when a single invocation
-spawns **many independent full-LLM calls drawing on the same rate-limit pool**.
-Concretely:
+spawns **many independent full-LLM calls drawing on a shared, finite rate-limit
+pool**. "Shared" means shared among the fan-out's own calls; it does not mean
+shared with the main thread. Concretely:
 
 1. Multi-agent orchestration of any kind (a `Workflow`, a fan-out of subagents,
    a parallel sweep) where one call becomes N model calls.
@@ -1229,6 +1246,27 @@ Concretely:
    partly spent, so the second fan-out carries a higher risk than the first even
    when it is identical in size. Re-prompt; do not treat the first acceptance as
    standing.
+
+**Gated subagents do not delegate further, by default.** Consent priced on N
+agents must not run 2N. An agent spawned inside a gated fan-out has **no
+delegation authority** unless the accepted prompt granted it explicitly, so a
+subagent that wants to fan out must return and let the main agent seek fresh
+consent. Where delegation IS granted, disclosure 1 states the **bound on total
+agents**, not the first-level count.
+
+This is a default rather than a sixth disclosure on purpose. A sixth line would
+appear in every prompt including the many where the answer is trivially no, and
+a prompt that grows a line nobody reads is the ritualism shape §8.7's skip
+condition and §10.1's compliance guard both exist to prevent. The default costs
+nothing in the common case and fails safe in the rare one.
+
+**Moving subagents to a cheaper tier reduces the cost; it does not exit the
+trigger.** The mitigations below recommend exactly that, and on a plan whose
+cheaper tier has its own separate weekly limit, a literal reading of an
+earlier wording ("the same rate-limit pool") took the recommended configuration
+*out* of the gate. A hundred subagents contending for one finite weekly budget
+is the trigger whether or not the main thread draws on that budget too;
+exhausting the cheaper pool stops the work exactly as hard.
 
 **Over-firing guard (what the gate must NOT fire on):** ordinary single-agent
 tool calls, file reads of any size, long-running commands, large diffs, and
@@ -1301,6 +1339,8 @@ defect:
 - "I cannot estimate the token count precisely, so stating nothing is more honest"
 - "Surfacing cost would be nagging about something they already decided"
 - "The first pass was approved, so the second is covered"
+- "The first-level count is what I disclosed" (the agents those agents spawn are the same pool)
+- "The subagents are on the cheaper tier, so this is not the same pool"
 
 All are §8.9.2 violations. Same guard family as §8.9.1 ("User implied yes by
 typing `/dsm-go`"), §8.2.1 ("No counter-evidence found" without sources
@@ -1920,7 +1960,7 @@ and updated automatically. Project-specific content lives outside the delimiters
   content at every match and explodes the file (observed: IronCalc S17 reached
   95 MB). Recovery from a botched transcript Edit is a `[RETROACTIVE]`
   Bash-heredoc append, never a `replace_all` cleanup. The
-  `validate-transcript-edit.sh` hook blocks this case (check 0/3).
+  `validate-transcript-edit.sh` hook blocks this case (check 0/4).
 - Per-turn enforcement: a `UserPromptSubmit` hook in `.claude/settings.json`
   injects a reminder every turn. The hook enforces *occurrence*; the
   existing `validate-transcript-edit.sh` PreToolUse hook enforces *shape*.
