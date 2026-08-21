@@ -589,6 +589,46 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
 
      **Filesystem-over-MEMORY rule (per BL-421):** MEMORY.md describes inbox state at the END of the previous session, not the START of the current one. New entries may have arrived between wrap-up and session start (cross-repo notifications, hub→spoke pushes). Trust the filesystem (`ls _inbox/`) over MEMORY narration. If MEMORY says "inbox cleared" but `ls` shows entries, report what `ls` shows; do not echo MEMORY's stale claim.
    - **2d. Subscription file:** Read `~/.claude/claude-subscription.md` if it exists. Cache the plan type and configuration profiles for the session. If the file does not exist, note: "No subscription file found. To enable session configuration recommendations, provide your Claude plan details." Continue without recommendations until the file is created.
+   - **2e. FEATURES notification reconciliation (per BL-530):** The blog-poster notification is sent by `/dsm-wrap-up` Step 1e from a **session-scoped diff** (`git diff <baseline-sha>..HEAD -- FEATURES.md`), so an F-entry the introducing session failed to send is never a candidate again , the next session's diff starts behind it. Three ordinary paths skip that step: `/dsm-quick-wrap-up` names the notification among what it does not do, `/dsm-light-wrap-up` does not mention blog-poster at all, and a full wrap-up skips it whenever the cross-repo target was not confirmed. This step is the reconciliation that catches those, and it lives at session start **because the failure is that the previous session's wrap-up did not run it**; a check in the same place as the send cannot catch the send being skipped.
+
+     Run the snippet below and report its single line in the boot report. The absent-`FEATURES.md` guard is **inside** the snippet, not stated only as prose above it: when it lived in prose, the block run in a project without a `FEATURES.md` printed `OK: nothing owed` , a clean bill of health for a comparison it had not made. Found by executing that branch rather than by reading it.
+
+     ```bash
+     if [ ! -f FEATURES.md ]; then
+       echo "SKIP: no FEATURES.md in this project"
+       return 2>/dev/null || exit 0
+     fi
+     BP=$(awk -F'|' '/^\| *blog-poster *\|/ {gsub(/^ *| *$/,"",$3); print $3; exit}' .claude/dsm-ecosystem.md 2>/dev/null)
+     BP="${BP/#\~/$HOME}"; BP="${BP%/}"
+     if [ -z "$BP" ] || [ ! -d "$BP/_inbox" ]; then
+       echo "UNRESOLVED: blog-poster inbox not found (registry entry or path missing) , owed set NOT computed"
+     else
+       vset() { grep -hoE '^- \*\*F-[0-9]+' "$@" 2>/dev/null | grep -oE 'F-[0-9]+' | sort -u; }
+       FEAT=$(vset FEATURES.md)
+       RECV=$( { vset "$BP"/_inbox/*.md; vset "$BP"/_inbox/done/*.md; } | sort -u )
+       FLOOR=$(vset "$BP"/_inbox/done/*.md | tail -1)
+       [ -n "$FLOOR" ] || FLOOR=$(vset "$BP"/_inbox/*.md | head -1)
+       if [ -z "$FLOOR" ]; then
+         echo "UNRESOLVED: recipient has no verbatim F-entry history, so no watermark can be derived , owed set NOT computed"
+       else
+         OWED=$(comm -23 <(printf '%s\n' "$FEAT") <(printf '%s\n' "$RECV") | awk -v f="$FLOOR" '$0 >= f')
+         N=$(printf '%s' "$OWED" | grep -c '^F-')
+         if [ "$N" -eq 0 ]; then echo "OK: nothing owed to blog-poster (watermark $FLOOR)"
+         else echo "OWED: $N F-entries owed to blog-poster (watermark $FLOOR): $(printf '%s' "$OWED" | tr '\n' ' ')"; fi
+       fi
+     fi
+     ```
+
+     **Report, never send.** The output is a boot-report line and nothing else. A cross-repo write stays behind its own confirmation gate, and this step performs none , verified by checksumming the recipient's `_inbox/` tree before and after a run. It also runs **no `git`** inside the recipient repository: cross-repo inbox traffic is write-only, and a read-only `git status` there is the habit that erodes the rule.
+
+     **Verbatim quotation is what counts as notified, not an F-number appearing somewhere.** Both sides anchor on `^- **F-`, the entry form the §2 notification format requires. Anchoring loosely is not a near-miss, it is a different answer: measured against the real recipient, a bare `F-[0-9]+` match reports **109 owed with a watermark of F-001**, because one archived entry contains the prose "Past entries (F-001 to F-086) are populated lazily" and a range reference in a sentence is not a notification.
+
+     **The watermark is derived, never hard-coded.** It is the **highest** verbatim F-number in the recipient's `done/` archive , the top of its settled record , falling back to the **lowest** verbatim F-number in the live inbox when nothing has been archived yet. A hard-coded floor needs maintenance and goes stale silently; this one moves as the recipient archives. Do not replace it with "the last entry sent": the record is patchy rather than truncated, and the case that produced this step had three entries missing *below* six that had arrived.
+
+     **What a wrong result looks like (§19.1's second question).** "Nothing owed" and "could not look" must never print the same line, which is why both unresolvable cases print `UNRESOLVED` and say the set was **not computed** rather than reporting zero. An empty read is not a clean bill of health.
+
+     **Known limit:** F-numbers are compared as zero-padded three-digit strings, so the ordering breaks at F-1000. Stated rather than solved; at the current cadence that is years away and the fix is a numeric sort.
+
    - Any other session-start protocols added to DSM_0.2 in the future
 3. **Handoff consumption and lifecycle:** Check `dsm-docs/handoffs/` for handoffs awaiting consumption. Any handoff file (not in `done/`) that predates this session was written FOR this session. **This step is its consumer.** Read, surface, then archive, in that order:
    - **Read the file in full, before any move.** Handoffs are authored by `/dsm-wrap-up` Step 5 and `/dsm-quick-wrap-up` Step 4 only when there is "complex pending work that requires detailed context for the next session", and `dsm-docs/handoffs/README.md` says the same. DSM_0.2.A §18 goes further and parses a DSM version field out of the most recent handoff at session start, which is a read no other step performs.

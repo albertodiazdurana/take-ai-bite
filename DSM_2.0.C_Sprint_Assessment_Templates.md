@@ -120,7 +120,7 @@ checked off. See DSM_0.2 Three-Level Branching Strategy for the full model.
 ---
 
 ## Phase Boundary Checklist (intra-sprint)
-- [ ] Update methodology.md with phase observations and scores
+- [ ] Record phase observations and scores in `dsm-docs/feedback-to-dsm/YYYY-MM-DD_sN_methodology.md`
 - [ ] Create checkpoint if significant milestone reached
 - [ ] Log decisions made during phase (dsm-docs/decisions/)
 - [ ] Update blog materials if insights worth sharing
@@ -145,7 +145,7 @@ checked off. See DSM_0.2 Three-Level Branching Strategy for the full model.
 - [ ] Feedback files updated (backlogs, methodology)
 - [ ] Decision log updated with sprint decisions
 - [ ] Tests passing (DSM 4.0 projects)
-- [ ] dsm-docs/guides/smoke-tests.md current (or N/A if no smoke tests recorded this sprint)
+- [ ] dsm-docs/guides/smoke-tests.md current (DSM 4.0 projects; N/A for documentation projects)
 - [ ] Blog journal entry written
 - [ ] Blog publication tracker updated (`dsm-docs/blog/README.md`)
 - [ ] Repository README updated (status, results, structure)

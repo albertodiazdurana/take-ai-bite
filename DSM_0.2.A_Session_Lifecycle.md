@@ -896,11 +896,12 @@ same lesson content.
 | File | Purpose | Edited by | Read by |
 |------|---------|-----------|---------|
 | `.claude/reasoning-lessons.md` | Source of truth: full lessons + guidelines + provenance | Humans, `/dsm-wrap-up` Step 0 (`[auto]`), `/dsm-quick-wrap-up` Step 0 (`[auto]`), `/dsm-staa` Steps 6-7 (`[STAA]` + prunes) | `/dsm-staa`, humans |
-| `.claude/reasoning-lessons-compact.md` | Derived agent-facing mirror, regenerated from the live file | `/dsm-wrap-up` Step 0 and `/dsm-staa` Step 8 (regeneration sub-steps) only, never edited by hand | `/dsm-go` Step 1.5 |
+| `.claude/reasoning-lessons-compact.md` | Derived agent-facing mirror, regenerated from the live file | `/dsm-wrap-up` Step 0, `/dsm-quick-wrap-up` Step 0 and `/dsm-staa` Step 8 (regeneration sub-steps) only, never edited by hand | `/dsm-go` Step 1.5 |
 
 The compact mirror file is gitignored (same as the live file) and includes
-a header comment "Do not edit; auto-generated from `reasoning-lessons.md` by
-`/dsm-wrap-up` Step 0."
+a header comment naming its three regenerators: "Do not edit; auto-generated
+from `reasoning-lessons.md` by `/dsm-wrap-up` Step 0, `/dsm-quick-wrap-up`
+Step 0 or `/dsm-staa` Step 8."
 
 **Provenance header ownership (BL-510).** The live file's `**Last pruned:**` and
 `**Last appended:**` lines record which run last modified it. Every step that
@@ -976,7 +977,7 @@ content:
   ```markdown
   # Reasoning Lessons (compact mirror)
 
-  <!-- Do not edit; auto-generated from .claude/reasoning-lessons.md by /dsm-wrap-up Step 0 or /dsm-staa Step 8 -->
+  <!-- Do not edit; auto-generated from .claude/reasoning-lessons.md by /dsm-wrap-up Step 0, /dsm-quick-wrap-up Step 0 or /dsm-staa Step 8 -->
 
   **Source:** `.claude/reasoning-lessons.md`
   **Last regenerated:** YYYY-MM-DDTHH:MM
@@ -990,8 +991,8 @@ out of scope for §8.1 and tracked separately under BL-427 Step 5.
 **Canonical regeneration transform (BL-447, single source of truth):**
 
 The transform below is the ONE authoritative implementation of the trim rule.
-`/dsm-wrap-up` Step 0 and `/dsm-staa` Step 8 both reference this block; neither
-re-inlines its own copy (re-inlining is the drift mechanism that produced the
+`/dsm-wrap-up` Step 0, `/dsm-quick-wrap-up` Step 0 and `/dsm-staa` Step 8 all
+reference this block; none re-inlines its own copy (re-inlining is the drift mechanism that produced the
 silent-empty-mirror bug across three spokes — heating-systems S15,
 dsm-blog-poster S21, dsm-data-science-portfolio-working-folder S90/S91). If the
 rule changes, it changes HERE and both skills inherit it.
@@ -1011,7 +1012,7 @@ SRC_MTIME=$(date -r .claude/reasoning-lessons.md +%Y-%m-%dT%H:%M%:z)
 {
   printf '%s\n' \
     "# Reasoning Lessons (compact mirror)" "" \
-    "<!-- Do not edit; auto-generated from .claude/reasoning-lessons.md by /dsm-wrap-up Step 0 or /dsm-staa Step 8 -->" "" \
+    "<!-- Do not edit; auto-generated from .claude/reasoning-lessons.md by /dsm-wrap-up Step 0, /dsm-quick-wrap-up Step 0 or /dsm-staa Step 8 -->" "" \
     "**Source:** \`.claude/reasoning-lessons.md\`" \
     "**Last regenerated:** $NOW" \
     "**Source mtime at regeneration:** $SRC_MTIME" "" \
@@ -1055,9 +1056,9 @@ over-capture. Reserving `### ` for categories keeps the input unambiguous.
 
 **Regeneration trigger:**
 
-`/dsm-wrap-up` Step 0 regenerates the compact mirror as a final sub-step,
-immediately after `[auto]` extraction has appended new lessons to the live
-file. Single-pass: the live file is already open. If the live file does not
+`/dsm-wrap-up` Step 0 and `/dsm-quick-wrap-up` Step 0 both regenerate the
+compact mirror as a final sub-step, immediately after `[auto]` extraction has
+appended new lessons to the live file. Single-pass: the live file is already open. If the live file does not
 exist (protocol not active for this project), the compact mirror is not
 created either.
 
@@ -1079,8 +1080,9 @@ created either.
 **Size bound (canonical; this is the only site that states the number):**
 
 The bound on `.claude/reasoning-lessons-compact.md` is **61,440 B (60 KB)**.
-One number, stated once, here. `/dsm-go` Step 1.5 and `/dsm-wrap-up` Step 0
-reference this paragraph rather than restating the value.
+One number, stated once, here. `/dsm-go` Step 1.5, `/dsm-wrap-up` Step 0 and
+`/dsm-quick-wrap-up` Step 0 reference this paragraph rather than restating the
+value.
 
 The bound is not a preference and not the file's current size. Two independent
 instruments put it in the same place, which is why it is 60 KB and not a round
@@ -1100,7 +1102,8 @@ out to be the same size.
 regeneration that exceeds the bound MUST produce an observable different from
 one that does not:
 
-- Regeneration (`/dsm-wrap-up` Step 0, `/dsm-staa` Step 8) reports the measured
+- Regeneration (`/dsm-wrap-up` Step 0, `/dsm-quick-wrap-up` Step 0, `/dsm-staa`
+  Step 8) reports the measured
   size, the bound, and the ratio, e.g. `mirror 105,855 B / bound 61,440 B /
   1.72x OVER`. A passing regeneration reports the same three quantities with
   `within bound`. Both report; only the verdict differs.

@@ -99,7 +99,7 @@ Before starting alignment, check if git is initialized:
 
    | Folder | Has done/? | Template file(s) |
    |--------|-----------|-------------------|
-   | `dsm-docs/blog/` | Yes | journal.md |
+   | `dsm-docs/blog/` | Yes | journal.md, README.md |
    | `dsm-docs/checkpoints/` | Yes | README.md |
    | `dsm-docs/decisions/` | No | None |
    | `dsm-docs/feedback-to-dsm/` | Yes | README.md |
@@ -618,6 +618,28 @@ Reference: DSM_0.1 Blog Artifacts (three-document pipeline).
 
 ### [YYYY-MM-DD] {Title}
 {Observation, story, pattern, or insight}
+```
+
+### Blog Publication Tracker Template (`dsm-docs/blog/README.md`)
+
+```markdown
+# Blog Publication Tracker
+
+What has been published from this project, and where. The Sprint Boundary
+Checklist (DSM_2.0.C §1 Template 8, item 7) asks for this file to be current
+at every sprint boundary, which is why `/dsm-align` creates it as a stub
+rather than leaving the item unsatisfiable in a freshly scaffolded spoke.
+
+Distinct from `journal.md`, which is the append-only capture file for
+observations that have not been published yet. Entries move from the journal
+to a materials file to a post; this file records where they landed.
+
+| Date | Title | Channel | Source material |
+|------|-------|---------|-----------------|
+| | | | |
+
+An empty table is a valid state and means nothing has been published, which
+is different from the file being absent.
 ```
 
 ### Feedback README Template (`dsm-docs/feedback-to-dsm/README.md`)
