@@ -2,11 +2,14 @@
 
 **Parent document:** DSM_2.0_ProjectManagement_Guidelines_v2_v1.1.md
 **Scope:** Template 8 (sprint planning), Template 10 (end-of-day checkpoint
-questions), Template 11 (Q&A preparation), Template 12 (scope limitations log).
+questions), Template 11 (Q&A preparation), Template 12 (scope limitations log),
+Template 13 (project-level plan).
 
 This module contains templates for sprint-level planning and assessment
 artifacts. Template 8 provides the comprehensive sprint plan structure;
-Templates 10-12 provide assessment tools used during and after sprint execution.
+Templates 10-12 provide assessment tools used during and after sprint execution;
+Template 13 sits one tier above Template 8, for projects that arrive with a
+decomposition already done.
 
 ## Contents
 
@@ -16,6 +19,7 @@ Templates 10-12 provide assessment tools used during and after sprint execution.
 | 2 | [Template 10: End-of-Day Checkpoint Questions](#2-template-10-end-of-day-checkpoint-questions) | Quality gates for daily work verification |
 | 3 | [Template 11: Q&A Preparation Document](#3-template-11-qa-preparation-document) | Structured preparation for sprint presentations |
 | 4 | [Template 12: Scope Limitations Log](#4-template-12-scope-limitations-log) | Transparent documentation of scope boundaries |
+| 5 | [Template 13: Project-Level Plan for Pre-Decomposed Projects](#5-template-13-project-level-plan-for-pre-decomposed-projects) | Routing and tracking tier above Template 8 |
 
 ---
 
@@ -399,3 +403,145 @@ roadmap for future phases, and protects against scope creep.
    - **Prerequisites:** [What needs to happen first]
    - **Priority:** High / Medium / Low
 ```
+
+---
+
+## 5. Template 13: Project-Level Plan for Pre-Decomposed Projects
+
+A **routing and tracking** tier one level above Template 8. It applies when a
+project arrives with a decomposition already done , an external build
+specification, a client statement of work, a research protocol , and the
+decomposition is better than a sprint plan would produce, because it was made
+with the domain in hand before any code existed to rationalise around.
+
+**Canonical filename: `PROJECT-PLAN.md`, with a hyphen**, in `dsm-docs/plans/`.
+The hyphen is normative. It matches the `dsm-docs/` convention and the only real
+field usage; DSM_0.1's root anti-pattern table records the same spelling.
+
+**When to use:** the project arrives with a specification carrying its own
+milestones, numbered requirements, or pre-registered acceptance criteria.
+
+**When NOT to use:** a project without an existing decomposition starts at
+Template 8 and stays conformant. **This tier is never mandatory.** It adds a home
+for a case that already exists; it does not insert a step for everyone.
+
+**The rule that makes this tier work , reference, do not copy.** The plan's job is
+to route and track, not to restate. Where a source specification already carries
+acceptance criteria, milestones or invariants, the plan **points at them by
+section and does not reproduce them**. Copying creates two standards, and the copy
+is the one that rots. A field left as a pointer is the template working, not the
+template half-filled.
+
+**Thinness is the design.** If filling this template feels like re-decomposing the
+source, stop , the source is the decomposition and this is its index.
+
+**Two kinds of source, and only one of them stays the authority.** The
+reference-don't-copy rule above assumes an **external, authoritative** source , a
+client specification, a statement of work, a research protocol, anything carrying
+pre-registered acceptance criteria the project does not get to rewrite. There the
+source stays the standard and the plan points at it.
+
+A **project-authored draft** is the other case: a preliminary plan the team wrote
+before doing its own grounding research. When that research invalidates parts of
+the draft, the plan **supersedes** it, becomes the authority itself, and the draft
+becomes historical origin. That is correct, and it is the opposite of the rule
+above.
+
+Record which case applies in the `Source specification` header field , `authority`
+or `superseded` , because the two produce different reconciliation duties. Against
+an external authority, reconciliation means checking the plan still matches the
+source. Against a superseded draft, there is nothing to reconcile against and the
+plan's own history is the record.
+
+This distinction came from tracing the one real field instance
+(`meter-to-cash`) against an earlier draft of this template: its header reads
+`**Supersedes:** _reference/preliminary-plan.md`, which the earlier draft would
+have classed as a violation of its own central rule. It is not a violation; it is
+the second case, and the template was missing it.
+
+**Format:**
+
+```markdown
+# Project Plan: [Project Name]
+
+**Source specification:** [path or URL]
+**Source role:** [authority | superseded] , see "Two kinds of source" above
+**Status:** [Planning | In progress | Complete]
+**Last reconciled:** YYYY-MM-DD
+
+## Source of truth
+
+What this document does NOT restate, and where that content lives instead.
+
+| Content | Lives in | This plan's role |
+|---------|----------|------------------|
+| Acceptance criteria | [source §N] | reference only, never copied |
+| Numbered requirements | [source §N] | mapped to backlog items below |
+| Invariants / constraints | [source §N] | listed under Standing constraints |
+
+## Ladder
+
+The ordered phases or milestones, from the source specification. One line each.
+Do not restate the source's detail; name the milestone and point at it.
+
+| # | Milestone | Source ref | Status |
+|---|-----------|-----------|--------|
+| 1 | [name] | [§N] | [not started / in progress / done] |
+
+## Phase to backlog mapping
+
+Which backlog items carry which phase. This is the join between the source
+specification and DSM's Actionable Work Items rule: only items in
+`dsm-docs/plans/` are actionable, and this table is where a milestone becomes one.
+
+| Phase | Backlog items | Formalized on |
+|-------|---------------|---------------|
+| 1 | BACKLOG-NNN, BACKLOG-NNN | YYYY-MM-DD |
+
+## Standing constraints
+
+Constraints that hold across every phase (technology, data handling, licensing,
+deployment target, non-negotiables from the source). Not a re-listing of the
+source's invariants , the ones that shape how work is sequenced.
+
+- [constraint] , [why it constrains sequencing]
+
+## Reconciliation log
+
+This plan is a living document. Record when it was checked against the source
+and what moved.
+
+| Date | What changed | Trigger |
+|------|-------------|---------|
+| YYYY-MM-DD | [phase 2 closed; BACKLOG-NNN formalized] | [sprint boundary / phase close] |
+```
+
+**Relationship to Template 8.** Template 13 does not replace Template 8 and does
+not compete with it. A project may carry both: Template 13 for the whole-project
+ladder, Template 8 for whichever sprint is currently running. Template 13 has no
+Sprint Boundary Checklist , that stays Template 8's, and `/dsm-go` Step 3.6's hard
+gate continues to look for it there.
+
+**Why Template 13 and not the vacant Template 9.** The numbering runs 1-8 and
+10-12; 9 has never existed. Filling it would silently change what "Template 9"
+means in any document written while it was vacant, and three live documents
+already reference the vacancy , the EXP-004 TAB audit finding A2-041, the
+`invoice-triage` intake entry, and BACKLOG-519 itself. A vacant number in a
+sequence is a trap: the gap usually means something was removed, and removed
+things leave references behind. 13 is unallocated in all three DSM_2.0 modules
+and costs only a permanent gap, which the numbering already has.
+
+**Origin:** BACKLOG-519, from two independent spokes reaching the same absence.
+`meter-to-cash` invented a `PROJECT-PLAN.md` locally and wrote its own cadence
+rule into it because Central had none to inherit; `invoice-triage` then arrived
+with a 376-line build specification , 13 milestones, 20 numbered requirements, 13
+invariants with named test slots , and no canonical home for the whole-project
+view. Evidence base is two spokes, stated plainly rather than dressed up: both
+independently built or needed the same artifact, which is stronger than two
+reports of the same complaint, but it is two.
+
+**Cadence.** When a backlog item is formalized relative to the plan that spawns
+it, and how the plan is reconciled afterwards, is BACKLOG-477's subject. This
+template owns the artifact; BL-477 owns the rhythm. The Reconciliation log above
+is the join point.
+

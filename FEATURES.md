@@ -6,7 +6,7 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-000 is the first, newest entries
 appear at the top).
 
-**Current count:** 165 features across 11 capability domains.
+**Current count:** 165 features.
 
 ---
 

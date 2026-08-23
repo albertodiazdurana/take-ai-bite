@@ -2007,6 +2007,7 @@ and updated automatically. Project-specific content lives outside the delimiters
 - Only items in `dsm-docs/plans/` (and legacy `plan/backlog/`) are actionable work items.
 - Material found elsewhere (`_reference/`, `docs/`, README, inbox, sprint plan drafts) is INPUT to the planning pipeline, not a substitute for it.
 - Before suggesting implementation of anything that looks like a plan, verify that a formal BL exists in `dsm-docs/plans/`. If not, route through research → formalize → plan first.
+- When a project arrives with its own decomposition (an external build specification, a statement of work, a research protocol), that source is INPUT, not a work item, and re-decomposing it produces two descriptions of the same ladder. Route it through `dsm-docs/plans/PROJECT-PLAN.md` (DSM_2.0.C Template 13), whose Phase-to-backlog table is where a milestone becomes actionable. The plan REFERENCES the source's acceptance criteria and never copies them.
 
 ### Punctuation
 When an em dash ("—") connects phrases, replace it directly with a comma in the form ", " (no space before the comma, one space after). Produce this form in one step; never write the intermediate " , " (space before the comma). Applies in any language.
@@ -2259,6 +2260,7 @@ of testing is low; the cost of a broken merge is high.
 - Spoke compatibility: `@` reference still resolves, no new dependencies on features spokes cannot access
 - Published snippets: any runnable snippet added or modified in a skill file has been executed against its real input, in the real harness (see §19.1)
 - Verification commands: no check in this list is trusted on the strength of a pipeline's exit status or a status line a pipeline printed (see §19.2)
+- Delegated results: any evidence in this list that came back from a background workflow, a fan-out or a subagent has been checked against the run's own stats before being consumed (see §19.3)
 
 ### 19.1. Published Snippets Are Run Before They Ship
 
@@ -2458,6 +2460,113 @@ quietly fixed because it is the strongest available evidence for the section's
 own thesis: authoring the rule, stating its origin, and executing four
 demonstrations of it did not prevent the author from committing it within the
 hour. The display carve-out above is the specific clause that gap produced.
+
+### 19.3. Delegated Workflow Results Are Checked Before They Are Consumed
+
+§19.1 governs snippets **published** in skill files. §19.2 governs the ad-hoc verification
+commands an agent composes in the moment. Both ask the same question at the shell grain. This
+section asks it at the **delegation grain**: a background workflow, a fan-out, or a subagent
+returns a payload, and the main loop consumes it. Nothing currently asks whether the payload
+survived the return trip.
+
+**The failure it exists for.** A `deep-research` background workflow ran correctly through every
+upstream stage , 5 angles, 19 sources, 70 claims, 25 verified and 0 refuted, 101 agents, roughly
+3.1M tokens , and returned:
+
+```
+summary: "test"
+findings: [{claim: "test claim"}]
+```
+
+The real findings existed only in the per-agent transcripts and were recovered by hand. It was
+caught because the stats visibly contradicted the payload: 101 agents and 3.1M tokens cannot
+produce one claim reading `"test claim"`.
+
+**Three properties compound, and together they are why this needs its own rule:**
+
+1. **Every upstream signal reports success.** Agent count, token count and verification tallies
+   are all real and all large. No error, no non-zero exit, no warning.
+2. **The stub is syntactically valid.** It parses, it matches the schema, and it populates the
+   fields a consumer reads. **Schema validation cannot catch it**, which is why step 1 below is
+   a plausibility comparison and not a schema check.
+3. **The cost is already sunk.** By the time the stub arrives the expensive work is done and
+   discarded. Re-running is a second full-price fan-out (§8.9.2 territory); recovery from
+   transcripts is nearly free , but only if the agent knows to try.
+
+**Step 1 , sanity-check the payload against its own stats before consuming it.** N agents, M
+tokens and K verified claims against an empty, placeholder or implausibly small findings body
+is a **DEGRADED** result. Markers worth testing for: `"test"`, `"example"`, `"placeholder"`,
+`"TODO"`, a findings array whose length is grossly disproportionate to the claim count, and a
+summary shorter than the stats line describing it. The comparison is **proportionality against
+the run's own reported stats**, never an absolute size floor.
+
+**Step 2 , on degradation, recover from source-of-truth in this order.** The ordering is the
+rule, not a suggestion, because the first two are free and the third costs a fraction of a
+re-run:
+
+| Order | Source | Cost |
+|---|---|---|
+| 1 | The workflow's own output file, if it wrote one | free |
+| 2 | **The per-agent transcripts** | free |
+| 3 | Re-synthesis of the failed stage only (`resumeFromRunId`) | a fraction of a re-run |
+| 4 | A full re-run | last resort, never the reflex |
+
+**The per-agent transcripts are named by role, and the path is an example rather than the
+definition.** Verified on this machine 2026-08-23: they are `agent-<id>.jsonl` files under
+`~/.claude/projects/<project-slug>/<session-id>/subagents/`. Sixteen were found across two
+projects. This is deliberately **not** the path BL-520 was filed with , that named "the
+workflow's transcript directory", and the check found the files live in a `subagents/`
+directory instead. Harness layouts move; the role does not.
+
+**Step 3 , never report a degraded result as final.** Either recover the real content, or state
+the loss explicitly. A partial result presented as complete is the §22 shape, and §22's stop
+condition applies to the output in progress.
+
+**Over-firing guard (§8.9.2).** A genuinely small result set is not degraded. A research pass
+that honestly returns two findings from two agents is proportionate and must not be flagged; a
+check that fires on every small result trains the dismissal reflex, which leaves the reader
+worse off than no check. The guard is structural: the comparison is against the run's own
+stats, so a small run and a small payload agree.
+
+**Scope.** Background workflows, fan-outs, and delegated subagent results , the cases where
+expensive work is sunk before the payload arrives and recovery is nearly free. This is **not**
+a general "verify every tool result against its own stats" rule; that is a larger rule with a
+different cost profile.
+
+**Not proposed:** an automated degradation detector. It needs its own false-positive design
+pass, and a rule that must wait for tooling is a rule that does not exist yet , the same
+posture §19.1 takes on a snippet runner.
+
+**Anti-pattern guard.** "The stats look right, so the result is right" is the rationalisation
+this section forbids. Variants:
+
+- "It matched the schema"
+- "The workflow reported no errors"
+- "101 agents cannot all have failed"
+- "Re-running is expensive, so I will work with what came back" (the recovery ladder exists
+  precisely so this is a false dilemma)
+- "The findings are probably in there somewhere"
+
+Same guard family as §19.1 ("the snippet is obviously correct"), §19.2 ("the command obviously
+worked, the output looks right"), §8.2.1, §21.2 and §21.3.
+
+**Enforcement.** Prose and convention only; no hook inspects returned payloads. Same
+defence-in-depth posture as §19.1, §19.2, §8.9.1, §21.2 and §21.3.
+
+**Cross-references.**
+
+- §8.9.2 governs the fan-out's **cost and consent** side; this governs its **return** side.
+  Together they cover the lifecycle: price it, consent to it, bound its delegation, then check
+  what comes back.
+- §8.8 decides *whether* to delegate; this decides whether to trust what delegation returned.
+- §10 and §10.1 assume the result reaching the main loop **is** the research. This is the
+  section that checks that assumption, and it runs **before** §10's capture step , capturing a
+  stub into `dsm-docs/research/` records the stub.
+- §22 applies when a degraded result was already reported as final.
+
+**Origin:** BL-520, from IronCalc S23 (2026-07-02), observation OBS-S23-01. Evidence base is
+one incident, in one spoke, on one harness , stated plainly rather than dressed as a pattern,
+the BL-501 posture. Its cost when the failure never recurs is one plausibility comparison.
 
 ## 20. Three-Level Branching Strategy
 

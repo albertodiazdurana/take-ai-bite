@@ -2009,7 +2009,7 @@ divergence visibility.
 
 **Declared type:** Application (DSM 4.0)
 **Reason:** Application skeleton not yet scaffolded; sprint plan exists.
-**Set by:** alberto on 2026-04-23
+**Set by:** the project owner on 2026-04-23
 ```
 
 **Valid declared type values:** `Data Science`, `Application`, `Hybrid`,
