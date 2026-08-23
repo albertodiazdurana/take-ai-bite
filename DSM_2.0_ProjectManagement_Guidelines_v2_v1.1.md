@@ -320,6 +320,7 @@ All module files are in the same directory as this core file.
 | Template 10: End-of-Day Checkpoint Questions | Daily quality gates | [C](DSM_2.0.C_Sprint_Assessment_Templates.md) |
 | Template 11: Q&A Preparation Document | Presentation preparation | [C](DSM_2.0.C_Sprint_Assessment_Templates.md) |
 | Template 12: Scope Limitations Log | Scope boundary documentation | [C](DSM_2.0.C_Sprint_Assessment_Templates.md) |
+| Template 13: Project-Level Plan for Pre-Decomposed Projects | A project arrives with its own decomposition (external spec, SOW, research protocol) | [C](DSM_2.0.C_Sprint_Assessment_Templates.md) |
 | Code Artifact Quality Checklist | Incremental code development | [D](DSM_2.0.D_Quality_Operations.md) |
 | Artifact Portability Checklist | Multi-environment artifacts | [D](DSM_2.0.D_Quality_Operations.md) |
 | Visualization Quality Checklist | Figure inclusion in deliverables | [D](DSM_2.0.D_Quality_Operations.md) |

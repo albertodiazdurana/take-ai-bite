@@ -430,10 +430,14 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-515 | A pipeline's exit status belongs to its last command | v1.22.0 | 2026-08-20 | DSM_0.2 §19.2 |
 | BACKLOG-516 | PR creation does not verify the branch is fully pushed | v1.23.0 | 2026-08-20 | DSM_0.2 §20.4, /dsm-wrap-up Step 9.4 |
 | BACKLOG-518 | sync-commands deploys five commands where no spoke can see them | v1.23.0 | 2026-08-20 | scripts/sync-commands.sh, mirror-sync-manifest category 6 |
+| BACKLOG-519 | There is no project-level plan template above Template 8, and the filename Central does prescribe disagrees with the only real usage | — | 2026-08-23 | DSM_2.0.C Template 13, DSM_0.1 root anti-pattern table, DSM_0.2 §17.1 Actionable Work Items |
+| BACKLOG-520 | A background workflow's returned result can be a placeholder stub while every upstream stage succeeded | — | 2026-08-23 | DSM_0.2 §19.3 |
 | BACKLOG-523 | Wrap-up Step 9 does not say which baseline block it compares against | v1.23.0 | 2026-08-20 | /dsm-go Step 5, /dsm-wrap-up Step 9, /dsm-quick-wrap-up Step 7 |
 | BACKLOG-526 | The provenance-header rule has no create case | v1.23.0 | 2026-08-20 | DSM_0.2.A §8.1 provenance header, property 4 |
 | BACKLOG-527 | /dsm-align's report idempotence invariant is narrower than written | v1.23.0 | 2026-08-20 | /dsm-align persistent report invariant |
 | BACKLOG-514 | /dsm-quick-wrap-up appends lessons without regenerating the compact mirror | — | 2026-08-20 | /dsm-quick-wrap-up Step 0, DSM_0.2.A §8.1 |
+| BACKLOG-528 | Two research commands were never mapped to the mirror, and closing the gap trips a staging trap that leaves no trace | — | 2026-08-23 | scripts/take-ai-bite-sync.txt, scripts/sync-take-ai-bite.sh, mirror-sync-manifest.md category 6 |
+| BACKLOG-529 | The FEATURES header claims 11 capability domains from a snapshot that classified half the current list | — | 2026-08-23 | FEATURES.md header (domain clause dropped) |
 | BACKLOG-530 | The FEATURES notification is diff-driven with no reconciliation | — | 2026-08-21 | /dsm-go Step 2e |
 | BACKLOG-521 | Two Sprint Boundary Checklist items name paths no scaffold creates | — | 2026-08-21 | DSM_2.0.C Template 8, /dsm-align Step 3 |
 | BACKLOG-522 | dsm-docs/guides/ has no index and no trigger-gated convention | — | 2026-08-21 | dsm-docs/guides/README.md |

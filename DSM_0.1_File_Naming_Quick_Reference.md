@@ -405,7 +405,7 @@ Only ecosystem-required files belong in the project root. All project content
 
 | Anti-pattern | Correct location |
 |-------------|-----------------|
-| `PROJECT_PLAN.md`, `PLAN.md` | `dsm-docs/plans/` |
+| `PROJECT_PLAN.md`, `PLAN.md` | `dsm-docs/plans/PROJECT-PLAN.md` , the canonical spelling is **hyphenated** (BL-519 ruling; see DSM_2.0.C Template 13) |
 | `DECISIONS.md`, `ADR-*.md` | `dsm-docs/decisions/` |
 | `RESEARCH.md`, `STATE_OF_ART.md` | `dsm-docs/research/` |
 | `HANDOFF.md`, `SESSION_NOTES.md` | `dsm-docs/handoffs/` |
