@@ -380,6 +380,19 @@ Projects with existing append-only feedback files (`methodology.md`,
 Do not delete the legacy files; they contain historical scoring data and
 evidence that may be referenced by existing BLs.
 
+**Carve-out , DSM 1.0 project-lifecycle deliverables are not legacy (BL-472).**
+This migration applies to bare-named files used as a project's *session-feedback*
+record. It does NOT apply to the bare `backlogs.md` / `methodology.md` that DSM 1.0
+data-science projects maintain as **project-lifecycle deliverables**, collected across
+the whole project and finalized at project end with section scoring (DSM_1.0.D §6.4.5,
+DSM_0.1 §10). Those coexist with the per-session files by design and are never archived
+with a `legacy-` prefix. BL-472 (2026-07-12) established the two tiers after this
+migration text was written (2026-03-17), and the text was not updated at the time; the
+carve-out is recorded here so the canonical document stops instructing DSM 1.0 projects
+to archive a deliverable the model requires them to keep. Every other project type ,
+DSM 4.0, DSM 5.0, and External Contribution , is per-session only, so for those the
+migration above applies without exception.
+
 **Anti-Patterns:**
 
 **DO NOT:**
@@ -473,8 +486,8 @@ items. They accumulate until a portfolio update cycle or the Context Library
 **Anti-Patterns:**
 
 **DO NOT:**
-- Mix methodology feedback with technical reports; effectiveness scores go in
-  methodology.md, not here
+- Mix methodology feedback with technical reports; effectiveness scores go in the
+  session's `YYYY-MM-DD_sN_methodology.md` file, not here
 - Include full code listings; reference file paths, not source code
 - Report trivial progress (config changes, formatting fixes); report sprint-level
   increments that represent substantive engineering work

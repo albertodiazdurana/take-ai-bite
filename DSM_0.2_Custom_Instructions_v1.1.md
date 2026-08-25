@@ -2932,6 +2932,117 @@ after BL-352, BL-421, BL-424 shipped untested. Sibling preventive rule to
 §21.2 at the implementation lifecycle stage. First compliant example:
 BL-429 itself (recursive validation).
 
+### 21.4. Resolver Integrity Check
+
+§21.2 makes a BL name its failure modes at filing time. §21.3 makes the
+implementer execute that BL's Test Plan with per-item evidence before merge. §19
+sets the minimum verification for a task branch. All three are scoped to **one
+BL**, so all three can pass while the artifact the change landed in is left
+internally inconsistent. Nothing asks about the artifact as a whole.
+
+**The unit is the Resolver**, the term the corpus already maintains:
+`dsm-docs/plans/done/INDEX.md` carries a `Resolver (§ or concept)` column holding
+exactly this, the section, skill, hook or concept a BL landed as, and
+`/dsm-backlog-done` Step 8 already requires it. Coining a new term when a
+maintained one exists costs a migration and buys nothing.
+
+**The one question:** is the artifact this change landed in still internally
+consistent with itself?
+
+That is a different question from "did this change work", which §21.3 answers,
+and from "is this signal discriminating", which §19.1 and §19.2 answer. The axis
+matters and is stated so the four rules do not read as a pile: **§19.1 / §19.2 /
+§19.3 govern verification QUALITY** (is this evidence worth anything?), while
+**§21.3 and §21.4 govern verification OBLIGATION** (has something more been
+checked?). Within the obligation axis, §21.3 is the **change unit** and §21.4 is
+the **Resolver unit**.
+
+#### The mechanical half: a removed-or-renamed-string sweep
+
+For every string the change removed or renamed, sweep the corpus for surviving
+occurrences and classify each hit. This is one command and it is the half that
+needs no judgement to run:
+
+```bash
+grep -rn '<the removed or renamed string>' DSM_*.md scripts/commands/*.md
+```
+
+**A hit is a candidate, never a verdict.** Most hits are legitimate: a deliberate
+legacy reference, a CHANGELOG record of what changed, a migration rule that must
+name the old form in order to migrate it. The implementer reads each hit and
+records it as deliberate or stale. An identifier grep yields candidates because a
+historical mention and a live reading look identical to `grep`.
+
+**Assert the sweep can find the string before trusting a zero.** A pattern that
+matches nothing and a pattern that is broken produce the same empty output. Run
+it once against a file known to contain the string, per §19.1's second question.
+
+**Bound the pattern to the string, not to a path prefix.** A sweep narrowed by
+the directory the string usually appears in will miss the site that names it
+without the prefix, and the missed site is disproportionately likely to be a
+template or a prompt, which is the most load-bearing kind.
+
+#### The prose half: three checks the sweep cannot make
+
+1. **Cross-reference resolution.** Every section number, file path, step number
+   and BL reference the change introduced or moved still resolves to something
+   that exists.
+2. **Asserted counts still match reality.** Any count the artifact states about
+   itself, a feature total, a row count, an "all N commands" claim, is recomputed
+   rather than carried forward. A bare count is not an auditable claim, and the
+   one you computed yourself is the one you are least likely to re-check.
+3. **Mirror and deploy coverage of the artifact's own file.** If the change
+   edited a file, confirm that file is actually carried by whatever distributes
+   it: the mirror manifest, the command deploy, the `@` chain. Documentation that
+   describes a pattern while the implementation enumerates paths is a
+   silent-coverage defect, and the documentation is the half that reads as
+   coverage.
+
+#### It reports, it does not gate
+
+A finding is recorded in the BL's Test Execution Log as a per-item result with
+evidence; it does not block the merge. The forcing shape is §21.3's, so the check
+cannot be skipped silently, but the implementer decides what a hit means.
+
+**This satisfies §8.9.2's over-firing guard structurally rather than by tuning.**
+The string sweep returns nothing when the change removed or renamed nothing, so
+it is silent on exactly the ordinary work that a noisy gate would train the
+reader to dismiss. A gate that fires on ordinary work leaves the reader worse off
+than no gate, because a reflex-dismissed gate still reads as protection.
+
+#### Scope, and what is deliberately not here
+
+**Per-BL, not per-release.** A per-release variant runs once and large, which is
+the "a rule that must run at scale will not run" shape. It is **deferred, with
+its trigger named**: revisit if a defect is found that is invisible to every
+individual BL's sweep and visible only across a release. That has not happened
+yet; four of the five recorded instances are per-BL defects.
+
+**Trivial-BL exemption.** Mechanical status-update BLs inherit the §21.2 and
+§21.3 exemption. A BL that removed or renamed no string produces an empty sweep,
+which is recorded as empty rather than omitted, so "ran and found nothing" stays
+distinguishable from "was not run".
+
+**Anti-pattern guard.** "The change was additive, so there is nothing to sweep"
+is the rationalisation this rule forbids when the change also renamed a heading,
+moved a step number, or replaced a filename in passing. Additive-plus-a-rename is
+the common shape. Same guard family as §8.2.1 ("No counter-evidence found"
+without sources surveyed), §21.2 ("Risks: none known"), §21.3 ("all tests
+passed"), §19.1 ("the snippet is obviously correct").
+
+**Cross-references:** §21.3 (the change unit; this is its Resolver-unit sibling),
+§21.2 (failure modes at filing time), §19.1 / §19.2 / §19.3 (the quality axis),
+§8.9.2 (the over-firing guard this satisfies structurally), §22 (triage when a
+sweep surfaces a defect that already shipped).
+
+**Origin:** BL-531 (S250 user observation, S251 review, S252 implementation). Six
+BLs were implemented, tested and merged in one session; the user asked whether
+they interfered with each other. They did not, but **nothing in DSM required
+anyone to check**, and the cross-BL audit that ran only because it was asked for
+found a fourth instance of BL-521's class at `DSM_3.0.C:265`. Five of that BL's
+six evidence rows were reported by spokes rather than by the hub: the hub
+validates the diff, the spoke experiences the artifact.
+
 ---
 
 ## 22. Protocol Violation Triage Response

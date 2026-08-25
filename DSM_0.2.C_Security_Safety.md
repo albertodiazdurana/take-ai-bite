@@ -99,11 +99,25 @@ CLAUDE.md.
   `/dev/*` and `/tmp/*` (the harness scratchpad and ordinary scratch space are
   outside the repo by design and are not repositories).
 
+  **Relative targets resolve against the command's own `cd` (BL-532).** A relative
+  write target is resolved against the last literal `cd` in the command rather than
+  against the hook process's working directory. Before BL-532 the base was
+  `os.getcwd()`, which is the repo root, so `cd <outside-repo> && cat > note.md`
+  resolved to `<repo-root>/note.md`, matched the in-repo test, and was skipped in
+  silence while the write landed outside. A `cd` whose target is variable-constructed
+  or command-substituted leaves the base unchanged, so that case still degrades to
+  silence rather than erroring; where such a command also carries a write target that
+  cannot be resolved, the branch warns on the `cd` directory instead of the file.
+
   **This branch is a floor, not a proof.** It does not detect variable-constructed
   paths, `eval`, computed here-doc targets, or writes performed by a program the
-  command invokes. Treat it as a reminder, never as a guarantee that an ungated
-  cross-repo write cannot happen. The agent's own discipline remains the primary
-  control; the hook narrows the gap rather than closing it.
+  command invokes. It also sees **one command at a time**, while the Bash tool's
+  working directory **persists between calls**: a `cd` issued in an earlier call moves
+  the base for a later relative write and is invisible here. `pushd`, and `cd` inside a
+  subshell or shell function, are outside the parser in the same way. Treat the branch
+  as a reminder, never as a guarantee that an ungated cross-repo write cannot happen.
+  The agent's own discipline remains the primary control; the hook narrows the gap
+  rather than closing it.
 
   A warning that fired on ordinary work would be worse than no warning, because a
   reflex-dismissed gate still reads as protection. That is why the `Bash` branch

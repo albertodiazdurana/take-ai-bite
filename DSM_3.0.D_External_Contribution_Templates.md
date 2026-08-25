@@ -242,7 +242,7 @@ priority mechanism. Options:
 | 11 | Create governance folder | `{contributions-docs-path}/{project}/` | Section 6.6.2 |
 | 12 | Scaffold governance directory structure | Governance folder | See directory list in Module C |
 | 13 | Add project to ecosystem path registry | `.claude/dsm-ecosystem.md` | DSM_0.2; **required:** `dsm-central`, `portfolio`, `contributions-docs` |
-| 14 | Initialize feedback files | `{governance}/dsm-docs/feedback-to-dsm/` | methodology.md, backlogs.md |
+| 14 | Create feedback directory | `{governance}/dsm-docs/feedback-to-dsm/` | Directory + README only; per-session files `YYYY-MM-DD_sN_{type}.md` per DSM_0.2.A §4 |
 | 15 | Run contributor profile assessment | DSM Central | Map skills to project stack |
 | 16 | Send welcome inbox entry | `{governance}/_inbox/` | Include AI collaboration norms action item |
 | 17 | Fill in kickoff prompt from template above | DSM Central session | Section 6.6.7 Phase 2 |

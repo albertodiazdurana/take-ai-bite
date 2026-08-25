@@ -284,11 +284,38 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    e. If `gh` is not available or the PR fails, warn: "Branch protection is active. Cannot merge to main without a PR. The session branch `{session-branch}` has been pushed to remote. Merge manually via GitHub." and stop.
    f. If already on main (no session branch), skip this step.
 11. **Mirror sync PR safety net:** Check the Ecosystem Path Registry for entries with `mirror: true`. For each mirror repo, check for open PRs created by mirror sync:
-   a. Run: `cd {mirror-repo-path} && gh pr list --state open --head "sync/" --json number,title 2>/dev/null`
-   b. For each open sync PR: attempt `gh pr merge {number} --merge --delete-branch`
-   c. If merge succeeds: report "Merged mirror sync PR #{number} on {repo}"
-   d. If merge fails or `gh` unavailable: warn "Open mirror sync PR on {repo}: #{number} ({title}). Merge manually."
-   e. If no open sync PRs exist, skip silently.
+
+   a. **List open sync PRs. `--head` is an EXACT branch match, never a prefix (BL-535).**
+      Filter the prefix client-side:
+
+      ```bash
+      gh pr list --repo {mirror-repo} --state open --json number,title,headRefName \
+        --jq '.[] | select(.headRefName | startswith("sync/")) | "\(.number)\t\(.headRefName)\t\(.title)"'
+      ```
+
+      Do **not** use `--head "sync/"`. Measured 2026-08-25 against take-ai-bite, which had
+      four open PRs including two on `sync/` branches: `--head "sync/"` returned **empty at
+      exit 0**, `--head "sync/s237-backlog-skill-targets"` returned `93`, and the client-side
+      filter returned `93 92`. The shipped form was structurally incapable of matching
+      anything, so this safety net had never fired once, and an empty result was
+      indistinguishable from a clean repo.
+
+   b. **Merge only a sync PR whose head branch THIS session created.** Compare each
+      `headRefName` against the sync branches this session pushed. This is a **positive test**
+      on session-created branches, not an exclusion list of PRs to avoid: a remembered
+      exclusion list is the mechanism that produced BL-535, and it fails the moment someone
+      forgets an entry. A mirror may legitimately hold long-lived retained sync PRs; take-ai-bite
+      holds `#92` and `#93` deliberately, and a working filter matches them on its first run.
+   c. For each PR that passes (b): attempt `gh pr merge {number} --merge --delete-branch`.
+   d. If merge succeeds: report "Merged mirror sync PR #{number} on {repo}".
+   e. If merge fails or `gh` unavailable: warn "Open mirror sync PR on {repo}: #{number} ({title}). Merge manually."
+   f. **Report the three outcomes distinguishably**, so inertness can never again read as an
+      all-clear:
+      - `No open sync PRs on {repo}` , the query ran and returned nothing.
+      - `Open sync PRs on {repo} not created by this session: #92, #93 , left alone` , matched
+        but deliberately skipped by (b).
+      - `Sync PR query FAILED on {repo}: {error} , UNVERIFIED` , when `gh` errors. An empty
+        result from a failed call is not an absence; never report it as "no open sync PRs".
 11.5. **Parallel sessions registry cleanup:** Read `.claude/parallel-sessions.txt` if it
    exists. If the file does not exist, skip silently. Otherwise run three phases in order:
 

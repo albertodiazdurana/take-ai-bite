@@ -119,7 +119,13 @@ Conditions that must pass before the implementing branch merges to main:
      executed against its real input in the real harness before merge, and
      the captured output belongs here. Answer both questions §19.1 names:
      does it produce the intended output, and would a wrong result look
-     different from a right one? -->
+     different from a right one?
+     Resolver integrity (DSM_0.2 §21.4): after the per-item results, record the
+     removed-or-renamed-string sweep for this change, and the three prose checks
+     (cross-reference resolution, asserted counts, mirror/deploy coverage of the
+     artifact's own file). A change that removed or renamed nothing records an
+     empty sweep as empty, so "ran and found nothing" stays distinguishable from
+     "was not run". It reports; it does not gate the merge. -->
 
 - T-1: [result + evidence]
 - T-2: [result + evidence]
