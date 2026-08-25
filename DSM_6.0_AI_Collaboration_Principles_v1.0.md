@@ -798,7 +798,7 @@ to existing DSM protocols and identifies the gaps that remain.
 
 | Protocol | DSM Location | Principle |
 |----------|-------------|-----------|
-| Feedback Tracking (methodology.md, backlogs.md) | DSM_0.2 | Critical Thinking |
+| Feedback Tracking (per-session `YYYY-MM-DD_sN_{type}.md`) | DSM_0.2 | Critical Thinking |
 | Session-End Inbox Push (ripe feedback to hub) | DSM_0.2 | Know Your Context |
 | Backlog System (improvements, developments, done) | CLAUDE.md | Critical Thinking |
 | Decision Logging (dsm-docs/decisions/) | DSM_5.0 | The Human Brings the Spark |

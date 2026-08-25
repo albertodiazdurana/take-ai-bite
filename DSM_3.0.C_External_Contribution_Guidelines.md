@@ -196,7 +196,7 @@ Ecosystem Path Registry), not in the external repository:
   blog/            # Blog journal entries and materials
   checkpoints/     # Milestone snapshots
   decisions/       # Design decisions log
-  feedback-to-dsm/ # methodology.md, backlogs.md (DSM feedback)
+  feedback-to-dsm/ # per-session DSM feedback (YYYY-MM-DD_sN_{type}.md)
   handoffs/        # Session handoff documents
   plan/            # Contribution plans and scope documents
   research/        # Phase 0.5 research (upstream analysis, gap studies)
@@ -262,12 +262,15 @@ Contribution milestones replace sprint boundaries as feedback triggers:
 |-----------|----------------|
 | PR submitted | Note approach, design decisions, observations |
 | PR reviewed (changes requested) | Record reviewer feedback, adapt approach |
-| PR merged | Update methodology.md scores, note what worked |
+| PR merged | Record DSM section scores in the session's `_methodology.md` file, note what worked |
 | Issue resolved | Record contribution impact and lessons |
 | Review cycle complete | Push ripe entries to DSM Central inbox |
 
-Feedback files use the same structure as spoke projects (methodology.md, backlogs.md)
-but are located in `{contributions-docs-path}/{project}/feedback-to-dsm/`.
+Feedback files use the same per-session structure as spoke projects
+(`YYYY-MM-DD_sN_backlogs.md` / `_methodology.md`, DSM_0.2.A §4) but are located in
+`{contributions-docs-path}/{project}/feedback-to-dsm/`. External Contribution projects
+do not use the bare-named project-lifecycle deliverables, which DSM_1.0.D §6.4.5 scopes
+to DSM 1.0 data-science projects.
 
 #### 6.6.7. External Contribution Onboarding Lifecycle
 

@@ -439,6 +439,10 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-528 | Two research commands were never mapped to the mirror, and closing the gap trips a staging trap that leaves no trace | — | 2026-08-23 | scripts/take-ai-bite-sync.txt, scripts/sync-take-ai-bite.sh, mirror-sync-manifest.md category 6 |
 | BACKLOG-529 | The FEATURES header claims 11 capability domains from a snapshot that classified half the current list | — | 2026-08-23 | FEATURES.md header (domain clause dropped) |
 | BACKLOG-530 | The FEATURES notification is diff-driven with no reconciliation | — | 2026-08-21 | /dsm-go Step 2e |
+| BACKLOG-531 | BL testing validates the change but never the artifact it lands in | v1.25.0 | 2026-08-25 | DSM_0.2 §21.4 (Resolver Integrity Check) |
+| BACKLOG-532 | The cross-repo write guard resolves a relative path against its own working directory | v1.25.0 | 2026-08-24 | .claude/hooks/validate-cross-repo-write.sh (cd base resolution), DSM_0.2.C §2 |
+| BACKLOG-533 | /dsm-review-feedback reads two feedback filenames that exist on zero projects, and four methodology sites still describe them as current | v1.25.0 | 2026-08-25 | scripts/commands/dsm-review-feedback.md Steps 1-4, DSM_0.2.A §4 BL-472 carve-out |
+| BACKLOG-535 | /dsm-wrap-up Step 11's mirror-sync PR filter is an exact branch match, so the safety net never fires | v1.25.0 | 2026-08-25 | /dsm-wrap-up Step 11 (client-side prefix filter + session-created positive guard) |
 | BACKLOG-521 | Two Sprint Boundary Checklist items name paths no scaffold creates | — | 2026-08-21 | DSM_2.0.C Template 8, /dsm-align Step 3 |
 | BACKLOG-522 | dsm-docs/guides/ has no index and no trigger-gated convention | — | 2026-08-21 | dsm-docs/guides/README.md |
 | BACKLOG-524 | Cost gate misses recursive delegation; trigger wording ambiguous | — | 2026-08-21 | DSM_0.2 §8.9.2 |

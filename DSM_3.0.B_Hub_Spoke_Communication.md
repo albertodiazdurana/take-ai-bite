@@ -58,15 +58,15 @@ session to trigger feedback review:
 
 ```
 Review project feedback at ~/[project-name]/dsm-docs/feedback-to-dsm/:
-- methodology.md ([N] scored entries, avg [X.X]/5, [M] gaps identified)
-- backlogs.md ([N] backlog proposals, [M] medium / [L] low priority)
+- [N] per-session methodology files ([N] scored entries, avg [X.X]/5, [M] gaps identified)
+- [N] per-session backlog files ([N] backlog proposals, [M] medium / [L] low priority)
 
-For each backlog proposal in backlogs.md:
+For each backlog proposal:
 - Accept: create BACKLOG-XXX in plan/backlog/improvements/ or developments/
 - Reject: note why (already addressed, out of scope, or insufficient evidence)
 - Defer: note dependency or prerequisite
 
-For methodology.md scores below 3:
+For methodology scores below 3:
 - Assess whether a DSM improvement is warranted
 - Cross-reference with existing backlog items to avoid duplicates
 
@@ -79,7 +79,7 @@ Before handing off feedback, verify in the spoke project:
 
 | Check | Description |
 |-------|-------------|
-| Files exist | `dsm-docs/feedback-to-dsm/methodology.md` and `backlogs.md` present |
+| Files exist | Per-session files `dsm-docs/feedback-to-dsm/YYYY-MM-DD_sN_backlogs.md` / `_methodology.md` present and not yet in `done/` (DSM_0.2.A §4). DSM 1.0 projects additionally carry the bare-named project-lifecycle `backlogs.md` / `methodology.md` deliverables (DSM_1.0.D §6.4.5); other project types do not |
 | Scores complete | All used DSM sections scored (1-5 scale) |
 | Proposals structured | Each backlog proposal has Problem, Proposed Solution, Evidence |
 | Summary metrics | Entry count, average score, gap count included |
@@ -153,7 +153,7 @@ The hub creates these artifacts before the spoke session begins:
 | Artifact | Location | Notes |
 |----------|----------|-------|
 | CLAUDE.md | `.claude/CLAUDE.md` | With `@` reference to DSM_0.2 and protocol reinforcement |
-| Feedback files | `dsm-docs/feedback-to-dsm/` | `methodology.md` and `backlogs.md` (2 files) |
+| Feedback directory | `dsm-docs/feedback-to-dsm/` | Directory + `README.md` only. Feedback uses per-session files (`YYYY-MM-DD_sN_{type}.md`, DSM_0.2.A §4) created when there is feedback to record; do NOT pre-create empty files |
 | Decision log | `dsm-docs/decisions/` | Initialized with DEC-000 template |
 | Blog directory | `dsm-docs/blog/` | Empty directory for sprint journal entries |
 | Research directory | `dsm-docs/research/` | If Phase 0.5 applies |
@@ -187,7 +187,7 @@ Phase 0.5 research questions (if applicable):
 First task: [Phase 0.5 research | Sprint 1 planning | specific starting point]
 
 Governance notes:
-- Feedback files initialized in dsm-docs/feedback-to-dsm/ (methodology.md, backlogs.md)
+- Feedback goes in dsm-docs/feedback-to-dsm/ as per-session files (YYYY-MM-DD_sN_backlogs.md / _methodology.md); created only when there is feedback to record
 - Blog materials go in dsm-docs/blog/ (not dsm-docs/feedback-to-dsm/)
 - Decision log initialized in dsm-docs/decisions/
 - Sprint boundary checklist: checkpoint, feedback, decision log, blog entry, README
@@ -232,9 +232,9 @@ during active work, with a defined lifecycle: write, process, remove.
 - Contains action items, notifications, or guidance from DSM Central
 - Spoke processes entries at session start, then removes them
 
-**Relationship to feedback files:** Spoke `dsm-docs/feedback-to-dsm/` files (backlogs.md,
-methodology.md) remain as a drafting space where observations accumulate over
-multiple sessions. The inbox handles entries that are ripe and need attention.
+**Relationship to feedback files:** Spoke `dsm-docs/feedback-to-dsm/` per-session files
+(`YYYY-MM-DD_sN_backlogs.md` / `_methodology.md`) are the drafting space where a
+session's observations are recorded before they are ripe. The inbox handles entries that are ripe and need attention.
 Feedback files are for collecting; the inbox is for transmitting.
 
 #### 6.4.2. Inbox Entry Format Template
@@ -288,8 +288,8 @@ decision logs, and `_inbox/done/`, not in the active inbox.
 
 **Hub processing:**
 1. At session start, check `_inbox/` for unprocessed files
-2. For each entry, read the source spoke's `dsm-docs/feedback-to-dsm/` files (methodology.md,
-   backlogs.md) to extract full context; the inbox entry is a summary, the feedback
+2. For each entry, read the source spoke's `dsm-docs/feedback-to-dsm/` per-session files
+   to extract full context; the inbox entry is a summary, the feedback
    file has the detailed rationale and evidence
 3. Process each entry per Section 6.4.3 using the full context
 4. Clear processed entries from inbox

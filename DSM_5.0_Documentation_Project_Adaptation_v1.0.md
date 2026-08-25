@@ -315,8 +315,12 @@ For projects with extensive cross-references:
 ### 9.3 Feedback Integration
 
 Documentation projects in the DSM ecosystem should track methodology effectiveness:
-- `dsm-docs/feedback-to-dsm/methodology.md`: Per-section scores for DSM guidance used
-- `dsm-docs/feedback-to-dsm/backlogs.md`: Feedback-derived backlog items for DSM Central
+- `dsm-docs/feedback-to-dsm/YYYY-MM-DD_sN_methodology.md`: Per-section scores for DSM guidance used
+- `dsm-docs/feedback-to-dsm/YYYY-MM-DD_sN_backlogs.md`: Feedback-derived backlog items for DSM Central
+
+One file per session, created only when there is feedback to record, moved to `done/`
+once DSM Central confirms processing (DSM_0.2.A §4). Documentation projects do not use
+the bare-named project-lifecycle deliverables, which DSM_1.0.D §6.4.5 scopes to DSM 1.0.
 
 **Hub exemption:** Hub projects (DSM Central) route improvements directly to
 `plan/backlog/`; the `dsm-docs/feedback-to-dsm/` directory pattern applies to spoke projects
