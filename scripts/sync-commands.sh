@@ -54,8 +54,25 @@ SOURCE_DIR="${SCRIPT_DIR}/commands"
 USER_TARGET="${HOME}/.claude/commands"
 
 # Legacy project-level location. NOTHING deploys here any more (BL-518); it is
-# retained only so --check can report copies left behind by the old split, which
-# SHADOW the user-level ones and would otherwise go stale invisibly.
+# retained only so --check can report copies left behind by the old split.
+#
+# PRECEDENCE, measured 2026-08-25 (S254) and NOT the direction this file asserted
+# until then. Claude Code resolves a name collision as enterprise > personal >
+# project: https://code.claude.com/docs/en/skills.md , "Across levels, enterprise
+# overrides personal, and personal overrides project", and "If you have files in
+# `.claude/commands/`, those work the same way". So the USER-level copy wins, and
+# a project-level leftover does NOT shadow it.
+#
+# What that means for a leftover here is conditional, which is why it is spelled
+# out rather than reduced to a slogan:
+#   - A user-level copy of the same name EXISTS -> the leftover is INERT. It is
+#     not what the agent loads. Deleting it removes noise, not risk.
+#   - No user-level copy exists (a fresh clone on another machine, a spoke that
+#     has never run --deploy) -> the project-level copy is the ONLY copy and IS
+#     what loads. There it is load-bearing, not residue.
+#
+# The URL is cited because this file previously stated the opposite with no source,
+# and that assertion was read as fact and filed as BACKLOG-537.
 LEGACY_PROJECT_TARGET="${REPO_DIR}/.claude/commands"
 
 # ALL commands deploy to USER_TARGET (BL-518, option A, decided 2026-08-20).
@@ -90,9 +107,10 @@ get_target() {
 }
 
 # Report copies at the legacy project-level path that nothing writes any more.
-# A project-level command SHADOWS the user-level one, so a leftover here is not
-# inert: it is what the agent actually loads, frozen at whatever it said when
-# the split was removed. Reported, never deleted , removing files with
+# The USER-level copy wins a name collision (see the precedence note above), so a
+# leftover here is inert wherever a user-level copy of the same name exists, and
+# is the loaded copy only where none does. Either way it is stale by construction,
+# because nothing writes this path. Reported, never deleted , removing files with
 # substantive content is a user decision (Destructive Action Protocol).
 report_orphans() {
     [ -d "$LEGACY_PROJECT_TARGET" ] || return 0
@@ -110,11 +128,14 @@ report_orphans() {
         if [ -f "${SOURCE_DIR}/${name}" ] && diff -q "${SOURCE_DIR}/${name}" "${LEGACY_PROJECT_TARGET}/${name}" > /dev/null 2>&1; then
             echo "  - ${name} (currently matches source, but nothing keeps it current)"
         else
-            echo "  - ${name} (DIFFERS from source; this is the copy an agent here loads)"
+            echo "  - ${name} (DIFFERS from source; loaded only if no user-level copy exists)"
         fi
     done
-    echo "  These shadow the user-level copies. Nothing deploys to this path any"
-    echo "  more (BL-518). Delete them once you have confirmed nothing needs them."
+    echo "  Nothing deploys to this path any more (BL-518). The user-level copy"
+    echo "  wins a name collision (personal overrides project), so these are inert"
+    echo "  wherever a user-level copy of the same name exists , and are the copy"
+    echo "  that loads only where none does. Delete once you have confirmed nothing"
+    echo "  needs them."
 }
 
 check_drift() {

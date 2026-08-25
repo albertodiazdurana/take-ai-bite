@@ -87,7 +87,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 <details>
 <summary>Latest additions to the framework (click to expand)</summary>
 
-- **Single-target command deployment** — Slash commands install to the one folder every project reads from, and the drift check reports leftover copies that would shadow them
+- **Single-target command deployment** — Slash commands install to the one folder every project reads from, and the drift check reports leftover copies at the retired path
 - **Pipeline exit-status rule** — A command piped into another reports its last step's status, so a rejected push can print success; three verified checks now cover the case, and using a pipe as a success probe is ruled out
 - **Systems Prompt Engineering (DSM_6.1)** — A full chapter naming the discipline: version-controlled instruction systems, failure mode taxonomy, practitioner maturity model, and PMP knowledge area mapping
 - **Chunked drafting for structured documents** — Project plans, proposals, reports, and other prose deliverables are drafted one section at a time with per-section review, not generated whole
