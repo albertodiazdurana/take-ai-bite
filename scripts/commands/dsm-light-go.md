@@ -39,10 +39,16 @@ Light resume is for **same-day continuation only**. If the open session branch w
 
 Before proceeding with the lightweight flow, verify the project has a minimal
 DSM scaffold. Count canonical `dsm-docs/` subdirectories (`blog`, `checkpoints`,
-`decisions`, `feedback-to-dsm`, `guides`, `handoffs`, `plans`, `research`, `inbox`).
+`decisions`, `feedback-to-dsm`, `guides`, `handoffs`, `plans`, `research`).
 
-**If fewer than 5 of 9 exist:**
-- Warn: "Project scaffold incomplete ({N}/9 dsm-docs/ folders). Lightweight
+**The authority for this list is DSM_0.1 §10 (Canonical Spoke Folder Names)**, and it must
+stay identical to `/dsm-go` Step 0.5's list and `/dsm-align` Step 3's creation table. There
+is no `dsm-docs/inbox`; the canonical inbox is `_inbox/` at project ROOT. A ninth entry,
+`inbox`, was listed here until BL-534 and made a correct project report `8/9` forever. See
+`/dsm-go` Step 0.5 for the full account and the threshold-direction note.
+
+**If fewer than 5 of 8 exist:**
+- Warn: "Project scaffold incomplete ({N}/8 dsm-docs/ folders). Lightweight
   start cannot operate on an unscaffolded project. Options: (a) run `/dsm-align`
   to scaffold, then retry `/dsm-light-go`, or (b) fall back to full `/dsm-go`."
 - Stop and wait for user decision.

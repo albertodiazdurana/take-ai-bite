@@ -31,13 +31,34 @@ Before project type detection or branch setup, verify that the project has the
 canonical DSM scaffold. The scaffold is project-type-agnostic; it must exist
 before any session-start protocol can run correctly.
 
-1. Count how many of the 9 canonical `dsm-docs/` subdirectories exist:
+1. Count how many of the 8 canonical `dsm-docs/` subdirectories exist:
    `blog`, `checkpoints`, `decisions`, `feedback-to-dsm`, `guides`, `handoffs`,
-   `plans`, `research`, `inbox`
+   `plans`, `research`
+
+   **The authority for this list is DSM_0.1 §10 (Canonical Spoke Folder Names), and
+   `/dsm-align` Step 3's creation table is the same set.** Do not add a member without
+   changing all three together. There is no `dsm-docs/inbox`: the canonical inbox is
+   `_inbox/` at project ROOT and item 2 below is where it is checked. Earlier revisions
+   listed a ninth entry, `inbox`, which no specification lists and no step creates, so a
+   correctly scaffolded project reported `8/9` at every boot and the count could never
+   reach its own stated maximum. The gate did not misfire, but a number that is wrong in
+   a way that looks like a known quirk is how a defect survives review, and this one
+   survived five consecutive spoke reports plus a Central boot that wrote off the missing
+   folder as "expected". It also PROPAGATED: `dsm-blog-poster` was measured carrying an
+   empty `dsm-docs/inbox/.gitkeep` created to satisfy this list, which inflated its count
+   to a false `9/9`, the same ghost BL-266 deleted from Central in S150.
 2. Also check for `_inbox/` at project root
 2a. Also check for `.claude/reasoning-lessons.md`
-3. **If fewer than 5 of 9 `dsm-docs/` subdirectories exist, or `_inbox/` is missing, or `.claude/reasoning-lessons.md` is missing:**
-   - Warn: "Project scaffold incomplete ({N}/9 dsm-docs/ folders found).
+3. **If fewer than 5 of 8 `dsm-docs/` subdirectories exist, or `_inbox/` is missing, or `.claude/reasoning-lessons.md` is missing:**
+
+   **Threshold direction, stated rather than left implied.** The absolute figure stays at
+   five; only the denominator moves. For every project that does not carry the ghost folder
+   this is a no-op, because the ninth entry could never be present, so "fewer than 5" tested
+   the same eight folders before and after. For a project whose ghost inflated the count it
+   is strictly TIGHTER: four real folders plus a ghost scored `5/9` and passed, and now
+   scores `4/8` and fires. Tighter is the correct direction, since the gate exists to catch
+   an incomplete scaffold and the ghost was masking exactly that.
+   - Warn: "Project scaffold incomplete ({N}/8 dsm-docs/ folders found).
      Forcing /dsm-align in Step 1.8 regardless of version match."
    - Set a flag `FORCE_ALIGN=true`. Continue to Step 0 (do NOT invoke `/dsm-align` here).
    - In Step 1.8, if `FORCE_ALIGN=true`, skip the version check and run `/dsm-align` unconditionally.
