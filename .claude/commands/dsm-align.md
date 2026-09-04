@@ -214,7 +214,7 @@ Before starting alignment, check if git is initialized:
 
 6. **Push unpushed feedback to DSM Central:**
    The DSM Central repo path is the parent directory of the `DSM_0.2_Custom_Instructions_v1.1.md` file referenced by the `@` import in this project's CLAUDE.md. Target: `{dsm-central-path}/_inbox/{this-project-name}.md`.
-   a. **Per-session files:** Scan `dsm-docs/feedback-to-dsm/` for files matching `YYYY-MM-DD_sN_backlogs.md` or `YYYY-MM-DD_sN_methodology.md` that are NOT in `done/`. For each ripe file (see DSM_0.2 Session-End Inbox Push ripe criteria), append its content to the inbox file and move the source to `dsm-docs/feedback-to-dsm/done/`.
+   a. **Per-session files (backlogs, methodology, and topical):** Scan `dsm-docs/feedback-to-dsm/` for every file matching `YYYY-MM-DD_sN_*.md` that is NOT in `done/`. **Match on the date-and-session prefix, not the suffix** (mirrors `/dsm-wrap-up` Step 6a and `/dsm-review-feedback`, BL-536/BL-533): topically-named per-session feedback carries the same full header as `_backlogs`/`_methodology` files and must not be silently skipped by a suffix-only scan. Classify by suffix after matching. For each ripe file (see DSM_0.2 Session-End Inbox Push ripe criteria), append its content to the inbox file and move the source to `dsm-docs/feedback-to-dsm/done/`.
    b. **Legacy files:** If `dsm-docs/feedback-to-dsm/backlogs.md` or `dsm-docs/feedback-to-dsm/methodology.md` exist with unpushed entries, push using the old `**Pushed:**` marker model.
    c. **Technical progress:** Scan `dsm-docs/feedback-to-dsm/technical.md` for entries without a `**Pushed:**` date. Push using the `**Pushed:**` marker model.
    d. Group all entries under a single inbox entry header:

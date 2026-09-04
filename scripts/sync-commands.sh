@@ -75,6 +75,15 @@ USER_TARGET="${HOME}/.claude/commands"
 # and that assertion was read as fact and filed as BACKLOG-537.
 LEGACY_PROJECT_TARGET="${REPO_DIR}/.claude/commands"
 
+# BACKLOG-537 guard: fail --check if a project-level dsm-*.md copy exists AT
+# CENTRAL specifically. Central has no legitimate reason to carry one (nothing
+# has deployed here since BL-518); a mirror like take-ai-bite legitimately does
+# (its own project-level commands, BL-528 scope) and must not be flagged. Central
+# self-detection is the BL-407 primitive: scripts/take-ai-bite-sync.txt exists
+# only in Central, never in a mirror clone.
+IS_CENTRAL=0
+[ -f "${REPO_DIR}/scripts/take-ai-bite-sync.txt" ] && IS_CENTRAL=1
+
 # ALL commands deploy to USER_TARGET (BL-518, option A, decided 2026-08-20).
 #
 # WHY, because the next reader will otherwise re-derive the question: these
@@ -112,6 +121,8 @@ get_target() {
 # is the loaded copy only where none does. Either way it is stale by construction,
 # because nothing writes this path. Reported, never deleted , removing files with
 # substantive content is a user decision (Destructive Action Protocol).
+ORPHAN_COUNT=0
+
 report_orphans() {
     [ -d "$LEGACY_PROJECT_TARGET" ] || return 0
     local -a orphans=()
@@ -121,6 +132,7 @@ report_orphans() {
         name="$(basename "$f")"
         orphans+=( "$name" )
     done
+    ORPHAN_COUNT=${#orphans[@]}
     [ ${#orphans[@]} -eq 0 ] && return 0
     echo ""
     echo "ORPHANED project-level copies in ${LEGACY_PROJECT_TARGET}:"
@@ -131,11 +143,16 @@ report_orphans() {
             echo "  - ${name} (DIFFERS from source; loaded only if no user-level copy exists)"
         fi
     done
-    echo "  Nothing deploys to this path any more (BL-518). The user-level copy"
-    echo "  wins a name collision (personal overrides project), so these are inert"
-    echo "  wherever a user-level copy of the same name exists , and are the copy"
-    echo "  that loads only where none does. Delete once you have confirmed nothing"
-    echo "  needs them."
+    if [ "$IS_CENTRAL" -eq 1 ]; then
+        echo "  Central has none legitimately (nothing deploys here, BL-518). This is"
+        echo "  shadow residue (BACKLOG-537) and --check will fail until it is removed."
+    else
+        echo "  Nothing deploys to this path any more (BL-518). The user-level copy"
+        echo "  wins a name collision (personal overrides project), so these are inert"
+        echo "  wherever a user-level copy of the same name exists , and are the copy"
+        echo "  that loads only where none does. Delete once you have confirmed nothing"
+        echo "  needs them."
+    fi
 }
 
 check_drift() {
@@ -197,6 +214,9 @@ check_drift() {
 
     if [ $drifted -gt 0 ] || [ $missing -gt 0 ]; then
         echo "Run 'scripts/sync-commands.sh --deploy' to sync tracked -> runtime"
+        CHECK_RC=1
+    elif [ "$IS_CENTRAL" -eq 1 ] && [ "$ORPHAN_COUNT" -gt 0 ]; then
+        echo "Central-only guard (BACKLOG-537): delete the orphaned copies listed above."
         CHECK_RC=1
     else
         CHECK_RC=0

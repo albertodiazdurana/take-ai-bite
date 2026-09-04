@@ -450,6 +450,8 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-522 | dsm-docs/guides/ has no index and no trigger-gated convention | — | 2026-08-21 | dsm-docs/guides/README.md |
 | BACKLOG-524 | Cost gate misses recursive delegation; trigger wording ambiguous | — | 2026-08-21 | DSM_0.2 §8.9.2 |
 | BACKLOG-517 | Transcript delimiter timestamps are never checked against the wall clock | — | 2026-08-21 | validate-transcript-edit.sh check 4/4, DSM_0.2 §7 |
+| BACKLOG-536 | `/dsm-wrap-up` Step 6a's per-session feedback scan is suffix-specific, so topically-named feedback is never pushed | v1.26.2 | 2026-08-31 | /dsm-wrap-up Step 6a, /dsm-align Step 6a (scope widened in-flight), DSM_0.2.A §4 |
+| BACKLOG-537 | Central's six leftover project-level command copies are inert residue the deploy warning flags every run | v1.26.2 | 2026-08-31 | scripts/sync-commands.sh (delete + Central-only --check guard) |
 
 ---
 
