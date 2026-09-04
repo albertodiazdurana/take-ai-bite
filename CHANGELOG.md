@@ -5,6 +5,17 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.26.3] - 2026-09-04
+
+Patch: a published reference document that had been wrong for months is corrected, along with the script that was supposed to keep it right.
+
+### Fixed
+
+- **The document-metrics script wrote to a folder renamed away in S138, created it on the way, and reported success either way (BACKLOG-546).** `scripts/document_structure_metrics.py` hardcoded its output under `docs/`, the governance folder renamed to `dsm-docs/` months ago. The script had not been touched since before that rename. So `--update` wrote where nothing reads, **created** the stale directory via `mkdir(parents=True, exist_ok=True)`, printed `Reference file updated:` and exited 0. The single visible symptom, "No previous snapshot for comparison", reads as a first run rather than a wrong path.
+  What that cost is public. `dsm-docs/guides/document-structure-metrics.md` calls itself a "Current snapshot", is carried to the mirror as manifest category 2, and stated `DSM_0.2_Custom_Instructions_v1.1.md` at **771** lines against a real 1,879, listed **no** `DSM_0.2` module at all, and totalled **16,438** against a real 25,887 , understated by 36%. Both the path and the regenerated guide are corrected here.
+  The `mkdir` is replaced by an assertion rather than repointed, because it is the half that made a wrong path indistinguishable from a right one: a script whose output is a fixed tracked governance file has no business creating that location. Pointed at a nonexistent parent it now exits 1 and creates nothing, where before it exited 0 and created the tree.
+  **Spoke action:** None. The corrected guide arrives with the next mirror sync.
+
 ## [1.26.2] - 2026-09-04
 
 Patch: two implemented backlog items that had never reached main are shipped, and a same-name checkpoint collision is resolved without losing either file.
