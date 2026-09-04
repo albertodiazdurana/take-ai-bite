@@ -38,7 +38,9 @@ Minor rather than patch: four new `DSM_0.2.*` module files are the "New DSM sect
 - **BACKLOG-541** (Low): the documentation half of the scaffold-count defect; sites outside the two skill files still state a nine-folder scaffold.
 - **BACKLOG-542** (Medium): backlog items resting on unmeasured platform claims, the prevention step for a command-precedence assertion that was inverted corpus-wide.
 - **BACKLOG-544** (Medium): generational memory tiering; the one-time split shipped here needs the recurring decommission and archive machinery to stay maintained.
-- **BACKLOG-545** (Medium): harden the residual framing in the core protocol text, the delimiter vocabulary and the per-turn hook reminder, so the BL-543 class cannot recur through a surface the fix did not reach.
+- **BACKLOG-545** (Medium, **resolved in this release**): harden the residual framing in the core protocol text, the delimiter vocabulary and the per-turn hook reminder, so the BL-543 class cannot recur through a surface the fix did not reach.
+- **BACKLOG-546** (Medium): `scripts/document_structure_metrics.py` writes to the `docs/` folder renamed away in S138, creating the directory as it goes and reporting success; the guide it should maintain understates the corpus by 36% and lists no DSM_0.2 module.
+- **BACKLOG-547** (Medium): the Central align exception is a procedure that exists only inside the gitignored markers it writes, and this release moved the §17.1 template it reads, so following it literally now reports enormous drift where there is none.
 
 ## [1.25.0] - 2026-08-25
 
