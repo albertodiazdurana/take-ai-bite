@@ -275,8 +275,12 @@ to `done/`. This prevents accumulation of processed entries in long-lived
 append-only files.
 
 **File naming:** `dsm-docs/feedback-to-dsm/YYYY-MM-DD_sN_{type}.md` where type is
-`backlogs` or `methodology`. Only create a file when there is feedback to
-record; no empty files.
+`backlogs` or `methodology`, or a topical slug when the entry doesn't fit either
+category (e.g. `reasoning-lessons-intake-cap`). `/dsm-wrap-up` Step 6a and
+`/dsm-review-feedback` both match on the date-session prefix and classify by
+suffix afterward (BL-536/BL-533), so a topical name is read and pushed the same
+as a named-suffix one, not silently skipped. Only create a file when there is
+feedback to record; no empty files.
 
 **Lifecycle:**
 

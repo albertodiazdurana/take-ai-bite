@@ -5,6 +5,20 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.26.2] - 2026-09-04
+
+Patch: two implemented backlog items that had never reached main are shipped, and a same-name checkpoint collision is resolved without losing either file.
+
+### Fixed
+
+- **BACKLOG-536 and BACKLOG-537 were implemented, tested, closed and then never merged (four sessions).** Both fixes , `/dsm-wrap-up`'s per-session feedback scan widened from a suffix match to a prefix match, and `sync-commands.sh`'s Central-only guard against leftover project-level command copies , were complete on a session branch, with their backlog files already moved to `done/` and marked Implemented on that same branch. What was missing was one merge. The record that hid it is worth quoting because the wording is the whole defect: the session note read "shipped BL-536/537 (tested, merged to session-255)", and merged-to-session-255 is a **Level 2** branch, not main. Every per-item check had passed; nothing was watching the level.
+  The merge was tested into a scratch branch before being taken, and is clean and additive: `sync-commands.sh` gains the Central-detection guard on top of what v1.26.0 shipped, and neither of the day's two earlier releases regressed (verified: the renamed transcript delimiter and the retired punctuation rule both survive the merge, with controls).
+  **Spoke action:** Run `scripts/sync-commands.sh --deploy`. `/dsm-wrap-up` and `/dsm-align` both changed.
+
+- **A same-name checkpoint existed at two paths with different contents.** `2026-08-31_s255_checkpoint.md` was a 99-line consumed record in `checkpoints/done/` on one branch and a distinct 41-line checkpoint in `checkpoints/` on the other. The merge brought them together, where a bare-name move would have destroyed one , the S211 shape the inbox lifecycle rule already names. Both are kept: the second is archived as `2026-08-31_s255_light-continuation_checkpoint.md`.
+
+- **A lesson entry quoting a model-side trigger term verbatim was neutralized.** The merge reintroduced the un-neutralized wording from the older branch; the neutral form is restored. The file is not read at session start, so this is hygiene rather than a live risk, and it is the standing practice from BACKLOG-543 being applied rather than a new rule.
+
 ## [1.26.1] - 2026-09-04
 
 Patch: one rule retired and a half-finished deletion completed. Nothing gains or loses a section.
