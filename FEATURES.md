@@ -6,9 +6,17 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-000 is the first, newest entries
 appear at the top).
 
-**Current count:** 171 features.
+**Current count:** 174 features.
 
 ---
+
+## September 2026
+
+- **F-173 (2026-09-03) A completeness check that could never report complete (BL-534, `/dsm-go`, `/dsm-light-go`)** — Session start counts the project's standard folders and reports how many of them exist. It counted against nine where both the naming specification and the tool that creates the folders say eight, so a correctly set-up project reported eight out of nine at every boot and could never reach its own stated maximum. The gate never misfired; that is precisely why it lasted. A number that is wrong in a way that looks like a familiar quirk gets written off, and five separate projects plus the hub itself did write it off, one of them describing the missing folder as expected. It had also spread: a project was found carrying an empty placeholder file created purely to satisfy the phantom entry, which lifted its score to a false nine out of nine and hid the very incompleteness the check exists to find. The passing threshold is unchanged; only what it is measured against moves, which makes the check slightly stricter for any project that had grown the extra folder.
+
+- **F-172 (2026-09-03) The instruction file loaded on every turn is 43% shorter (BL-543, DSM_0.2)** — The core instruction document is read in full on every turn of every session, and roughly two fifths of it was material consulted at most once: the origin story behind each rule, a protocol's enforcement narrative and worked examples, and the template text a single command copies verbatim. Those three kinds of content now live in four companion files the core points at, read when they are actually needed. The behavioural rules stayed where they are, including two that read like narrative but are actually instructions and were deliberately left behind rather than moved with the prose around them. The reduction came out of an experiment built to test a different theory, which the evidence went on to disprove; it is kept anyway, on the straightforward ground that a budget spent every turn is worth reclaiming whatever the experiment concluded.
+
+- **F-171 (2026-09-03) Sessions that would not start on the newest models start again (BL-543)** — Sessions on the newest model family began refusing at boot, before any work could happen, on a project whose configuration had not changed in any way that looked relevant. The cause was one phrase in a block of always-loaded instructions that a model-side safeguard read as a request of a kind it declines. Two things about finding it are worth more than the fix. It was not a size problem, though it looked exactly like one: three rounds of trimming the loaded context, one of them below a size already measured as working, all still failed, and the failure only cleared when that single block was removed. And the wording was rewritten to say what it had always meant in the vocabulary the protocol itself already uses, rather than being tuned by trial and error against the safeguard. A standing practice came with it, and it outlasts the fix: a phrase that trips a safeguard must never be written down in a file that loads at session start, because the note-keeping machinery copies recorded phrases into exactly those files, which is how this one kept reappearing after each attempt to remove it.
 
 ## August 2026
 
