@@ -6,11 +6,13 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-000 is the first, newest entries
 appear at the top).
 
-**Current count:** 174 features.
+**Current count:** 175 features.
 
 ---
 
 ## September 2026
+
+- **F-174 (2026-09-04) The reasoning log's before-acting entry is now called a plan (BL-545, DSM_0.2 §6)** — The block an agent writes before it acts was labelled "thinking", and that label sat in the instruction file loaded on every turn, in the reminder injected on every turn, and in every project's local configuration. Renaming it to "plan" says what the block is actually for, and removes the last copies of a vocabulary an earlier fix had already moved away from everywhere else. The reminder was changed first and on its own, because measurement put it ahead of the documentation: it is injected as its own short instruction every single turn, where the same word in the big always-loaded file appears once inside a large document. Nothing has to migrate. The checker that guards these entries matches the general shape of the label rather than a list of names, and only ever inspects the text being added, so old logs keep working, both names pass, and a project that never updates is not broken by the change. Verified in both directions, along with a check that the test could actually fail: the first attempt reported success on all three probes while never reaching the condition under test.
 
 - **F-173 (2026-09-03) A completeness check that could never report complete (BL-534, `/dsm-go`, `/dsm-light-go`)** — Session start counts the project's standard folders and reports how many of them exist. It counted against nine where both the naming specification and the tool that creates the folders say eight, so a correctly set-up project reported eight out of nine at every boot and could never reach its own stated maximum. The gate never misfired; that is precisely why it lasted. A number that is wrong in a way that looks like a familiar quirk gets written off, and five separate projects plus the hub itself did write it off, one of them describing the missing folder as expected. It had also spread: a project was found carrying an empty placeholder file created purely to satisfy the phantom entry, which lifted its score to a false nine out of nine and hid the very incompleteness the check exists to find. The passing threshold is unchanged; only what it is measured against moves, which makes the check slightly stricter for any project that had grown the extra folder.
 

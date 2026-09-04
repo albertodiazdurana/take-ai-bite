@@ -40,7 +40,7 @@ When the `UserPromptSubmit` per-turn reminder hook fires and tells you to append
 
    **Supersedes BL-442's off-by-one warning.** BL-442 added a non-halting warning for the `W > A` window and recorded in its Risks the expectation that the warning would fire only inside that window rather than on every default invocation. Measurement falsified that expectation: the window was active on six consecutive runs (S241 through the 2026-08-19 run, per the `.claude/reasoning-lessons.md` provenance header) and the default was overridden on all six. A default taken zero times out of six is the wrong default, so rows 2 and 3 replace the warning rather than soften it. BL-442's section C had already written this option down.
 3. **Read the transcript:** Read the selected transcript file in full.
-   **Delimiter-based parsing:** Transcripts use typed delimiters (`<------------Start Thinking / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`) to mark block boundaries. Use these to segment the transcript into typed, timestamped blocks before analysis.
+   **Delimiter-based parsing:** Transcripts use typed delimiters (`<------------Start Plan / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`) to mark block boundaries. Use these to segment the transcript into typed, timestamped blocks before analysis.
 4. **Analyze for reasoning patterns:** Examine the transcript systematically for:
    - **Decision heuristics:** How were choices made between alternatives? What worked, what didn't?
    - **Course corrections:** Where did reasoning start in one direction then pivot? What triggered the pivot?

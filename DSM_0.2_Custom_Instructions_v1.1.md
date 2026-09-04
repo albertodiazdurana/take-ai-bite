@@ -77,14 +77,14 @@ See Session Transcript Protocol below for when and where to use them.
 **Three delimiter types:**
 
 ```
-<------------Start Thinking / HH:MM------------>
+<------------Start Plan / HH:MM------------>
 <------------Start Output / HH:MM------------>
 <------------Start User / HH:MM------------>
 ```
 
 | Type | When to use |
 |------|-------------|
-| Thinking | Agent reasoning, decision processes, planning (before acting) |
+| Plan | What is about to be done and why: the approach, the options weighed, the decision taken (before acting) |
 | Output | Summary of completed work (after acting) |
 | User | Summary of the user's prompt (start of each turn) |
 
@@ -98,13 +98,19 @@ implicitly closes the previous block. No explicit end delimiter is needed.
 - Do NOT output delimiters in conversation text; the VS Code extension
   collapses them after streaming (microsoft/vscode#287658)
 - All three types follow the same format; only the type label differs
+- **`Plan` was named `Thinking` before v1.26.0, and both validate.** The shape validator
+  matches the general `<------------Start ` form rather than a list of type names, and it
+  inspects only the content being appended, so a transcript carrying the old label is never
+  re-validated and needs no migration. Existing transcripts are working state and are not
+  rewritten; a file may carry both labels across the boundary. The rename exists because the
+  label is loaded on every turn and `Plan` says what the block is actually for.
 
 ---
 
 ## 7. Session Transcript Protocol
 
 **Relationship to DSM_7.0 §2.1:** §7 defines the transcript protocol
-shape (append-only, first-tool-call thinking, last-tool-call output,
+shape (append-only, first-tool-call plan entry, last-tool-call output,
 delimiter format). DSM_7.0 §2.1.5 describes the Claude-specific
 mechanism: the `UserPromptSubmit` hook that injects the per-turn
 reminder and the `PreToolUse` validator that enforces anchor shape on
@@ -133,13 +139,13 @@ to all DSM projects, not just DSM Central.
 
 **Per-turn flow:**
 
-1. **First tool call:** Append user prompt summary and thinking to the transcript file
+1. **First tool call:** Append the user prompt summary and the plan entry to the transcript file
 2. **User reviews:** The file is open in VS Code; the user sees reasoning appear
 3. **Agent acts:** Performs tool calls, edits, searches
 4. **Last tool call:** Append output summary to the transcript file
 5. **Conversation text:** Write only results, outputs, and questions to the user
 
-Two appends per turn: thinking before work, output after work. The thinking
+Two appends per turn: the plan before work, the output after work. The plan
 append must be the agent's **first tool call** in the turn, before any other
 tool calls or file edits.
 
@@ -157,7 +163,7 @@ tool calls or file edits.
 
 [prompt summary]
 
-<------------Start Thinking / HH:MM------------>
+<------------Start Plan / HH:MM------------>
 
 [reasoning content]
 
@@ -190,19 +196,19 @@ Optional platform-specific fields (append when retrievable; omit entirely when n
 
 `Agent` and `Model` are mandatory. If introspection is uncertain, append `(self-reported)` to the value (e.g., `**Model:** claude-opus-4-7 (self-reported)`). The schema is agent-agnostic; only the values differ across harnesses.
 
-**When to write thinking:**
+**When to write a plan entry:**
 - Non-trivial decisions (choosing between approaches, interpreting ambiguous input)
 - Multi-step work (explaining what will be done and why before doing it)
 - Session-start checks (showing the reasoning behind each check)
 - Any situation where the "why" matters as much as the "what"
 
-**When to skip thinking (output summary still required):**
+**When to skip the plan entry (output summary still required):**
 - Simple acknowledgments ("Understood", "Done")
 - Single-fact answers with no decision process
 - Tool calls where the action is self-explanatory
 
 **Rules:**
-- Thinking must be the **first tool call** of the turn, before any other tool calls or file edits
+- The plan entry must be the **first tool call** of the turn, before any other tool calls or file edits
 - Output summary appended AFTER completing work
 - File is ephemeral: content cleared at session end, not committed
 - Transcript is append-only; never modify or backfill past entries
@@ -253,7 +259,7 @@ under §23 (Skill/Hook Collaboration Protocol).
   ```bash
   NOW=$(date +%H:%M)
   cat >> .claude/session-transcript.md << EOF
-  <------------Start Thinking / ${NOW}------------>
+  <------------Start Plan / ${NOW}------------>
   ...
   EOF
   ```
@@ -271,11 +277,11 @@ operational rules stay stated here because they are behavior, not narrative:
 
 - **Turn-boundary self-check:** every turn begins with a transcript append , pure-reasoning
   turns (decision analysis, trade-off comparison, recommendation) explicitly included, since
-  they carry the highest-value thinking. The only exemption is content-trivial turns
+  they carry the highest-value reasoning. The only exemption is content-trivial turns
   (one-word acknowledgments, single-fact confirmations with no new reasoning). If there is
   new reasoning, there is a transcript append.
 - **[RETROACTIVE] recovery:** if an append was missed, append a
-  `<------------Start Thinking [RETROACTIVE] / HH:MM------------>` entry at the *current*
+  `<------------Start Plan [RETROACTIVE] / HH:MM------------>` entry at the *current*
   time, state which turns were missed, and note the gap; never backdate or edit history.
 
 Module G carries the S171 origin, the check-4 warn-not-block rationale, the
@@ -283,7 +289,7 @@ pure-reasoning-turn worked example, and the full recovery procedure.
 
 **Contemporaneous Work Log for Efficiency Analysis:**
 
-Thinking blocks are a work log, written at each decision point, not a
+Plan blocks are a work log, written at each decision point, not a
 post-hoc clean summary of the decision. Include alternatives that were
 weighed and set aside, points of uncertainty, checks that were repeated,
 and any change of approach. Write "considered X, set it aside because Y,
@@ -312,8 +318,8 @@ log entry that compresses several rounds of back-and-forth behind a
 single confident sentence is a defect.
 
 This rule does not apply to trivial turns (single-fact answers, simple
-acknowledgments) where the "When to skip thinking" rule above already
-permits omission. It applies to every turn that warrants a thinking
+acknowledgments) where the "When to skip the plan entry" rule above already
+permits omission. It applies to every turn that warrants a plan
 block at all.
 
 ---
@@ -657,7 +663,7 @@ The `@` reference imports protocols as background context, but agents may deprio
 | Notebook Collaboration Protocol | DSM 1.0 or Hybrid projects | "User copies each cell; output ONE cell at a time as a fenced code block; wait for output" |
 | App Development Protocol | DSM 4.0 projects | "One bite per stop, a bite being the smallest increment the user can verify (one testable function, test-first); concept approval happens in conversation before the write, the permission window is not the gate" |
 | Pre-Generation Brief Protocol | All projects | "Four-gate model: collaborative definition (confirm threads → dependencies → packaging) → concept (explain) → implementation (diff review) → run (when applicable); each gate = explicit stop" |
-| Session Transcript Protocol | All projects | "Append thinking to .claude/session-transcript.md BEFORE acting; output AFTER; conversation text = results only; use Session Transcript Delimiter Format: `<------------Start Thinking / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`" |
+| Session Transcript Protocol | All projects | "Append the plan entry to .claude/session-transcript.md BEFORE acting; output AFTER; conversation text = results only; use Session Transcript Delimiter Format: `<------------Start Plan / HH:MM------------>`, `<------------Start Output / HH:MM------------>`, `<------------Start User / HH:MM------------>`" |
 
 **Example reinforcement in project CLAUDE.md:**
 ```markdown
@@ -669,11 +675,11 @@ The `@` reference imports protocols as background context, but agents may deprio
 
 ```markdown
 ## Session Transcript Protocol (reinforces inherited protocol)
-- Append thinking to `.claude/session-transcript.md` BEFORE acting
+- Append the plan entry to `.claude/session-transcript.md` BEFORE acting
 - Output summary AFTER completing work
 - Conversation text = results only
 - Use Session Transcript Delimiter Format for every block:
-  <------------Start Thinking / HH:MM------------>
+  <------------Start Plan / HH:MM------------>
   <------------Start Output / HH:MM------------>
   <------------Start User / HH:MM------------>
 - HH:MM is 24-hour local time when the block begins; no end delimiter needed

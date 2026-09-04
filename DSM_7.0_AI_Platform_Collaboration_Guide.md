@@ -170,7 +170,7 @@ Claude-specific mechanisms. Grouped by protocol.
 
 **Session transcript and the UserPromptSubmit hook.**
 `.claude/hooks/transcript-reminder.sh` (UserPromptSubmit) injects a
-per-turn reminder that the agent must append thinking to
+per-turn reminder that the agent must append the plan entry to
 `.claude/session-transcript.md` before work (per TAB/DSM patterns audit P-01). A second
 hook, `.claude/hooks/validate-transcript-edit.sh` (PreToolUse on
 Edit), enforces append-only shape with three checks: anchor is the

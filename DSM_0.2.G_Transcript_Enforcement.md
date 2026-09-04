@@ -51,7 +51,7 @@ explicitly covered: a turn whose response is a multi-paragraph decision
 analysis, trade-off comparison, or recommendation requires the same
 first-tool-call transcript append as a turn that edits code. The
 pure-reasoning-turn failure mode is the most damaging variant because
-pure-reasoning turns contain the highest-value thinking (decision
+pure-reasoning turns contain the highest-value reasoning (decision
 rationale, considered-and-rejected paths, risk framing) and losing that
 content inverts the transcript's stated purpose as a reasoning log.
 
@@ -60,7 +60,7 @@ user asks "which of these two options should we pick?" and the agent
 responds with a multi-paragraph comparison (five-question gate
 evaluation, Option A vs Option B analysis, recommendation, proposed
 next steps) as a pure-text response with zero tool calls. This is a
-protocol violation. The agent must append thinking to the transcript as
+protocol violation. The agent must append the plan entry to the transcript as
 the first tool call of that turn, even though the turn would otherwise
 have none. The transcript append is the one required tool call.
 
@@ -78,7 +78,7 @@ If the agent detects mid-turn or at the start of a later turn that it
 missed an earlier append, it must:
 
 1. Append a recovery entry to the transcript labeled
-   `<------------Start Thinking [RETROACTIVE] / HH:MM------------>` where
+   `<------------Start Plan [RETROACTIVE] / HH:MM------------>` where
    HH:MM is the *current* time, not a fabricated earlier time.
 2. State which turn(s) were missed and a brief reconstruction of the
    reasoning that would have been recorded.

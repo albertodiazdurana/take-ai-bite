@@ -95,7 +95,7 @@ discipline (§19) before §21.3 codified that testing is not compressible.
 **Origin:** BL-432 (S207, derived from heating-systems-conversational-ai
 S10.L2 incident where auto mode silently bypassed `/dsm-go` Step 5.9's
 light-wrap-up continuation prompt). The agent recognized the prompt's
-existence in its thinking block ("§5.9 normally offers /dsm-light-go
+existence in its plan block ("§5.9 normally offers /dsm-light-go
 switch, but user explicitly typed /dsm-go, I'll honor that"), then
 unilaterally pressed past it. The user was never given the choice §5.9
 mandates. Combined with the absence of a concurrent-session safety net

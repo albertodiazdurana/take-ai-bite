@@ -231,7 +231,7 @@ Pre-flight for Cell N:
 ```
 
 **Behavioral trigger:** Before outputting any notebook cell, the agent writes
-the pre-flight in the session transcript thinking block. This prevents
+the pre-flight in the session transcript plan block. This prevents
 structural skips (e.g., jumping to code at a phase transition without the
 required markdown header cell).
 

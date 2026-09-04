@@ -112,7 +112,7 @@ Every appended entry must contain a timestamped delimiter:
 Your appended content does not contain this delimiter.
 
 FIX: Start your appended block with:
-  <------------Start Thinking / HH:MM------------>
+  <------------Start Plan / HH:MM------------>
 or for output blocks:
   <------------Start Output / HH:MM------------>
 EOF

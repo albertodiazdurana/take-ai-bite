@@ -91,5 +91,5 @@ Light wrap-up is for **same-day continuation only**. If the current session bran
 - No co-author lines in commits
 - If $ARGUMENTS is provided, use it as the session description in MEMORY.md
 - All steps run autonomously; do not pause for confirmation between steps
-- **Thinking-before-acting is mandatory during wrap-up.** Time pressure at session end is the highest-risk moment for skipping reasoning; append thinking to the transcript before each wrap-up step, not after
+- **Planning-before-acting is mandatory during wrap-up.** Time pressure at session end is the highest-risk moment for skipping reasoning; append the plan entry to the transcript before each wrap-up step, not after
 - Follow .claude/CLAUDE.md conventions for this project

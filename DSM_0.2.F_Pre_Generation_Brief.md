@@ -234,7 +234,7 @@ Gate 3 does not apply to artifacts that are only created, not executed
 ### 8.5. Pre-Generation Reasoning Structure
 
 Before generating any artifact, apply Critical Thinking (DSM_6.0 §1.4.2) by
-answering three questions in the session transcript thinking block:
+answering three questions in the session transcript plan block:
 
 1. **What** — what is this generation? (type, structure, role in the plan)
 2. **Why** — why is it needed? (what requirement or goal it serves)
@@ -251,7 +251,7 @@ hyperparameter selection, algorithm comparisons).
 
 **Behavioral trigger:** This reasoning structure activates within Gate 1 of
 every non-trivial artifact. It structures the thinking, not the gate itself.
-The what/why/how is written in the transcript thinking block, making reasoning
+The what/why/how is written in the transcript plan block, making reasoning
 visible and auditable.
 
 **Design decision documentation:** When implementing code that involves design choices (alternative approaches, external concepts, trade-offs), document the decision rationale before or alongside the implementation. For experiments, follow the Experiment Execution Protocol below. Maintain a citations log for external benchmarks, APIs, or research referenced in the code. See DSM_0.1 Citation Standards for format and placement.

@@ -87,6 +87,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 <details>
 <summary>Latest additions to the framework (click to expand)</summary>
 
+- **The before-acting log entry is called a plan** — Renamed from "thinking" across the instruction file, the per-turn reminder and every project config; old logs keep working and both names validate
 - **A lighter always-loaded core** — The instruction document read on every turn is 43% shorter; origin notes, enforcement narrative and template text moved to companion files the core points at
 - **Boot recovered on the newest models** — One phrase in an always-loaded block was tripping a model-side safeguard at session start; found by ablation rather than by trimming, since three rounds of size reduction all still failed
 - **A folder check that can now report complete** — Session start counted nine standard folders where the specification and the scaffolder both say eight, so a correct project could never reach its own maximum
@@ -106,7 +107,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 
 </details>
 
-See the full timeline of 174 features → [FEATURES.md](FEATURES.md)
+See the full timeline of 175 features → [FEATURES.md](FEATURES.md)
 
 ## What's Coming
 

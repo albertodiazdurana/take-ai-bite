@@ -445,6 +445,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-534 | `/dsm-go` and `/dsm-light-go` count nine scaffold folders where the specification and the scaffolder both say eight, so a correct project can never report a complete count | v1.26.0 | 2026-08-25 | /dsm-go Step 0.5 + /dsm-light-go Scaffold Pre-Check (folder census, DSM_0.1 §10 named as authority) |
 | BACKLOG-535 | /dsm-wrap-up Step 11's mirror-sync PR filter is an exact branch match, so the safety net never fires | v1.25.0 | 2026-08-25 | /dsm-wrap-up Step 11 (client-side prefix filter + session-created positive guard) |
 | BACKLOG-543 | A wording pattern in the always-loaded Session Transcript reinforcement block correlates with a model-side session-start refusal on newer models | v1.26.0 | 2026-09-03 | DSM_0.2 §17.1 alignment template + `.claude/CLAUDE.md` reinforcement block (rewording); localized by manual ablation |
+| BACKLOG-545 | Reframe the Session Transcript Protocol delimiter from "thinking" to a plan entry ecosystem-wide | v1.26.0 | 2026-09-04 | DSM_0.2 §6 delimiter label (`Start Plan`), §7, DSM_0.2.G, the §17.1 template, and `transcript-reminder.sh` |
 | BACKLOG-521 | Two Sprint Boundary Checklist items name paths no scaffold creates | — | 2026-08-21 | DSM_2.0.C Template 8, /dsm-align Step 3 |
 | BACKLOG-522 | dsm-docs/guides/ has no index and no trigger-gated convention | — | 2026-08-21 | dsm-docs/guides/README.md |
 | BACKLOG-524 | Cost gate misses recursive delegation; trigger wording ambiguous | — | 2026-08-21 | DSM_0.2 §8.9.2 |
