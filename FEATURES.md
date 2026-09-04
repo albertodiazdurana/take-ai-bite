@@ -6,11 +6,13 @@ Methodology (DSM), the human-AI collaboration framework behind
 feature is numbered for easy reference (F-000 is the first, newest entries
 appear at the top).
 
-**Current count:** 175 features.
+**Current count:** 176 features.
 
 ---
 
 ## September 2026
+
+- **F-175 (2026-09-04) A standing rule retired in favour of a skill that does the same work on demand (v1.26.1, DSM_0.2 §17.1)** — Every project carried an instruction to convert a particular dash to a comma in anything a reader outside the project would see. It was correct, and it was never finished: a rule like that is enforced on every pass, by every author and every agent, forever, to reach a state a skill can now produce against a completed document in one go. The rule is removed rather than repaired. What prompted the review was a defect rather than a preference: an unrelated edit had already deleted the rule's body and left behind the three paragraphs that said which files it applied to, so the surviving text began "The rule governs..." with no rule above it, and the release told every project to adopt that state. Completing the deletion and retiring the rule turned out to be the same edit. The earlier entry describing the rule stays in this timeline, because a timeline records what was true at the time and is not a claim about what is current.
 
 - **F-174 (2026-09-04) The reasoning log's before-acting entry is now called a plan (BL-545, DSM_0.2 §6)** — The block an agent writes before it acts was labelled "thinking", and that label sat in the instruction file loaded on every turn, in the reminder injected on every turn, and in every project's local configuration. Renaming it to "plan" says what the block is actually for, and removes the last copies of a vocabulary an earlier fix had already moved away from everywhere else. The reminder was changed first and on its own, because measurement put it ahead of the documentation: it is injected as its own short instruction every single turn, where the same word in the big always-loaded file appears once inside a large document. Nothing has to migrate. The checker that guards these entries matches the general shape of the label rather than a list of names, and only ever inspects the text being added, so old logs keep working, both names pass, and a project that never updates is not broken by the change. Verified in both directions, along with a check that the test could actually fail: the first attempt reported success on all three probes while never reaching the condition under test.
 

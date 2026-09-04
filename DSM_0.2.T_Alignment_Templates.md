@@ -45,12 +45,6 @@ Read on demand by `/dsm-align`; NOT part of the `@` import chain.
 - Before suggesting implementation of anything that looks like a plan, verify that a formal BL exists in `dsm-docs/plans/`. If not, route through research → formalize → plan first.
 - When a project arrives with its own decomposition (an external build specification, a statement of work, a research protocol), that source is INPUT, not a work item, and re-decomposing it produces two descriptions of the same ladder. Route it through `dsm-docs/plans/PROJECT-PLAN.md` (DSM_2.0.C Template 13), whose Phase-to-backlog table is where a milestone becomes actionable. The plan REFERENCES the source's acceptance criteria and never copies them.
 
-**Scope.** The rule governs files that reach a reader outside the project, by any channel. Publication to a public repository is the most common instance, not the definition: a document delivered by email, as an attachment, as a PDF or .docx, or through any other channel has an outside reader and is governed. For a project with a public mirror, the mirror-sync manifest's set is governed; for a project that is itself public, every tracked file is. Working state is exempt wherever it lives: `.claude/` runtime artifacts, session transcripts, reasoning-lessons files, backlog items, checkpoints, research files, and gitignored files anywhere. Cross-repo governance traffic (inbox entries, feedback files) is transmitted working state rather than a delivered document, and is exempt on the same ground.
-
-The predicate is readership, not agent consumption. `agent-consumed` does not discriminate, because published methodology documents are read by agents too. Nor is it repository visibility: a private project whose deliverables are documents sent to outside readers is governed for those documents, and a public repository's working state is still exempt.
-
-Exempt is not forbidden. An exempt file may be normalized as a one-time tidy; the rule simply does not require it.
-
 ### Code Output Standards (reinforces Earn Your Assertions)
 - Show actual values: shapes, metrics, counts, paths
 - No generic confirmations: avoid "Done!", "Success!", "Data loaded successfully!"
