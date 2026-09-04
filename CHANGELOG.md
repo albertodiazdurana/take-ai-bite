@@ -5,6 +5,26 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.26.1] - 2026-09-04
+
+Patch: one rule retired and a half-finished deletion completed. Nothing gains or loses a section.
+
+### Removed
+
+- **The punctuation rule is retired, deliberately, and the `humanizer` skill replaces it.** The standing instruction to convert a phrase-connecting em dash to a comma is gone from the §17.1 alignment template and from Central's own configuration. The reason is the labour, not the typography: enforcing it meant every author and every agent policing a character on every pass, forever, to reach a result a skill now produces on demand against a finished document. Rules that must be obeyed continuously are expensive in a way that rules invoked when needed are not, and this one had no failure mode that justified the standing cost. **Reach for `humanizer` when a document is going to an outside reader; do not re-derive a standing rule from this entry or from the FEATURES history, which records the rule as it existed and is not a statement that it is current.**
+  **Spoke action:** Run `/dsm-align`. **A spoke that already realigned on 1.26.0 should realign again**, for the reason in Fixed below.
+
+### Fixed
+
+- **v1.26.0 shipped a half-deleted rule, and instructed the fleet to propagate it.** The BACKLOG-543 fix commit removed the punctuation rule's heading and both of its rule paragraphs from the §17.1 template, and left the three paragraphs that scope the rule behind. The survivors open "**Scope.** The rule governs files that reach a reader outside the project" directly beneath the Actionable Work Items bullets, where "the rule" has no antecedent and the block reads as a continuation of the section above it. The deletion was collateral inside an unrelated edit: it appears in no commit subject, in no CHANGELOG entry, and behind no spoke action. Two 1.26.0 entries carry `**Spoke action:** Run /dsm-align`, so a spoke that did what the release told it to do acquired the headless block, while a spoke that ignored the release did not. The orphans are now removed from the template and from Central's configuration, which completes the deletion in the direction the retirement above makes correct.
+  Reported by a spoke, with provenance traced to the three commits that authored, moved and truncated the text. It is worth stating what did not catch it here: the release ran a §21.4 removed-string sweep, and that sweep was scoped to the strings the release's own edits removed rather than to the artifact being published, so an inherited deletion inside the same diff was invisible to it. The gap is filed as BACKLOG-550.
+
+### Spawned
+
+- **BACKLOG-548** (Medium): `/dsm-wrap-up`'s mirror guard tests for the Central marker, so every spoke classifies as a mirror and has its inbox entries dropped from the wrap-up commit, logged as if the guard were working. Reported by a spoke with 33 tracked inbox files contradicting the guard's premise.
+- **BACKLOG-549** (Medium): `/dsm-align`'s inbox notification is a pointer to a report the same skill overwrites on its next run, and the skill describes that file three incompatible ways in two steps.
+- **BACKLOG-550** (High): the §21.4 sweep is scoped to the releasing session's own edits, so a defect inherited from another session's commit inside the same release ships unexamined , which is exactly how the Fixed entry above happened.
+
 ## [1.26.0] - 2026-09-03
 
 Minor rather than patch: four new `DSM_0.2.*` module files are the "New DSM section or methodology track" row of DSM_2.0.D §7.4's cadence table. Not major, and the distinction is worth stating because the always-loaded core lost 43% of its length in this release: no section was deleted or renumbered, every section number still resolves, and the content moved into modules the core points at, which is the same move modules A-D already made without a major bump.
