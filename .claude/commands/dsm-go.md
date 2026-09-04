@@ -839,10 +839,10 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    2. Offer content reconstruction: "Reconstruct MEMORY update and reasoning lessons from the archived transcript? (y/n)"
    3. **If accepted:**
       a. Read the archived transcript
-      b. Parse for: BLs completed, key decisions, work summary (scan `**Output:**` blocks and thinking blocks)
+      b. Parse for: BLs completed, key decisions, work summary (scan `**Output:**` blocks and plan blocks)
       c. Supplement with `git log main..HEAD` to capture all commits from the incomplete session
       d. Update MEMORY.md "Latest Session" section with the reconstructed summary
-      e. Extract reasoning lessons: scan thinking blocks for decision patterns, course corrections, efficiency observations. Append new entries to `.claude/reasoning-lessons.md` tagged as `[recovered]`
+      e. Extract reasoning lessons: scan plan blocks for decision patterns, course corrections, efficiency observations. Append new entries to `.claude/reasoning-lessons.md` tagged as `[recovered]`
       f. Report what was reconstructed
    4. **Action suggestions (always shown, regardless of reconstruction choice):**
       a. Check if the previous session's branch should be merged to main. If all work is committed and no Level 3 branches remain open, suggest: "Session {N}'s branch is ready to merge to main. Merge now and create a new session branch? (y/n)". If the user accepts, merge to main, delete the old session branch, and create a new session branch (`session-{N+1}/YYYY-MM-DD`) for the current session before continuing to Step 6.
@@ -896,7 +896,7 @@ The session-scoped confirmation file used by `validate-cross-repo-write.sh` (BL-
    This file is the persistent reasoning log per the Session Transcript Protocol in DSM_0.2. The user keeps it open in VS Code to monitor agent thinking in real time.
 
    **Behavioral activation (mandatory, immediate):** From this point forward,
-   follow the Session Transcript Protocol (DSM_0.2): append thinking to
+   follow the Session Transcript Protocol (DSM_0.2): append the plan entry to
    `.claude/session-transcript.md` as the **first tool call** of every turn,
    before any other tool calls or file edits. Append output summary as the
    **last tool call** after completing work. Conversation text is for results,

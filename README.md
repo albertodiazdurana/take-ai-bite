@@ -87,6 +87,10 @@ They are not theoretical; they emerged from daily practice with AI agents across
 <details>
 <summary>Latest additions to the framework (click to expand)</summary>
 
+- **The before-acting log entry is called a plan** — Renamed from "thinking" across the instruction file, the per-turn reminder and every project config; old logs keep working and both names validate
+- **A lighter always-loaded core** — The instruction document read on every turn is 43% shorter; origin notes, enforcement narrative and template text moved to companion files the core points at
+- **Boot recovered on the newest models** — One phrase in an always-loaded block was tripping a model-side safeguard at session start; found by ablation rather than by trimming, since three rounds of size reduction all still failed
+- **A folder check that can now report complete** — Session start counted nine standard folders where the specification and the scaffolder both say eight, so a correct project could never reach its own maximum
 - **Single-target command deployment** — Slash commands install to the one folder every project reads from, and the drift check reports leftover copies at the retired path
 - **Pipeline exit-status rule** — A command piped into another reports its last step's status, so a rejected push can print success; three verified checks now cover the case, and using a pipe as a success probe is ruled out
 - **Systems Prompt Engineering (DSM_6.1)** — A full chapter naming the discipline: version-controlled instruction systems, failure mode taxonomy, practitioner maturity model, and PMP knowledge area mapping
@@ -103,7 +107,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 
 </details>
 
-See the full timeline of 171 features → [FEATURES.md](FEATURES.md)
+See the full timeline of 175 features → [FEATURES.md](FEATURES.md)
 
 ## What's Coming
 

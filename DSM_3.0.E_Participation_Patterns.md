@@ -299,11 +299,11 @@ DSM Central <--reads--- dsm-docs/feedback-to-dsm/         (sanitized by user, re
 
 ### Session Transcript Protocol (reinforces inherited protocol)
 
-- Append thinking to `.claude/session-transcript.md` BEFORE acting
+- Append the plan entry to `.claude/session-transcript.md` BEFORE acting
 - Output summary AFTER completing work
 - Conversation text = results only
 - Use Session Transcript Delimiter Format for every block:
-  `<------------Start Thinking / HH:MM------------>`
+  `<------------Start Plan / HH:MM------------>`
   `<------------Start Output / HH:MM------------>`
   `<------------Start User / HH:MM------------>`
 - HH:MM is 24-hour local time when the block begins; no end delimiter needed
@@ -514,11 +514,11 @@ Standard spoke pattern (see DSM_3 Section 6.9).
 
 ## Session Transcript Protocol (reinforces inherited protocol)
 
-- Append thinking to `.claude/session-transcript.md` BEFORE acting
+- Append the plan entry to `.claude/session-transcript.md` BEFORE acting
 - Output summary AFTER completing work
 - Conversation text = results only
 - Use Session Transcript Delimiter Format for every block:
-  `<------------Start Thinking / HH:MM------------>`
+  `<------------Start Plan / HH:MM------------>`
   `<------------Start Output / HH:MM------------>`
   `<------------Start User / HH:MM------------>`
 - HH:MM is 24-hour local time when the block begins; no end delimiter needed

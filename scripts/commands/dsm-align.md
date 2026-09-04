@@ -251,7 +251,7 @@ Before starting alignment, check if git is initialized:
      a. Detect project type from Step 1
      b. Read the CLAUDE.md Alignment Template System section in DSM_0.2 (follow the `@` reference to find it)
      c. Generate the aligned section from the base template + project-type-specific additions.
-        **Critical:** Copy the template text EXACTLY as written in DSM_0.2 §17.1, including the numbered heading `## 1. DSM_0.2 Alignment (managed by /dsm-align)`. Do not paraphrase, shorten, or renumber headings.
+        **Critical:** Copy the template text EXACTLY as written in `DSM_0.2.T_Alignment_Templates.md` (extracted from DSM_0.2 §17.1 by EXP-007; §17.1 now carries a pointer to it), including the numbered heading `## 1. DSM_0.2 Alignment (managed by /dsm-align)`. Do not paraphrase, shorten, or renumber headings.
      d. Identify where project-specific content starts in the current CLAUDE.md (first heading after the `@` reference line, or end of file)
      e. Insert the delimiters and aligned content between the `@` reference and the project-specific content
      f. Report: "CLAUDE.md alignment section added. [N] lines of managed content inserted."

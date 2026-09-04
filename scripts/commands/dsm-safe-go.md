@@ -37,7 +37,7 @@ Minimal troubleshooting boot for DSM projects. Zero dependencies on other skills
 
 5. **Transcript best-effort:**
    - If `.claude/session-transcript.md` exists:
-     - Attempt to append a single thinking block summarizing the safe-go results
+     - Attempt to append a single plan block summarizing the safe-go results
      - If the append fails for any reason (permission, hook error, file locked), skip silently and continue
    - If the file does not exist: skip silently
    - Do NOT create the file if it is missing
