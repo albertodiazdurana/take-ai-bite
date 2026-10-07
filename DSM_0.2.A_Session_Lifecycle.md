@@ -1036,8 +1036,8 @@ line, identified as the first `### ` category heading OR the first
 heading itself) is dropped.
 
 ```bash
-NOW=$(date +%Y-%m-%dT%H:%M%:z)
-SRC_MTIME=$(date -r .claude/reasoning-lessons.md +%Y-%m-%dT%H:%M%:z)
+NOW=$(date +%Y-%m-%dT%H:%M%z)
+SRC_MTIME=$(date -r .claude/reasoning-lessons.md +%Y-%m-%dT%H:%M%z)
 {
   printf '%s\n' \
     "# Reasoning Lessons (compact mirror)" "" \

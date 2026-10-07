@@ -5,6 +5,12 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Portable `date +%z` in the compact-mirror regeneration transform (DSM_0.2.A §8.1).** `%:z` is a GNU `date` extension unsupported on macOS/BSD `date`, which emitted a literal `:z` and dropped the timezone offset in the compact mirror's `**Last regenerated:**` and `**Source mtime at regeneration:**` header fields. Replaced with the portable `%z` at both occurrences; the offset format changes from `+02:00` to `+0200`, both valid ISO-8601 and equivalent for the `/dsm-go` Step 1.5 staleness comparison. Resolves #121.
+
 ## [1.27.0] - 2026-10-06
 
 Minor: adds a core egress-safety rule and a `/dsm-staa` PII safeguard (both from sensitive-data spoke experience), plus a cluster of Cloned-Mirror Kick-off / fork-init improvements. Resolves take-ai-bite issues #118, #119, and #113; #117 (new-spoke bootstrap) has a recorded design pass and is deferred to its own release.
