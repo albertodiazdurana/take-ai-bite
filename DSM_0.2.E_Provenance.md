@@ -233,6 +233,19 @@ validates the diff, the spoke experiences the artifact.
 
 ---
 
+## 21.5. Independent Fork-Local Backlog Line
+
+**Origin:** BL-581 (S277 filing from take-ai-bite issue #124 + reference
+PR #125, alberto-passerelle fork; S278 implementation). A public-mirror fork
+cannot see or safely guess Central's BL numbering and a de-identified fork
+carries no active BL bodies, so a fork that spots an enhancement had no
+sanctioned place to develop it. The fork proposed a reference §21.5; Central
+authored its own, grounding against PR #125 rather than merging it (Actionable
+Work Items: the issue/PR is INPUT). Reference PR #125 closed unmerged with
+contributor credit; issue #124 closed.
+
+---
+
 ## 23.4. Runtime Register Context Convention
 
 **Origin:** S8 incident, where the humanizer

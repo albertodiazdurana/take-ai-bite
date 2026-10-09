@@ -210,7 +210,10 @@ runs the 15-step Kick-off sequence: copy templates to runtime paths,
 substitute `{REPO_ROOT}` / `{project_name}` / `{ISO_DATE}`,
 self-register the clone as `dsm-central`, deploy commands, chmod
 hooks, write the done marker (DSM_0.2.A §25). This is the mechanism
-that turns a cloned mirror into a functional DSM hub.
+that turns a cloned mirror into a functional DSM hub. A
+Kick-off'd clone MAY then maintain its own fork-local backlog
+line, numbered from `BACKLOG-001` independent of Central's
+numbering (DSM_0.2 §21.5).
 
 **Three-Level Branching Strategy.** DSM's L1 (main) / L2 (session) /
 L3 (task) branch model runs on Claude's sessions-are-per-directory

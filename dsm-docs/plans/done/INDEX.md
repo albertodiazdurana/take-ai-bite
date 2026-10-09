@@ -478,6 +478,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-578 | First-class new-spoke bootstrap path for an uninitialized directory | v1.29.0 | 2026-10-09 | DSM_0.2.A §25.7 + /dsm-new-spoke + /dsm-go Step 0.8c guard |
 | BACKLOG-579 | Fix GNU-only `date +%:z` in the §8.1 compact-mirror transform (macOS/BSD portability) | v1.27.1 | 2026-10-08 | DSM_0.2.A §8.1 canonical transform (`%:z` → portable `%z`); take-ai-bite #121/#122 |
 | BACKLOG-580 | A completed design can sit in a decision record while its parent BL stays active, and nothing cross-references the two | v1.27.2 | 2026-10-08 | /dsm-align Step 11e (decision-record completion marker vs active-BL status, best-effort) |
+| BACKLOG-581 | Sanctioned independent fork-local backlog line for public-mirror forks | v1.30.0 | 2026-10-09 | DSM_0.2 §21.5 (fork-local backlog line) + DSM_7.0 §2.1 cross-ref |
 
 ---
 

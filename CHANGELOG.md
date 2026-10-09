@@ -5,6 +5,15 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.30.0] - 2026-10-09
+
+Minor: a sanctioned independent backlog line for public-mirror forks, so a fork — including one promoted to a local hub by the Cloned-Mirror Kick-off — can develop methodology enhancements without waiting on the private Central or guessing a BL number it cannot see (BACKLOG-581, take-ai-bite issue #124 / reference PR #125, alberto-passerelle fork).
+
+### Added
+
+- **Independent fork-local backlog line (BACKLOG-581, DSM_0.2 §21.5; cross-ref DSM_7.0 §2.1).** A fork of a DSM repository could not develop methodology enhancements independently: BL numbering is owned by the private Central (a fork cannot see or safely guess the next number) and a de-identified public fork ships `dsm-docs/plans/` as a `README` plus an INDEX-only `done/`, so it carries no active BL bodies of its own. The new §21.5 permits a fork to maintain its own `BACKLOG-###` line numbered from 001, independent of Central's numbering: fork numbers are a local identity (not a claim on Central's namespace); Central stays canonical and assigns the real number on upstream absorption, with the fork recording the mapping; fork-local BL bodies must be name-free (public-repo egress discipline, DSM_0.2.C §5.7/§5.8); an additive `git merge upstream/main` preserves fork-local BLs with no mirror-sync-manifest change; and upstream contribution (issue + cross-fork PR + attached BL) is optional but recommended. Central authored §21.5 grounding against the fork's reference PR #125, not merging it (the issue/PR is INPUT to the planning pipeline, per Actionable Work Items).
+  **Spoke action:** none required — §21.5 is a new methodology section arriving at the next mirror sync; it enables a fork to open its own backlog line but mandates no change to an existing spoke.
+
 ## [1.29.0] - 2026-10-09
 
 Minor: a first-class bootstrap path for turning an uninitialized directory into a new DSM spoke, so a fresh spoke no longer has to misuse the Cloned-Mirror Kick-off path (which self-registers the directory as its own hub) or be hand-assembled (BACKLOG-578, take-ai-bite issue #117).
