@@ -1651,6 +1651,64 @@ sweep surfaces a defect that already shipped).
 
 **Origin:** see [DSM_0.2.E_Provenance.md](DSM_0.2.E_Provenance.md).
 
+### 21.5. Independent Fork-Local Backlog Line
+
+A **fork** of a DSM repository — a clone of the public mirror, including one
+promoted to its own local hub by the Cloned-Mirror Kick-off (DSM_0.2.A §25) —
+MAY maintain its own backlog line, numbered from `BACKLOG-001` in the fork's
+`dsm-docs/plans/`, independent of DSM Central's numbering. This lets a fork
+develop methodology enhancements without waiting on Central and without guessing
+a number it cannot see: Central's line lives in the private hub, and a
+de-identified public fork ships `dsm-docs/plans/` as a `README` plus an
+INDEX-only `done/`, so it carries no active BL bodies of its own until it opens
+this line.
+
+**Rules:**
+
+- **Independent numbering.** A fork's `BACKLOG-###` is a *local identity*, not a
+  claim on Central's namespace. A fork's `BACKLOG-001` and Central's
+  `BACKLOG-001` are different items, distinguished by repository; forks do not
+  coordinate numbering with one another.
+- **Central stays canonical.** The fork line never overrides Central's numbering
+  or decisions. On upstream absorption Central assigns the canonical number and
+  the fork-local BL records the mapping (a `**Central BL:**` field, added when
+  known) so provenance survives the renumber.
+- **Name-free, always.** A public fork's `dsm-docs/plans/` ships publicly, so
+  every fork-local BL body MUST be name-free: no client, mandate, or person
+  names, no confidential content (the public-mirror egress discipline of
+  DSM_0.2.C §5.7 and §5.8). A worked instance that needs real names stays in the
+  private or gitignored originating project; the fork-local BL carries only its
+  project-agnostic form.
+- **Fork-sync preserves fork-local BLs.** A fork updates by merging
+  `upstream/main` (an additive 3-way `git merge`), so fork-local
+  `BACKLOG-###_*.md` survive the update as our-side additions, the same way a
+  fork's checkpoints and local `.gitignore` guards do. No mirror-sync-manifest
+  entry is required: that manifest (DSM_0.2 §18) governs what Central publishes
+  *outward* to its mirrors, not what a fork *adds* on its own side.
+- **Upstream contribution is optional but recommended.** A developed fork-local
+  BL SHOULD be offered upstream — a GitHub issue on the public repo plus a
+  cross-fork PR carrying the methodology-document change, with the BL body
+  attached for Central's backlog pipeline — so a change that helps every fork
+  reaches Central. A fork MAY keep a BL purely local; the recommendation is a
+  nudge, not a gate.
+
+**Agent behavior:** on a fork (a Kick-off'd clone, or any non-Central repo
+maintaining its own `dsm-docs/plans/`), when the user formalizes a proposal,
+mint it in the fork-local line from `BACKLOG-001` rather than guessing a Central
+number, keep the body name-free, index it in the fork's
+`dsm-docs/plans/README.md`, and when the work is complete offer the upstream
+contribution per the routing above. This is INPUT to Central's planning pipeline,
+not a bypass of it: Central still authors its own section or BL when it absorbs
+the change (the issue/PR is INPUT, per Actionable Work Items).
+
+**Cross-references:** §21 (scope — a parallel fork namespace does not collide
+with Central's), §21.1 (naming), §21.2 (risks), §21.4 (resolver sweep after a
+contributed change lands); DSM_0.2.A §25 (Cloned-Mirror Kick-off, which creates
+the fork-as-hub state); DSM_0.2.C §5.7 / §5.8 (egress discipline the name-free
+rule inherits); DSM_7.0 §2.1 (platform-side fork/mirror mechanics).
+
+**Origin:** see [DSM_0.2.E_Provenance.md](DSM_0.2.E_Provenance.md).
+
 
 ---
 
