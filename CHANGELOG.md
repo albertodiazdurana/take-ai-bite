@@ -5,6 +5,15 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.29.0] - 2026-10-09
+
+Minor: a first-class bootstrap path for turning an uninitialized directory into a new DSM spoke, so a fresh spoke no longer has to misuse the Cloned-Mirror Kick-off path (which self-registers the directory as its own hub) or be hand-assembled (BACKLOG-578, take-ai-bite issue #117).
+
+### Added
+
+- **New-spoke bootstrap: the `/dsm-new-spoke` skill plus a `/dsm-go` Step 0.8 guard (BACKLOG-578, DSM_0.2.A §25.7).** `/dsm-go` on a fresh directory meant to become a spoke had no fitting path: Step 0.8's Cloned-Mirror Kick-off self-registers the directory as its own `dsm-central` and copies `.claude/*.template` files a hand-created spoke does not have, so it either failed or halted, and the workaround was undocumented. The new `/dsm-new-spoke <hub-path>` skill scaffolds the directory as a spoke of an existing hub: it validates the hub path, registers the real hub as `dsm-central` (never self), writes a minimal `@`-referenced CLAUDE.md, and runs the spoke `/dsm-align` path to build `dsm-docs/` + `_inbox/` and generate the alignment section — without copying templates or self-registering. A new `/dsm-go` Step 0.8c guard makes the wrong-path case a route rather than a failure: when `KICKOFF_NEEDED` fires against a directory with no `.claude/*.template` files, it does not run Kick-off (which would mis-register the directory as a hub) and instead points the user to `/dsm-new-spoke`. Spoke-vs-mirror is a user intent, not a directory property, so the skill invocation is the intent signal; DSM_0.2.A §25.7 documents the distinction at the §25 entry point.
+  **Spoke action:** none required — `/dsm-new-spoke` is a new command, available user-level wherever `scripts/sync-commands.sh --deploy` has run and arriving on mirror clones at the next sync; it is then available for bootstrapping further spokes.
+
 ## [1.28.0] - 2026-10-09
 
 Minor: a review-cost bound and a prune mechanism for the ecosystem reasoning-lessons aggregation file, which had grown unbounded (BACKLOG-567). The bound is an honest long-term target — the build confirmed the file is mostly irreducible cross-project value, so it is approached as lessons get codified, not by one-shot pruning.

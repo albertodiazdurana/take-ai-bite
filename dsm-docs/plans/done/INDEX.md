@@ -475,6 +475,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-575 | Make sync-commands.sh --check orphan wording mirror-aware | v1.27.0 | 2026-10-06 | scripts/sync-commands.sh report_orphans() (IS_CENTRAL-aware header + non-central branch) |
 | BACKLOG-576 | Prune/prompt ecosystem-template placeholder rows for a standalone fork | v1.27.0 | 2026-10-06 | — already resolved in corpus (DSM_0.2.A §25.2 step 5); no change made |
 | BACKLOG-577 | Emit a fork-init readiness checklist at the end of Cloned-Mirror Kick-off | v1.27.0 | 2026-10-06 | DSM_0.2.A §25.2 step 15 + /dsm-go Step 0.8d |
+| BACKLOG-578 | First-class new-spoke bootstrap path for an uninitialized directory | v1.29.0 | 2026-10-09 | DSM_0.2.A §25.7 + /dsm-new-spoke + /dsm-go Step 0.8c guard |
 | BACKLOG-579 | Fix GNU-only `date +%:z` in the §8.1 compact-mirror transform (macOS/BSD portability) | v1.27.1 | 2026-10-08 | DSM_0.2.A §8.1 canonical transform (`%:z` → portable `%z`); take-ai-bite #121/#122 |
 | BACKLOG-580 | A completed design can sit in a decision record while its parent BL stays active, and nothing cross-references the two | v1.27.2 | 2026-10-08 | /dsm-align Step 11e (decision-record completion marker vs active-BL status, best-effort) |
 

@@ -270,6 +270,32 @@ Inspect manually."
 
 ### 0.8c. Execute Kick-off sequence
 
+**New-spoke guard (BL-578), evaluated first.** `KICKOFF_NEEDED` fires for two
+situations §0.8a's deterministic table cannot tell apart: a cloned mirror that
+has not been kicked off yet, and an uninitialized directory a user intends to
+make a *spoke*. They are distinguishable by one fact — a cloned mirror ships
+`.claude/*.template` files, a hand-created spoke directory does not. So before
+invoking Kick-off, probe for the templates:
+
+```bash
+ls "$ROOT"/.claude/*.template >/dev/null 2>&1 && echo "TEMPLATES_PRESENT" || echo "NO_TEMPLATES"
+```
+
+- `NO_TEMPLATES`: this is **not** a cloned mirror. Do NOT run Kick-off (it would
+  fail at its copy-template steps, §25.2 step 3, and would wrongly self-register
+  the directory as a hub). Report and halt `/dsm-go`:
+
+  > "No `.claude/*.template` files found — this looks like a new-spoke bootstrap,
+  > not a cloned mirror. To scaffold this directory as a spoke of an existing hub,
+  > run `/dsm-new-spoke <hub-path>`. (If this IS a cloned mirror, the clone is
+  > incomplete — re-clone or restore the templates.)"
+
+  Do NOT write `.claude/kickoff-done.txt`; the directory is left untouched for
+  `/dsm-new-spoke`. This is the "either fails or halts" case from issue #117,
+  turned into a route. See DSM_0.2.A §25.7.
+- `TEMPLATES_PRESENT`: this is a cloned mirror. Proceed with the Kick-off
+  sequence below.
+
 Invoke the 15-step sequence documented in **DSM_0.2.A §25.2**. Step 0.8 is
 the invocation point, not the specification. Key steps summarized:
 
