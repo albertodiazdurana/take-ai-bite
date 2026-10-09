@@ -2922,7 +2922,48 @@ On subsequent sessions, Step 0.8 detects the marker and skips Kick-off.
 Step 1.8 still runs `/dsm-align` unconditionally (per `/dsm-go` Step 1.8
 rules, the alignment runs every session regardless).
 
-### 25.7. Behavioral Trigger
+### 25.7. New-Spoke Bootstrap Versus Cloned-Mirror Kick-off
+
+Cloned-Mirror Kick-off (§25.1–§25.6) is one of **two** ways a directory enters
+the DSM ecosystem, and it is the wrong one for a brand-new spoke. The two paths
+differ in what they register as `dsm-central`:
+
+| | Cloned-Mirror Kick-off (`/dsm-go` Step 0.8) | New-spoke bootstrap (`/dsm-new-spoke`) |
+|---|---|---|
+| Starting point | a cloned DSM mirror (ships `scripts/`, `.claude/*.template`, the sync marker) | a fresh / uninitialized directory |
+| `dsm-central` becomes | the clone itself (self-registration, §25.4) | an **existing** hub, passed by the user |
+| `.claude/*.template` | copied to runtime paths (§25.2 step 3) | not used; the spoke has none |
+| Invocation | auto-invoked, because a cloned mirror is deterministically detectable | a dedicated skill, because "intended as a spoke" is not |
+
+**Why a dedicated skill and not another Step 0.8 branch.** Spoke-vs-mirror is a
+**user intent, not a directory property.** An uninitialized spoke directory and a
+generic pre-Kick-off state both present as "no `.claude/dsm-ecosystem.md`," so
+§25.1's deterministic decision table cannot distinguish them without a user
+signal. `/dsm-new-spoke <hub-path>` makes the **invocation itself the signal**:
+it means "scaffold HERE as a spoke of hub X." This is symmetric with Kick-off
+being auto-invoked precisely because a cloned mirror IS deterministically
+detectable (it ships `scripts/`, the templates, and the sync marker); a
+hand-created spoke directory is not.
+
+**The Step 0.8 guard.** The one case §25.1 cannot resolve — `KICKOFF_NEEDED`
+fired against a directory with **no** `.claude/*.template` files — is exactly a
+new-spoke directory mistaken for a cloned mirror. `/dsm-go` Step 0.8c probes for
+the templates before invoking Kick-off; when they are absent it does not run
+Kick-off (which would fail at its copy-template step and wrongly self-register
+the directory as a hub) and instead routes the user to `/dsm-new-spoke`. This is
+the wrong-path failure issue #117 reported, turned into a route.
+
+**What `/dsm-new-spoke` does:** take or prompt for the hub path (validated to
+contain `DSM_0.2_Custom_Instructions_v1.1.md`); scaffold the canonical
+`dsm-docs/` + `_inbox/`; write `.claude/dsm-ecosystem.md` with `dsm-central` →
+the real hub (never self); write a minimal `@`-referenced `.claude/CLAUDE.md`;
+then run the **spoke** `/dsm-align` path (not the hub fast-path) to generate the
+alignment section and install the transcript hooks. It does not copy
+`.claude/*.template` files, does not self-register, and does not write
+`.claude/kickoff-done.txt`. Afterward `/dsm-go` boots the directory as `SPOKE`
+(§25.1). Origin: BACKLOG-578 (take-ai-bite issue #117).
+
+### 25.8. Behavioral Trigger
 
 This protocol activates when **any** of these conditions are true at the
 start of a session:
@@ -2941,7 +2982,7 @@ Kick-off does **not** activate when:
 - The repo is a spoke (detection: `.claude/dsm-ecosystem.md` has
   `dsm-central` pointing to a DIFFERENT filesystem path)
 
-### 25.8. Origin
+### 25.9. Origin
 
 Origin: Session 191 (2026-04-15). Context: the author cloned
 `dsm-take-ai-bite` on a fresh WSL environment and discovered that the

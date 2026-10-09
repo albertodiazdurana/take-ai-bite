@@ -87,6 +87,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 <details>
 <summary>Latest additions to the framework (click to expand)</summary>
 
+- **New-spoke bootstrap command** — A fresh directory becomes a spoke of an existing hub with one command, instead of misusing the cloned-mirror setup that would wrongly register it as its own hub
 - **Punctuation rule retired** — A standing instruction enforced on every pass is replaced by a skill run on demand against a finished document
 - **The before-acting log entry is called a plan** — Renamed from "thinking" across the instruction file, the per-turn reminder and every project config; old logs keep working and both names validate
 - **A lighter always-loaded core** — The instruction document read on every turn is 43% shorter; origin notes, enforcement narrative and template text moved to companion files the core points at
@@ -108,7 +109,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 
 </details>
 
-See the full timeline of 188 features → [FEATURES.md](FEATURES.md)
+See the full timeline of 189 features → [FEATURES.md](FEATURES.md)
 
 ## What's Coming
 
