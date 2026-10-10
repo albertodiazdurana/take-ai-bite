@@ -809,3 +809,94 @@ re-deriving it locally.
 the matched tokens into an append-only transcript block — the control became the vector.
 The STAA-specific application of this rule lives in the `/dsm-staa` command file (its
 read-PII-then-write-lessons shape), added under BL-572. Implemented under BL-571.
+
+### 5.9. Data-Protection and Compliance Briefing by Design
+
+A project that processes personal or confidential data needs a data-protection and
+compliance review of its data-handling model. Without a by-design mechanism that need
+surfaces ad hoc — usually after a PII-handling model is already in operation — and is
+recorded, if at all, in no uniform form, so it is easy to miss or discover late. This
+section makes DSM request a standard **briefing artifact** for such projects. The briefing
+is a **hand-off to human or expert review**: it states the data-handling model and the
+open review questions and asserts **no legal conclusions of its own**. Its basis is the
+§5.1 *Restricted* class (PII, health data, GDPR-scoped personal data).
+
+**Trigger (declarative-primary).** The briefing is requested when the project declares it
+handles Restricted data, through a line in the project-specific section of
+`.claude/CLAUDE.md`:
+
+```
+**Handles personal/confidential data:** yes
+```
+
+An optional heuristic MAY prompt the declaration — a gitignored mandate or PII store
+present in the project — but never sets it: the declaration is authoritative and the
+heuristic only advises. Declarative-primary is the §8.9.2 over-firing guard applied here;
+a heuristic firing on its own would flag synthetic-data projects and train the operator to
+dismiss the signal.
+
+**Requirements.** Every briefing contains, regardless of project type:
+
+- **Context** — what the project does, why personal data arises, the processing
+  environment (device, local or remote, the model context).
+- **Data scope** — categories of data subjects and affected groups; sensitivity, including
+  whether special categories (GDPR Art. 9) are present.
+- **Data flows and storage** — zones, what crosses each boundary, processing in the model
+  context, retention relevance.
+- **Control model and TOMs** — the technical and organizational measures in place, and the
+  open points.
+- **Open review questions** — the expert-review core (legal basis, processor or
+  third-country transfer, controller role, retention and deletion, minimization and purpose
+  limitation, TOMs), phrased as **questions**.
+- **Blocked steps and decision needs** — what stays provisional until sign-off, and the
+  possible outcomes (approval, approval-with-conditions, rework).
+- **References** — the operative rules, the decision log, project governance.
+- **Egress discipline** — the briefing is itself **name-free** and leak-scanned, because it
+  is potentially shareable or external (see the reconciliation note below).
+
+**Template.** A briefing instance lives at `dsm-docs/decisions/` and follows this skeleton;
+instances localize to the reviewer's language (a national-authority briefing is written in
+that authority's language):
+
+```
+# <Project> — Data-Protection and Compliance Briefing
+
+Purpose · Audience · Status (OPEN | APPROVED | CONDITIONS) · Date
+Scope note (name-free; asserts no legal conclusions) · References
+
+A. Context               — project, why personal data arises, processing environment
+B. Data scope            — subject categories, affected groups, sensitivity; Art. 9 yes/no
+C. Data flows & storage  — zones, boundary crossings, model-context processing, retention
+D. Control model & TOMs  — protections in place; open TOM points
+E. Open review questions — legal basis, processor/third-country, controller role,
+                           retention/deletion, minimization/purpose limitation, TOMs
+F. Blocked steps         — what stays provisional until sign-off; possible outcomes
+G. References            — operative rules, decision log, governance
+```
+
+**Per-project-type adaptation.** The requirement adapts to the project type:
+
+| Project type | Briefing requirement |
+|--------------|----------------------|
+| Documentation (DSM 5.0) | Full briefing, mandatory when the trigger is set. |
+| Data Science (DSM 1.0) | Full briefing, mandatory; datasets carrying PII are the common case (see §5.4). |
+| Application (DSM 4.0) | Full when the application processes real personal data; a lightweight "not applicable, with justification" entry when it runs on synthetic or anonymized data only. |
+| Hybrid | Full if any component touches Restricted data. |
+| External Contribution | Defer to the upstream project's data-protection regime; record the deferral and any DSM-side handling in the governance storage, not the upstream repository. |
+
+**Surfacing (soft, not a blocker).** A missing briefing does not gate in-flight technical
+work. When the trigger is set and no briefing exists, the condition **warns** at the
+scaffold / session-start completeness check — the same report-not-block posture as other
+DSM completeness checks — and is silent once the briefing exists. This section defines the
+convention; wiring it into the session-start skill and DSM_0.2.A is a deferred follow-up, so
+the convention can be used before the mechanical surfacing is built.
+
+This section builds on, and does not restate, the §5 rules it depends on: §5.1 supplies the
+Restricted class that is the trigger basis; §5.7 and §5.8 govern the briefing's name-free
+egress and its leak-scan; §8.9.2 is the over-firing guard the declarative-primary trigger
+honors; §21.3 governs the test evidence when the surfacing wiring is later built.
+
+**Origin:** take-ai-bite issue #127 with reference PR #128, an external fork contribution
+(credited). The direction was proposed externally and absorbed per BL-582; Central authored
+this section rather than merging the reference PR, because an external issue or PR is INPUT
+to the planning pipeline (Actionable Work Items), not a change to merge verbatim.

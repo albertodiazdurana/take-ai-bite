@@ -5,6 +5,15 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.31.0] - 2026-10-10
+
+Minor: a by-design data-protection and compliance briefing for projects that handle personal or confidential data, so the review need is requested up front in a uniform form rather than surfacing ad hoc after a PII-handling model is already running (BACKLOG-582, take-ai-bite issue #127 / reference PR #128, alberto-passerelle fork).
+
+### Added
+
+- **Data-Protection and Compliance Briefing by Design (BACKLOG-582, DSM_0.2.C §5.9).** DSM requested no data-protection or compliance review by design for projects handling personal data, so the need surfaced ad hoc — usually after a PII-handling model was already in operation — and was recorded, if at all, in no uniform form. The new §5.9 makes DSM request a standard briefing: a declarative-primary trigger (a `**Handles personal/confidential data:** yes` line in the project CLAUDE.md, on the §5.1-Restricted basis, with an optional heuristic), a constant requirements checklist, an A–G template placed at `dsm-docs/decisions/`, and per-project-type adaptation (Documentation and Data Science full; Application lightweight-with-justification on synthetic data; Hybrid conditional; External Contribution deferred to the upstream regime). The briefing is a name-free hand-off to human or expert review that asserts no legal conclusions, and a missing one warns at the scaffold / session-start completeness check rather than blocking work. Central authored §5.9 grounding against the fork's reference PR #128, not merging it (the issue/PR is INPUT to the planning pipeline, per Actionable Work Items).
+  **Spoke action:** none required — §5.9 is a new opt-in section arriving at the next mirror sync; a project handling Restricted data may adopt the briefing, but nothing is mandated and the session-start surfacing wiring is a deferred follow-up.
+
 ## [1.30.0] - 2026-10-09
 
 Minor: a sanctioned independent backlog line for public-mirror forks, so a fork — including one promoted to a local hub by the Cloned-Mirror Kick-off — can develop methodology enhancements without waiting on the private Central or guessing a BL number it cannot see (BACKLOG-581, take-ai-bite issue #124 / reference PR #125, alberto-passerelle fork).

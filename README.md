@@ -109,7 +109,7 @@ They are not theoretical; they emerged from daily practice with AI agents across
 
 </details>
 
-See the full timeline of 190 features → [FEATURES.md](FEATURES.md)
+See the full timeline of 191 features → [FEATURES.md](FEATURES.md)
 
 ## What's Coming
 
