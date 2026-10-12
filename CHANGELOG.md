@@ -5,6 +5,12 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Fork-local BL workflow visibility and non-contradiction principle (DSM_0.2 §21.5, §21.6).** Extends §21.5 with an on-`main` visibility rule (fork-local plans bodies + index live on `main`, visible to every session type), a complete any-session-type fork-local BL workflow, and a non-`main` discoverability note — closing the gap where a non-`main` session could not see the fork-local line and minted a number in Central's namespace. Adds §21.6 (Fork Non-Contradiction and Free-Contribution Principle): a fork may add or propose but never place a rule on its `main` that contradicts upstream, while remaining free to develop and contribute; defines the Non-Contradiction Check the §21.5 workflow requires. Additive to canonical §21.5.
+
 ## [1.32.0] - 2026-10-11
 
 Minor: wire the §5.9 data-protection / compliance briefing surfacing check into session start, so a project that declares it handles personal or confidential data is actually warned when its briefing is missing — the mechanical follow-up v1.31.0 deferred (BACKLOG-583).

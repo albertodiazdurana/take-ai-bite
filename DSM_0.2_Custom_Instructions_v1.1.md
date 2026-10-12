@@ -1669,6 +1669,14 @@ this line.
   claim on Central's namespace. A fork's `BACKLOG-001` and Central's
   `BACKLOG-001` are different items, distinguished by repository; forks do not
   coordinate numbering with one another.
+- **Visibility: fork-local plans live on `main`.** The fork-local `dsm-docs/plans/`
+  bodies and the `plans/README.md` index are kept on the fork's `main`, visible to every
+  session type, carrying the next number and status. The methodology-document edits a BL
+  implements stay on their own `bl-NNN/*` branches (or upstream PRs); only the plans
+  bodies and the index are the always-visible part. This visibility is what lets a
+  non-`main` session find the line and its next number instead of guessing Central's
+  (the collision where a session on `main` saw only the de-identified index and minted a
+  number in Central's namespace).
 - **Central stays canonical.** The fork line never overrides Central's numbering
   or decisions. On upstream absorption Central assigns the canonical number and
   the fork-local BL records the mapping (a `**Central BL:**` field, added when
@@ -1692,6 +1700,28 @@ this line.
   reaches Central. A fork MAY keep a BL purely local; the recommendation is a
   nudge, not a gate.
 
+**Fork-local BL workflow (any session type):** the procedure below is followed by any
+session that files a fork-local BL — a `/dsm-go` session, a parallel session, a
+`/dsm-staa` run, or any skill that may formalize an issue it finds:
+
+1. **Find the next number** from the fork's `plans/README.md` index on `main` — never
+   guess Central's line.
+2. **Draft a name-free body** with the standard required fields (Status, Priority, Date
+   Created, Origin, Author), a §21.2 Risks section, a Test Plan, and a **Non-Contradiction
+   Check** (§21.6).
+3. **Track it** by adding a row to the `plans/README.md` index on `main`.
+4. **Implement** on a `bl-NNN/*` branch (Three-Level Branching Strategy, §20).
+5. **Offer it upstream** — optional but recommended, via the contribution routing in the
+   Rules above.
+
+**Discoverability for non-`main` sessions:** a session that is not operating on `main` (a
+`/dsm-staa` run, a parallel session, any filing skill) consults the on-`main`
+`plans/README.md` index to derive the next fork-local number *before* minting one, rather
+than improvising a number in Central's namespace. The visibility rule above is what makes
+that consult possible; this workflow is what the filing session follows. (Whether a given
+skill such as STAA may file at all is a separate question, settled by that skill's own
+write-scope rather than here.)
+
 **Agent behavior:** on a fork (a Kick-off'd clone, or any non-Central repo
 maintaining its own `dsm-docs/plans/`), when the user formalizes a proposal,
 mint it in the fork-local line from `BACKLOG-001` rather than guessing a Central
@@ -1703,9 +1733,66 @@ the change (the issue/PR is INPUT, per Actionable Work Items).
 
 **Cross-references:** §21 (scope — a parallel fork namespace does not collide
 with Central's), §21.1 (naming), §21.2 (risks), §21.4 (resolver sweep after a
-contributed change lands); DSM_0.2.A §25 (Cloned-Mirror Kick-off, which creates
-the fork-as-hub state); DSM_0.2.C §5.7 / §5.8 (egress discipline the name-free
-rule inherits); DSM_7.0 §2.1 (platform-side fork/mirror mechanics).
+contributed change lands), §21.6 (the Non-Contradiction Check the workflow above
+requires); DSM_0.2.A §25 (Cloned-Mirror Kick-off, which creates the fork-as-hub
+state); DSM_0.2.C §5.7 / §5.8 (egress discipline the name-free rule inherits);
+DSM_7.0 §2.1 (platform-side fork/mirror mechanics).
+
+**Origin:** see [DSM_0.2.E_Provenance.md](DSM_0.2.E_Provenance.md).
+
+### 21.6. Fork Non-Contradiction and Free-Contribution Principle
+
+A fork's relationship to upstream TAB is governed by two clauses that pull in opposite
+directions and are stated together so neither is read alone: a fork is constrained in
+*what* it may place on its own `main`, but not in *whether* it may develop or contribute.
+
+**(a) Non-contradiction.** A fork-local addition MUST NEVER contradict upstream TAB
+methodology. A fork may **add** (a new section, rule, or template) or **propose a change**
+(via an upstream contribution), but it may not place on the fork's `main` a rule that
+conflicts with an existing upstream rule. Upstream is canonical; on conflict the fork
+reconciles toward upstream. The contradiction would otherwise surface at fork-sync
+(`git merge upstream/main`) as a late conflict — the principle is that it never gets that
+far, because the addition was checked against upstream before it landed.
+
+**(b) Free contribution.** A fork is free to draft, track, implement, and contribute
+without building restrictions. No gate blocks a fork from developing a BL or opening a
+contribution; the independent fork-local backlog (§21.5) is the sanctioned vehicle, and
+its use is encouraged, not rationed. Clause (a) constrains the *content* a fork places on
+its `main`; it is never a reason to discourage development or contribution.
+
+**(c) Reconciliation on conflict.** Where a fork-local addition and a later upstream
+change collide, upstream wins the base and the fork re-expresses its addition on top of it
+(or drops it). Fork-sync (`git merge upstream/main`, additive) is the mechanism, and
+§21.5's on-`main` visibility rule keeps the fork's additions auditable, so a collision is
+caught at the sync rather than lived with silently.
+
+**The Non-Contradiction Check.** This is the drafting-step check that the §21.5 fork-local
+BL workflow (step 2) requires. Before a fork-local BL's change lands on the fork's `main`,
+the author writes a short **Non-Contradiction Check** block in the BL body asserting that
+the change:
+
+- **adds or proposes** rather than contradicts — it introduces a new rule or proposes a
+  change through a contribution, and places no rule on fork `main` that conflicts with an
+  existing upstream rule; and
+- **names the upstream surface** it relates to — the section it extends, or the
+  contribution it will ride — so a reviewer can see the relationship is additive.
+
+A check that cannot honestly assert both is the signal to reconcile the change toward
+upstream (clause a) before filing, or to route it as a proposed upstream change rather
+than a fork-`main` addition. As with §21.2's Risks and §21.3's test evidence, an empty or
+reflexive assertion ("does not contradict anything") defeats the check; the test is that
+the author engaged the question and named the surface.
+
+**Agent behavior:** when drafting a fork-local BL (§21.5 workflow step 2), write the
+Non-Contradiction Check block. When a fork-local addition would conflict with an upstream
+rule, surface the conflict and reconcile toward upstream rather than placing the
+conflicting rule on the fork's `main`. Never treat non-contradiction as grounds to
+discourage a contribution (clause b).
+
+**Cross-references:** §21.5 (the fork-local backlog line and workflow that requires this
+check), §21.2 (Risks — the distinct negative-space check at filing time), §21.3 (test
+evidence — the same anti-reflexive-assertion guard); DSM_0.2.C (egress discipline for
+name-free fork bodies); DSM_0.2.A §25 (Cloned-Mirror Kick-off).
 
 **Origin:** see [DSM_0.2.E_Provenance.md](DSM_0.2.E_Provenance.md).
 
