@@ -5,6 +5,12 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Read-only active-session detection for STAA (DSM_0.2.A §26, `/dsm-staa` Step 0).** `/dsm-go` Step 0.7 runs §26 concurrent-session detection, but no other session-entry skill does, so a `/dsm-staa` session sharing the one git working copy could branch, commit, and move a live session's `HEAD` with no warning. `/dsm-staa` now runs a read-only §26 check at start (read `.claude/session.lock`, probe the recorded pid, non-suppressible halt on LIVE, warn on STALE/UNKNOWN), reads but never writes the lock, and files no BL / makes no commit — a BL-worthy finding is recorded for a later `/dsm-go` session. Additive §26.2 lifecycle-table row; no change to Step 0.7, the §26.3 verdict logic, or the §26.5 parallel-session exemption.
+
 ## [1.32.0] - 2026-10-11
 
 Minor: wire the §5.9 data-protection / compliance briefing surfacing check into session start, so a project that declares it handles personal or confidential data is actually warned when its briefing is missing — the mechanical follow-up v1.31.0 deferred (BACKLOG-583).

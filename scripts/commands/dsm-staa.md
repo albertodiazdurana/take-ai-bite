@@ -17,6 +17,43 @@ When the `UserPromptSubmit` per-turn reminder hook fires and tells you to append
 
 **Scrub-before-analyse (projects with a declared PII/egress policy).** Prefer scrubbing names from the transcript before running STAA. The transcript is gitignored, so `git filter-repo` does **not** reach it — the transcript scrub is a separate, manual step from any tracked-history scrub.
 
+## Step 0: Active-Session Detection
+
+STAA shares the one git working copy with any other Claude Code conversation in this
+directory, yet (unlike `/dsm-go` Step 0.7) it has historically run no concurrent-session
+check. A STAA session started while a main session is live and unwrapped can race that
+session's working copy — a concurrent-session incident where a STAA window created a branch
+and committed a BL, moving the live session's `HEAD`. Before Step 1, STAA runs a **read-only**
+§26 detection:
+
+1. Read `.claude/session.lock`. If absent → no active session; proceed to Step 1.
+2. If present, probe the recorded pid for liveness (reuse the `/dsm-go` Step 0.7a /
+   DSM_0.2.A §26.3 snippet **verbatim** — same block, so the verdict logic never drifts):
+
+   ```bash
+   LOCK_PID=$(awk '/^pid:/ {print $2}' .claude/session.lock)
+   case "$LOCK_PID" in
+     ''|unknown|*[!0-9]*) echo "VERDICT=UNKNOWN" ;;
+     *) if kill -0 "$LOCK_PID" 2>/dev/null && ps -p "$LOCK_PID" -o comm= 2>/dev/null | grep -q claude
+        then echo "VERDICT=LIVE"; else echo "VERDICT=STALE"; fi ;;
+   esac
+   ```
+
+3. Act on the verdict per §26.3 (the verdict is a finding, never a recommendation):
+   - **`LIVE`** → **non-suppressible stop.** Display the lockfile contents and the verdict,
+     then halt: "Session {N} is active and unwrapped; wrap it up before running STAA
+     (concurrent working-copy hazard)." Do not proceed to Step 1. Non-suppressible under
+     DSM_0.2 §8.9.1 — auto mode does not bypass it.
+   - **`STALE` / `UNKNOWN`** → warn (non-halting): report the verdict and the lock's
+     transcript mtime as a weak secondary signal, and let the user decide whether to
+     proceed. Do not convert mtime into a verdict (a long-cold lock is equally consistent
+     with a crashed window and an idled-then-resumed one).
+
+**STAA reads, never writes, the lock.** STAA does not create or modify `.claude/session.lock`
+— it runs in a separate conversation and must not claim the single-session invariant (the
+§26.5 parallel-sibling reasoning). This detection is additive to §26: it does not change
+`/dsm-go` Step 0.7, the §26.3 verdict logic, or the §26.5 parallel-session exemption.
+
 ## Steps
 
 1. **List available transcripts:** List files in `.claude/transcripts/` sorted chronologically. Display each filename with the session number and date extracted from the file header.
@@ -102,6 +139,7 @@ When the `UserPromptSubmit` per-turn reminder hook fires and tells you to append
 - This agent produces NO session transcript. The IMPORTANT block at the top of this file explains the two files involved (archived subject vs live reasoning log) and the meta-recursion concern. Do not re-derive the rationale; read the IMPORTANT block.
 - This agent does NOT modify any project files except `.claude/reasoning-lessons.md`, its compact mirror `.claude/reasoning-lessons-compact.md` (Step 8), `.claude/last-staa.txt` (Step 9), and — only when over bound (Step 7b, BACKLOG-567) — the tracked aggregation file `dsm-docs/reasoning-lessons-ecosystem.md`. The first three are gitignored local-only artifacts. The aggregation file is the one tracked file STAA may edit; STAA still **commits nothing** (its no-commit property holds), so the prune is left uncommitted for the next `/dsm-wrap-up` to commit with the session's other changes.
 - The analysis session is lightweight; no git commits, no wrap-up needed
+- **STAA files no BL and makes no git commit (write scope).** If STAA finds a BL-worthy issue, it records the finding in its conversation output (and may note it in `.claude/reasoning-lessons.md`, a gitignored artifact) for a later `/dsm-go` session to file through the fork-local BL workflow (DSM_0.2 §21.5). Creating a branch or committing a BL from a STAA session — a concurrent-session incident — is the prohibited action this codifies against, and is exactly what makes the missing Step 0 detection dangerous: STAA's only writes are the three gitignored local artifacts named above, never a tracked file and never a commit
 - If the transcript is very long (500+ lines), warn about context budget and offer to analyze in sections
 - Cross-reference findings with existing MEMORY.md entries to avoid redundancy
 - Be specific in lessons; "be more careful" is not actionable, "check file existence before editing" is

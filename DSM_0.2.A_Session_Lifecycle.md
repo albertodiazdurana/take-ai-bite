@@ -3083,6 +3083,7 @@ which is what every lockfile written before BL-487 contained.
 | Stage | Skill | Step | Action |
 |-------|-------|------|--------|
 | Detect | `/dsm-go` | 0.7 | Check `.claude/session.lock`; halt if present |
+| Detect (read-only) | `/dsm-staa` | 0 | Read `.claude/session.lock`; halt on LIVE; never write |
 | Write | `/dsm-go` | 6 | Write lockfile after transcript reset |
 | Remove | `/dsm-wrap-up` | 13 | `rm -f .claude/session.lock` |
 | Remove | `/dsm-light-wrap-up` | 8 | `rm -f .claude/session.lock` |
