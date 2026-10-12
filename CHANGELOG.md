@@ -5,6 +5,12 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Clean index before creating a Level 3 task branch (DSM_0.2 §20.9, §20.3 cross-ref).** Creating an L3 branch carries the session branch's staged index onto the new branch, and the first commit there commits the entire index — so boot-staged session-artifact moves (`/dsm-go` Steps 3/3.5) can be absorbed into the task commit silently, polluting a held upstream-destined branch while the session branch loses the moves. §20.9 states the clean-index precondition, a warn-not-block guard, and recovery; §20.3 gains a cross-reference.
+
 ## [1.32.0] - 2026-10-11
 
 Minor: wire the §5.9 data-protection / compliance briefing surfacing check into session start, so a project that declares it handles personal or confidential data is actually warned when its briefing is missing — the mechanical follow-up v1.31.0 deferred (BACKLOG-583).

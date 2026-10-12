@@ -1236,6 +1236,11 @@ merge to the session branch, not directly to main.
 (BL moved to done/), trivial fixes (typos, dates), session artifacts (handoffs,
 checkpoints, feedback), parallel session commits (via commit booking).
 
+**Clean index before cutting the branch:** before creating a Level 3 branch, the
+session-branch index must be clean of staged changes the branch is not meant to carry
+(e.g. boot-staged session-artifact moves), or the first task commit absorbs them. See
+§20.9 (Clean Index Before Creating a Level 3 Task Branch).
+
 ### 20.4. Branch Push Policy
 
 **Default: local only.** Branches are not pushed to GitHub unless needed.
@@ -1355,6 +1360,43 @@ git checkout session-{N}/{YYYY-MM-DD}-recovery
 Then push the recovery branch and open a follow-up PR. The work is
 preserved on the recovery branch; main is rewound to its remote state
 without touching the working tree.
+
+**Origin:** see [DSM_0.2.E_Provenance.md](DSM_0.2.E_Provenance.md).
+
+### 20.9. Clean Index Before Creating a Level 3 Task Branch
+
+Creating a Level 3 task branch (`git checkout -b bl-NNN/*` or `sprint-N/*`) carries the
+session branch's **staged index** onto the new branch, and the first `git commit` there
+commits the **entire** index — not only the paths just `git add`ed. Staged changes the
+branch was not meant to carry ride into the task commit silently; every command exits 0.
+
+The live trap is boot-staged session-artifact moves. `/dsm-go` Steps 3 / 3.5 annotate and
+`git mv` a consumed handoff and checkpoint into `done/`, leaving them **staged** on the
+session branch. If the next action is a BL implementation, `CLAUDE.md` directs the agent to
+cut an L3 branch as its first action — carrying those staged moves onto a held,
+upstream-destined methodology branch (which pollutes the eventual PR) while the session
+branch, the correct home for the moves, loses them when the agent switches back. A later
+`git add <bl-files>` does not scope the commit; it adds to an already-dirty index.
+
+**Rule:** before creating a Level 3 task branch, the session-branch index MUST be clean of
+staged changes the branch is not meant to carry. Either commit the pending session-artifact
+moves to the session branch first (they belong there), or confirm the index is clean:
+
+```bash
+git diff --cached --name-only   # empty, or only what the L3 branch should carry
+```
+
+**Guard (warn, not block).** A PreToolUse(Bash) guard can warn when `git checkout -b bl-*`
+or `git switch -c bl-*` runs with a non-empty staged index. It should warn rather than
+block: an implementer may legitimately carry staged work onto the task branch, so a hard
+block would obstruct that. The precondition is primarily a prose discipline; the guard is a
+reminder.
+
+**Recovery if the moves already rode onto the task branch.** Re-home the moves on the
+session branch and rebuild the task branch clean. The incident that produced this rule was
+recovered this way: the boot-staged handoff/checkpoint moves were split out of the
+methodology commit and re-committed on the session branch, and the task branch was rebuilt
+methodology-only.
 
 **Origin:** see [DSM_0.2.E_Provenance.md](DSM_0.2.E_Provenance.md).
 
