@@ -75,7 +75,7 @@ reinforcement problem: instructions that are technically present but
 behaviorally inactive.
 
 DSM solves this with explicit reinforcement blocks in the alignment section.
-The Worklog Protocol, for example, must include the literal
+The Session Transcript Protocol, for example, must include the literal
 delimiter syntax in the reinforcement block; referencing "Reasoning Delimiter
 Format" by name is insufficient (observed in spoke project sessions where
 agents defaulted to markdown heading style).
@@ -152,7 +152,7 @@ Effective command files share several design patterns:
 
 ## 4. Protocol Templates as Behavioral Specifications
 
-DSM protocols (Pre-Generation Brief, Worklog, Protocol Violation
+DSM protocols (Pre-Generation Brief, Session Transcript, Protocol Violation
 Triage) are not guidelines; they are behavioral specifications. Each one
 defines a precise interaction pattern that the agent must follow, with
 explicit anti-patterns that identify common deviations.
@@ -185,7 +185,7 @@ the agent what failure looks like, not just what success looks like.
 
 Protocols do not operate in isolation. They compose and interact:
 
-- **Pre-Generation Brief + Worklog:** The brief is presented in
+- **Pre-Generation Brief + Session Transcript:** The brief is presented in
   conversation text (Gate 1); the reasoning behind the brief is in the
   transcript. Two channels, one protocol.
 - **Protocol Violation Triage + Backlog System:** A triage identifies a root

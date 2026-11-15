@@ -346,7 +346,7 @@ table has not been updated, the agent must:
 3. For any missing protocol, surface the gap to the user before executing:
    "Protocol {name} was added/modified in vX.Y.Z but is not listed in your Protocol
    Applicability table. Apply, skip, or defer?"
-4. Record the user's decision in the worklog
+4. Record the user's decision in the session transcript
 5. Never execute an unlisted protocol silently
 
 **Why this matters:** Without this gate, new protocols run in spoke projects without

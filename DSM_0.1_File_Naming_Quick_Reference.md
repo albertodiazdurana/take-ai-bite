@@ -244,7 +244,7 @@ Track creation and publication status of blog materials.
 
 Blog posts, external-facing deliverables, and public documents routinely
 use DSM-specific terms (spoke, hub, Level 3 branch, `@` reference,
-Pre-Generation Brief, Worklog, etc.). Readers outside the
+Pre-Generation Brief, Session Transcript, etc.). Readers outside the
 project cannot be assumed to know these terms.
 
 **Convention:** on first use of a DSM-specific term in a blog post or

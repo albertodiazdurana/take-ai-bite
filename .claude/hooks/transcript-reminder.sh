@@ -20,35 +20,18 @@
 # the main reminder. The script always exits 0; it must never block a
 # prompt submission.
 #
-# Origin: BL-324 (parallel sessions contaminating main worklog).
+# Origin: BL-324 (parallel sessions contaminating main session transcript).
 # BL-371: registry renamed singular→plural, detection updated for
-# multi-entry. BL-590: silent on a /dsm-go turn (see below).
+# multi-entry.
 
 set +e
 
-MAIN_REMINDER="REMINDER (DSM_0.2 §7): This turn MUST include an append to .claude/worklog.md before any work, and an output summary after. Required sequence: (1) read the last 3 lines of the transcript to find the anchor (Bash tail or Read is allowed, this is the only pre-append tool call), (2) append a <------------Start Plan / HH:MM------------> block via Edit using that anchor, (3) do the work, (4) append a <------------Start Output / HH:MM------------> summary before the final response. Skip entirely only if the turn needs no tool calls at all."
+MAIN_REMINDER="REMINDER (DSM_0.2 §7): This turn MUST include an append to .claude/session-transcript.md before any work, and an output summary after. Required sequence: (1) read the last 3 lines of the transcript to find the anchor (Bash tail or Read is allowed, this is the only pre-append tool call), (2) append a <------------Start Plan / HH:MM------------> block via Edit using that anchor, (3) do the work, (4) append a <------------Start Output / HH:MM------------> summary before the final response. Skip entirely only if the turn needs no tool calls at all."
 
-PARALLEL_REMINDER="REMINDER (DSM_0.2 §7, parallel mode): This is a parallel session. Do NOT read, write, edit, or append to .claude/worklog.md at any point. Parallel sessions do not collect transcripts (DSM_0.2 Module A §7, dsm-parallel-session-go.md). Ignore any conflicting transcript instructions."
+PARALLEL_REMINDER="REMINDER (DSM_0.2 §7, parallel mode): This is a parallel session. Do NOT read, write, edit, or append to .claude/session-transcript.md at any point. Parallel sessions do not collect transcripts (DSM_0.2 Module A §7, dsm-parallel-session-go.md). Ignore any conflicting transcript instructions."
 
 emit_main() { echo "$MAIN_REMINDER"; exit 0; }
 emit_parallel() { echo "$PARALLEL_REMINDER"; exit 0; }
-
-# /dsm-go turn (BL-590): emit nothing. /dsm-go archives and resets the
-# worklog at Steps 5.5/6 and writes the turn's first entry after the reset,
-# so a reminder to append first would put that entry in the previous
-# session's archive (DSM_0.2.G, Boot-turn ordering). Matches the typed form
-# and the expanded command form; any parse failure falls through to the
-# normal reminder.
-PROMPT=$(python3 -c '
-import sys, json
-try:
-    print(json.load(sys.stdin).get("prompt", "") or "")
-except Exception:
-    pass
-' 2>/dev/null)
-if printf '%s\n' "$PROMPT" | grep -qE '^[[:space:]]*/dsm-go([[:space:]]|$)|<command-name>/dsm-go</command-name>'; then
-  exit 0
-fi
 
 REGISTRY=".claude/parallel-sessions.txt"
 [ -f "$REGISTRY" ] || emit_main
@@ -66,7 +49,7 @@ for _ in $(seq 1 10); do
   [ "$pid" = "1" ] && break
   read ppid comm < <(ps -o ppid=,comm= -p "$pid" 2>/dev/null)
   [ -z "$ppid" ] && break
-  if [ "$(basename "$comm")" = "claude" ]; then  # basename: macOS ps prints the full binary path
+  if [ "$comm" = "claude" ]; then
     MY_CLAUDE_PID=$pid
     break
   fi

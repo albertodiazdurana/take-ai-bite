@@ -37,7 +37,7 @@ Instruction system evaluation asks different questions:
 | Evaluation Level | Question | Method |
 |-----------------|----------|--------|
 | Individual output | Did this response meet criteria? | LLM-as-a-Judge, human review |
-| Protocol compliance | Did the agent follow the prescribed behavior? | Worklog analysis |
+| Protocol compliance | Did the agent follow the prescribed behavior? | Session transcript analysis |
 | System consistency | Do instruction documents agree with each other? | Cross-reference validation |
 | Ecosystem health | Do changes propagate correctly across projects? | Mirror sync verification, version comparison |
 | Evolution trajectory | Is the methodology improving over time? | Temporal comparison, feedback volume analysis |
@@ -128,8 +128,8 @@ failure mode from the taxonomy in DSM_6.1 §7.
 
 ## 4. STAA as Systematic Effectiveness Analysis
 
-The Worklog Analysis Agent (STAA) is DSM's retrospective
-evaluation tool. It analyzes worklogs to extract reasoning
+The Session Transcript Analysis Agent (STAA) is DSM's retrospective
+evaluation tool. It analyzes session transcripts to extract reasoning
 patterns, identify protocol compliance issues, and generate improvement
 signals.
 
@@ -268,7 +268,7 @@ Sources and change history for this module.
 - DSM_0.2 §22: Protocol Violation Triage Response
 - DSM_6.0 §1.9: Think Ahead Principle
 - A DSM spoke project: automated cross-reference validation
-- STAA: Worklog Analysis Agent (/dsm-staa command)
+- STAA: Session Transcript Analysis Agent (/dsm-staa command)
 
 ### 7.2. External References
 

@@ -53,7 +53,7 @@ its components contradict each other. An ecosystem fails when changes
 propagate incorrectly or feedback loops break.
 
 DSM operates primarily at the system and ecosystem levels. Every DSM
-protocol, from the Worklog Protocol to the Three-Level Branching
+protocol, from the Session Transcript Protocol to the Three-Level Branching
 Strategy, is an instruction artifact: a version-controlled document that
 shapes AI behavior across sessions, projects, and contributors.
 
@@ -89,7 +89,7 @@ protocols for a single project.
 
 **DSM evidence:** The introduction of CLAUDE.md as a persistent system
 prompt, the Pre-Generation Brief Protocol (DSM_0.2 §8) as a reusable
-interaction pattern, and the Worklog Protocol (DSM_0.2 §7) as
+interaction pattern, and the Session Transcript Protocol (DSM_0.2 §7) as
 a continuity mechanism. Each of these is an instruction artifact that
 persists across sessions and shapes AI behavior without being rewritten
 each time.
@@ -139,7 +139,7 @@ the entire information ecosystem around the model: system instructions,
 retrieved knowledge, tool definitions, memory, and session state.
 
 DSM has been practicing context engineering before the term was coined.
-The worklog protocol (structured note-taking for long-horizon
+The session transcript protocol (structured note-taking for long-horizon
 tasks), dsm-go/dsm-wrap-up (context initialization and persistence),
 CLAUDE.md (system prompt at the "right altitude"), and the Ecosystem Path
 Registry (cross-project context routing) are all context engineering

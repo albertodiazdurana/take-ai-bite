@@ -279,7 +279,7 @@ but how much detail the context requires.
 |---------|-----------------|---------|
 | External contribution (PR, issue, upstream commit) | Explicit: state AI involvement in PR description or commit message | "AI-assisted: Claude used for implementation, human reviewed and tested" |
 | Published artifact (blog post, documentation, report) | Explicit: note in artifact or metadata | "Written with AI assistance" or project-level AI collaboration document |
-| Internal DSM work (spoke project, methodology) | Implicit: Worklog and commit history provide the record | No additional disclosure needed; the process is self-documenting |
+| Internal DSM work (spoke project, methodology) | Implicit: Session Transcript and commit history provide the record | No additional disclosure needed; the process is self-documenting |
 | Exploratory work (notebooks, scratch analysis) | Optional: disclose if sharing results externally | Personal workflow; disclose when outputs leave the notebook |
 
 **What to disclose:**
@@ -329,7 +329,7 @@ is not disclosed prominently, and the defaults favor the tool vendor.
    what the terms were when you last checked.
 2. **Document** the tool, tier, date terms were verified, and any
    restrictions. Record this alongside the asset (e.g., in a creation log,
-   `dsm-docs/assets/` manifest, or inline in the worklog).
+   `dsm-docs/assets/` manifest, or inline in the session transcript).
 3. **Flag high-risk scenarios:**
    - Free tier with no commercial use rights
    - Tool retains ownership of generated outputs
@@ -338,7 +338,7 @@ is not disclosed prominently, and the defaults favor the tool vendor.
    - Terms changed recently (check change history if available)
 
 **Scope:** applies to all public-facing deliverables. Internal artifacts
-(worklogs, draft documents, personal analysis) do not require
+(session transcripts, draft documents, personal analysis) do not require
 the same review, but treat them as restricted until verified if they may
 become public.
 
@@ -786,7 +786,7 @@ to existing DSM protocols and identifies the gaps that remain.
 
 | Protocol | DSM Location | Principle |
 |----------|-------------|-----------|
-| Worklog (reasoning visible in real time) | DSM_0.2 | The Human Brings the Spark |
+| Session Transcript (reasoning visible in real time) | DSM_0.2 | The Human Brings the Spark |
 | Session-Start Checks (inbox, version, handoffs) | DSM_0.2 | Know Your Context |
 | Session Close-Out and Wrap-Up | DSM_0.2 | Know Your Context |
 | Checkpoint and Handoff system | DSM_0.2, DSM_5.0 | Know Your Context |

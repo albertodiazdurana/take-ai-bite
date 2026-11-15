@@ -80,7 +80,7 @@ Light wrap-up is for **same-day continuation only**. If the current session bran
 
 ## Notes
 
-- Do NOT clear or overwrite `.claude/worklog.md`; it persists for the next lightweight session
+- Do NOT clear or overwrite `.claude/session-transcript.md`; it persists for the next lightweight session
 - Do NOT extract reasoning lessons (deferred)
 - Do NOT check README changes (deferred)
 - Do NOT push feedback (deferred)

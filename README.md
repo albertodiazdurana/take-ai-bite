@@ -45,7 +45,7 @@ These principles are operationalized by DSM, a living, versioned methodology tha
 
 DSM is not a static document. It evolves through a hub-spoke feedback loop where every session, every project, and every practitioner's experience feeds back into the methodology. Protocols are tested, refined, and propagated across the ecosystem. What one project discovers improves every future project.
 
-This is what makes TAB unique to your own experience. Worklogs capture reasoning. Checkpoints preserve milestones. Memory files retain context across sessions. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that accumulates your expertise, not just your files.
+This is what makes TAB unique to your own experience. Session transcripts capture reasoning. Checkpoints preserve milestones. Memory files retain context across sessions. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that accumulates your expertise, not just your files.
 
 ## Systems Prompt Engineering
 
@@ -62,15 +62,6 @@ The framework operates at three levels:
 | **Ecosystem** | Instruction architecture across projects | Hub-spoke propagation, feedback loops, mirror sync |
 
 For the full chapter, see [`DSM_6.1_Systems_Prompt_Engineering_v1.0.md`](DSM_6.1_Systems_Prompt_Engineering_v1.0.md).
-
-## Getting Started
-
-1. Fork this repository and clone your fork.
-2. Open the folder in VS Code with the Claude Code extension and type `/dsm-go`.
-3. Follow [`GETTING_STARTED.md`](GETTING_STARTED.md): prerequisites, every step with a check, how to
-   keep your fork up to date, and instructions for an AI assistant helping you.
-
-TAB is for individual use: each person works in their own fork.
 
 ## Start Here
 
@@ -96,12 +87,6 @@ They are not theoretical; they emerged from daily practice with AI agents across
 <details>
 <summary>Latest additions to the framework (click to expand)</summary>
 
-- **Works on macOS and zsh** — Session start, wrap-up and the session-analysis agent give the right results on a Mac: the lock check shows the real age of a session's log, a parallel session gets its own reminder, and wrap-up keeps the shell's search path under zsh
-- **Lessons shared only after review** — Wrap-up keeps reasoning lessons in the project; they reach the hub only through a review step that shows each lesson with a privacy scan, and a hub's lesson files stay out of public forks
-- **One-line instructions-file check** — Session start reports in one line whether the project's instructions file has its four sections, and holds back only a project that has never wrapped up
-- **Getting started from your own fork** — A step-by-step guide, with a check at every step, takes a newcomer or the AI assistant helping them from installing git to a first finished session on their own fork of Take AI Bite
-- **Wrap-up on any git host** — The end-of-session merge works on GitHub, GitLab, any other host or with no remote, reports a failed push as failed, and in a fork never reaches the project it was forked from
-- **New-spoke bootstrap command** — A fresh directory becomes a spoke of an existing hub with one command, instead of misusing the cloned-mirror setup that would wrongly register it as its own hub
 - **Punctuation rule retired** — A standing instruction enforced on every pass is replaced by a skill run on demand against a finished document
 - **The before-acting log entry is called a plan** — Renamed from "thinking" across the instruction file, the per-turn reminder and every project config; old logs keep working and both names validate
 - **A lighter always-loaded core** — The instruction document read on every turn is 43% shorter; origin notes, enforcement narrative and template text moved to companion files the core points at
@@ -123,12 +108,13 @@ They are not theoretical; they emerged from daily practice with AI agents across
 
 </details>
 
-See the full timeline of 205 features → [FEATURES.md](FEATURES.md)
+See the full timeline of 177 features → [FEATURES.md](FEATURES.md)
 
 ## What's Coming
 
 - **Structural compliance retrofit** — Applying document structure standards (TOC, intro paragraphs, line budgets) across all methodology files
 - **A queryable knowledge graph** that compiles human-authored methodology into a navigable, interconnected structure, making the ecosystem's accumulated knowledge searchable across projects and sessions
+- **Onboarding guide** — A newcomer-friendly path into the framework for practitioners encountering DSM for the first time
 
 ## Links
 

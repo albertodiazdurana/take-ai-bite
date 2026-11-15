@@ -35,7 +35,7 @@ _Lessons about slash-command behavior, edge cases, and skill authoring._
 <!--
   This file is the per-project reasoning-lessons runtime file (gitignored in Central).
   It starts empty. Wrap-up (/dsm-wrap-up) appends [auto]-tagged lessons extracted from
-  the worklog. STAA sessions append [STAA]-tagged lessons from full analysis.
+  the session transcript. STAA sessions append [STAA]-tagged lessons from full analysis.
 
   Ecosystem-scope lessons (ones that apply across projects) should be promoted to
   dsm-docs/reasoning-lessons-ecosystem.md (tracked, Layer 3) instead of accumulating here.

@@ -53,7 +53,6 @@ the reader has already paid the cost the gate exists to avoid.
 
 | Guide | Applies when all of these hold |
 |-------|-------------------------------|
-| [boot-safeguard-fork-migration.md](boot-safeguard-fork-migration.md) | (1) the repo is a Kick-off'd fork or clone of the public DSM mirror; (2) it predates v1.33.0 and is updating to it or later; (3) sessions run, or will run, on a strict model |
 | [mcp-var-expansion.md](mcp-var-expansion.md) | (1) a Claude Code MCP server's credential is a `${VAR}` reference in `.mcp.json`; (2) the value comes from a gitignored `.env` rather than the shell profile; (3) the server rejects requests, or reports connected while calls fail |
 
 ## Adding a guide

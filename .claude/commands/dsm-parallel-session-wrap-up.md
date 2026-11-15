@@ -93,7 +93,7 @@ from the main session tab.
 
 - No co-author lines in commits
 - No MEMORY.md updates (main session handles this)
-- No worklog entries
+- No session transcript entries
 - No reasoning lessons extraction
 - No feedback push
 - No branch deletion or merging (shared branch model)

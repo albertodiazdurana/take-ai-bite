@@ -1,6 +1,6 @@
 #!/bin/bash
-# Hook: Enforce worklog append-only rule (DSM_0.2 §7)
-# Fires on PreToolUse for Edit calls to *worklog.md, and (BL-552)
+# Hook: Enforce session transcript append-only rule (DSM_0.2 §7)
+# Fires on PreToolUse for Edit calls to *session-transcript.md, and (BL-552)
 # for Bash calls that redirect into it. The two paths validate different
 # things because different things are knowable: the Edit path sees old_string
 # and new_string and checks all four rules below; the Bash path sees only a
@@ -83,9 +83,9 @@ try:
 except Exception:
     sys.exit(0)
 
-# Only commands that redirect into the worklog are inspected.
+# Only commands that redirect into the session transcript are inspected.
 # Everything else produces no output at all (the over-firing control).
-if not re.search(r">>?\s*[^\s|;&]*\.claude/worklog\.md", cmd):
+if not re.search(r">>?\s*[^\s|;&]*\.claude/session-transcript\.md", cmd):
     sys.exit(0)
 
 out = []
@@ -96,9 +96,7 @@ for m in re.finditer(r"<<-?\s*([\x27\x22]?)([A-Za-z_][A-Za-z0-9_]*)\1", cmd):
     rest = cmd[m.end():]
     end = re.search(r"^[ \t]*" + re.escape(delim) + r"[ \t]*$", rest, re.M)
     body = rest[:end.start()] if end else rest
-    # A delimiter written earlier in the same command (the DSM_0.2.G default
-    # form: printf the delimiter, then a quoted heredoc body) counts.
-    if "<------------Start " not in body and "<------------Start " not in cmd[:m.start()]:
+    if "<------------Start " not in body:
         out.append("B1|no timestamped delimiter in the appended block")
     if quote == "" and "\x60" in body:
         out.append("B2|unquoted heredoc whose body contains a backtick")
@@ -107,7 +105,7 @@ print("\n".join(out))
 
   if [ -n "$BASH_FINDINGS" ]; then
     cat >&2 <<WARNEOF
-WARNING: Worklog Bash append (DSM_0.2 §7, BL-552).
+WARNING: Session transcript Bash append (DSM_0.2 §7, BL-552).
 
 $BASH_FINDINGS
 
@@ -119,10 +117,10 @@ B1 , every appended entry must carry a delimiter:
 B2 , an UNQUOTED heredoc performs command substitution on backticks as well as
 on \$(...). A backtick-quoted term in ordinary prose is EXECUTED and replaced by
 its output, and the surviving text still reads as fluent English with the span
-missing. Both directions are described in DSM_0.2.G (Appending with Bash).
-FIX: single-quote the heredoc (<< 'EOF') when the body contains backticks, and
-printf the delimiter with a fresh \$(date +%H:%M) before it; or prefer the Edit
-append path, which this hook validates in full.
+missing. DSM_0.2 §7 names only the \$(...) direction; BACKLOG-500 is the
+protocol-text half of this gap.
+FIX: single-quote the heredoc (<< 'EOF') when the body contains backticks, or
+prefer the Edit append path, which this hook validates in full.
 WARNEOF
     exit 1
   fi
@@ -139,8 +137,8 @@ print(f'NEW_STRING={shlex.quote(ti.get(\"new_string\", \"\"))}')
 print(f'REPLACE_ALL={shlex.quote(\"true\" if ti.get(\"replace_all\", False) else \"\")}')
 ")"
 
-# Only validate worklog.md edits
-if [[ ! "$FILE_PATH" =~ \.claude/worklog\.md$ ]]; then
+# Only validate session-transcript.md edits
+if [[ ! "$FILE_PATH" =~ \.claude/session-transcript\.md$ ]]; then
   exit 0
 fi
 
@@ -157,9 +155,9 @@ fi
 # is wrong regardless of their state.
 if [[ "$REPLACE_ALL" == "true" ]]; then
   cat >&2 <<EOF
-BLOCKED: Worklog violation — replace_all forbidden (DSM_0.2 §7, check 0/4).
+BLOCKED: Session transcript violation — replace_all forbidden (DSM_0.2 §7, check 0/4).
 
-Edit with replace_all: true is never allowed on .claude/worklog.md.
+Edit with replace_all: true is never allowed on .claude/session-transcript.md.
 The append-anchor rule assumes a unique last-line anchor; replace_all duplicates
 your new content at every match and explodes the file (S17: 95 MB).
 
@@ -186,7 +184,7 @@ fi
 # --- Check 1: old_string anchored to last non-empty line ---
 if ! echo "$LAST_LINE" | grep -qF -- "$FIRST_OLD_LINE"; then
   cat >&2 <<EOF
-BLOCKED: Worklog violation — wrong anchor (DSM_0.2 §7, check 1/4).
+BLOCKED: Session transcript violation — wrong anchor (DSM_0.2 §7, check 1/4).
 
 old_string is not anchored to the last non-empty line of the file.
 
@@ -196,7 +194,7 @@ Last non-empty line:
 Your old_string started with:
   $FIRST_OLD_LINE
 
-FIX: Read the last 3 lines of .claude/worklog.md, use the last
+FIX: Read the last 3 lines of .claude/session-transcript.md, use the last
 non-empty line as old_string, and append new content after it.
 EOF
   exit 2
@@ -205,7 +203,7 @@ fi
 # --- Check 2: new_string starts with old_string (append-only) ---
 if [[ "$NEW_STRING" != "$OLD_STRING"* ]]; then
   cat >&2 <<EOF
-BLOCKED: Worklog violation — content replaced (DSM_0.2 §7, check 2/4).
+BLOCKED: Session transcript violation — content replaced (DSM_0.2 §7, check 2/4).
 
 new_string must START WITH old_string verbatim. You are replacing content
 instead of appending after it.
@@ -222,7 +220,7 @@ APPENDED="${NEW_STRING#"$OLD_STRING"}"
 # Check for <------------Start {anything}------------>
 if ! echo "$APPENDED" | grep -q '<------------Start '; then
   cat >&2 <<EOF
-BLOCKED: Worklog violation — missing delimiter (DSM_0.2 §7, check 3/4).
+BLOCKED: Session transcript violation — missing delimiter (DSM_0.2 §7, check 3/4).
 
 Every appended entry must contain a timestamped delimiter:
   <------------Start {timestamp}------------>
@@ -278,7 +276,7 @@ if [ -n "$DELIM_TS" ]; then
   # veto (DSM_0.2 §19.2's family).
   if [ "$DRIFT" -gt 5 ]; then
     cat >&2 <<WARNEOF
-WARNING: Worklog delimiter timestamp drift (DSM_0.2 §7, check 4/4).
+WARNING: Session transcript delimiter timestamp drift (DSM_0.2 §7, check 4/4).
 
   delimiter says : $DELIM_TS
   wall clock is  : $NOW_TS

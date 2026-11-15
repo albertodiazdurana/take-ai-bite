@@ -41,8 +41,6 @@ protocol listed in the dispatch table is needed.
 23. [CLAUDE.md Section Completeness Gate for New Projects](#23-claudemd-section-completeness-gate-for-new-projects)
 24. [Sprint Plan Cross-Reference Before Completion](#24-sprint-plan-cross-reference-before-completion)
 25. [Cloned-Mirror Kick-off Protocol](#25-cloned-mirror-kick-off-protocol)
-26. [Concurrent-Session Detection Protocol](#26-concurrent-session-detection-protocol)
-27. [Git Host Resolution Rule](#27-git-host-resolution-rule)
 
 ---
 
@@ -540,17 +538,17 @@ neither marker nor checkpoint exists, the agent falls back to full `/dsm-go`.
 | Bandwidth report | Transcript boundary marker |
 | Contributor profile check | Checkpoint (minimal) |
 
-**Work-notes step mandate:** Lightweight mode reduces context loading, not work-notes
-documentation. The Worklog Protocol (plan-before-acting) is
+**Thinking step mandate:** Lightweight mode reduces context loading, not reasoning
+documentation. The Session Transcript Protocol (thinking-before-acting) is
 mandatory in lightweight mode. Both cascading failure incidents observed in spoke
 projects (redundant searches, wrong routing, secret leaks) occurred when the
-plan step was skipped under time pressure in light or wrap-up mode. Sessions
-that maintained explicit plan entries had the fewest errors.
+thinking step was skipped under time pressure in light or wrap-up mode. Sessions
+that maintained explicit thinking entries had the fewest errors.
 
 **Transcript behavior:** In lightweight mode, the transcript is not archived or
-reset. `/dsm-light-go` appends a boundary marker; work notes accumulate across
+reset. `/dsm-light-go` appends a boundary marker; reasoning accumulates across
 the lightweight chain. When a full `/dsm-go` eventually runs, it archives the
-accumulated multi-worklog.
+accumulated multi-session transcript.
 
 **Deferred items tracking:** The lightweight wrap-up checkpoint includes a
 checklist of deferred items. The next full `/dsm-go` processes them as part of
@@ -758,7 +756,7 @@ within the same main session.
 | Allowed (parallel session) | Prohibited (main session only) |
 |---------------------------|-------------------------------|
 | Read any repo file | Modify MEMORY.md |
-| Edit files in declared scope (BL type) | Modify worklog |
+| Edit files in declared scope (BL type) | Modify session transcript |
 | Write to `.claude/` (findings, notes) | Process inbox entries |
 | Commit on shared session branch (via booking) | Push feedback to DSM Central |
 | Read MEMORY.md, CLAUDE.md | Edit files outside declared scope |
@@ -780,7 +778,7 @@ operate in isolation from the main session's numbering state.
 
 | Skipped | Reason |
 |---------|--------|
-| Worklog | Avoids concurrent writes to shared file |
+| Session transcript | Avoids concurrent writes to shared file |
 | MEMORY.md writes | Main session owns memory lifecycle |
 | Inbox processing | Avoids duplicate processing |
 | Reasoning lessons | Main session handles extraction |
@@ -829,9 +827,9 @@ Reference: Lifecycle Skill Prohibition rule
 
 ## 8. Reasoning Lessons Protocol
 
-Worklogs contain valuable decision heuristics, course corrections, and
-recurring work-note patterns that are lost when the transcript is overwritten at the
-next session start. This protocol captures and curates those patterns into a persistent
+Session transcripts contain valuable reasoning traces, decision heuristics, and
+course corrections that are lost when the transcript is overwritten at the next
+session start. This protocol extracts and curates those patterns into a persistent
 file that the agent reads at session start, creating cross-session learning.
 
 **File:** `.claude/reasoning-lessons.md` (gitignored, project-local)
@@ -873,18 +871,6 @@ outputs a STAA recommendation after each auto extraction.
 - **Pruning cadence:** Every 5 sessions, review the file
 - **File size target:** ~100 entry lines (excluding headers and comments); if
   exceeded, trigger a prune pass regardless of cadence, maximum 200 lines hard cap
-- **Per-entry size ceiling:** soft target of ~600 characters of body text per
-  entry. This keeps the two stock targets mutually reachable: 61,440 B (the §8.1
-  byte bound) divided by 100 entries (the file size target above) is ~614 B per
-  entry, so an average entry longer than ~600 characters makes the count target and
-  the byte bound impossible to satisfy together. That is the state BACKLOG-495
-  measured: an 866 B average, with most entries already over the ceiling. The
-  ceiling is soft:
-  an entry that earns the length may exceed it, but the default when an entry runs
-  over is to compress it, or split it into two cross-referenced entries, and never
-  to silently drop the surplus. Both append paths are governed: `/dsm-wrap-up`
-  Step 0 and `/dsm-staa` Steps 6-7. The ceiling bounds the per-entry flow; the
-  entry-count target and the pruning cadence bound the accumulated stock.
 - **Prune actions:**
   1. **Promote to memory:** entries reinforced across 3+ sessions graduate to
      MEMORY.md (as Key Patterns or Common Pitfalls) or CLAUDE.md (as protocol
@@ -906,7 +892,7 @@ outputs a STAA recommendation after each auto extraction.
   4. **Consolidate:** entries expressing the same insight from different sessions
      merge into one with session cross-references (e.g., `[+S55]`)
 
-**Relationship to Worklog Protocol:** The transcript is the raw data
+**Relationship to Session Transcript Protocol:** The transcript is the raw data
 (ephemeral, overwritten each session, optionally archived to `.claude/transcripts/`).
 Reasoning lessons are the curated extract (persistent, accumulating across sessions).
 The transcript feeds the lessons; the lessons feed the agent's priming at session start.
@@ -1038,8 +1024,8 @@ line, identified as the first `### ` category heading OR the first
 heading itself) is dropped.
 
 ```bash
-NOW=$(date +%Y-%m-%dT%H:%M%z)
-SRC_MTIME=$(date -r .claude/reasoning-lessons.md +%Y-%m-%dT%H:%M%z)
+NOW=$(date +%Y-%m-%dT%H:%M%:z)
+SRC_MTIME=$(date -r .claude/reasoning-lessons.md +%Y-%m-%dT%H:%M%:z)
 {
   printf '%s\n' \
     "# Reasoning Lessons (compact mirror)" "" \
@@ -1176,32 +1162,21 @@ propagates beyond the originating project.
 |-------|---------|----------------|
 | `ecosystem` | Applies to any DSM project | Redistributed to all spokes via DSM Central |
 | `pattern` | Applies to projects with same participation pattern or type | Redistributed selectively |
-| `project` | Specific to this project's domain | Stays local; never sent to the hub |
+| `project` | Specific to this project's domain | Stays local; reported for pattern detection |
 
 **Entry format with scope:** `- [{tag}] S{N} [{scope}]: {lesson text}`
 
 Example: `- [auto] S12 [ecosystem]: When placing DSM infrastructure, confirm project root before creating files.`
 
 **Management rules:**
-- Only `ecosystem` and `pattern` lessons are offered by the STAA share step
-  (§8.3) and get redistributed
-- `project` lessons stay in the originating project; no skill sends them to
-  the hub
+- Only `ecosystem` and `pattern` scope lessons get redistributed
+- `project` scope lessons are reported in the push notification but not
+  redistributed to other spokes
+- A `project` lesson recurring independently in 3+ spokes escalates to
+  `ecosystem` scope
 - Deduplication: if a lesson already exists in DSM Central's aggregation file
-  or in a DSM_0.2 protocol, the hub acknowledges it when processing the
-  notification but does not re-add it
-- **Local-file retention at DSM Central (BACKLOG-495 flow control):** at DSM
-  Central, an `ecosystem`-scope lesson extracted by `/dsm-wrap-up` Step 0 is written
-  to the aggregation file `dsm-docs/reasoning-lessons-ecosystem.md` and withheld from
-  the local boot-primed `.claude/reasoning-lessons.md`. The aggregation file already
-  carries it for redistribution, and the local file is the size-bounded boot primer
-  (§8.1), so retaining ecosystem lessons in both re-accumulates the local file with
-  content it does not need to prime a session. The one exception is an `ecosystem`
-  lesson that `/dsm-staa` derives from its own analysis: STAA may retain it locally
-  when it is high-value for boot priming, because those are few and are the ones most
-  worth keeping visible. `pattern` and `project` lessons are retained locally as
-  before. This rule is the flow control on the local file's growth; spokes are
-  unaffected, since a spoke's local file is its only lessons file.
+  or in a DSM_0.2 protocol, acknowledge in the push notification but do not
+  re-add
 
 **When to classify:**
 - `[auto]` extraction at wrap-up: the agent assigns a scope based on
@@ -1211,32 +1186,16 @@ Example: `- [auto] S12 [ecosystem]: When placing DSM infrastructure, confirm pro
 
 ### 8.3. Cross-Project Propagation
 
-Reasoning lessons reach DSM Central only through a reviewed share step in
-`/dsm-staa`. No skill sends a lesson to another project on its own: a lesson
-crosses the project boundary only after the user has read its text and approved
-it in the same session (BACKLOG-606).
+Reasoning lessons generated in spoke projects must propagate to DSM Central.
+Without propagation, valuable patterns stay siloed in individual projects.
 
-**Reviewed sharing rule:** wrap-up extracts and classifies lessons into the
-local `.claude/reasoning-lessons.md` and sends nothing. The `/dsm-staa` share
-step is the only path to the hub:
+**Mandatory push rule:** At session wrap-up, after extracting reasoning lessons,
+the agent checks whether any new lessons were added during this session. If new
+lessons exist, push a notification to DSM Central's inbox listing the new
+entries with their scope classification.
 
-- **Candidates:** `ecosystem` and `pattern` lessons not yet decided, per the
-  local record `.claude/lessons-shared.txt` (one line per decided lesson:
-  decision, date, a hash of the lesson line; no lesson text). `project`
-  lessons are never offered. At a hub, only `[STAA]` lessons are offered,
-  because wrap-up already adds the `[auto]` ones.
-- **Review:** each candidate is shown in full with its scope, its destination
-  and the scan result, reported generically (DSM_0.2.C §5.8). The user
-  approves, edits, drops or skips each one; a bare "all" is not accepted.
-  Dropped lessons are recorded so they are not offered again; skipped ones are
-  offered at the next run.
-- **Send:** only approved or edited text is written. At a spoke, one
-  notification to `{dsm-central-path}/_inbox/{this-project-name}.md` in the
-  format below; at a hub, an append to the aggregation file with attribution.
-  Dropping everything writes nothing.
-- **Cross-repo confirmation:** the step adds the target to
-  `.claude/cross-repo-writes-session.txt` only after approval, writes, then
-  removes the line it added (DSM_0.2.C §2).
+**Push mechanism:** Uses the Session-End Inbox Push protocol. The notification
+goes to `{dsm-central-path}/_inbox/{this-project-name}.md`.
 
 **Inbox entry format:**
 
@@ -1246,9 +1205,8 @@ step is the only path to the hub:
 **Type:** Notification
 **Priority:** Medium
 **Source:** {project name}
-**Reviewed:** approved in /dsm-staa (Session N); {A} approved, {E} edited, {D} dropped
 
-Lessons shared via the reviewed STAA share step:
+New reasoning lessons added via {[auto]/[STAA]} (Session N):
 
 | # | Category | Scope | Lesson |
 |---|----------|-------|--------|
@@ -1257,80 +1215,25 @@ Lessons shared via the reviewed STAA share step:
 Source file: {project}/.claude/reasoning-lessons.md
 ```
 
-**Lesson files are never public.** A hub's lesson files (the aggregation file,
-`_inbox/`, the local lessons files and the compact mirror) never enter a public
-repository. DSM Central is private, and its mirror manifest publishes none of
-them. Every other hub, including a fork of the public mirror, keeps them in
-`.gitignore`. Before writing the aggregation file or a lesson notification at
-such a hub, the writing skill runs `git check-ignore -q` on the target; if the
-target is not ignored, it stops and names the `.gitignore` line to add instead
-of writing.
-
 **Central aggregation file:** `dsm-docs/reasoning-lessons-ecosystem.md` collects
-the `ecosystem` and `pattern` lessons shared through the STAA step, plus the
-hub's own, with attribution to the originating project and session.
+`ecosystem` and `pattern` scope lessons from all spokes, with attribution to
+the originating project and session. The agent processes incoming lesson
+notifications during DSM Central session-start inbox processing: ecosystem
+lessons are added to the aggregation file; pattern lessons are added with a
+scope note; project lessons are acknowledged but not added.
 
 **Wrap-up variants:**
-- `/dsm-wrap-up`: extract + classify, local only; at a hub it also adds
-  `[auto]` `ecosystem`/`pattern` lessons to the aggregation file
-- `/dsm-quick-wrap-up`: extract + classify, local only
-- `/dsm-light-wrap-up`: defers extraction and classification
-- `/dsm-staa`: the reviewed share step, the only path to the hub
+- `/dsm-wrap-up`: extract + classify + push (full cycle)
+- `/dsm-quick-wrap-up`: extract + classify, defer push (no cross-repo writes)
+- `/dsm-light-wrap-up`: defer everything (extraction, classification, push)
 
 **DSM Central sessions:** When processing a lesson notification in the inbox,
 the agent:
-1. Checks for the `**Reviewed:**` line. A notification without it came from a
-   spoke still running an older wrap-up: ask the user before adding any of its
-   lessons
-2. Checks each lesson against the aggregation file for duplicates
-3. Adds non-duplicate `ecosystem` and `pattern` lessons to
-   `dsm-docs/reasoning-lessons-ecosystem.md` with attribution (pattern lessons
-   with a scope note)
-4. Moves the inbox entry to `_inbox/done/`
-
-**Aggregation file review-cost bound and prune (BACKLOG-567).** The aggregation file
-`dsm-docs/reasoning-lessons-ecosystem.md` is **not** boot-read (it is not read at
-`/dsm-go` Step 1.5, which reads only the local compact mirror) and is **not** in the
-public mirror manifest (`scripts/take-ai-bite-sync.txt`), so it carries no
-boot-priming token cost and, at Central, no confidentiality surface; at any other hub
-the "Lesson files are never public" rule above keeps it out of git. Its governing cost is a full-file
-**review** read (inbox processing, redistribution, escalation review), so its bound is a
-review-cost bound, derived differently from §8.1's boot-priming byte bound. Do not
-transplant §8.1's 61,440 B number, which is sized to a cost this file does not incur.
-
-- **Bound (soft, advisory):** ~120 KB / ~30K tokens. This keeps a full review read under
-  ~15% of a 200K-token window while staying generous for a file read rarely. It is
-  **flagged, never blocking** (the §8.1 posture). The ~120 KB figure is a **long-term
-  target**, not a near-term reachable number: on a corpus of mostly-uncodified,
-  at-or-under-ceiling entries, archive-on-codification and the ~600-char ceiling yield only
-  modest immediate reductions (measured at the BACKLOG-567 build, S276: archival −3 KB,
-  compression ≤9 KB, against a ~175 KB irreducible floor of still-valuable entries). The
-  file approaches the bound gradually, as lessons get codified into protocols over
-  successive STAA runs and are then archived. A sustained large overage is therefore a
-  signal to **review which entries have since been codified** (and archive them), not to
-  compress valuable prose harder.
-- **Per-entry ceiling (soft):** ~600 characters of **body text only**, excluding the
-  attribution prefix (originating project + session + scope tag). The prefix's length is
-  justified by the cross-project attribution the file exists to carry; the body is held
-  to the same density discipline as the local file (BACKLOG-495). Compress or split,
-  never drop.
-- **Prune owner and cadence:** `/dsm-staa`, checked at STAA runs (not every run), pruning
-  only when the file is over the bound. This extends STAA's existing ownership of the
-  local file's prune and resumes the single S187-STAA archiving pass this file has
-  already had.
-- **Prune action set (each leaves a tombstone — no silent drop):**
-  1. **Archive-on-codification (primary):** a lesson escalated into a DSM protocol, BL, or
-     MEMORY is replaced by `<!-- Archived SNNN-STAA: {summary} codified in {destination} -->`.
-     A codified lesson is redundant with the protocol that absorbed it; this directly
-     targets the signal-degradation the bound exists to limit.
-  2. **Consolidate cross-spoke duplicates:** near-identical lessons from multiple spokes
-     merge into one with all attributions preserved (the Deduplication convention applied
-     retroactively; a 3+-spoke recurrence also triggers Escalation to `[E]`).
-  3. **Tombstone dead-project lessons:** a `project`-scope lesson whose originating
-     project no longer exists becomes `<!-- Archived SNNN: {summary}, project retired -->`.
-- **STAA does not commit the prune.** Consistent with STAA's no-commit design, the prune
-  edits the tracked file but leaves it **uncommitted**; the next `/dsm-wrap-up` commits it
-  with the session's other changes. STAA records the prune in `.claude/last-staa.txt`.
+1. Reads the notification and checks each lesson against the aggregation file
+   for duplicates
+2. Adds non-duplicate `ecosystem` and `pattern` lessons to
+   `dsm-docs/reasoning-lessons-ecosystem.md` with attribution
+3. Moves the inbox entry to `_inbox/done/`
 
 **Anti-Patterns:**
 
@@ -1381,7 +1284,7 @@ when no session-specific topic is apparent.
 - **Aspiration:** Every session
 - **Minimum:** Every 3 sessions (aligned with sprint boundaries)
 - **Skip when:** Session is time-constrained, focused on mechanical work, or context
-  budget is tight. Note the skip in the worklog ("Learning step skipped:
+  budget is tight. Note the skip in the session transcript ("Learning step skipped:
   [reason]") so patterns of skipping become visible.
 
 **Relationship to Reasoning Lessons:** Reasoning Lessons extract *internal* patterns
@@ -1417,7 +1320,7 @@ the project CLAUDE.md, not here.
 
 ### 10.1. Transcript Retirement
 
-Worklogs archive at session start (/dsm-go Step 6.5) and accumulate
+Session transcripts archive at session start (/dsm-go Step 6.5) and accumulate
 in `.claude/transcripts/`. STAA analysis is the intended next step, but it is
 selective: not every transcript warrants full analysis. The auto-extraction at
 wrap-up already captures tactical reasoning lessons.
@@ -1916,7 +1819,7 @@ require acknowledgment and do not interrupt tool calls or workflow.
 ```
 
 The reminder is a single line, visually distinct but unobtrusive. It does not
-appear in the worklog (the transcript is for reasoning, not
+appear in the session transcript (the transcript is for reasoning, not
 notifications).
 
 ### 15.3. Anti-Patterns
@@ -1927,7 +1830,7 @@ notifications).
 - Reset the cumulative counter on lightweight session boundaries (only reset
   after the configured gap)
 - Treat the timer as a hard limit; the user decides when to stop
-- Add the reminder to the worklog; it belongs in conversation text
+- Add the reminder to the session transcript; it belongs in conversation text
   only
 
 ---
@@ -2312,17 +2215,13 @@ DSM_3 Section 6.4.
 
 > **Core reference:** DSM_0.2 §4. Moved here from core to reduce always-loaded context.
 
-At session start, run three checks to surface unprocessed GitHub issues. Run them
-only when §27 resolves `GIT_HOST=github`, and always against the project's own
-repository (`--repo "$GH_REPO"`, from the §27 snippet): in a GitHub fork, an
-unqualified `gh issue list` lists the upstream repository's issues as if they were
-the fork's. Skip all checks silently for any other `GIT_HOST`, and on any `gh` error
-(a fork with issues turned off returns one).
+At session start, run three checks to surface unprocessed GitHub issues. If `gh`
+is not available, skip all checks silently.
 
 ### 20.1. External Issues (Priority Path)
 
 ```
-gh issue list --repo "${GH_REPO:?run the §27 host snippet first}" --label external --state open
+gh issue list --label external --state open
 ```
 
 External-labeled issues come from outside contributors and take priority.
@@ -2330,7 +2229,7 @@ External-labeled issues come from outside contributors and take priority.
 ### 20.2. New Issues Since Last Session
 
 ```
-gh issue list --repo "${GH_REPO:?run the §27 host snippet first}" --state open --search "created:>={YYYY-MM-DD}"
+gh issue list --state open --search "created:>={YYYY-MM-DD}"
 ```
 
 Replace `{YYYY-MM-DD}` with the date from MEMORY.md's "Latest Session" entry.
@@ -2340,7 +2239,7 @@ the `external` label.
 ### 20.3. Untriaged Open Issues (Classified)
 
 ```
-gh issue list --repo "${GH_REPO:?run the §27 host snippet first}" --state open
+gh issue list --state open
 ```
 
 Classify the results into two groups, excluding issues already surfaced by 20.1/20.2:
@@ -2486,11 +2385,9 @@ or files the agent has already read in the current session.
 > **Origin:** Ensures every project CLAUDE.md is complete before
 > implementation begins.
 
-Every project CLAUDE.md must contain four sections. For a project with no
-session history yet (§23.2), this is a hard gate: the agent does not proceed to
-implementation until all sections are present and approved. A project that
-already has session history is not blocked; a missing section is reported in
-one line at session start (§23.3).
+Every project CLAUDE.md must contain four sections before implementation work
+starts. This is a hard gate: the agent does not proceed to implementation
+until all sections are present and approved.
 
 ### 23.1. Required CLAUDE.md Sections
 
@@ -2505,25 +2402,18 @@ Sections 2-4 each require explicit user approval before being written.
 
 ### 23.2. Completeness Check Behavior
 
-**At `/dsm-go` (Step 2a.8):** a snippet checks the four numbered headings and
-prints one line at every session start. The snippet in `/dsm-go` is
-authoritative; this section describes it (BL-608).
+**At `/dsm-go` (step 2a.8):** After content validation (step 2a.7), check
+whether all 4 sections are present in CLAUDE.md.
 
-- **All 4 present:** `OK`. No action needed.
-- **Section 1 missing:** `/dsm-align` has not run. The line says so; run it
-  before continuing.
-- **Sections 2-4 missing, project with session history:** `REPORT`. The line
-  lists the missing sections and never blocks; offer the §23.4 workflow.
-- **Sections 2-4 missing, project with no session history:** `BLOCK`. The
-  hard gate of §23.3 applies until the sections exist or the user types
-  `defer` for the session.
+- **All 4 present:** Pass silently. No action needed.
+- **Section 1 missing:** This indicates `/dsm-align` was not run. Suggest
+  running it before continuing.
+- **Sections 2-4 missing (new or incomplete project):** Report which sections
+  are missing and suggest completing them: "CLAUDE.md is missing sections:
+  [list]. Complete these before starting implementation. Next: [suggest next
+  section to add based on project state]."
 
-**Session history** is any of: `.claude/last-wrap-up.txt`, a checkpoint under
-`dsm-docs/checkpoints/` (including `done/`), or an archived worklog under
-`.claude/transcripts/`. The marker alone is not enough: it is gitignored, so a
-clone of an established project has the tracked checkpoints but not the marker.
-
-**Detection:** The snippet checks for numbered section headings in
+**Detection heuristic:** The agent checks for numbered section headings in
 CLAUDE.md. Each section must use an explicit `## N.` heading:
 
 - Section 1: `## 1. DSM_0.2 Alignment` (inside alignment delimiters, managed by `/dsm-align`)
@@ -2540,19 +2430,16 @@ readable for both agents and humans.
 ### 23.3. Hard Gate Enforcement
 
 The completeness gate is enforced at the boundary between setup and
-implementation, for a project with no session history (§23.2). The agent must
-not begin implementation work (as defined below) in such a project while
-sections are missing, unless the user types `defer` for the session. The
-`/dsm-go` line for this case is `BLOCK`, and it is non-suppressible (DSM_0.2
-§8.9.1).
+implementation. The agent must not begin implementation work (writing code,
+creating deliverables, running experiments) while sections are missing.
 
 **What counts as implementation:** Creating code files, writing notebooks,
 building application features, running experiments. Research, planning, and
 CLAUDE.md completion are not implementation.
 
-**Existing projects:** A project with session history is never blocked by this
-gate. A complete CLAUDE.md prints `OK` at every session start; missing sections
-print a `REPORT` line, and the agent offers the §23.4 workflow.
+**Existing projects:** Projects with a complete CLAUDE.md (all 4 sections
+present) pass the gate silently at every session start. The gate only
+activates when sections are missing.
 
 **Empty projects or new folders:** Only accept `/dsm-go` as the first command.
 Running other DSM commands on an unscaffolded project could interfere with
@@ -2573,16 +2460,6 @@ user through completion:
 
 Each section follows the Pre-Generation Brief Protocol (Gate 1 concept,
 Gate 2 implementation review).
-
-**Related session-start CLAUDE.md-driven check (distinct from this gate).** Separately
-from the four-section new-project gate above, and running at *every* session start rather
-than only on new or incomplete projects, `/dsm-go` Step 2g surfaces the DSM_0.2.C §5.9
-data-protection and compliance briefing: when the project CLAUDE.md declares
-`**Handles personal/confidential data:** yes` and no briefing exists at `dsm-docs/decisions/`,
-the boot report **warns** (report-not-block, silent once the briefing exists). It is
-cross-referenced here because it is the other session-start check keyed on a CLAUDE.md
-declaration; its specification, requirements, and template live in DSM_0.2.C §5.9 (wired by
-BL-583). This is a surfacing reminder, not a hard gate — it never blocks implementation.
 
 ---
 
@@ -2640,7 +2517,7 @@ following are true:
 
 The user may override the gate by explicitly acknowledging incomplete items:
 "Defer X to next sprint" or "Accept Y as-is." The agent records the
-override in the worklog.
+override in the session transcript.
 
 ### 24.4. What Counts as Evidence
 
@@ -2667,7 +2544,7 @@ Do not count "discussed" or "planned" as evidence of completion.
 ## 25. Cloned-Mirror Kick-off Protocol
 
 **Relationship to DSM_7.0 §2.1:** §A.25 defines the Kick-off sequence
-(detection signals, 15-step promotion, idempotency rules). DSM_7.0
+(detection signals, 14-step promotion, idempotency rules). DSM_7.0
 §2.1.5 covers the Claude-specific realization: `.claude/*.template`
 files promoted to runtime paths, `{REPO_ROOT}` / `{project_name}` /
 `{ISO_DATE}` substitution via the Edit tool (not shell `sed`), and the
@@ -2819,28 +2696,15 @@ a previous partial Kick-off should be skipped without error.
     Re-chmod every Kick-off because copy operations (including Edit/Write
     tools) can strip the executable bit.
 12. **Inspect `.git/info/exclude` for the blanket rule.** Claude Code
-    usually adds `.claude/` as a blanket ignore rule when it recognizes a
-    repo, but that rule is per-clone local state and is never cloned, so a
-    fresh fork may start WITHOUT it. Kick-off never edits `.git/info/exclude`
-    (§25.3, §25.5); it reports, and branches on what it finds:
-    - **Rule present (or `.claude/` already covered by `.gitignore`):** report
-      informational: "Claude Code's `.git/info/exclude` retains the `.claude/`
-      blanket rule. Tracked files stay tracked; new session-scoped `.claude/*`
-      files (transcripts, baselines) remain hidden from `git status`, which is
-      the intended behavior."
-    - **Rule absent AND generated runtime files (`.claude/CLAUDE.md`,
-      `skills-registry.md`, `kickoff-done.txt`, `memory/`, …) show as
-      untracked in `git status`:** report that this fresh fork lacks the
-      blanket rule, and PRINT the exact line the user can add themselves —
-      Kick-off does not run it:
-      ```
-      echo '.claude/' >> .git/info/exclude
-      ```
-      State that adding it is optional (the shipped `.gitignore` already keeps
-      session state out of history; the blanket rule only quiets `git status`),
-      and that Kick-off does not add it automatically because the file is
-      local, un-synced per-clone state the user alone should own (§25.5).
-      Printing a line the user runs is not an edit, so §25.3 holds.
+    auto-adds `.claude/` as a blanket ignore rule on fresh clones. Kick-off
+    does NOT remove this line. Instead, the shipped `.gitignore` provides
+    the fine-grained rules for `.claude/*` and the files that matter for
+    cross-clone propagation (hooks, templates) are already tracked in the
+    repo, so they remain tracked regardless of the exclude rule. Kick-off
+    reports this as informational: "Claude Code's `.git/info/exclude`
+    retains `.claude/` blanket rule. Tracked files stay tracked; new
+    session-scoped `.claude/*` files (transcripts, baselines) remain hidden
+    from `git status` by this rule, which is the intended behavior."
 13. **Scaffold `_inbox/` and `dsm-docs/` folders.** Delegate to `/dsm-align`
     Step 3 (Canonical dsm-docs folder check). Either invoke `/dsm-align`
     now or defer to `/dsm-go` Step 1.8 which will run `/dsm-align`
@@ -2854,21 +2718,7 @@ a previous partial Kick-off should be skipped without error.
     ```
     This marker prevents re-running Kick-off on subsequent sessions. Users
     can delete the marker to re-run Kick-off intentionally.
-15. **Report completion, with a fork-init readiness checklist.** First emit a
-    short readiness checklist of the environment tools the boot gates depend
-    on, each with its present/absent status, derived from the gates that
-    consume them (report-only, never a hard gate):
-    - `git` — required; present (Kick-off ran).
-    - `gh` — recommended on GitHub; enables `/dsm-go` gates 2a.6 (default-branch
-      verification) and 2a.7 (open-PR CI) and the pull-request merge in
-      `/dsm-wrap-up`. If absent, those gates skip with a one-line note and the
-      wrap-up merges locally and pushes `main` (§27).
-    - `glab` — optional on GitLab; enables the merge-request merge in
-      `/dsm-wrap-up` (§27). If absent, the wrap-up merges locally and pushes `main`.
-    Extend the list only with tools a boot gate or the wrap-up merge actually
-    consumes, so the checklist cannot drift from them; for general toolchain setup, point
-    to the Environment Preflight Protocol (Module D) rather than duplicating it.
-    Then tell the user:
+15. **Report completion.** Tell the user:
     "Cloned-Mirror Kick-off complete. This clone is now self-registered as
     `dsm-central` in `.claude/dsm-ecosystem.md`, pointing to `{REPO_ROOT}`.
     `/dsm-align` will now populate the CLAUDE.md alignment section from the
@@ -2927,37 +2777,25 @@ owns its methodology going forward.
 
 ### 25.5. Handling Claude Code's `.git/info/exclude`
 
-Claude Code usually adds `.claude/` as a blanket ignore rule to
+Claude Code automatically adds `.claude/` as a blanket ignore rule to
 `.git/info/exclude` when it recognizes a repo. This rule is **per-clone
-local state** (not in git, not synced, not shared) — so a fresh fork may
-start without it, since the rule was never cloned.
+local state** (not in git, not synced, not shared).
 
 The interaction with shipped `.claude/*` content:
 
 1. Files tracked in the repo (hooks, templates) remain **tracked** after
    Kick-off. Git's tracking precedence means `.git/info/exclude` does not
    untrack already-tracked files; it only hides untracked ones.
-2. New files created during sessions (`worklog.md`,
+2. New files created during sessions (`session-transcript.md`,
    `session-baseline.txt`, `transcripts/*`, `last-*.txt`) are untracked and
    match the blanket rule, so they correctly stay out of git history.
 3. The shipped `.gitignore` contains line-specific rules for these same
    session-scoped files. Both the blanket rule and the line-specific rules
    keep session state out of git; they are complementary, not conflicting.
 
-**Kick-off does not edit `.git/info/exclude`.** It reports, and where the
-blanket rule is present the default behavior is correct: session state is
-protected, shared infrastructure is tracked, no action needed.
-
-**Fresh-fork case (rule absent).** Because the rule is per-clone local state
-and is never cloned, a fresh fork may start without it. The shipped
-`.gitignore`'s line-specific rules still keep session state out of history,
-but the generated runtime files (`.claude/CLAUDE.md`, `skills-registry.md`,
-`kickoff-done.txt`, `memory/`) can then show as untracked noise in
-`git status`. Kick-off step 12 detects this and PRINTS the exact line
-(`echo '.claude/' >> .git/info/exclude`) for the user to add if they want a
-quieter status; it still does not add the line itself. Printing a line the
-user chooses to run is not an edit, so §25.3's "no `.git/info/exclude` edits"
-anti-requirement holds — the file stays something the user alone owns.
+**Kick-off does not edit `.git/info/exclude`.** The default behavior is
+correct: session state is protected, shared infrastructure is tracked, no
+action needed.
 
 ### 25.6. Relation to `/dsm-align` and `/dsm-go`
 
@@ -2973,7 +2811,7 @@ Execution sequence on a fresh clone's first session:
 4. `/dsm-go` Step 1.8 invokes `/dsm-align`. `/dsm-align` runs the hub
    fast-path (because `scripts/commands/` is present, shipped via T1a).
    It populates the `<!-- BEGIN DSM_0.2 ALIGNMENT -->` section from the
-   §17.1 template, installs worklog hooks (Step 10b in
+   §17.1 template, installs session-transcript hooks (Step 10b in
    `/dsm-align`), and verifies `.gitattributes`.
 5. Session proceeds normally from Step 2 onward.
 
@@ -2981,48 +2819,7 @@ On subsequent sessions, Step 0.8 detects the marker and skips Kick-off.
 Step 1.8 still runs `/dsm-align` unconditionally (per `/dsm-go` Step 1.8
 rules, the alignment runs every session regardless).
 
-### 25.7. New-Spoke Bootstrap Versus Cloned-Mirror Kick-off
-
-Cloned-Mirror Kick-off (§25.1–§25.6) is one of **two** ways a directory enters
-the DSM ecosystem, and it is the wrong one for a brand-new spoke. The two paths
-differ in what they register as `dsm-central`:
-
-| | Cloned-Mirror Kick-off (`/dsm-go` Step 0.8) | New-spoke bootstrap (`/dsm-new-spoke`) |
-|---|---|---|
-| Starting point | a cloned DSM mirror (ships `scripts/`, `.claude/*.template`, the sync marker) | a fresh / uninitialized directory |
-| `dsm-central` becomes | the clone itself (self-registration, §25.4) | an **existing** hub, passed by the user |
-| `.claude/*.template` | copied to runtime paths (§25.2 step 3) | not used; the spoke has none |
-| Invocation | auto-invoked, because a cloned mirror is deterministically detectable | a dedicated skill, because "intended as a spoke" is not |
-
-**Why a dedicated skill and not another Step 0.8 branch.** Spoke-vs-mirror is a
-**user intent, not a directory property.** An uninitialized spoke directory and a
-generic pre-Kick-off state both present as "no `.claude/dsm-ecosystem.md`," so
-§25.1's deterministic decision table cannot distinguish them without a user
-signal. `/dsm-new-spoke <hub-path>` makes the **invocation itself the signal**:
-it means "scaffold HERE as a spoke of hub X." This is symmetric with Kick-off
-being auto-invoked precisely because a cloned mirror IS deterministically
-detectable (it ships `scripts/`, the templates, and the sync marker); a
-hand-created spoke directory is not.
-
-**The Step 0.8 guard.** The one case §25.1 cannot resolve — `KICKOFF_NEEDED`
-fired against a directory with **no** `.claude/*.template` files — is exactly a
-new-spoke directory mistaken for a cloned mirror. `/dsm-go` Step 0.8c probes for
-the templates before invoking Kick-off; when they are absent it does not run
-Kick-off (which would fail at its copy-template step and wrongly self-register
-the directory as a hub) and instead routes the user to `/dsm-new-spoke`. This is
-the wrong-path failure issue #117 reported, turned into a route.
-
-**What `/dsm-new-spoke` does:** take or prompt for the hub path (validated to
-contain `DSM_0.2_Custom_Instructions_v1.1.md`); scaffold the canonical
-`dsm-docs/` + `_inbox/`; write `.claude/dsm-ecosystem.md` with `dsm-central` →
-the real hub (never self); write a minimal `@`-referenced `.claude/CLAUDE.md`;
-then run the **spoke** `/dsm-align` path (not the hub fast-path) to generate the
-alignment section and install the transcript hooks. It does not copy
-`.claude/*.template` files, does not self-register, and does not write
-`.claude/kickoff-done.txt`. Afterward `/dsm-go` boots the directory as `SPOKE`
-(§25.1). Origin: BACKLOG-578 (take-ai-bite issue #117).
-
-### 25.8. Behavioral Trigger
+### 25.7. Behavioral Trigger
 
 This protocol activates when **any** of these conditions are true at the
 start of a session:
@@ -3041,7 +2838,7 @@ Kick-off does **not** activate when:
 - The repo is a spoke (detection: `.claude/dsm-ecosystem.md` has
   `dsm-central` pointing to a DIFFERENT filesystem path)
 
-### 25.9. Origin
+### 25.8. Origin
 
 Origin: Session 191 (2026-04-15). Context: the author cloned
 `dsm-take-ai-bite` on a fresh WSL environment and discovered that the
@@ -3095,7 +2892,7 @@ started: <ISO 8601 with TZ>
 agent: <harness identifier>
 model: <model identifier>
 branch: <git branch>
-transcript_anchor: <md5 hash of worklog.md after Step 6 reset>
+transcript_anchor: <md5 hash of session-transcript.md after Step 6 reset>
 pid: <Claude Code process PID, or "unknown" if unavailable>
 ```
 
@@ -3116,7 +2913,7 @@ if [ -z "$LOCK_PID" ]; then
   for _ in $(seq 1 10); do
     read ppid comm < <(ps -o ppid=,comm= -p "$pid" 2>/dev/null)
     [ -z "$ppid" ] && break
-    if [ "$(basename "$comm")" = "claude" ]; then LOCK_PID=$pid; break; fi  # basename: macOS ps prints the full binary path
+    if [ "$comm" = "claude" ]; then LOCK_PID=$pid; break; fi
     pid=$ppid
     [ "$pid" = "1" ] && break
   done
@@ -3132,7 +2929,6 @@ which is what every lockfile written before BL-487 contained.
 | Stage | Skill | Step | Action |
 |-------|-------|------|--------|
 | Detect | `/dsm-go` | 0.7 | Check `.claude/session.lock`; halt if present |
-| Detect (read-only) | `/dsm-staa` | 0 | Report a live lock and ask; never write or remove it |
 | Write | `/dsm-go` | 6 | Write lockfile after transcript reset |
 | Remove | `/dsm-wrap-up` | 13 | `rm -f .claude/session.lock` |
 | Remove | `/dsm-light-wrap-up` | 8 | `rm -f .claude/session.lock` |
@@ -3242,7 +3038,7 @@ limitation surfaces in practice.
 
 A wrap-up skill MAY use the lockfile's `transcript_anchor` field to verify
 no foreign appends happened during the session: recompute the md5 of
-`.claude/worklog.md` between the lockfile's anchor offset and
+`.claude/session-transcript.md` between the lockfile's anchor offset and
 EOF; if the hash diverges from a baseline computed at the lockfile write
 plus all subsequent agent appends, a concurrent session may have appended
 silently.
@@ -3257,7 +3053,7 @@ S10.L2 (2026-04-29). Two Claude Code
 conversations were running in parallel against the same project on the
 same git branch (`session-10/2026-04-23`). Neither agent detected the
 other. Discovery happened only when `git status` and the shared
-`.claude/worklog.md` showed entries the active agent had not
+`.claude/session-transcript.md` showed entries the active agent had not
 authored. One session ran `/dsm-align` v1.7.0 to v1.8.0 + drafted the
 Haystack upstream issue (T6) + closed BL-004; the parallel session ran T7
 (Phase 2 embedding-model selection) and made 3 edits to a shared sprint
@@ -3265,102 +3061,3 @@ plan. Both sessions on the same branch, modifying the same working tree,
 appending to the same transcript, with no awareness of each other.
 
 Filed as BL-431 in DSM Central S207 (2026-05-05).
-
----
-
-## 27. Git Host Resolution Rule
-
-Skills that talk to a git host (the `/dsm-wrap-up` merge and its checks, the `/dsm-go` checks, the §20
-issue check) resolve the host once per run from the `origin` remote and name the repository on every
-host-CLI call. Two facts make this necessary:
-
-- A DSM project can live on GitHub, on GitLab, on any other git server, or on no server at all. A merge
-  that only works through GitHub's `gh` leaves every other project unmerged.
-- A GitHub fork made with `gh repo fork --clone` sets the `upstream` remote as `gh`'s default repository
-  (`gh repo fork --help`). An unqualified `gh pr …` or `gh issue …` call in a fork therefore reads and
-  writes the upstream repository, not the user's fork.
-
-### 27.1. Git Host Resolution Snippet
-
-Canonical form; the skills carry copies, and this section is authoritative if they diverge.
-
-```bash
-ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-ORIGIN_URL=$(git remote get-url origin 2>/dev/null)
-ORIGIN_HOST=$(printf '%s' "$ORIGIN_URL" | sed -E 's#^[a-z+]+://##; s#^[^@/]*@##; s#[:/].*##')
-ORIGIN_REPO=$(printf '%s' "$ORIGIN_URL" | sed -E 's#\.git$##; s#^[a-z+]+://[^/]+/##; s#^[^@/]*@[^:/]+:##')
-GH_REPO="$ORIGIN_HOST/$ORIGIN_REPO"
-GIT_HOST=$(sed -nE 's/^\*\*Git host:\*\*[[:space:]]*(github|gitlab|other|none)([^a-z].*)?$/\1/p' "$ROOT/.claude/CLAUDE.md" 2>/dev/null | head -1)
-if [ -z "$GIT_HOST" ]; then
-  if [ -z "$ORIGIN_URL" ]; then GIT_HOST=none
-  elif [ -n "$ORIGIN_HOST" ] && gh repo view "$GH_REPO" --json name >/dev/null 2>&1; then GIT_HOST=github
-  elif [ -n "$ORIGIN_HOST" ] && glab repo view "$ORIGIN_URL" >/dev/null 2>&1; then GIT_HOST=gitlab
-  else GIT_HOST=other; fi
-fi
-echo "GIT_HOST=$GIT_HOST GH_REPO=$GH_REPO"
-```
-
-| `GIT_HOST` | Meaning |
-|---|---|
-| `github` | `gh` is installed, authenticated, and can see the `origin` repository on its host |
-| `gitlab` | `glab` is installed, authenticated, and can see the `origin` repository |
-| `other` | A remote exists but neither CLI can reach it (another host, a local path, or a missing or unauthenticated CLI) |
-| `none` | No `origin` remote (a local-only project) |
-
-Classification is by CLI success against `origin`, not by URL text, so a self-hosted or enterprise host
-is classified correctly when its CLI is set up. `GH_REPO` is `HOST/OWNER/REPO`, the form `gh --repo`
-accepts; `glab -R` takes `ORIGIN_URL` as it is, nested groups included. Never print `ORIGIN_URL` in a
-report: an HTTPS remote can carry a credential.
-
-**Shell variables do not survive between an agent's tool calls.** A later call that uses these values
-either re-runs this snippet first, or starts by setting `GIT_HOST=…` and `GH_REPO=…` to the resolved
-values (neither holds a credential: the parsing drops any `user:token@` part). `ORIGIN_URL` is never
-written out; a call that needs it re-runs the snippet. **An empty value brings the fork hazard back,
-silently:** `gh` treats `--repo ""` as no value and falls back to its default repository, which in a fork
-is the upstream one (measured S287: exit 0, upstream's pull requests listed). So the skills write the value
-as `"${GH_REPO:?run the §27 host snippet first}"` (likewise `ORIGIN_URL`), which stops the command with
-that message when the variable is unset instead of running it against the wrong repository.
-
-### 27.2. Wrap-Up Merge Path by Host
-
-| `GIT_HOST` | `/dsm-wrap-up` Step 10 merge |
-|---|---|
-| `github` | Pull request on `$GH_REPO`, merged with `--match-head-commit` set to local `HEAD` |
-| `gitlab` | Merge request through `glab -R "$ORIGIN_URL"`, merged with `--auto-merge=false` and `--sha` set to local `HEAD`. If `glab` cannot create the merge request, use the local merge |
-| `other` | Local merge, then push `main` |
-| `none` | Local merge, no push |
-
-Rules every path follows:
-
-- **Each outcome line comes from its own command's exit status** (DSM_0.2 §19.2). A push that failed is
-  reported as failed.
-- **Never force.** A rejected push of `main` (a protected branch) stops the merge, puts local `main` back
-  where it was, and tells the user to merge the session branch through the host's web interface.
-- **One merge route per branch.** Once a pull or merge request exists, a failure to merge it stops the
-  wrap-up; it does not fall back to a local merge of the same branch.
-- The local merge's push to `main` is the same publication as a pull-request merge to `main`
-  (DSM_0.2.C §2) and is authorized the same way, by the user invoking `/dsm-wrap-up`.
-
-### 27.3. Repository Checks by Git Host
-
-The read-only checks (`/dsm-wrap-up` 9.5, `/dsm-go` 2a.6 and 2a.7, the §20 issue check) run only when
-`GIT_HOST` is `github`, and always with `--repo "$GH_REPO"`. They skip silently for `other` and `none`.
-For `gitlab` they also skip for now: the JSON fields they would read are not documented for `glab`
-(BACKLOG-602).
-
-### 27.4. Declaring the Git Host Override
-
-A project may add one line to the project-specific part of `.claude/CLAUDE.md`:
-
-```markdown
-**Git host:** github | gitlab | other | none
-```
-
-The declaration replaces detection. Use it when detection is wrong (an SSH host alias, for example) or to
-choose the local merge on purpose (`other`). A value outside the four is ignored.
-
-### 27.5. Git Host Resolution Origin
-
-BACKLOG-600 (S287, 2026-10-19), found while checking take-ai-bite's fork-first onboarding (BACKLOG-599):
-the wrap-up could only merge through GitHub, and in a fork its pull request would have been opened on the
-upstream repository.

@@ -234,7 +234,7 @@ Gate 3 does not apply to artifacts that are only created, not executed
 ### 8.5. Pre-Generation Reasoning Structure
 
 Before generating any artifact, apply Critical Thinking (DSM_6.0 §1.4.2) by
-answering three questions in the worklog plan block:
+answering three questions in the session transcript plan block:
 
 1. **What** — what is this generation? (type, structure, role in the plan)
 2. **Why** — why is it needed? (what requirement or goal it serves)

@@ -4,7 +4,7 @@
 
 **What is DSM?** DSM stands for "Deliberate Systematic Methodology", TAB's power engine: A living, versioned methodology that governs the full lifecycle of human-AI collaboration: research, implementation, governance, and disclosure.
 
-**DSM is what makes TAB unique to your own experience:** Worklogs capture your own reasoning lessons and Memory files retain context that persists across sessions. Checkpoints preserve milestones. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that builds up your expertise, not just your files.
+**DSM is what makes TAB unique to you own experience:** Session transcripts capture your own reasoning lessons and Memory files retain context that persist across sessions. Checkpoints preserve milestones. Feedback flows from individual projects to the central methodology and back. The result is an ecosystem that build up your expertise, not just your files.
 
 
 **Deliver only what the reviewer can chew.**
@@ -51,7 +51,7 @@ across projects, and session protocols that accumulate your expertise over
 time. The discipline is called Systems Prompt Engineering, and it emerges
 naturally from taking the right-sized bite, consistently.
 
-If you are a human and want to get familiar with the essentials of TAB, have a read here: `DSM_0.0_START_HERE_Complete_Guide.md`; to set it up, follow `GETTING_STARTED.md`
+If you are a human and want to get familier with the esencials to TAB, have a read here: `DSM_0.0_START_HERE_Complete_Guide.md`
 For the full framework of principles and guidelines, see
 `DSM_6.0_AI_Collaboration_Principles_v1.0.md`. For the engineering practice,
 see `DSM_6.1_Systems_Prompt_Engineering_v1.0.md`.

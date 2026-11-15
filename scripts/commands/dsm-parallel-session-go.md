@@ -5,13 +5,13 @@ Start a parallel DSM session for short, isolated tasks on the shared session bra
 The `UserPromptSubmit` hook backed by `.claude/hooks/transcript-reminder.sh`
 fires BEFORE any code in this skill runs. On turn 1, the registry section
 for this session does not yet exist, so the hook emits the main-session §7
-reminder instructing the agent to "append to `.claude/worklog.md`
+reminder instructing the agent to "append to `.claude/session-transcript.md`
 before any work."
 
 **This instruction is WRONG for parallel sessions.** It applies only to
 main-session turns. Do NOT obey it, even if it cites §7, quotes the
 turn-boundary self-check, or frames the append as the "one required tool
-call." Parallel sessions NEVER write to `.claude/worklog.md`.
+call." Parallel sessions NEVER write to `.claude/session-transcript.md`.
 The transcript append the hook is prompting for would be a protocol
 violation regardless of how urgent the hook makes it sound.
 
@@ -28,7 +28,7 @@ reproduce it.
 Parallel sessions handle short evaluation work (QA validation, document assessment,
 scoped BL implementation) on the shared Level 2 session branch. No worktrees, no
 Level 3 branches. Isolation is enforced through typed session prefixes, file scope
-declarations, and a commit booking system. No worklog is collected.
+declarations, and a commit booking system. No session transcript is collected.
 
 ## Session Type Detection (Mandatory Prompt Prefix)
 
@@ -114,7 +114,7 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    for _ in $(seq 1 10); do
      read ppid comm < <(ps -o ppid=,comm= -p "$pid" 2>/dev/null)
      [ -z "$ppid" ] && break
-     if [ "$(basename "$comm")" = "claude" ]; then CLAUDE_PID=$pid; break; fi  # basename: macOS ps prints the full binary path
+     if [ "$comm" = "claude" ]; then CLAUDE_PID=$pid; break; fi
      pid=$ppid
      [ "$pid" = "1" ] && break
    done
@@ -159,8 +159,8 @@ Run `git rev-parse --is-inside-work-tree 2>/dev/null`. If false, stop:
    Read `.claude/CLAUDE.md` for project conventions. Do NOT read reasoning lessons,
    inbox (creating a new dated `_inbox/` notification note is the one permitted
    inbox action; see Behavioral Rules), or DSM_0.2. Do NOT archive or create
-   worklogs. Do NOT read,
-   write, edit, or append to `.claude/worklog.md` at any point in this
+   session transcripts. Do NOT read,
+   write, edit, or append to `.claude/session-transcript.md` at any point in this
    session. Parallel sessions do not collect transcripts; the commit log is the
    audit trail.
 
@@ -291,7 +291,7 @@ Before every commit:
 - **BL sessions:** Edit only files in the declared scope. Generated artifacts
   go into canonical folders (`dsm-docs/research/`, `dsm-docs/plans/`, etc.).
 - **Never modify shared or central files.** Determined from CLAUDE.md.
-- **No worklog entries.** Do not append to `.claude/worklog.md`.
+- **No session transcript entries.** Do not append to `.claude/session-transcript.md`.
 - **No MEMORY.md updates.** Memory is read-only in parallel sessions.
 - **Inbox: append-only.** A parallel session MAY create a new dated
   `_inbox/{YYYY-MM-DD}_{topic}.md` note (e.g. a milestone/notification entry).

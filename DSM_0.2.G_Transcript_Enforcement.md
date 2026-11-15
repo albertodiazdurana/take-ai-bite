@@ -1,132 +1,9 @@
-# DSM_0.2 Worklog Protocol Detail
+# DSM_0.2 Session Transcript Enforcement Detail
 
-Detail for the Worklog Protocol (DSM_0.2 §7): file, header and lifecycle; append
-rules and the Bash append procedure; activation; the enforcement mechanism; the
-turn-boundary self-check; retroactive recovery. Read on demand; NOT part of the `@`
-import chain. §7 keeps the operational rules always loaded and points here for
-schema, procedures, rationale and worked examples.
-
----
-
-**Worklog File, Header and Lifecycle Detail:**
-
-**Relationship to DSM_7.0 §2.1:** §7 defines the protocol shape (append-only,
-first-tool-call plan entry, last-tool-call output, delimiter format). DSM_7.0
-§2.1.5 describes the Claude-specific mechanism: the `UserPromptSubmit` hook that
-injects the per-turn reminder and the `PreToolUse` validator that enforces anchor
-shape on Edit tool calls. The protocol stays in §7; the Claude execution layer
-lives in DSM_7.0 §2.1.
-
-**Lifecycle detail:** the file lives permanently in `.claude/`. `/dsm-wrap-up` does
-not touch it; stale content from the previous session is harmless because
-`/dsm-go` replaces it at the next session start. The user keeps the file open in
-VS Code across sessions. `/dsm-light-go` does not overwrite it: it appends a
-session-boundary marker, which keeps the work-notes chain continuous across
-lightweight session sequences.
-
-**Permission detail:** the worklog is an agent-internal working artifact, not a
-deliverable, so auto-approval of writes to it applies in every DSM project, not
-only DSM Central.
-
-**Header** (written by `/dsm-go` Step 6):
-
-```
-# Session N Transcript
-**Started:** YYYY-MM-DDTHH:MM+TZ
-**Project:** [project name]
-**Agent:** [harness identifier, e.g., "Claude Code"]
-**Model:** [model identifier, e.g., "claude-opus-4-7"]
-```
-
-Optional platform-specific fields (append when retrievable; omit entirely when
-not; never write placeholder values like `Effort: unknown`):
-
-```
-**Effort:** [low | medium | high]
-**Thinking:** [on | off]
-**Fast mode:** [on | off]
-```
-
-```
----
-```
-
-`Agent` and `Model` are mandatory. If introspection is uncertain, append
-`(self-reported)` to the value (e.g., `**Model:** claude-opus-4-7 (self-reported)`).
-The schema is agent-agnostic; only the values differ across harnesses.
-
----
-
-**Worklog Append Rules Detail:**
-
-**Why append-only:** each entry records the work notes as they stood when written.
-
-**Why the last-line anchor:** mid-file insertions cause out-of-order timestamps and
-confuse the user reading the log live; they recurred in several sessions despite
-earlier guidance.
-
-**Why never `replace_all`:** the anchor rule assumes a unique last-line anchor;
-`replace_all` duplicates the new content at every match and explodes the file (S17:
-95 MB / 1.5M lines; S22: an Output block duplicated at every match). Recovery from a
-botched Edit is a `[RETROACTIVE]` Bash append, never a `replace_all` cleanup.
-`validate-transcript-edit.sh` blocks this case (check 0/4).
-
-**Why no batching:** the user follows the log live and cannot review work notes after
-the fact.
-
-**Appending with Bash (when the Edit path is unavailable):** the Edit path (read the
-last 3 lines, anchor on the last non-empty line) is preferred and needs no shell
-quoting. It is unavailable in one known case: when the last non-empty line also
-occurs earlier in the file, the anchor rule and Edit's own uniqueness rule cannot
-both be met. The validator rejects any longer anchor, and Edit rejects the short one
-as ambiguous. That case calls for a Bash append (BACKLOG-500).
-
-The two heredoc forms fail in opposite directions:
-
-| Body contains | Unquoted `<< EOF` | Single-quoted `<< 'EOF'` |
-|---|---|---|
-| `$(date +%H:%M)` meant to expand | Expands (correct) | Written as literal text (S69) |
-| Backticks or `$` in prose, such as a code span | Runs the backticked text as a command and writes its output in place of the span | Kept as written (correct) |
-
-Bash substitutes both `$(...)` and backticks, so a code span in ordinary prose is the
-usual way to meet the second row. That failure exits 0 and the surrounding prose
-still reads normally with the span missing, which is why it recurred unnoticed (S145
-in a spoke, S249 and S258 at Central, take-ai-bite #141).
-
-Default form: write the delimiter with a fresh clock read, then the body through a
-single-quoted heredoc, in the same Bash call:
-
-```bash
-printf '\n<------------Start Plan / %s------------>\n\n' "$(date +%H:%M)" >> .claude/worklog.md
-cat >> .claude/worklog.md << 'EOF'
-Body text; `code spans` and $VARS stay as written.
-EOF
-```
-
-The timestamp comes from a clock read made as the line is written, not from a value
-typed into the body, so it is a reading rather than an estimate.
-`validate-transcript-edit.sh` check 4/4 detects a drifted timestamp (BACKLOG-517);
-this form prevents one (BACKLOG-554). Use an unquoted heredoc only when the body holds
-no backticks and no other `$`, as in the fixed header `/dsm-go` Step 6 writes.
-
-**Leak-scan rationale:** the worklog is an egress artifact and append-only, so an
-echoed value cannot be unwritten; the prohibition applies at write time, not as a
-later scrub.
-
-**Activation rationale:** the presence of `.claude/worklog.md` is the activation
-signal, independent of `/dsm-go` Step 6 and of any session-start flow having run.
-It is the third enforcement layer, alongside the per-turn hook (occurrence) and the
-PreToolUse shape validator, and it covers continuation sessions that defer from
-`/dsm-light-go` to `/dsm-go` mid-flight. The one authorized exception is `/dsm-staa`
-(see §7).
-
-**Boot-turn ordering:** on a `/dsm-go` turn, the turn's first entry is written after
-Step 6 resets the file, not before Step 5.5 archives it. Anything appended earlier is
-copied into the previous session's archive and later attributed to the wrong session
-(BACKLOG-590, take-ai-bite #142). Step 6 already writes that entry, so the session-start
-checks run first and nothing is owed before them. `transcript-reminder.sh` prints no
-reminder on a `/dsm-go` prompt for the same reason. `/dsm-light-go` appends a boundary
-marker instead of archiving, so the ordinary order applies there.
+The enforcement mechanism, turn-boundary self-check, and retroactive-recovery
+detail for the Session Transcript Protocol (DSM_0.2 §7), extracted from §7.
+Read on demand; NOT part of the `@` import chain. §7 keeps the operational rules
+always-loaded and points here for the origins, rationale, and worked examples.
 
 ---
 
@@ -164,21 +41,21 @@ requiring it. The hook is the mechanism.
 
 Every turn begins with a transcript append. Every turn. At the start of
 every turn, before composing a response, the agent must ask: "Was my
-first tool call this turn an append to `.claude/worklog.md`?"
+first tool call this turn an append to `.claude/session-transcript.md`?"
 If the answer is no, the protocol has been violated. The check is binary;
 no "I planned to" or "the next call would have been" answers count.
 
-This rule applies to turns that produce analysis, recommendations, or
-decisions **without touching any files**. Analysis-only turns are
+This rule applies to turns that produce reasoning, recommendations, or
+decisions **without touching any files**. Pure-reasoning turns are
 explicitly covered: a turn whose response is a multi-paragraph decision
 analysis, trade-off comparison, or recommendation requires the same
 first-tool-call transcript append as a turn that edits code. The
-analysis-only-turn failure mode is the most damaging variant because
-analysis-only turns contain the highest-value work notes (decision
+pure-reasoning-turn failure mode is the most damaging variant because
+pure-reasoning turns contain the highest-value reasoning (decision
 rationale, considered-and-rejected paths, risk framing) and losing that
-content inverts the transcript's stated purpose as a work log.
+content inverts the transcript's stated purpose as a reasoning log.
 
-**Example of the analysis-only-turn failure mode:** a turn in which the
+**Example of the pure-reasoning-turn failure mode:** a turn in which the
 user asks "which of these two options should we pick?" and the agent
 responds with a multi-paragraph comparison (five-question gate
 evaluation, Option A vs Option B analysis, recommendation, proposed
@@ -189,10 +66,10 @@ have none. The transcript append is the one required tool call.
 
 **The only exemption is content-trivial turns:** one-word
 acknowledgments ("Understood", "OK"), single-fact confirmations ("Yes",
-"No"), and responses with no new work notes. The exemption is content-
+"No"), and responses with no new reasoning. The exemption is content-
 based, not tool-call-count-based. A turn that produces substantive new
-work notes of any length is never content-trivial, regardless of whether
-it touches files. If there are new work notes, there is a transcript
+reasoning of any length is never content-trivial, regardless of whether
+it touches files. If there is new reasoning, there is a transcript
 append.
 
 **[RETROACTIVE] Transcript Append Self-Detection Rule:**
@@ -204,7 +81,7 @@ missed an earlier append, it must:
    `<------------Start Plan [RETROACTIVE] / HH:MM------------>` where
    HH:MM is the *current* time, not a fabricated earlier time.
 2. State which turn(s) were missed and a brief reconstruction of the
-   work notes that would have been recorded.
+   reasoning that would have been recorded.
 3. Note the gap explicitly; never edit history or insert mid-file to make
    it look like the appends happened on time.
 
