@@ -1,8 +1,8 @@
 # Deliberate Systematic Methodology (DSM) - Start Here
 **A gentle introduction to working with AI on real projects**
 
-**Version:** 1.37.1
-**Last Updated:** 2026-10-22
+**Version:** 1.26.4
+**Last Updated:** 2026-09-30
 
 ---
 
@@ -68,10 +68,8 @@ DSM Central (hub)
    project structure, quality standards
 2. **Your project** references Central through a single line in its configuration
    file (`.claude/CLAUDE.md`). The agent loads the methodology from there
-3. **Updates flow from your hub to your projects.** When the methodology in your hub
-   changes, every project that references it gets the change at its next session start.
-   If your hub is a fork of TAB, it does not change by itself: you bring TAB's updates in
-   (see [GETTING_STARTED.md](GETTING_STARTED.md#getting-updates-and-sending-feedback))
+3. **Updates propagate automatically.** When Central improves a protocol, every
+   project that references it gets the improvement at the next session start
 
 You never need to copy methodology files into your project. The agent reads them
 from Central and applies them in context.
@@ -166,25 +164,43 @@ repositories, professional portfolios, knowledge bases, technical writing.
 
 ## 5. Getting Started
 
-### Setup Overview for New Users
+### Prerequisites
 
-TAB is for individual use: you work in your own **fork** of it, a copy on GitHub, GitLab or a similar
-service that stays linked to TAB so you can bring in its updates. Setup in brief:
+Before you start, you need:
 
-1. Install **git** (and tell it your name and email), **bash** (Git Bash or WSL on Windows), the
-   GitHub CLI **`gh`** if your fork is on GitHub, and **VS Code** with **Claude Code** (a paid Claude
-   plan or an API account).
-2. **Fork TAB and clone your fork**, then point `gh` at your fork.
-3. Open the folder in VS Code and type **`/dsm-go`**: the first run sets everything up.
-4. Create your first project, and end the session with **`/dsm-wrap-up`**.
-5. From time to time, **bring TAB's updates into your fork**.
+- A **GitHub account** and **git** installed
+- **VS Code** with the **Claude Code** extension
+- A **Claude account** (the agent runs inside Claude Code)
 
-In a team, every member has their own fork. To look around first, a downloaded copy works as a quick
-try, without updates.
+### Quick Start
 
-**Full steps, with a check for each:** [GETTING_STARTED.md](GETTING_STARTED.md). It is written so an AI
-assistant can walk you through it, and it explains what happens to your data and the recommended
-privacy settings; read that part before working with client or personal data.
+1. Pick a parent folder to hold the methodology and your projects side by side.
+2. Inside it, clone the methodology:
+   `git clone https://github.com/albertodiazdurana/take-ai-bite`
+3. Open the `take-ai-bite` folder in VS Code. In the **Claude Code chat window**
+   (where you type to chat with Claude), type `/dsm-go`. This loads DSM.
+4. Tell the agent what you want to build and where to put it (for example, a new
+   folder next to `take-ai-bite`). The agent creates your project folder and links
+   it to the methodology, the wiring beginners usually get wrong by hand.
+5. To help the agent understand your work, describe it in the chat, or create a
+   `_preliminary_plan/preliminary_plan.md` file describing:
+   - what you want to do;
+   - whether you are building **code**, a **Jupyter notebook**, or
+     **documentation** (markdown only);
+   - if it is a **private** project (sensitive data, no git), say so;
+   - if you are **contributing to an external project**, how you want to
+     contribute and the folder where that project lives or will be cloned.
+
+   The agent reads this, works out the project type, and asks if anything is unclear.
+6. Open your new project folder in VS Code and type `/dsm-go` to start working
+   there. From now on, you work inside your project.
+
+**Already have files elsewhere?** If your project builds on files that already
+exist somewhere on your machine, set up the project folder and its
+`preliminary_plan.md` first, then, from inside your project, ask the agent to
+read or import the relevant files. Tell it where they are and it brings them in.
+
+For full setup (configuration, ecosystem wiring, folder conventions), see **DSM_3.0**.
 
 ### What Happens During `/dsm-go`
 
@@ -236,8 +252,8 @@ every project in the ecosystem.
    sent via the inbox system
 3. **Central improves.** Feedback is triaged, and improvements are implemented as
    backlog items
-4. **Projects get updates.** Once the improvement is in your hub (for a fork of TAB,
-   after you bring TAB's updates in), each project inherits it at its next session start
+4. **Projects get updates.** The next time a spoke starts a session, it inherits
+   the improved methodology automatically
 
 ### The Inbox System
 
@@ -251,7 +267,7 @@ session start and feedback generation at session end.
 ### Learning From a Session
 
 At the end of a session, `/dsm-wrap-up` sometimes tells you *"STAA recommended:
-yes."* STAA (Worklog Analysis Agent) is a look back at the reasoning
+yes."* STAA (Session Transcript Analysis Agent) is a look back at the reasoning
 behind a session: where choices were made, where the approach changed direction,
 what worked, and what slowed things down.
 
@@ -329,8 +345,7 @@ as a potential improvement.
 **Can I use DSM with a team?**
 DSM is designed for individual human-AI collaboration. Team coordination (shared
 repositories, code review) uses standard git workflows. Each team member runs
-their own DSM sessions in their own fork of TAB (see
-[GETTING_STARTED.md](GETTING_STARTED.md#each-team-member-needs-a-fork)).
+their own DSM sessions.
 
 ---
 

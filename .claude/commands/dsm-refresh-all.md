@@ -26,4 +26,4 @@ Re-read all DSM context sources without session-start overhead. Use when CLAUDE.
 - Use `/dsm-refresh-memory` for a lighter refresh (MEMORY.md only)
 - Use `/dsm-go` for a full session start with baseline, transcript reset, and session-start checks
 - Follow .claude/CLAUDE.md conventions for this project
-- Follow the Worklog Protocol from DSM_0.2 (append the plan entry to .claude/worklog.md)
+- Follow the Session Transcript Protocol from DSM_0.2 (append reasoning to .claude/session-transcript.md)

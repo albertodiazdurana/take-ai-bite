@@ -32,7 +32,7 @@ When DSM_0.2 introduces a breaking change, DSM Central must notify all spoke pro
 and external contributions so they can update their Protocol Applicability tables.
 
 **What counts as a breaking change:**
-- New mandatory protocol added (e.g., Worklog Protocol)
+- New mandatory protocol added (e.g., Session Transcript Protocol)
 - Existing protocol behavior modified in a way that changes agent actions
 - Protocol removed or deprecated
 
@@ -278,13 +278,13 @@ research file that the user cannot meaningfully review.
 Research also happens incidentally during implementation: web searches to
 understand API behavior, reference implementation analysis, trade-off
 comparisons to inform a design choice. These findings must persist beyond the
-worklog.
+session transcript.
 
 **Trigger:** When the agent conducts research involving web searches, external
 source analysis, or multi-source comparison to inform a task, write a structured
 document to `dsm-docs/research/` as part of the research process, not after. Use the
 standard research file header (Purpose, Target Outcome, Status, dates). The
-worklog captures reasoning; the research artifact captures conclusions
+session transcript captures reasoning; the research artifact captures conclusions
 for future sessions.
 
 **Threshold:** Apply when findings would take more than 5 minutes to reconstruct

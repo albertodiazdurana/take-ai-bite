@@ -43,7 +43,7 @@ maintain separate vocabularies.
 
 These terms appear pervasively across DSM documents as if defined, but are
 neither formal principles nor emergent concepts. They name the structural
-units (spoke, hub, mirror), workflow artifacts (BL, Worklog,
+units (spoke, hub, mirror), workflow artifacts (BL, Session Transcript,
 inbox entry, reasoning lesson), and protocol primitives (Gate 0-3, Level 3
 branch, parallel session, `@` reference) that the methodology runs on.
 
@@ -59,7 +59,7 @@ branch, parallel session, `@` reference) that the methodology runs on.
 | **session branch / task branch / Level 3 branch** | The three working layers of DSM branching: session branch (Level 2, per-session), task branch (Level 3, per-BL or per-sprint), main (Level 1) | DSM_0.2 §20 |
 | **parallel session** | A short isolated session running on the shared Level 2 session branch with typed prefix (QA / BL-#) and declared file scope | DSM_0.2.A Parallel Session Protocol |
 | **Pre-Generation Brief / Gate 0-3** | The four-gate approval model gating artifact creation: collaborative definition (G0), concept (G1), implementation (G2), run (G3) | DSM_0.2 §8 |
-| **Worklog** | The append-only reasoning log at `.claude/worklog.md` that is the agent's primary reasoning channel | DSM_0.2 §7 |
+| **Session Transcript** | The append-only reasoning log at `.claude/session-transcript.md` that is the agent's primary reasoning channel | DSM_0.2 §7 |
 | **`@` reference** | The CLAUDE.md import directive that recursively pulls referenced files into agent context, the discovery mechanism for DSM_0.2 itself | DSM_0.2 §17 |
 | **BL / backlog item** | A single, independently-completable unit of proposed work tracked in `dsm-docs/plans/` | DSM_0.2 §21, CLAUDE.md Change Tracking Workflow |
 | **Cloned-Mirror Kick-off** | The first-session bootstrap protocol on a fresh mirror clone that promotes `.template` files to runtime paths | DSM_0.2.A Cloned-Mirror Kick-off Protocol |

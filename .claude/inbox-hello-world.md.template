@@ -11,7 +11,7 @@ walk you through any open entries.
 
 ## Two things to know
 
-- `.claude/worklog.md` is where TAB's reasoning is logged in
+- `.claude/session-transcript.md` is where TAB's reasoning is logged in
   real time. Keep it open in your editor. That's how you see what TAB
   is thinking.
 - Close a session by telling TAB "let's wrap up" or running `/dsm-wrap-up`.

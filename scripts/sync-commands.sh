@@ -135,11 +135,7 @@ report_orphans() {
     ORPHAN_COUNT=${#orphans[@]}
     [ ${#orphans[@]} -eq 0 ] && return 0
     echo ""
-    if [ "$IS_CENTRAL" -eq 1 ]; then
-        echo "ORPHANED project-level copies in ${LEGACY_PROJECT_TARGET}:"
-    else
-        echo "Tracked project-level command copies in ${LEGACY_PROJECT_TARGET}:"
-    fi
+    echo "ORPHANED project-level copies in ${LEGACY_PROJECT_TARGET}:"
     for name in "${orphans[@]}"; do
         if [ -f "${SOURCE_DIR}/${name}" ] && diff -q "${SOURCE_DIR}/${name}" "${LEGACY_PROJECT_TARGET}/${name}" > /dev/null 2>&1; then
             echo "  - ${name} (currently matches source, but nothing keeps it current)"
@@ -151,13 +147,11 @@ report_orphans() {
         echo "  Central has none legitimately (nothing deploys here, BL-518). This is"
         echo "  shadow residue (BACKLOG-537) and --check will fail until it is removed."
     else
-        echo "  On a mirror or fresh clone these tracked copies are INTENTIONAL"
-        echo "  (mirror-sync manifest category 6): they let /dsm-go work before any"
-        echo "  deploy, and are the LOADED runtime wherever no user-level copy of the"
-        echo "  same name exists. They become inert only once a user-level deploy wins"
-        echo "  the name collision (personal overrides project). --check does NOT fail"
-        echo "  on them here; do NOT delete them on a mirror, delete only after"
-        echo "  confirming a user-level copy supersedes each."
+        echo "  Nothing deploys to this path any more (BL-518). The user-level copy"
+        echo "  wins a name collision (personal overrides project), so these are inert"
+        echo "  wherever a user-level copy of the same name exists , and are the copy"
+        echo "  that loads only where none does. Delete once you have confirmed nothing"
+        echo "  needs them."
     fi
 }
 

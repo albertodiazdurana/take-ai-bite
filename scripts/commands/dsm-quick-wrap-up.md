@@ -4,7 +4,7 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
 
 **Steps 0, 1, and 1.5 are independent and can run in parallel.**
 
-0. **Extract reasoning lessons:** Scan `.claude/worklog.md` for notable reasoning patterns from this session. For each notable entry, append a 1-2 line summary to `.claude/reasoning-lessons.md` under the appropriate category, tagged `[auto]`. Notable entries include:
+0. **Extract reasoning lessons:** Scan `.claude/session-transcript.md` for notable reasoning patterns from this session. For each notable entry, append a 1-2 line summary to `.claude/reasoning-lessons.md` under the appropriate category, tagged `[auto]`. Notable entries include:
    - Mistakes caught mid-reasoning (course corrections)
    - Decision heuristics that worked or failed
    - Efficiency observations (ordering, batching, parallelism)
@@ -14,8 +14,8 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    **Format:** `- [auto] S{N} [{scope}]: {lesson text}` (where N is the session number)
    **Scope classification:** For each extracted lesson, assign a scope label per the Reasoning Lessons Protocol (DSM_0.2 Module A): `ecosystem`, `pattern`, or `project`. The agent assigns scope based on whether the lesson is domain-specific or generalizable.
    **STAA recommendation:** After extracting, assess whether this session warrants deeper STAA analysis. Recommend STAA when the session involved complex multi-option decisions, entered unfamiliar territory (new domain, tool, or pattern), the auto extraction felt incomplete (rich reasoning that resists summarization), or a course correction occurred that may represent a recurring pattern. Output: "STAA recommended: [yes/no]. [1-sentence reason]." **Invocation:** STAA must be run in a separate Claude Code conversation. Do not wrap it in `/dsm-go` or `/dsm-parallel-session-go`. Enter `/dsm-staa` directly.
-   **Lessons stay local (BACKLOG-606):** quick wrap-up sends no lesson to another project; sharing happens only through `/dsm-staa` Step 8b. At a hub, add this session's `[auto]` `ecosystem`/`pattern` lessons to the aggregation file exactly as `/dsm-wrap-up` Step 0 does, including its check at a hub that is not DSM Central.
-   **Provenance header update (per BL-510; canonical rule in DSM_0.2.A §8.1):** After the appends above have landed, update the live file's `**Last appended:**` line, and `**Last pruned:**` when entries were removed, with this run's identifier, date, counts and a one-line note. Four properties, all four required. **Chain, never replace:** move the superseded value behind `Prior:` (the form the file already uses) rather than overwriting it. **No-op when nothing changed:** if nothing was appended and nothing pruned, make no header change. **Same run, not the next one:** do it here, not in a later step or a later skill, because deferring is the structure that produced the gap. **Create when absent (property 4, BL-526):** where the `**Last appended:**` line does not exist, create it and state within the line that this run created it and that earlier appends predate the header, so its date is not misread as the file's first write. Absence is not a reason to skip; property 2 still governs, so a run that appended and pruned nothing makes no header change even when the line is missing. This step is not deferred: the header is a local write to a file this step already edits, so skipping it here leaves the staleness for a later skill to inherit rather than to fix.
+   **Lesson push:** Deferred (no cross-repo writes in quick wrap-up). Classified lessons remain in `.claude/reasoning-lessons.md` for push via `/dsm-wrap-up` or `/dsm-align`.
+   **Provenance header update (per BL-510; canonical rule in DSM_0.2.A §8.1):** After the appends above have landed, update the live file's `**Last appended:**` line, and `**Last pruned:**` when entries were removed, with this run's identifier, date, counts and a one-line note. Four properties, all four required. **Chain, never replace:** move the superseded value behind `Prior:` (the form the file already uses) rather than overwriting it. **No-op when nothing changed:** if nothing was appended and nothing pruned, make no header change. **Same run, not the next one:** do it here, not in a later step or a later skill, because deferring is the structure that produced the gap. **Create when absent (property 4, BL-526):** where the `**Last appended:**` line does not exist, create it and state within the line that this run created it and that earlier appends predate the header, so its date is not misread as the file's first write. Absence is not a reason to skip; property 2 still governs, so a run that appended and pruned nothing makes no header change even when the line is missing. This step is NOT deferred the way the lesson push is: the header is a local write to a file this step already edits, so skipping it here leaves the staleness for a later skill to inherit rather than to fix.
    **Compact mirror regeneration (per DSM_0.2.A §8.1; transform per BL-447):** After the appends and the provenance-header update above have landed, regenerate `.claude/reasoning-lessons-compact.md` from the live `.claude/reasoning-lessons.md`. **Run the canonical regeneration transform defined in DSM_0.2.A §8.1 ("Canonical regeneration transform"), then run the two post-generation sanity checks specified there.** Do NOT re-inline a transform here: the canonical awk in §8.1 is the single source of truth, and re-inlining a divergent copy was the BL-447 drift bug that silently emptied the mirror on flat-structured spoke files. `/dsm-wrap-up` Step 0 and `/dsm-staa` Step 8 reference the same §8.1 block; this is the third. If the live file does not exist, skip this sub-step (protocol not active for this project). If nothing was appended this run, still skip , there is nothing to propagate, and the §8.1 no-op posture applies here for the same reason it applies to the provenance header. Report the measured size, the §8.1 bound and their ratio in EVERY case, so a breach and a pass produce different output rather than a pass producing silence , `mirror {measured} B / bound {§8.1 value} B / {ratio}x OVER` against `mirror {measured} B / bound {§8.1 value} B / within bound`. Read the bound's value from §8.1 at regeneration time; do NOT copy it into this file (per BL-491). On a breach add: "Consider pruning the live file or promoting older lessons to MEMORY.md before the next wrap-up." Advisory, not blocking: still write the file. **Advisory means non-blocking, never silent.**
 
    **Why this is here and not deferred (BL-514).** Quick wrap-up is chosen for speed, and this is the one sub-step that costs real work. It is included anyway because the alternative is not "no cost", it is the same regeneration paid by `/dsm-go` Step 1.5 at the next boot, whose staleness check detects the stale mirror and regenerates it inline before reading , at the moment context is scarcest. The gap this closes is therefore a *placement* defect rather than a data-loss one: no lesson was ever lost, because Step 1.5 recovers. What was wrong is that three sibling steps wrote the live file and only two maintained its mirror, with no stated reason for the asymmetry.
@@ -41,8 +41,6 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    - Keep concise; MEMORY.md must stay under 200 lines
    - **Do NOT write a "Pending next session" list.** Step 1.5 (Checkpoint) owns pending items.
 
-1.4. **Memory tiering size check (BACKLOG-544):** after updating MEMORY.md above, measure the sessions zone (the bytes below the `<!-- SESSIONS ZONE` marker). If it exceeds ~4 KB, invoke `/dsm-memory-decommission` to move the oldest session group to `MEMORY-long-term.md`. Then, if `MEMORY-long-term.md` exceeds 10 KB, invoke `/dsm-memory-archive` to move its oldest group to `MEMORY-archived.md`. Both skills are move-only and auto-create their destination; skip silently if MEMORY.md has no `<!-- SESSIONS ZONE` marker (project not tiered). The threshold is on the sessions zone, not total MEMORY.md, because the evergreen zone alone can exceed a small total target (BACKLOG-544).
-
 1.5. **Checkpoint:** Create a minimal checkpoint in `dsm-docs/checkpoints/` recording the session state. This step is the primary owner of "pending next session" items — do not duplicate them in MEMORY.md (Step 1).
 
    **Filename:** `YYYY-MM-DD_sN_checkpoint.md` where N is the session number.
@@ -55,7 +53,7 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    **Last commit:** [git log --oneline -1]
 
    ## Work completed this session
-   [1-3 line summary drawn from worklog Output blocks and git log]
+   [1-3 line summary drawn from session transcript Output blocks and git log]
 
    ## Pending next session
    [items that require human decision or cannot be derived from backlog/inbox/git.
@@ -138,29 +136,13 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
    - Files in the baseline with unchanged checksums = pre-existing, not touched this session (skip them)
    - If `.claude/session-baseline.txt` does not exist (session started without `/dsm-go`), fall back to staging all changed files
 
-   **Mirror self-detection inbox guard (BL-566; reuses the DSM_0.2.A §25.1 /
-   `/dsm-go` Step 0.8a role signals):** Decide whether this repo is the read-only
-   public mirror before staging `_inbox/*`. It is the mirror ONLY when it carries
-   NONE of the DSM-role signals: `scripts/take-ai-bite-sync.txt` is absent AND
-   `.claude/dsm-ecosystem.md` has no `dsm-central` row. In that mirror case,
-   exclude every `_inbox/*` path from the stage-set except `_inbox/README.md` and
-   `_inbox/.gitkeep`, logging each: "Mirror inbox guard: skipped `_inbox/{file}`."
-   Otherwise stage `_inbox/*` normally. The two signals, grounded (BL-566) against
-   the real public mirror (take-ai-bite) and a git clone of Central:
-   - `take-ai-bite-sync.txt` present: this is DSM Central or a git clone of it (the
-     file is TRACKED, so a clone inherits it); both track their own `_inbox`, so stage.
-   - a `dsm-central` row present: a configured spoke (row points at its hub) or a
-     self-registered clone (row points at itself); both own a real `_inbox`, so stage.
-   - neither signal: the read-only public mirror, whose selective file-sync copies
-     neither the sync file nor a `dsm-central` registry, so stage nothing but the
-     README bootstrap.
-   The absence of `take-ai-bite-sync.txt` ALONE no longer implies mirror: every
-   spoke also lacks it, which was the BL-566 defect (a two-state read of a
-   three-state world that put every spoke in the mirror branch and silently dropped
-   its tracked `_inbox` from the wrap-up commit). A repo with no role signals at all
-   takes the mirror branch (default-skip): the only real repo in that bucket is the
-   public mirror, because a configured spoke always carries a `dsm-central` row by
-   wrap-up time.
+   **Mirror self-detection inbox guard:** If
+   `scripts/take-ai-bite-sync.txt` does NOT exist in the current
+   working tree, this repo is a mirror (not the hub). Exclude any
+   `_inbox/*` path from the stage-set except `_inbox/README.md` and
+   `_inbox/.gitkeep`. Log each excluded path: "Mirror inbox guard:
+   skipped `_inbox/{file}` (mirror inbox guard)." Parity with `/dsm-wrap-up`
+   Step 9.
 
    Then `git commit` and `git push` in sequence. If no session changes exist, skip the commit.
    After committing, delete `.claude/session-baseline.txt` (consumed).
@@ -185,7 +167,7 @@ Execute the DSM session wrap-up checklist without feedback push. Use this varian
 
 ## Notes
 
-- Do NOT clear or overwrite `.claude/worklog.md`; `/dsm-go` handles the reset at next session start
+- Do NOT clear or overwrite `.claude/session-transcript.md`; `/dsm-go` handles the reset at next session start
 - No co-author lines in commits
 - If $ARGUMENTS is provided, use it as the session description in MEMORY.md
 - All steps run autonomously; do not pause for confirmation between steps

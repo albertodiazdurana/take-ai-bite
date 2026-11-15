@@ -58,7 +58,7 @@ The @ import inherits all DSM protocols, but not all apply to this context.
 | Phase 0.5 Research | No | Research is contribution-specific, not DSM-phased |
 | DSM Feedback Tracking | Partially | Log methodology observations at milestones |
 | Session Management | Yes | Monitor tokens and hand off when approaching limits |
-| Worklog Protocol | {Yes/Adapt} | {Use if VS Code extension, skip for CLI} |
+| Session Transcript Protocol | {Yes/Adapt} | {Use if VS Code extension, skip for CLI} |
 
 When in doubt: follow {project} conventions first, then DSM protocols.
 
@@ -252,7 +252,7 @@ priority mechanism. Options:
 | Step | Action | Expected result |
 |------|--------|-----------------|
 | 18 | Run `/dsm-go` in the fork | Inbox found at governance path |
-| 19 | Confirm transcript created in `.claude/` | `.claude/worklog.md` exists |
+| 19 | Confirm transcript created in `.claude/` | `.claude/session-transcript.md` exists |
 | 20 | Confirm handoffs path accessible | Agent can read/write governance handoffs |
 
 If any verification step fails, fix the setup and re-verify before marking

@@ -5,305 +5,6 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.37.1] - 2026-10-22
-
-Patch: DSM's session-start, wrap-up and session-analysis snippets now work on macOS and zsh (BACKLOG-609). On a fork, `/dsm-align`'s closed-backlog check reads the fork's own index (BACKLOG-610). The mirror-sync manifest no longer lists the content scanner as mirrored (BACKLOG-611).
-
-### Fixed
-
-- **macOS and zsh portability (BACKLOG-609; `/dsm-go`, `/dsm-staa`, `/dsm-parallel-session-go`, `/dsm-wrap-up`, DSM_0.2.A §26, `transcript-reminder.sh`).** Three snippets gave a plausible but wrong result on macOS:
-  - The session-lock age always read 0, because `stat -c` is GNU-only. BSD `stat -f %m` is now the fallback.
-  - The session's Claude process was never found, because macOS `ps` prints the full binary path. The match now compares the basename, so a parallel session records its process ID and gets its own reminder.
-  - Under zsh, wrap-up Step 0.5's `path` variable emptied `PATH` and skipped the remaining pre-confirmed targets. The variable is renamed.
-
-  Linux behaviour is unchanged.
-  **Spoke action:** refresh the user-level commands (`scripts/sync-commands.sh --deploy`). `/dsm-align` updates the reminder hook at the next session start.
-  **Fork action:** merge this release, then redeploy the commands.
-- **Closed-backlog check on forks (BACKLOG-610, `/dsm-align` Step 11b).** On a fork the check compared closed items against the inherited `done/INDEX.md`, which carries Central's numbering. Fork items were reported missing, or passed only because a Central item had the same number. The check now uses `done/fork-INDEX.md` when it exists, and accepts row IDs written as `BACKLOG-NNN` or a bare `NNN`. Central's result is unchanged.
-  **Spoke action:** covered by the command refresh.
-- **Mirror-sync manifest (BACKLOG-611).** The manifest listed the content scanner among the scripts mirrors receive. The scanner is Central-only by design (BACKLOG-560), and take-ai-bite has no copy; the manifest now says so.
-
-### Spawned
-
-- **BACKLOG-612** (Medium): under zsh, a file pattern that matches nothing is a shell error, so some published snippets print errors on macOS and one may report `UNRESOLVED` instead of a count; measure each site under zsh, then fix.
-
-## [1.37.0] - 2026-10-21
-
-Minor: reasoning lessons no longer leave a project before a person has read them, and a hub's lesson files never become public (BACKLOG-606, from take-ai-bite #150). The `/dsm-go` CLAUDE.md section check now prints one line at every boot and holds back only a project that has never wrapped up (BACKLOG-608). Acceptance: test plans T-1 to T-12 of both BLs passed in scratch projects, and a full `/dsm-go` of the release candidate on Opus 5.5, in a fresh clone, finished normally. Still to verify: the first real hub wrap-up after the release (BACKLOG-606 T-7) and a tester's run on a fork.
-
-### Added
-
-- **Reviewed lesson sharing (BACKLOG-606, `/dsm-staa` Step 8b, DSM_0.2.A §8.3).** `/dsm-staa` is now the only way a reasoning lesson reaches the hub. It offers the `ecosystem` and `pattern` lessons not yet decided, at most 10 per run, newest first; `project` lessons are never offered. Each lesson is shown in full with a scan for email addresses, links, project names and an optional local term list (`.claude/leak-scan-patterns.txt`). Matches are masked, and the masked text is what gets sent. The user approves, edits, drops or skips each lesson, and nothing is written unless something is approved. Decisions are recorded in `.claude/lessons-shared.txt` (hashes only), so a lesson is not offered twice. The step also runs when there is no new session to analyse.
-  **Spoke action:** refresh the user-level commands (`scripts/sync-commands.sh --deploy`). If you create `.claude/leak-scan-patterns.txt`, keep it out of git.
-- **Lesson files are never public (BACKLOG-606, DSM_0.2.A §8.3).** A hub's lesson files (the aggregation file, `_inbox/`, the local lessons files and the compact mirror) stay out of any public repository. take-ai-bite's `.gitignore` now ignores them. At any hub other than DSM Central, wrap-up and the share step run `git check-ignore` before writing, and stop if the file would be tracked.
-  **Fork action:** merge this release to get the new `.gitignore`. If your fork already committed any of these files, untrack them with `git rm --cached <path>` and commit. Anything already pushed stays in the fork's history; this release cannot remove it, and rewriting history is your decision.
-
-### Changed
-
-- **Wrap-up keeps lessons local (BACKLOG-606).** `/dsm-wrap-up`, `/dsm-quick-wrap-up` and `/dsm-finalize-project` no longer send lessons to the hub. At a hub, wrap-up and quick wrap-up still add the session's `[auto]` `ecosystem`/`pattern` lessons to the hub's own aggregation file. Wrap-up and finalize report how many lessons are waiting to be shared. The §8.2 rule that escalated a `project` lesson seen in 3+ projects is retired, because those lessons no longer reach the hub. DSM_0.2.C §5.8/§5.9 and DSM_3.0.F describe the new flow.
-  **Spoke action:** covered by the command refresh. A hub may still receive lesson notes from a project that has not refreshed; those notes have no `**Reviewed:**` line, and the agent asks before adding them.
-- **CLAUDE.md section check (BACKLOG-608, `/dsm-go` Step 2a.8, DSM_0.2.A §23).** The check is now a snippet that prints one of four lines. `OK` means all sections are present. `REPORT` means sections are missing in a project with session history, and never blocks. `BLOCK` means a project that has never wrapped up: no implementation work until the sections exist, or until you type `defer`. `UNRESOLVED` means the check could not run. Sections 2-4 count only outside the alignment block. The fork CLAUDE.md template gains sections 2-4, and `GETTING_STARTED.md` step 7 says what the first `/dsm-go` will ask.
-  **Spoke action:** covered by the command refresh. A project with session history that lacks sections 2-4 sees a one-line report and can add them when convenient.
-
-### Fixed
-
-- **Guard hook committed as non-executable.** `.claude/hooks/validate-boot-safeguard-write.sh` had been committed as non-executable since BACKLOG-584 Phase 2, so a fresh clone of the hub repository started with a hook that could not run. take-ai-bite was not affected.
-
-### Spawned
-
-- **BACKLOG-607** (Medium): human review of every other message one project writes into another's inbox (feedback and notifications).
-
-## [1.36.0] - 2026-10-19
-
-Minor: take-ai-bite can be recommended to a newcomer as it is. A new `GETTING_STARTED.md` makes "fork, then clone" the documented start (BACKLOG-599), and the session wrap-up now merges on any git host and stays on the user's own fork (BACKLOG-600). The two ship together because the guide describes the new wrap-up. Acceptance: two first-turn `/dsm-go` boots of the release candidate on Opus 5.5 started normally (no refusal). The merge paths were tested against stand-in repositories and stand-in CLIs, and the fork case against a fake fork. A tester's run on a real fork, and on GitLab, follows the release.
-
-### Added
-
-- **Getting-started guide (BACKLOG-599, `GETTING_STARTED.md`).** One path from nothing to a first finished session on the reader's own fork, with a check the reader or their AI assistant can run at every step. It covers:
-  - prerequisites: installing git and setting its identity, a git host account, `gh`, bash, VS Code and Claude Code, and the plan the AI assistant needs;
-  - a provider-neutral note on where project content is sent, with recommended privacy settings;
-  - forking and cloning, GitLab and other hosts, and one fork per team member;
-  - a download-only quick try, with its limits (no updates, no route back to take-ai-bite);
-  - how to bring take-ai-bite's later updates into a fork;
-  - a block of instructions written for an AI assistant helping with setup.
-
-  The README gains a short Getting Started block. START_HERE §5 becomes an overview that links to the guide, and §2 and §6 no longer say that updates reach other people's copies automatically. TAKE_AI_BITE.md typos are fixed.
-  **Spoke action:** none.
-  **Fork action:** read "Getting Updates and Sending Feedback" in `GETTING_STARTED.md`. After merging an update, redeploy the commands (`scripts/sync-commands.sh --deploy`), because user-level copies override the repository's own.
-- **Git host resolution rule (BACKLOG-600, DSM_0.2.A §27).** Skills that talk to a git host work out from `origin` whether it is `github`, `gitlab`, `other` or `none`, using the CLI that can actually reach the repository rather than the URL text. Every host-CLI call then names the repository. A project can override the detection with a `**Git host:**` line in its CLAUDE.md.
-  **Spoke action:** none required. Optionally declare `**Git host:**` if detection is wrong for the project.
-
-### Changed
-
-- **`/dsm-wrap-up` merges by host (BACKLOG-600, Steps 9.4 and 10).**
-  - **GitHub:** a pull request on the project's own repository, merged only if its head matches local `HEAD` (`--match-head-commit`).
-  - **GitLab:** a merge request through `glab`, merged at once (`--auto-merge=false`, `--sha`). If `glab` cannot create the request, the wrap-up falls back to the local merge.
-  - **Any other host:** a local merge, then a push of `main`.
-  - **No remote:** a local merge.
-
-  Each outcome line comes from its own command's exit status, so a failed push is reported as failed (the old message said the branch "has been pushed" either way). A rejected push of `main` puts local `main` back and never forces.
-  **Spoke action:** refresh the user-level commands on each machine (`scripts/sync-commands.sh --deploy` from Central).
-- **Checks never read the upstream repository from a fork (BACKLOG-600).** `/dsm-go` 2a.6 (default branch), `/dsm-go` 2a.7 and `/dsm-wrap-up` 9.5 (failing CI) and the DSM_0.2.A §20 issue check name the repository explicitly. They run only on GitHub; GitLab follows in BACKLOG-602. `gh repo fork --clone` makes the upstream repository `gh`'s default, and `gh` treats an empty `--repo` as no value, so each call stops if the value is missing instead of reading upstream. The "Remote repository?" prompts in `/dsm-go`, `/dsm-align` and `/dsm-new-spoke` now cover any host, and the Kick-off readiness list includes `glab`.
-  **Spoke action:** covered by the same command refresh.
-
-### Fixed
-
-- **Mirror-sync safety net merged by number without naming the mirror (BACKLOG-600, `/dsm-wrap-up` Step 11c).** Run from Central, `gh pr merge {number}` would have acted on Central's own pull request with that number. It now names `--repo {mirror-repo}`.
-
-### Spawned
-
-- **BACKLOG-601** (Medium): optional privacy-leaning default in take-ai-bite (non-essential traffic off, with a notice and an update reminder).
-- **BACKLOG-602** (Low): run the repository checks on GitLab projects too.
-
-## [1.35.0] - 2026-10-15
-
-Minor: the worklog fixes that BACKLOG-592 unblocked land in the on-demand Module G instead of §7 (BACKLOG-554, BACKLOG-500, BACKLOG-590), and two fork-facing additions to the core return: §20.9 and an extended §21.5 (BACKLOG-587, BACKLOG-588, BACKLOG-589, BACKLOG-591). The always-loaded §7 is unchanged. Acceptance: the release candidate booted clean on Opus 5.5 in 3 scripted boots (2 first-turn, 1 full) and 1 operator boot, against a known-failing control that was refused.
-
-### Fixed
-
-- **Bash worklog appends cover both heredoc failure directions (BACKLOG-554, BACKLOG-500, DSM_0.2.G "Appending with Bash").** G now names the one case that needs a Bash append (the worklog's last line also appears earlier, so Edit and the anchor rule cannot both hold). It shows that a quoted heredoc writes `$(date)` as literal text while an unquoted one runs backticks in prose as commands, with exit 0 and no visible error, and it gives a default form: `printf` the delimiter with a fresh clock read, then write the body through a single-quoted heredoc. `validate-transcript-edit.sh` accepts that form without a false warning. `/dsm-go` Step 6 and two DSM_7.0 passages are corrected; one of them stated the unquoted form as the rule. Input: take-ai-bite #141.
-  **Spoke action:** none by hand. `/dsm-go` runs `/dsm-align` on this version change, which copies the updated hook; refresh the user-level commands on each machine (`scripts/sync-commands.sh --deploy` from Central).
-- **`/dsm-go` writes its first worklog entry after the reset (BACKLOG-590, DSM_0.2.G "Boot-turn ordering").** The per-turn reminder no longer tells a `/dsm-go` turn to append before Step 5.5 archives the file, so the boot plan stops landing in the previous session's archive. `transcript-reminder.sh` prints nothing on a `/dsm-go` prompt, and `/dsm-go` Steps 5.5 and 6 point to the new G note. Verified in a full headless boot (the archive ends with the previous session's last entry) and an operator boot. Input: take-ai-bite #142.
-  **Spoke action:** covered by the same `/dsm-align` run and command refresh.
-
-### Added
-
-- **Clean staged index before a Level 3 branch (BACKLOG-587, DSM_0.2 §20.9).** Before `git checkout -b` for a `bl-*` or `sprint-*` branch, assert `git diff --cached --quiet`; commit session artifacts on the session branch first, or stop and report. This keeps the checkpoint moves `/dsm-go` stages from riding into a task branch. Input: take-ai-bite #137 and reference PR #138.
-  **Spoke action:** none (the core is imported).
-- **Fork-local backlog lifecycle (BACKLOG-588, BACKLOG-589, BACKLOG-591, DSM_0.2 §21.5).** A fork-local BL and its README row are committed to the branch every session starts from. A six-step workflow covers minting through closing. A BL is done when Central ships a change covering it, when its local work is complete, or when it is withdrawn, and its row moves to `done/fork-INDEX.md`, never to the synced `done/INDEX.md`. A fork extends Central's methodology and does not contradict it; at a fork-sync, Central's text wins. Input: take-ai-bite #139, #144 and reference PR #140.
-  **Spoke action:** none for spokes; forks read §21.5 before minting their next fork-local BL.
-
-## [1.34.0] - 2026-10-15
-
-Minor: make the Worklog Protocol readable on strict models by trimming the always-loaded §7 and removing two Module G blocks that a strict model would not read (BACKLOG-592), plus a read-only live-session check for `/dsm-staa` (BACKLOG-586).
-
-### Changed
-
-- **Worklog Protocol trimmed and Module G cleaned (BACKLOG-592, DSM_0.2 §7, DSM_0.2.G).** §7 keeps every operational rule in condensed form and shrinks from 11,489 B to 3,497 B. The header schema, the Bash append procedure, the lifecycle detail and the rationale move to DSM_0.2.G, now titled "Worklog Protocol Detail". Two G blocks that stopped a strict-model read are deleted. Three stale passages in §7 are fixed (a "cleared at session end" claim that contradicted the lifecycle, a wrong §23 citation, a "see below" that pointed to Module A), and the worklog wording in `/dsm-go`, `/dsm-light-go`, `/dsm-refresh-all` and `/dsm-refresh-memory` now matches the new §7 definition. Acceptance: 12/12 clean Opus 5.5 boots of the final state (2 scripted, 10 operator), against a known-failing control that was refused.
-  **Spoke action:** none for the core (spokes import it); refresh the user-level commands on each machine (`scripts/sync-commands.sh --deploy` from Central).
-
-### Added
-
-- **`/dsm-staa` read-only active-session check (BACKLOG-586, `/dsm-staa` Step 0, DSM_0.2.A §26.2).** The analysis agent now runs `/dsm-go` §0.7a's lock probe before anything else: a live lock gets an explicit continue/stop question, a stale or unknown lock a one-line report, no lock nothing. It never writes or removes the lock, files no backlog item, and runs no git command that changes HEAD, the index, or refs.
-  **Spoke action:** covered by the same command refresh.
-
-## [1.33.1] - 2026-10-13
-
-Patch: a migration guide for forks of the public mirror, so a fork maintainer can complete the v1.33.0 boot-safeguard fix on their own machine (BACKLOG-585 Phase 3).
-
-### Added
-
-- **Fork migration guide (`dsm-docs/guides/boot-safeguard-fork-migration.md`, BACKLOG-585 Phase 3).** Merging `upstream/main` brings a fork the v1.33.0 methodology files but not the files that live only on the maintainer's machine. The guide covers those in five steps: merge upstream; refresh the user-level commands with `scripts/sync-commands.sh --deploy` (stale user-level copies override the repo's own and were the cause of a refused fresh-clone boot during the rollout); realign with `/dsm-align`; retire the old live work-log file and update the boot-read memory, lessons and handoffs; verify with a grep plus a strict-model boot. It is trigger-gated in the guides index and never spells out the retired file name as one string.
-  **Fork action:** follow the guide on a non-strict model, then confirm with a strict-model boot.
-  **Spoke action:** none; Central's own spokes follow the internal spoke migration runbook.
-
-## [1.33.0] - 2026-10-13
-
-Minor: fix the strict-model boot refusal, add a guard that keeps it from coming back, and ship that guard to the public mirror and its clones (BACKLOG-584, BACKLOG-585 Phase 0/2).
-
-### Fixed
-
-- **Strict-model boot refusal (BACKLOG-584).** On strict models (Opus 5.5, Sonnet 5.5), a bare "start" or `/dsm-go` could be stopped by a model-side safety refusal before the session began. An incremental ablation traced it to three additive co-triggers in always-loaded context, none sufficient alone: the name of the live work-log file, three marker phrases in the DSM_0.2 core, and one DSM_0.2 §7 subsection. The fix renames the live work-log file to `.claude/worklog.md` across the core, modules, alignment template, commands and hooks; rewords the three markers; and moves the §7 subsection's detail to DSM_0.2.G, leaving a pointer. The validated fix boots clean on Opus 5.5.
-  **Spoke action:** run `/dsm-align` (the next `/dsm-go` after this release routes there automatically). It delivers the clean CLAUDE.md alignment block, the updated hooks and `.claude/worklog.md`. Then, by hand: retire the old live work-log file and point `.gitignore` at `.claude/worklog.md`, and keep any boot-read memory, lessons, handoffs or checkpoints free of the old file name. Run the migration on a non-strict model if the project's existing local files still carry the old content, because a strict model can also stop mid-session when it reads them.
-
-### Added
-
-- **Boot-safeguard reintroduction guard (BACKLOG-584 Phase 2, `.claude/hooks/validate-boot-safeguard-write.sh`).** A PreToolUse hook on Write, Edit and Bash that blocks the known trigger content from being written into always-loaded or boot-read surfaces (CLAUDE.md, the DSM_0.2 core, memory, lessons, active handoffs and checkpoints). It is a backstop for known literals, not a complete filter; the full scope and the override are in DSM_0.2.G. Wired through `scripts/templates/settings-hooks.json`, so `/dsm-align` Step 10b installs it.
-  **Spoke action:** none beyond the `/dsm-align` run above.
-
-### Changed
-
-- **Mirror sync scope (BACKLOG-585 Phase 2, `dsm-docs/guides/mirror-sync-manifest.md`, `scripts/take-ai-bite-sync.txt`).** The guard hook and its wiring template `scripts/templates/settings-hooks.json` now sync to the mirror. The template was already present on the mirror but had arrived outside the sync list and gone stale, the silent-decay case manifest §4 records. Manifest category 8 now names the wiring template, because a hook script without its wiring entry never runs.
-- **Kick-off settings template (`.claude/settings.json.template`).** A freshly kicked-off mirror clone now wires `validate-cross-repo-write.sh` and the new guard. Before this, the template wired neither, so a clone carried the cross-repo write hook script without running it.
-- **Spoke migration guide kept Central-internal.** `dsm-docs/guides/boot-safeguard-spoke-migration.md` is the second recorded exception to manifest category 2: it points to a Central-private decision record and quotes the retired file name in its verification commands. Forks get a fork-specific note in BACKLOG-585 Phase 3.
-
-## [1.32.0] - 2026-10-11
-
-Minor: wire the §5.9 data-protection / compliance briefing surfacing check into session start, so a project that declares it handles personal or confidential data is actually warned when its briefing is missing — the mechanical follow-up v1.31.0 deferred (BACKLOG-583).
-
-### Added
-
-- **DP/compliance briefing surfacing check (BACKLOG-583, `/dsm-go` Step 2g; DSM_0.2.C §5.9, DSM_0.2.A §23).** §5.9 (v1.31.0) defined the briefing and a surfacing *convention* — "warns at the scaffold / session-start completeness check" — but nothing performed the check, so a project with the trigger set and no briefing received no warning. The new `/dsm-go` Step 2g performs it: when the project CLAUDE.md declares `**Handles personal/confidential data:** yes` and no briefing exists at `dsm-docs/decisions/`, the boot report warns (report-not-block, silent once a briefing exists). Detection is declarative-primary (the CLAUDE.md line), with the briefing matched by the title §5.9's template defines; the optional heuristic stays advisory and is deliberately not wired (§8.9.2 over-firing guard). §5.9's "deferred follow-up" note is reconciled to the built wiring, and DSM_0.2.A §23 cross-references the check for discoverability.
-  **Spoke action:** none required — Step 2g is silent unless a project sets the §5.9 `**Handles personal/confidential data:** yes` trigger; a project that handles Restricted data should ensure a briefing exists at `dsm-docs/decisions/`. The updated `/dsm-go` reaches projects at the next command deploy / mirror sync.
-
-## [1.31.0] - 2026-10-10
-
-Minor: a by-design data-protection and compliance briefing for projects that handle personal or confidential data, so the review need is requested up front in a uniform form rather than surfacing ad hoc after a PII-handling model is already running (BACKLOG-582, take-ai-bite issue #127 / reference PR #128, alberto-passerelle fork).
-
-### Added
-
-- **Data-Protection and Compliance Briefing by Design (BACKLOG-582, DSM_0.2.C §5.9).** DSM requested no data-protection or compliance review by design for projects handling personal data, so the need surfaced ad hoc — usually after a PII-handling model was already in operation — and was recorded, if at all, in no uniform form. The new §5.9 makes DSM request a standard briefing: a declarative-primary trigger (a `**Handles personal/confidential data:** yes` line in the project CLAUDE.md, on the §5.1-Restricted basis, with an optional heuristic), a constant requirements checklist, an A–G template placed at `dsm-docs/decisions/`, and per-project-type adaptation (Documentation and Data Science full; Application lightweight-with-justification on synthetic data; Hybrid conditional; External Contribution deferred to the upstream regime). The briefing is a name-free hand-off to human or expert review that asserts no legal conclusions, and a missing one warns at the scaffold / session-start completeness check rather than blocking work. Central authored §5.9 grounding against the fork's reference PR #128, not merging it (the issue/PR is INPUT to the planning pipeline, per Actionable Work Items).
-  **Spoke action:** none required — §5.9 is a new opt-in section arriving at the next mirror sync; a project handling Restricted data may adopt the briefing, but nothing is mandated and the session-start surfacing wiring is a deferred follow-up.
-
-## [1.30.0] - 2026-10-09
-
-Minor: a sanctioned independent backlog line for public-mirror forks, so a fork — including one promoted to a local hub by the Cloned-Mirror Kick-off — can develop methodology enhancements without waiting on the private Central or guessing a BL number it cannot see (BACKLOG-581, take-ai-bite issue #124 / reference PR #125, alberto-passerelle fork).
-
-### Added
-
-- **Independent fork-local backlog line (BACKLOG-581, DSM_0.2 §21.5; cross-ref DSM_7.0 §2.1).** A fork of a DSM repository could not develop methodology enhancements independently: BL numbering is owned by the private Central (a fork cannot see or safely guess the next number) and a de-identified public fork ships `dsm-docs/plans/` as a `README` plus an INDEX-only `done/`, so it carries no active BL bodies of its own. The new §21.5 permits a fork to maintain its own `BACKLOG-###` line numbered from 001, independent of Central's numbering: fork numbers are a local identity (not a claim on Central's namespace); Central stays canonical and assigns the real number on upstream absorption, with the fork recording the mapping; fork-local BL bodies must be name-free (public-repo egress discipline, DSM_0.2.C §5.7/§5.8); an additive `git merge upstream/main` preserves fork-local BLs with no mirror-sync-manifest change; and upstream contribution (issue + cross-fork PR + attached BL) is optional but recommended. Central authored §21.5 grounding against the fork's reference PR #125, not merging it (the issue/PR is INPUT to the planning pipeline, per Actionable Work Items).
-  **Spoke action:** none required — §21.5 is a new methodology section arriving at the next mirror sync; it enables a fork to open its own backlog line but mandates no change to an existing spoke.
-
-## [1.29.0] - 2026-10-09
-
-Minor: a first-class bootstrap path for turning an uninitialized directory into a new DSM spoke, so a fresh spoke no longer has to misuse the Cloned-Mirror Kick-off path (which self-registers the directory as its own hub) or be hand-assembled (BACKLOG-578, take-ai-bite issue #117).
-
-### Added
-
-- **New-spoke bootstrap: the `/dsm-new-spoke` skill plus a `/dsm-go` Step 0.8 guard (BACKLOG-578, DSM_0.2.A §25.7).** `/dsm-go` on a fresh directory meant to become a spoke had no fitting path: Step 0.8's Cloned-Mirror Kick-off self-registers the directory as its own `dsm-central` and copies `.claude/*.template` files a hand-created spoke does not have, so it either failed or halted, and the workaround was undocumented. The new `/dsm-new-spoke <hub-path>` skill scaffolds the directory as a spoke of an existing hub: it validates the hub path, registers the real hub as `dsm-central` (never self), writes a minimal `@`-referenced CLAUDE.md, and runs the spoke `/dsm-align` path to build `dsm-docs/` + `_inbox/` and generate the alignment section — without copying templates or self-registering. A new `/dsm-go` Step 0.8c guard makes the wrong-path case a route rather than a failure: when `KICKOFF_NEEDED` fires against a directory with no `.claude/*.template` files, it does not run Kick-off (which would mis-register the directory as a hub) and instead points the user to `/dsm-new-spoke`. Spoke-vs-mirror is a user intent, not a directory property, so the skill invocation is the intent signal; DSM_0.2.A §25.7 documents the distinction at the §25 entry point.
-  **Spoke action:** none required — `/dsm-new-spoke` is a new command, available user-level wherever `scripts/sync-commands.sh --deploy` has run and arriving on mirror clones at the next sync; it is then available for bootstrapping further spokes.
-
-## [1.28.0] - 2026-10-09
-
-Minor: a review-cost bound and a prune mechanism for the ecosystem reasoning-lessons aggregation file, which had grown unbounded (BACKLOG-567). The bound is an honest long-term target — the build confirmed the file is mostly irreducible cross-project value, so it is approached as lessons get codified, not by one-shot pruning.
-
-### Added
-
-- **Review-cost bound + STAA prune for the ecosystem reasoning-lessons file (BACKLOG-567, DSM_0.2.A §8.3, `/dsm-staa` Step 7b).** `dsm-docs/reasoning-lessons-ecosystem.md` — the cross-project lesson aggregation (not boot-read, not mirrored) — had conventions for attribution/dedup/escalation but no size bound and no prune, and had grown to ~196 KB, larger than the boot-primed local file it feeds. §8.3 now states a soft ~120 KB review-cost bound (explicitly NOT §8.1's boot-priming bound), a per-entry ~600-char body-only ceiling, STAA as prune owner at STAA-run cadence, and a three-action prune set (archive-on-codification / consolidate-cross-spoke-duplicates / tombstone-dead-project), each leaving a tombstone so no lesson is silently dropped. `/dsm-staa` gains Step 7b to run the prune when the file is over bound — editing the one tracked file it touches while still committing nothing (the next wrap-up commits), and a no-op on spokes (the file is Central-only). The ~120 KB figure is a long-term target: a build-time prune confirmed archival (−3 KB) and compression (≤9 KB) cannot cross the ~175 KB irreducible floor of still-valuable entries, so the file approaches the bound only as lessons get codified into protocols over time. Build also walked one over-bound prune (6 archived + 1 consolidated, every tombstone citing a verified destination).
-  **Spoke action:** none — the bound and prune govern a Central-only, non-mirrored aggregation file; the `/dsm-staa` Step 7b change arrives with the next mirror sync and deploys via `sync-commands.sh --deploy` (and is a no-op where the aggregation file is absent).
-
-## [1.27.2] - 2026-10-08
-
-Patch: two report-only active-BL-hygiene audits added to `/dsm-align` (Central-only), closing the gap where a filed backlog item can sit open-and-invisible, or a completed design can stay mis-statused as active, with nothing checking.
-
-### Added
-
-- **Active-index currency audit, both directions (BACKLOG-557, `/dsm-align` Step 11d).** The active backlog index (`dsm-docs/plans/README.md`) had no currency check, so a BL file with no index row was invisible to every planning pass and `/dsm-go` Step 8 — BACKLOG-333/354 sat that way ~5 months. Step 11d set-differences active BL files against README rows across both active trees (`plans/` + `plan/backlog/developments/`); an unindexed file and a dead link (a row whose linked file does not resolve) are reported distinctly. Report-only, silent when clean (§8.9.2), empty-guarded. Absorbs BACKLOG-498's active-README dead-link criterion (one index, two directions).
-  **Spoke action:** none — Central-only audit; the updated `/dsm-align` arrives with the next mirror sync and deploys via `sync-commands.sh --deploy`.
-- **Decision-record completion vs active-BL status audit (BACKLOG-580, `/dsm-align` Step 11e).** A design/formalize BL whose decision record is marked complete could stay `Proposed` and listed active indefinitely (BACKLOG-558 did, ~10 sessions). Step 11e cross-references `dsm-docs/decisions/` completion markers (a `**Status:**…complete` keyed to a `**Backlog:**` subject) against active-BL status, reporting any BL marked resolved in a record but still in `plans/`. Best-effort (keyed on an explicit marker, not a bare BL mention, so a multi-BL policy record flags none); report-only, silent when clean. The third axis of active-BL hygiene (498 = done-index membership, 557 = active-index membership, 580 = status-vs-evidence).
-  **Spoke action:** none — Central-only audit; arrives with the next mirror sync.
-
-## [1.27.1] - 2026-10-08
-
-Patch: two methodology corrections — a portability fix to the canonical compact-mirror date transform, and a Cloned-Mirror Kick-off step-count drift fix. Both trivial, no behavior change beyond the corrected output.
-
-### Fixed
-
-- **Compact-mirror date transform used GNU-only `%:z` (BACKLOG-579, DSM_0.2.A §8.1).** The canonical regeneration transform (BL-447 single source of truth) formatted timestamps with `date +...%:z`, a GNU extension; on macOS/BSD `date` it emits a literal `:z` and drops the offset, writing a malformed timezone into the compact mirror's `**Last regenerated:**` / `**Source mtime at regeneration:**` headers. Replaced with the portable `%z` at both occurrences (offset format `+02:00` → `+0200`, both valid ISO-8601; the Step 1.5 staleness check compares at minute recency and is unaffected). Fixing the single canonical block fixes all three consuming skills (`/dsm-wrap-up` Step 0, `/dsm-quick-wrap-up` Step 0, `/dsm-staa` Step 8). Reported upstream as take-ai-bite issue #121 by an external contributor; fix verified on macOS Darwin 25.5.0.
-  **Spoke action:** none required — the corrected transform arrives with the next mirror sync; macOS/BSD spokes stop writing the malformed offset once re-synced.
-- **Cloned-Mirror Kick-off step-count drift: "14-step" → "15-step" (no BL, trivial).** §25.2 is canonically 15 numbered steps (step 14 = write marker, step 15 = report completion + readiness checklist); three stale references said "14-step": `DSM_0.2.A:2571`, `DSM_7.0:209`, and `scripts/commands/dsm-go.md:273`. Corrected with a `grep -rn '14-step'` sweep confirming no further sibling. The correct sites (`DSM_0.2.A:2640` "15-step", `:2648` "§25.2 step 14") were left untouched. Dropped §22 Prevent step recorded in S272's STAA notes, now actioned.
-  **Spoke action:** the corrected `/dsm-go` deploys via `sync-commands.sh --deploy`; documentation-only otherwise.
-
-## [1.27.0] - 2026-10-06
-
-Minor: adds a core egress-safety rule and a `/dsm-staa` PII safeguard (both from sensitive-data spoke experience), plus a cluster of Cloned-Mirror Kick-off / fork-init improvements. Resolves take-ai-bite issues #118, #119, and #113; #117 (new-spoke bootstrap) has a recorded design pass and is deferred to its own release.
-
-### Added
-
-- **Egress Leak-Scan Generic Reporting Rule (BACKLOG-571, DSM_0.2.C §5.8 + a §7 pointer).** A scan of an egress artifact (the worklog, `MEMORY.md`, the reasoning-lessons files) for sensitive data must report generically ("scan clean", or "N matches at lines X–Y") and never echo a matched value, or a scan/grep pattern containing it, into those append-only files; a pre-existing leak is flagged by line number for the scrub, never reproduced. An always-loaded §7 DO-NOT pointer keeps it visible at the transcript. Resolves #118.
-  **Spoke action:** none required — the rule is inherited through the `@` reference; sensitive-data spokes should point their PII-handling references at §5.8.
-- **`/dsm-staa` PII/egress safeguard (BACKLOG-572, `/dsm-staa`, core §7).** The analysis command gains an IMPORTANT block requiring name-free (role-not-name) excerpts and lessons, a statement of the reasoning-lessons propagation chain (wrap-up push + boot read), and a scrub-before-analyse recommendation for projects with a PII/egress policy; core §7's STAA-exception clause now points to it. Resolves #119.
-  **Spoke action:** the updated `/dsm-staa` arrives with the next mirror sync and deploys via `sync-commands.sh --deploy`.
-- **Fork-init readiness checklist at Cloned-Mirror Kick-off (BACKLOG-577, DSM_0.2.A §25.2 step 15 + `/dsm-go` Step 0.8d).** Kick-off now ends by listing the environment tools the boot gates depend on (`git`, `gh`) with present/absent status, report-only. Part of #113.
-  **Spoke action:** the updated `/dsm-go` deploys via `sync-commands.sh --deploy`.
-
-### Changed
-
-- **Cloned-Mirror Kick-off `.git/info/exclude` handling (BACKLOG-573, DSM_0.2.A §25.2 step 12 + §25.5, `/dsm-go` Step 0.8c).** When the `.claude/` blanket ignore rule is absent on a fresh fork and generated files show as untracked, Kick-off now PRINTS the exact line for the user to add themselves — it still never edits `.git/info/exclude`, so §25.3's anti-requirement holds (printing is not editing). Part of #113.
-  **Spoke action:** the updated `/dsm-go` deploys via `sync-commands.sh --deploy`.
-- **`sync-commands.sh --check` orphan wording is mirror-aware (BACKLOG-575).** On a mirror or fresh clone the tracked `.claude/commands/dsm-*.md` copies are load-bearing, so the check no longer labels them "ORPHANED … Delete"; the Central (hub) wording and the exit behavior are unchanged. Part of #113.
-  **Spoke action:** none — `sync-commands.sh` arrives with the next mirror sync.
-
-### Fixed
-
-- **Non-executable cross-repo-write guard on the mirror (BACKLOG-574).** The mirror's `.claude/hooks/validate-cross-repo-write.sh` shipped as mode 644 while its siblings were 755, leaving the cross-repo-write guard dead on a fresh fork until the first chmod; the committed mode is corrected to 755 at the mirror. Part of #113.
-  **Spoke action:** none — the corrected mode arrives with the mirror sync.
-
-Also: BACKLOG-576 (#113 template placeholders) was found already resolved in the corpus (DSM_0.2.A §25.2 step 5) and needs no change; BACKLOG-578 (#117 new-spoke bootstrap) carries a design pass and is held for its own release.
-
-## [1.26.8] - 2026-10-05
-
-Patch: two correctness fixes to session-lifecycle commands — the `/dsm-go` stale-branch cleanup now surfaces (instead of silently skipping) a main-merged branch whose upstream lags, and the wrap-up mirror self-detection guard no longer misclassifies every spoke as a mirror and drops its inbox.
-
-### Fixed
-
-- **`git branch -d` merge-criterion wording and the `/dsm-go` stale-cleanup silent-skip (BACKLOG-565, DSM_0.2 §20.4, `/dsm-go` Step 0d).** DSM_0.2 §20.4 described `git branch -d`'s guard as refusing "a commit not in its base"; the criterion `-d` actually tests is the branch's upstream (or `HEAD` if none), now corrected. Operationally, the stale-branch cleanup selected branches already merged to main and ran `git branch -d`, but a `-d` refusal was skipped silently — and because `-d` tests the upstream, a branch genuinely merged to main whose upstream ref lags refuses and was swallowed, so it was never cleaned. The cleanup now surfaces such a branch as a leftover rather than skipping it; `-D` is never introduced.
-  **Spoke action:** The updated `/dsm-go` arrives with the next mirror sync and deploys via `sync-commands.sh --deploy`.
-- **Wrap-up mirror self-detection guard classified every spoke as a mirror (BACKLOG-566, `/dsm-wrap-up` Step 9, `/dsm-quick-wrap-up` Step 7).** Both guards excluded a repo's `_inbox/*` from the wrap-up commit whenever `scripts/take-ai-bite-sync.txt` was absent, reading that absence as "this repo is a mirror." Every spoke also lacks that file, so every spoke was placed in the mirror branch and its tracked `_inbox` renames were dropped from the commit while logged as deliberate skips (a wrong result that looked exactly like a right one). Replaced with a role-signal predicate (DSM_0.2.A §25.1): a repo is the read-only public mirror only when it has no sync file AND no `dsm-central` row; Central, a git clone of Central, a spoke, and a self-registered clone all stage their own `_inbox` normally. The identical block lands in both skills.
-  **Spoke action:** The updated wrap-up skills arrive with the next mirror sync and deploy via `sync-commands.sh --deploy`; a spoke that tracks and processes its `_inbox` now stages it correctly at wrap-up.
-
-## [1.26.7] - 2026-10-05
-
-Patch: a boot-time assertion that the FEATURES/README feature count matches the actual number of entries, so the count cannot silently drift onto main or the public mirror.
-
-### Added
-
-- **FEATURES/README count-equality assertion — `/dsm-go` Step 2f (BACKLOG-569).** Session start now recomputes the actual F-entry count and compares it against the `FEATURES.md` `**Current count:**` header and the README's "N features" line, reporting a mismatch that names all three numbers (header claim, README claim, measured count) and staying silent/OK when they agree. It is the count-side sibling of the Step 2e notification reconciliation: the notification half of FEATURES maintenance had a guard, the count half had none, so a release that added entries without bumping the header (the S268 → S269 drift this closes) sat wrong on main and the public mirror until a later session happened to measure. Report-not-block, every session; placement at the boot was chosen over wrap-up because an autonomous wrap-up would log a mismatch and still proceed to ship it. The recompute-and-correct is surfaced like any other boot finding.
-  **Spoke action:** The updated `/dsm-go` arrives with the next mirror sync and deploys via `sync-commands.sh --deploy`. Once present it reports the count check at every boot and, if your `FEATURES.md`/README feature counts have drifted, flags them with both the claimed and the measured number.
-
-## [1.26.6] - 2026-10-02
-
-Patch: a review flag for the always-loaded memory file's permanent (evergreen) zone, plus a correction to a feature count that had drifted.
-
-### Added
-
-- **Evergreen-zone review flag — `/dsm-wrap-up` Step 2.4a (BACKLOG-568).** Wrap-up now measures the MEMORY.md evergreen zone (the bytes above the sessions-zone marker, the complement of the BACKLOG-544 tiering check) and raises a non-blocking flag when it exceeds a soft ~6 KB target. After the tiering machinery drains the sessions zone, the evergreen zone becomes the dominant and only-growing half of the always-loaded cost, and nothing watched it. The flag recommends a judgement-executed review — trim resolved lines, or promote durable-but-not-boot-critical lines to CLAUDE.md, a guide, or `MEMORY-long-term.md` and then remove them (promote before remove, never a silent drop) — but performs no automatic move, because the evergreen zone has no timestamp groups to age and is high-value always-loaded context.
-  **Spoke action:** The updated wrap-up skill arrives with the next mirror sync and deploys via `sync-commands.sh --deploy`. Once present it reports the evergreen size at every wrap-up and flags when your `MEMORY.md` evergreen zone exceeds ~6 KB; the trim/promote is yours to perform by judgement.
-
-### Fixed
-
-- **FEATURES.md and README feature count had drifted (surfaced at the S269 boot; BACKLOG-569 is the prevent).** The v1.26.5 release added two F-entries (F-177, F-178) without bumping the FEATURES "Current count" header or the README's mirrored count, so both read 177 against 179 actual entries. The counts are corrected, and with F-179 added this release they now read 180.
-
-### Spawned
-
-- **BACKLOG-569** (Medium): assert the FEATURES "Current count" equals the actual F-entry count at wrap-up/release so the count cannot silently drift again — the prevent half of the §22 response to the stale count this release fixes.
-
-## [1.26.5] - 2026-10-01
-
-Patch: two flow controls on the always-loaded boot context — a per-entry size ceiling plus a codified split for the reasoning-lessons file, and generational memory-tiering skills that keep MEMORY.md lean across sessions.
-
-### Added
-
-- **Generational memory tiering — `/dsm-memory-decommission` and `/dsm-memory-archive` skills (BACKLOG-544).** Two move-only skills age session-tagged content down a three-tier chain: `MEMORY.md` (always loaded) → `MEMORY-long-term.md` (on demand) → `MEMORY-archived.md` (deepest). They auto-run at wrap-up when a tier is over threshold and move the oldest session group whole, never touching the evergreen zone, with a backup and before/after validation. The decommission trigger is on the sessions-zone size (~4 KB), not total `MEMORY.md`, because the evergreen zone alone can exceed a small total target.
-  **Spoke action:** The two commands arrive with the next mirror sync and deploy via `sync-commands.sh --deploy`. Once present they auto-run at your wrap-up when your `MEMORY.md` sessions zone exceeds ~4 KB; no manual step is required.
-- **Soft per-entry size ceiling on reasoning lessons (BACKLOG-495), DSM_0.2.A §8 Maintenance.** Each lesson entry targets ~600 characters of body text — the figure that keeps the 100-entry count target and the 61,440 B byte bound mutually reachable. The ceiling is soft: an over-length entry is compressed or split into two cross-referenced entries, never silently dropped.
-  **Spoke action:** The ceiling applies to your own local reasoning-lessons file; it arrives with the next mirror sync. Existing entries are not retrofitted — it governs new entries at `/dsm-wrap-up` and `/dsm-staa`.
-
-### Changed
-
-- **The ecosystem-split flow control is codified (BACKLOG-495), DSM_0.2.A §8.2.** At DSM Central, an `ecosystem`-scope lesson from `/dsm-wrap-up` is written to the aggregation file and withheld from the local boot-primed file (which the aggregation file already carries for redistribution); a `/dsm-staa`-measured ecosystem lesson may stay local when it is high-value for boot priming. This was existing practice; it is now a stated rule rather than an emergent one.
-  **Spoke action:** None. This rule governs Central's own split; a spoke's local lessons file is its only one.
-
 ## [1.26.4] - 2026-09-30
 
 Patch: the public mirror's provenance corpus is de-identified — no specific project, client, or spoke name reaches it — and the standing rule that keeps it that way is codified as methodology.
@@ -377,7 +78,7 @@ Minor rather than patch: four new `DSM_0.2.*` module files are the "New DSM sect
 
 ### Fixed
 
-- **A wording pattern in the always-loaded reinforcement block correlated with a model-side session-start refusal on newer models (BL-543).** Sessions on the newest model family began failing at boot. The cause was **semantic and highly local**: one imperative phrasing in the Worklog *reinforcement* block, in `.claude/CLAUDE.md` and in the §17.1 base template, read to a model-side safeguard as a request of a kind it declines. It was **not** a size or threshold problem, and the evidence for that is the part worth keeping: three successive context reductions, one of them below a size already measured as clean, all still failed, and removing that single block cleared it. Localized by **manual ablation** after the mass hypothesis had been pursued and disproven. The fix rewords the block to the protocol's own native vocabulary, work notes and plan, which is what the block always meant.
+- **A wording pattern in the always-loaded reinforcement block correlated with a model-side session-start refusal on newer models (BL-543).** Sessions on the newest model family began failing at boot. The cause was **semantic and highly local**: one imperative phrasing in the Session Transcript *reinforcement* block, in `.claude/CLAUDE.md` and in the §17.1 base template, read to a model-side safeguard as a request of a kind it declines. It was **not** a size or threshold problem, and the evidence for that is the part worth keeping: three successive context reductions, one of them below a size already measured as clean, all still failed, and removing that single block cleared it. Localized by **manual ablation** after the mass hypothesis had been pursued and disproven. The fix rewords the block to the protocol's own native vocabulary, work notes and plan, which is what the block always meant.
   **Spoke action:** Run `/dsm-align`. **This is the only entry in this release that requires it:** the reword lands inside the §17.1 base template, so a spoke's reinforcement block keeps the old phrasing until it realigns.
   A standing practice comes with it and is stated here because it outlives the fix: the phrasing that triggers a model-side safeguard must never be written into a file that is loaded at session start, since the memory and handoff machinery propagates recorded phrases into exactly those surfaces, which is how this one reproduced itself across sessions. Verbatim detail is quarantined to a research log that no boot reads. The robustness follow-up is filed as BACKLOG-545.
 
@@ -548,7 +249,7 @@ Minor rather than patch: BL-531 and BL-520 each add a new DSM_0.2 section, which
 
 ### Changed
 
-- **DSM_0.2 §17.1: the punctuation rule now states which files it governs (BL-505).** The em-dash-to-comma rule applied everywhere by default, which put worklogs, reasoning-lessons files and other private runtime artifacts under the same obligation as published methodology. Scope is now keyed on **readership**: the rule governs files that reach a public repository, which for a project with a public mirror is the set the mirror-sync manifest carries, and for a project that is itself public is every tracked file. Files living only inside a private repository, and gitignored files anywhere, are exempt. The predicate is deliberately readership rather than `agent-consumed`, because published methodology documents are read by agents too and that test fails to discriminate. Exempt is not forbidden: an exempt file may still be normalized as a one-time tidy.
+- **DSM_0.2 §17.1: the punctuation rule now states which files it governs (BL-505).** The em-dash-to-comma rule applied everywhere by default, which put session transcripts, reasoning-lessons files and other private runtime artifacts under the same obligation as published methodology. Scope is now keyed on **readership**: the rule governs files that reach a public repository, which for a project with a public mirror is the set the mirror-sync manifest carries, and for a project that is itself public is every tracked file. Files living only inside a private repository, and gitignored files anywhere, are exempt. The predicate is deliberately readership rather than `agent-consumed`, because published methodology documents are read by agents too and that test fails to discriminate. Exempt is not forbidden: an exempt file may still be normalized as a one-time tidy.
   **Spoke action:** Run `/dsm-align` to pick up the revised §17.1 alignment block.
 
 ### Fixed
@@ -766,7 +467,7 @@ Four sibling BLs filed in S211 implemented in S212 as a coherent silent-failure 
 
 ### Fixed
 
-- **BL-449:** Forbid Edit `replace_all: true` on `.claude/worklog.md`. The append-anchor rule assumes a unique last-line anchor; `replace_all` duplicates content at every match and explodes the file (S17: 95 MB / 1.5M lines; S22: Output block duplicated). `validate-transcript-edit.sh` gains a Check 0 that blocks the case before the anchor/append/delimiter checks, naming the `[RETROACTIVE]` Bash-heredoc recovery path. Prohibition added to DSM_0.2 §7 anti-patterns + §17.1 template + CLAUDE.md. Size-anomaly detection deferred per the BL risk note (deterministic `replace_all` block is the high-value guard).
+- **BL-449:** Forbid Edit `replace_all: true` on `.claude/session-transcript.md`. The append-anchor rule assumes a unique last-line anchor; `replace_all` duplicates content at every match and explodes the file (S17: 95 MB / 1.5M lines; S22: Output block duplicated). `validate-transcript-edit.sh` gains a Check 0 that blocks the case before the anchor/append/delimiter checks, naming the `[RETROACTIVE]` Bash-heredoc recovery path. Prohibition added to DSM_0.2 §7 anti-patterns + §17.1 template + CLAUDE.md. Size-anomaly detection deferred per the BL risk note (deterministic `replace_all` block is the high-value guard).
   **Spoke action:** Run `/dsm-align` (§7/§17.1 + hook); spokes re-`chmod` the synced hook at next `/dsm-go` Step 0e.
 
 ### Spawned
@@ -789,7 +490,7 @@ Three BLs implemented in S211 from a 5-spoke inbox triage, all silent-failure / 
 ### Spawned
 
 - **BL-448** (Medium): cross-repo writes must be write-only, no git operations in the target repo.
-- **BL-449** (Medium): forbid `replace_all` on `worklog.md` Edits + `validate-transcript-edit.sh` anomaly detection.
+- **BL-449** (Medium): forbid `replace_all` on `session-transcript.md` Edits + `validate-transcript-edit.sh` anomaly detection.
 - **BL-450** (Medium): `/dsm-wrap-up` Step 0.5 pre-confirm known cross-repo targets (avoid BL-391 hook fragmenting the wrap-up).
 - **BL-451** (Medium): inbox-done lifecycle, collision-safe dated `done/` filenames.
 
@@ -852,7 +553,7 @@ No new BLs spawned by this version. All 6 BLs in §1.9.0 came FROM external spok
   - **Spoke action:** Run `sync-commands.sh --deploy` to update runtime copies. Next wrap-up creates a checkpoint instead of carrying pending items in MEMORY.md.
 - **BL-413: /dsm-go context efficiency improvements.** Three changes reducing Sonnet session-start context consumption: (1) Step 0e unconditional `chmod +x hooks`, (2) Step 1.8 conditional `/dsm-align` on version diff (with FORCE_ALIGN override for incomplete scaffold), (3) Step 2b inbox lazy-load (filenames only, content deferred to user request). Estimated 40-55% context savings on version-match sessions.
   - **Spoke action:** Run `sync-commands.sh --deploy`. Next `/dsm-go` skips `/dsm-align` when version matches and reads inbox filenames only.
-- **BL-410: Agent and Model identity in worklog header.** `/dsm-go` Step 6 now appends `**Agent:**` and `**Model:**` fields (mandatory) with optional `**Effort:** / **Thinking:** / **Fast mode:**` fields when retrievable. Agent-agnostic schema; `(self-reported)` suffix when introspection is uncertain.
+- **BL-410: Agent and Model identity in session-transcript header.** `/dsm-go` Step 6 now appends `**Agent:**` and `**Model:**` fields (mandatory) with optional `**Effort:** / **Thinking:** / **Fast mode:**` fields when retrievable. Agent-agnostic schema; `(self-reported)` suffix when introspection is uncertain.
 - **BL-408: Hello-world welcome inbox template (`.claude/_inbox-hello-world.template`).** Fresh mirror clones receive a welcome entry on Kick-off explaining the inbox mechanism and DSM ecosystem navigation.
 - **BL-407: Mirror-sync inbox write guard.** Two-layer guard in `/dsm-wrap-up` Step 8d (pre-sync) and Step 9 (mirror self-detection, via `scripts/take-ai-bite-sync.txt` absence) excludes `_inbox/*` paths (except README.md and .gitkeep) from mirror stage-sets. Prevents past failure mode where Central wrap-up wrote notification files into mirror tracked `_inbox/` paths, polluting every fresh clone.
 - **BL-406: Parallel-sessions registry stale-active GC.** `/dsm-wrap-up` Step 11.5 now runs a 3-phase cleanup (corrupted-entry pruning, stale-active GC via PID + branch signals, all-wrapped file deletion) on `.claude/parallel-sessions.txt`. Decision table determines safe-to-GC (process dead + branch merged) vs retain-for-inspection.
@@ -1139,7 +840,7 @@ None. Neither BL-349 nor BL-350 produced follow-up BLs this session.
 - **BACKLOG-331:** Light-go switch-flow recovery and DSM_0.2 §7 hardening (4 sub-items in one BL).
   - Switch-flow guarantee in `scripts/commands/dsm-light-go.md` Safety Gate handoff text + `scripts/commands/dsm-go.md` Step 6 no-skip rule for deferral entries. Closes the S69 failure mode (~6 turns with zero transcript appends after `/dsm-light-go` → `/dsm-go` switch dropped Step 6).
   - **Spoke action:** Run `sync-commands.sh --deploy` to update the runtime copies of `dsm-go` and `dsm-light-go`.
-  - Unconditional activation rule in DSM_0.2 §7 + §17.1 base template + Central `.claude/CLAUDE.md`: "if `.claude/worklog.md` exists in the project, the protocol is active". Third independent enforcement layer alongside the per-turn hook (occurrence) and PreToolUse shape validator.
+  - Unconditional activation rule in DSM_0.2 §7 + §17.1 base template + Central `.claude/CLAUDE.md`: "if `.claude/session-transcript.md` exists in the project, the protocol is active". Third independent enforcement layer alongside the per-turn hook (occurrence) and PreToolUse shape validator.
   - **Spoke action:** Run `/dsm-align` to propagate the unconditional activation bullet to spoke CLAUDE.md alignment blocks.
   - Heredoc anti-pattern in DSM_0.2 §7 Anti-Patterns + §17.1 + alignment block + inline warning in `dsm-go.md` Step 6: never use single-quoted heredoc (`<< 'EOF'`) when content contains `$(date +%H:%M)` or other shell expansions; capture timestamp into a variable and use unquoted heredoc, or prefer the Edit-tool append path.
   - **Spoke action:** Run `/dsm-align` to propagate the heredoc anti-pattern bullet to spokes.
@@ -1228,7 +929,7 @@ None this version.
   does not.
   **Spoke action:** Review §7 for the new Process Narration for Reasoning
   Efficiency Analysis subsection.
-- §17.1 base template Worklog reinforcement block: two new
+- §17.1 base template Session Transcript reinforcement block: two new
   bullets propagating per-turn enforcement, turn-boundary self-check,
   and process narration to all spokes.
   **Spoke action:** Run `/dsm-align` to update the §17.1 reinforcement
@@ -1430,7 +1131,7 @@ None this version.
 
 ### Changed - Session 161 Protocol Improvements (BL-292, BL-293, BL-296)
 
-- §6 renamed to Worklog Delimiter Format, 3 universal typed delimiters (BL-292)
+- §6 renamed to Session Transcript Delimiter Format, 3 universal typed delimiters (BL-292)
   **Spoke action:** Run `/dsm-align` to update reinforcement block
 - Stale branch cleanup at session start: `/dsm-go` Step 0d, `/dsm-light-go` Step 1.6 (BL-293)
 - CHANGELOG spoke action annotation convention §2.1, version check enhancement (BL-296)
@@ -1607,7 +1308,7 @@ None this version.
   - `DSM_0.2.B_Artifact_Creation.md` (360 lines): composition challenge, edit explanation stop, enabling file content, notebook collaboration, notebook-to-script, app development, revert safeguards
   - `DSM_0.2.C_Security_Safety.md` (242 lines): secret exposure, destructive action, untrusted input, query sanitization
   - `DSM_0.2.D_Research_Onboarding.md` (437 lines): breaking change notification, external DSM descriptions, step 0 situational assessment, phase 0.5 research, environment preflight, first session prompt, phase-to-DSM mapping, command file version tracking
-- Core retains: project type detection, inbox check, version check, read-only access, reasoning delimiter, worklog, pre-generation brief, context budget, inclusive language, CLAUDE.md configuration, AI collaboration principles, ecosystem path registry
+- Core retains: project type detection, inbox check, version check, read-only access, reasoning delimiter, session transcript, pre-generation brief, context budget, inclusive language, CLAUDE.md configuration, AI collaboration principles, ecosystem path registry
 - Module Dispatch Table maps 28 protocols to their modules with trigger conditions
 - 78% reduction in always-loaded context (2,625 → 577 lines)
 
@@ -1821,7 +1522,7 @@ None this version.
 
 ### Added - BL-156 Phase 3 Partial: Take AI Bite Spoke Configuration
 
-- Take AI Bite `.claude/CLAUDE.md`: spoke project configuration with Documentation (DSM 5.0) / Standard Spoke pattern, Protocol Applicability table, content sync workflow, public-facing content rules (DSM acronym disambiguation), Worklog and Pre-Generation Brief reinforcement blocks
+- Take AI Bite `.claude/CLAUDE.md`: spoke project configuration with Documentation (DSM 5.0) / Standard Spoke pattern, Protocol Applicability table, content sync workflow, public-facing content rules (DSM acronym disambiguation), Session Transcript and Pre-Generation Brief reinforcement blocks
 - DSM_3 Section 7 Project Registry: added Take AI Bite entry ("Public-facing framework distribution, curated DSM subset for external adoption")
 - DSM_3 Section 7: spoke metrics refreshed (218 -> 471 tests, Sprint 11)
 - 3 new backlog items from spoke feedback: BL-179 (Lightweight Chain Resilience), BL-180 (Sprint Alignment Review at Boundary), BL-181 (Sprint Boundary Hub/Portfolio Notification)
@@ -1887,7 +1588,7 @@ None this version.
 ### Added - Lightweight Session Lifecycle (BACKLOG-151) + Per-Session Feedback (BACKLOG-153 Phase 1)
 
 - DSM_0.2 Lightweight Session Lifecycle: new protocol section documenting the lightweight mode, safety gate, deferred-items pattern, and transcript behavior for continuation sessions with known tasks
-- DSM_0.2 Worklog Protocol: updated lifecycle paragraph with lightweight mode exception (transcript persists, boundary marker appended instead of overwritten)
+- DSM_0.2 Session Transcript Protocol: updated lifecycle paragraph with lightweight mode exception (transcript persists, boundary marker appended instead of overwritten)
 - DSM_0.2 Command File Version Tracking: added `dsm-light-go` and `dsm-light-wrap-up` to user-level command listing
 - `/dsm-go` and `/dsm-light-go`: checkpoint consumption at session start (read, annotate, move to done/) prevents checkpoint accumulation
 - `/dsm-wrap-up` and `/dsm-quick-wrap-up`: parallelism hints for independent startup steps, MEMORY.md context notes, cross-references between variants
@@ -2046,7 +1747,7 @@ None this version.
 - Ecosystem Path Registry: `.claude/dsm-ecosystem.md` replaces hardcoded cross-repo paths with configurable logical name -> path mappings
 - New DSM_0.2 section: Ecosystem Path Registry (consumption, logical names, fallback behavior, validation)
 - `/dsm-go` Step 2a.5: reads and validates registry at session start; warns on missing paths
-- `/dsm-go` Step 6.7: STAA reminder when worklog is archived (BL-126 enhancement)
+- `/dsm-go` Step 6.7: STAA reminder when session transcript is archived (BL-126 enhancement)
 - `/dsm-wrap-up` Step 1b: uses registry for portfolio inbox path instead of hardcoded path
 - DSM_0.2 README Change Notification: portfolio target uses `{portfolio-path}` from registry
 - DSM_3: hub and governance references use registry instead of hardcoded absolute paths
@@ -2057,9 +1758,9 @@ None this version.
 ### Added - Reasoning Lessons Experiment (BACKLOG-126)
 
 - Reasoning Lessons extraction: `[auto]` tagged entries extracted at CA wrap-up, `[STAA]` tagged entries from dedicated analysis sessions
-- `/dsm-staa` command: Worklog Analysis Agent for deep transcript review without creating its own transcript (avoids recursion)
+- `/dsm-staa` command: Session Transcript Analysis Agent for deep transcript review without creating its own transcript (avoids recursion)
 - `/dsm-go` Step 1.5: reads `.claude/reasoning-lessons.md` at session start to prime with accumulated patterns
-- `/dsm-go` Step 6.5: archives previous worklog to `.claude/transcripts/{timestamp}-ST.md` before reset
+- `/dsm-go` Step 6.5: archives previous session transcript to `.claude/transcripts/{timestamp}-ST.md` before reset
 - `/dsm-wrap-up` and `/dsm-quick-wrap-up` Step 0: scans transcript for notable reasoning patterns before other wrap-up steps
 - 10-session experiment (Sessions 51-61) comparing lightweight automated extraction vs full STAA analysis
 

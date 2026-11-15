@@ -1,0 +1,1 @@
+This is just a test message to check if the inbox is working properly. If you can see this message, then everything is set up correctly!

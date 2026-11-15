@@ -116,7 +116,7 @@ assembly of information from multiple sources.
 | /dsm-parallel-session-go | Context isolation | Creates independent branch and baseline; scoped context for parallel work |
 | /dsm-parallel-session-wrap-up | Context merge | Merges isolated work back; completes BL lifecycle; updates shared state |
 | /dsm-align | Template synchronization | Validates CLAUDE.md alignment, ecosystem paths, inbox structure |
-| /dsm-staa | Retrospective analysis | Analyzes worklog for reasoning patterns and improvement signals |
+| /dsm-staa | Retrospective analysis | Analyzes session transcript for reasoning patterns and improvement signals |
 | /dsm-checkpoint | Milestone snapshot | Captures current state for future session resumption |
 | /dsm-version-update | Release management | Versions, tags, syncs methodology changes across ecosystem |
 
@@ -193,7 +193,7 @@ each with a different time horizon and purpose.
 
 | Layer | Artifact | Time Horizon | Purpose |
 |-------|----------|-------------|---------|
-| Session state | Worklog | Current session | Real-time reasoning record |
+| Session state | Session transcript | Current session | Real-time reasoning record |
 | Session bridge | Checkpoints, handoffs | Between sessions | Task continuity across session boundaries |
 | Project memory | MEMORY.md | Months | Accumulated project knowledge and patterns |
 | Ecosystem memory | Reasoning lessons | Months to years | Cross-session heuristics and failure patterns |
@@ -203,7 +203,7 @@ each with a different time horizon and purpose.
 
 Each memory layer has different decay characteristics:
 
-- **Worklog:** Ephemeral; overwritten each full session. Not committed.
+- **Session transcript:** Ephemeral; overwritten each full session. Not committed.
 - **Checkpoints:** Consumed and moved to done/ at the next session start.
   Short-lived by design.
 - **Handoffs:** Persist until superseded by the next handoff. Medium-lived.
@@ -284,7 +284,7 @@ Sources and change history for this module.
 
 - DSM_6.1: Systems Prompt Engineering (parent document)
 - DSM_0.2 §3: Session-Start Inbox Check
-- DSM_0.2 §7: Worklog Protocol
+- DSM_0.2 §7: Session Transcript Protocol
 - DSM_0.2 §11: Context Budget Protocol
 - DSM_0.2 §18: Ecosystem Path Registry
 - DSM_0.2 §22: Protocol Violation Triage Response

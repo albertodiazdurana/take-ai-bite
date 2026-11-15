@@ -13,7 +13,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 
 **Steps 0, 1, 2, and 2.5 are independent and can run in parallel.**
 
-0. **Extract reasoning lessons:** Scan `.claude/worklog.md` for notable reasoning patterns from this session. For each notable entry, append a 1-2 line summary to `.claude/reasoning-lessons.md` under the appropriate category, tagged `[auto]`. Notable entries include:
+0. **Extract reasoning lessons:** Scan `.claude/session-transcript.md` for notable reasoning patterns from this session. For each notable entry, append a 1-2 line summary to `.claude/reasoning-lessons.md` under the appropriate category, tagged `[auto]`. Notable entries include:
    - Mistakes caught mid-reasoning (course corrections)
    - Decision heuristics that worked or failed
    - Efficiency observations (ordering, batching, parallelism)
@@ -22,10 +22,10 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    If no notable entries exist, skip the extraction. If `.claude/reasoning-lessons.md` does not exist, skip this step entirely (protocol not active for this project).
    **Format:** `- [auto] S{N} [{scope}]: {lesson text}` (where N is the session number)
    **Scope classification:** For each extracted lesson, assign a scope label per the Reasoning Lessons Protocol (DSM_0.2 Module A): `ecosystem`, `pattern`, or `project`. The agent assigns scope based on whether the lesson is domain-specific or generalizable.
-   **STAA recommendation:** After extracting, assess whether this session warrants deeper STAA analysis. Recommend STAA when the session involved complex multi-option decisions, entered unfamiliar territory (new domain, tool, or pattern), the auto extraction felt incomplete (rich reasoning that resists summarization), or a course correction occurred that may represent a recurring pattern. Output: "STAA recommended: [yes/no]. [1-sentence reason]." Also report how many `ecosystem`/`pattern` lessons are not yet shared: run `/dsm-staa` Step 8b's candidate snippet (sub-step 2, with `ROLE` set as in sub-step 1) and output "Lessons not yet shared: N (shared only through `/dsm-staa` Step 8b)." **Invocation:** STAA must be run in a separate Claude Code conversation. Do not wrap it in `/dsm-go` or `/dsm-parallel-session-go`. Enter `/dsm-staa` directly.
-   **Lessons stay local (BACKLOG-606):** wrap-up sends no lesson to another project; sharing with the hub happens only through `/dsm-staa` Step 8b, after the user approves each lesson (DSM_0.2.A §8.3). **At a hub** (`/dsm-go` Step 0.8a token `CENTRAL` or `KICKOFF_DONE`), add this session's `[auto]` `ecosystem`/`pattern` lessons to `dsm-docs/reasoning-lessons-ecosystem.md` as `- [auto] S{N} {project} [{scope}]: {text}`. At a hub that is not DSM Central (no `scripts/take-ai-bite-sync.txt`), first run `git check-ignore -q dsm-docs/reasoning-lessons-ecosystem.md`. If it is not ignored, write nothing to the file and tell the user to add that path to `.gitignore` (§8.3, "Lesson files are never public").
+   **STAA recommendation:** After extracting, assess whether this session warrants deeper STAA analysis. Recommend STAA when the session involved complex multi-option decisions, entered unfamiliar territory (new domain, tool, or pattern), the auto extraction felt incomplete (rich reasoning that resists summarization), or a course correction occurred that may represent a recurring pattern. Output: "STAA recommended: [yes/no]. [1-sentence reason]." **Invocation:** STAA must be run in a separate Claude Code conversation. Do not wrap it in `/dsm-go` or `/dsm-parallel-session-go`. Enter `/dsm-staa` directly.
+   **Lesson push:** If new lessons were extracted this session, push a notification to DSM Central's inbox listing the new entries with scope classification. Use the inbox entry format from the Reasoning Lessons Protocol (DSM_0.2 Module A). Target: `{dsm-central-path}/_inbox/{this-project-name}.md`. If this IS DSM Central, add ecosystem/pattern lessons directly to `dsm-docs/reasoning-lessons-ecosystem.md` instead of self-notifying.
    **Provenance header update (per BL-510; canonical rule in DSM_0.2.A §8.1):** After the appends above have landed, update the live file's `**Last appended:**` line, and `**Last pruned:**` when entries were removed, with this run's identifier, date, counts and a one-line note. Four properties, all four required. **Chain, never replace:** move the superseded value behind `Prior:` (the form the file already uses) rather than overwriting it. **No-op when nothing changed:** if nothing was appended and nothing pruned, make no header change. **Same run, not the next one:** do it here, not in a later step or a later skill, because deferring is the structure that produced the gap. **Create when absent (property 4, BL-526):** where the `**Last appended:**` line does not exist, create it and state within the line that this run created it and that earlier appends predate the header, so its date is not misread as the file's first write. Absence is not a reason to skip; property 2 still governs, so a run that appended and pruned nothing makes no header change even when the line is missing. The failure this closes: a wrap-up that appends lessons and skips the header leaves the file naming the previous run as its last writer, while every other artifact of this session says otherwise.
-   **Compact mirror regeneration (per DSM_0.2.A §8.1; transform per BL-447):** After extraction (and, at a hub, the aggregation-file write) completes, regenerate `.claude/reasoning-lessons-compact.md` from the live `.claude/reasoning-lessons.md`. **Run the canonical regeneration transform defined in DSM_0.2.A §8.1 ("Canonical regeneration transform"), then run the two post-generation sanity checks specified there.** Do NOT re-inline a transform here: the canonical awk in §8.1 is the single source of truth (re-inlining a divergent copy was the BL-447 drift bug that silently emptied the mirror on flat-structured spoke files; `/dsm-staa` Step 8 references the same §8.1 block). The §8.1 transform is shape-tolerant (works with or without a `## Categories` heading), drops the guideline header + `[auto]`/`[STAA]` prefixes, preserves `### Category` headings + lesson bodies verbatim, prepends the freshness header, and fails loud (entry-count + size-floor warnings) instead of producing a silent header-only mirror. If the live file does not exist, skip this sub-step (protocol not active for this project). The §8.1 size-floor sanity check is the lower bound (catches header-only failures). The upper bound is **defined in DSM_0.2.A §8.1 and is deliberately not restated here** (per BL-491): read the value from that section at regeneration time. Report the measured size, that bound, and their ratio in EVERY case, so a breach and a pass produce different output rather than a pass producing silence , `mirror {measured} B / bound {§8.1 value} B / {ratio}x OVER` against `mirror {measured} B / bound {§8.1 value} B / within bound`. On a breach add: "Consider pruning the live file or promoting older lessons to MEMORY.md before the next wrap-up." Advisory, not blocking: still write the file. **Advisory means non-blocking, never silent.** The superseded form was a two-term maximum, a fixed floor OR-ed with a multiple of the live file's size; the second term is unreachable for any strict-trim transform, so the check never fired once. Do not reintroduce a second term, and do not copy the bound's value into this file.
+   **Compact mirror regeneration (per DSM_0.2.A §8.1; transform per BL-447):** After extraction (and any lesson push) completes, regenerate `.claude/reasoning-lessons-compact.md` from the live `.claude/reasoning-lessons.md`. **Run the canonical regeneration transform defined in DSM_0.2.A §8.1 ("Canonical regeneration transform"), then run the two post-generation sanity checks specified there.** Do NOT re-inline a transform here: the canonical awk in §8.1 is the single source of truth (re-inlining a divergent copy was the BL-447 drift bug that silently emptied the mirror on flat-structured spoke files; `/dsm-staa` Step 8 references the same §8.1 block). The §8.1 transform is shape-tolerant (works with or without a `## Categories` heading), drops the guideline header + `[auto]`/`[STAA]` prefixes, preserves `### Category` headings + lesson bodies verbatim, prepends the freshness header, and fails loud (entry-count + size-floor warnings) instead of producing a silent header-only mirror. If the live file does not exist, skip this sub-step (protocol not active for this project). The §8.1 size-floor sanity check is the lower bound (catches header-only failures). The upper bound is **defined in DSM_0.2.A §8.1 and is deliberately not restated here** (per BL-491): read the value from that section at regeneration time. Report the measured size, that bound, and their ratio in EVERY case, so a breach and a pass produce different output rather than a pass producing silence , `mirror {measured} B / bound {§8.1 value} B / {ratio}x OVER` against `mirror {measured} B / bound {§8.1 value} B / within bound`. On a breach add: "Consider pruning the live file or promoting older lessons to MEMORY.md before the next wrap-up." Advisory, not blocking: still write the file. **Advisory means non-blocking, never silent.** The superseded form was a two-term maximum, a fixed floor OR-ed with a multiple of the live file's size; the second term is unreachable for any strict-trim transform, so the check never fired once. Do not reintroduce a second term, and do not copy the bound's value into this file.
 0.5. **Pre-confirm known cross-repo targets (BL-450):** Wrap-up writes to several KNOWN cross-repo targets every run (auto-memory `MEMORY.md`, and the `_inbox/` of `dsm-central` / `portfolio` / `blog-spoke` / `contributions-docs` for feedback + notifications). Pre-populate `.claude/cross-repo-writes-session.txt` with these targets BEFORE the steps that write to them, so the BL-391 hook (`validate-cross-repo-write.sh`) does not fire a per-target confirmation mid-flow on protocol-defined destinations. This is NOT a gate weakening: these are the wrap-up's own declared destinations (the cross-repo-gate-satisfied-by-protocol-named-action carve-out family), and the gate STILL fires for any cross-repo write NOT in this list. `/dsm-go` Step 0f clears the file at next session start, so pre-confirmations are session-scoped.
 
    The hook matches canonicalized path **prefixes** (a confirmed line matches any write whose canonical path starts with it), so pre-confirm **directories** (the `_inbox/` parent and the auto-memory dir), not individual files. Resolve targets from the Ecosystem Path Registry (`.claude/dsm-ecosystem.md`); skip any entry absent from the registry or whose path does not exist on disk (no error). Append only lines not already present (idempotent).
@@ -47,9 +47,9 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    # which non-deterministically returns some OTHER project's MEMORY.md.
    add_target "$HOME/.claude/projects/$(pwd | sed 's#[/_]#-#g')/memory"
    # Ecosystem _inbox parents (registry-resolved; absent entries skipped by add_target)
-   for name in dsm-central portfolio blog-spoke contributions-docs; do  # not `path`: zsh ties it to PATH
-     target_path=$(awk -F'|' -v n="$name" '$0 ~ "\\| *"n" *\\|" {gsub(/^ *| *$/,"",$3); print $3; exit}' .claude/dsm-ecosystem.md 2>/dev/null)
-     add_target "${target_path:+${target_path%/}/_inbox}"
+   for name in dsm-central portfolio blog-spoke contributions-docs; do
+     path=$(awk -F'|' -v n="$name" '$0 ~ "\\| *"n" *\\|" {gsub(/^ *| *$/,"",$3); print $3; exit}' .claude/dsm-ecosystem.md 2>/dev/null)
+     add_target "${path:+${path%/}/_inbox}"
    done
    ```
 
@@ -78,27 +78,6 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    **MEMORY.md exclusion list (additional item — checkpoint ownership rule):**
    - Pending-next-session items. Step 2.5 (Checkpoint) owns these; do NOT duplicate them in MEMORY.md.
 
-2.4. **Memory tiering size check (BACKLOG-544):** after updating MEMORY.md above, measure the sessions zone (the bytes below the `<!-- SESSIONS ZONE` marker). If it exceeds ~4 KB, invoke `/dsm-memory-decommission` to move the oldest session group to `MEMORY-long-term.md`. Then, if `MEMORY-long-term.md` exceeds 10 KB, invoke `/dsm-memory-archive` to move its oldest group to `MEMORY-archived.md`. Both skills are move-only and auto-create their destination; skip silently if MEMORY.md has no `<!-- SESSIONS ZONE` marker (project not tiered). This keeps the always-loaded MEMORY.md lean across sessions. The threshold is on the sessions zone, not total MEMORY.md, because the evergreen zone alone can exceed a small total target (BACKLOG-544).
-
-2.4a. **Evergreen zone review flag (BACKLOG-568):** after the tiering check above, measure the EVERGREEN zone — the bytes ABOVE the `<!-- SESSIONS ZONE` marker, the complement of Step 2.4's sessions-zone measurement. The tiering skills deliberately never touch this zone (it has no timestamp groups to age), so nothing otherwise bounds the always-loaded cost it adds on every turn, and after tiering drains the sessions zone it becomes the dominant and only-growing half. If the evergreen zone exceeds ~6 KB (6,144 B), emit a non-blocking review flag. Skip silently only if MEMORY.md has no `<!-- SESSIONS ZONE` marker (project not tiered), consistent with Step 2.4.
-
-   ```bash
-   M="$HOME/.claude/projects/$(pwd | sed 's#[/_]#-#g')/memory/MEMORY.md"
-   MARK=$(grep -nF '<!-- SESSIONS ZONE' "$M" 2>/dev/null | head -1 | cut -d: -f1)
-   if [ -z "$MARK" ]; then
-     echo "SKIP: no SESSIONS ZONE marker (project not tiered)"
-   else
-     EVER=$(head -n $((MARK-1)) "$M" | wc -c)
-     if [ "$EVER" -gt 6144 ]; then
-       echo "FLAG: evergreen zone ${EVER} B > ~6 KB (6144 B) target — review recommended"
-     else
-       echo "OK: evergreen zone ${EVER} B within ~6 KB (6144 B) target"
-     fi
-   fi
-   ```
-
-   **Advisory means non-blocking, never silent** (per the §8.1 mirror-flag precedent in Step 0): report the measured evergreen size against the ~6 KB target in EVERY case — over, under, or skipped — so a breach and a pass produce different output rather than a pass producing silence. On a flag, the review is judgement-executed, never an automatic move (evergreen is high-value always-loaded context with no timestamp groups to age, unlike the sessions-zone tiering): **trim** resolved or superseded evergreen lines (a resolved Current Focus item, a Common Pitfall now codified in CLAUDE.md, a spoke status long superseded), or **promote** durable-but-not-boot-critical lines to CLAUDE.md, a guide, or `MEMORY-long-term.md` and then remove the original — **promote before remove, never a silent drop** (the §8 Maintenance prune-action model). The flag recommends the review; the operator or `/dsm-staa` performs it.
-
 2.5. **Checkpoint:** Create a minimal checkpoint in `dsm-docs/checkpoints/` recording the session state. This step is the primary owner of "pending next session" items — do not duplicate them in MEMORY.md (Step 2).
 
    **Filename:** `YYYY-MM-DD_sN_checkpoint.md` where N is the session number.
@@ -111,7 +90,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    **Last commit:** [git log --oneline -1]
 
    ## Work completed this session
-   [1-3 line summary drawn from worklog Output blocks and git log]
+   [1-3 line summary drawn from session transcript Output blocks and git log]
 
    ## Pending next session
    [items that require human decision or cannot be derived from backlog/inbox/git.
@@ -152,7 +131,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 3. **Refresh backup:** If `.claude/memory/MEMORY.md` exists in the project, copy the live MEMORY.md there
 4. **Contributor profile:** Check if `.claude/contributor-profile.md` needs updating (new skills exercised, proficiency changes). Skip if the file does not exist or nothing changed.
 5. **Handoff:** Only create a handoff in `dsm-docs/handoffs/` if there is complex pending work that requires detailed context for the next session. Skip if MEMORY.md is sufficient.
-6. **Feedback push:** Push ripe feedback to DSM Central. The DSM Central repo path is the parent directory of the `DSM_0.2_Custom_Instructions_v1.1.md` file referenced by the `@` import in this project's CLAUDE.md. Target: `{dsm-central-path}/_inbox/{this-project-name}.md`. **Write-only (DSM_0.2.C §2, BL-448):** all cross-repo inbox pushes in this step (and the README/downstream notifications above) append the target file only; NEVER run git (`add`/`commit`/`mv`) in the target repo. The target commits its own incoming files during its own session.
+6. **Feedback push:** Push ripe feedback to DSM Central. The DSM Central repo path is the parent directory of the `DSM_0.2_Custom_Instructions_v1.1.md` file referenced by the `@` import in this project's CLAUDE.md. Target: `{dsm-central-path}/_inbox/{this-project-name}.md`. **Write-only (DSM_0.2.C §2, BL-448):** all cross-repo inbox pushes in this step (and the lesson/README/downstream notifications above) append the target file only; NEVER run git (`add`/`commit`/`mv`) in the target repo. The target commits its own incoming files during its own session.
    a. **Per-session files (backlogs, methodology, and topical):** Scan `dsm-docs/feedback-to-dsm/` for every file matching `YYYY-MM-DD_sN_*.md` that is NOT in `done/`. **Match on the date-and-session prefix, not the suffix** (mirrors `/dsm-review-feedback`'s consuming-side fix, BL-533): `_backlogs` and `_methodology` are the two suffixes the convention names, but spokes also write topically-named per-session feedback carrying the same full header (Date/Session/Spoke/Type/Severity) that a suffix-only scan would silently miss. Classify by suffix after matching. For each file (named-suffix or topical), check ripe criteria (see DSM_0.2 Session-End Inbox Push). If ripe, append its content to the inbox file and move the source to `dsm-docs/feedback-to-dsm/done/`. If not ripe, leave in place for further drafting. Report the two groups separately so convention drift stays visible: `Per-session feedback pushed: {backlogs/methodology filenames}. Topical (off-convention name) feedback pushed: {filenames}.` Omit either line if empty.
    b. **Technical progress:** Scan `dsm-docs/feedback-to-dsm/technical.md` for entries without a `**Pushed:**` date. For each unpushed entry, append a Technical Progress Report inbox entry (see DSM_0.2 Technical Progress Reporting for format) and mark it with `**Pushed:** YYYY-MM-DD` in the source.
    c. **Legacy files:** If `dsm-docs/feedback-to-dsm/backlogs.md` or `dsm-docs/feedback-to-dsm/methodology.md` exist with unpushed entries, push them using the old `**Pushed:**` marker model. Report: "Legacy feedback files found; consider migrating to per-session format."
@@ -259,133 +238,51 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
    - Files in the baseline with unchanged checksums = pre-existing, not touched this session (skip them)
    - If `.claude/session-baseline.txt` does not exist (session started without `/dsm-go`), fall back to staging all changed files
 
-   **Mirror self-detection inbox guard (BL-566; reuses the DSM_0.2.A §25.1 /
-   `/dsm-go` Step 0.8a role signals):** Decide whether this repo is the read-only
-   public mirror before staging `_inbox/*`. It is the mirror ONLY when it carries
-   NONE of the DSM-role signals: `scripts/take-ai-bite-sync.txt` is absent AND
-   `.claude/dsm-ecosystem.md` has no `dsm-central` row. In that mirror case,
-   exclude every `_inbox/*` path from the stage-set except `_inbox/README.md` and
-   `_inbox/.gitkeep`, logging each: "Mirror inbox guard: skipped `_inbox/{file}`."
-   Otherwise stage `_inbox/*` normally. The two signals, grounded (BL-566) against
-   the real public mirror (take-ai-bite) and a git clone of Central:
-   - `take-ai-bite-sync.txt` present: this is DSM Central or a git clone of it (the
-     file is TRACKED, so a clone inherits it); both track their own `_inbox`, so stage.
-   - a `dsm-central` row present: a configured spoke (row points at its hub) or a
-     self-registered clone (row points at itself); both own a real `_inbox`, so stage.
-   - neither signal: the read-only public mirror, whose selective file-sync copies
-     neither the sync file nor a `dsm-central` registry, so stage nothing but the
-     README bootstrap.
-   The absence of `take-ai-bite-sync.txt` ALONE no longer implies mirror: every
-   spoke also lacks it, which was the BL-566 defect (a two-state read of a
-   three-state world that put every spoke in the mirror branch and silently dropped
-   its tracked `_inbox` from the wrap-up commit). A repo with no role signals at all
-   takes the mirror branch (default-skip): the only real repo in that bucket is the
-   public mirror, because a configured spoke always carries a `dsm-central` row by
-   wrap-up time.
+   **Mirror self-detection inbox guard:** If
+   `scripts/take-ai-bite-sync.txt` does NOT exist in the current
+   working tree, this repo is a mirror (not the hub). Exclude any
+   `_inbox/*` path from the stage-set except `_inbox/README.md` and
+   `_inbox/.gitkeep`. Log each excluded path: "Mirror inbox guard:
+   skipped `_inbox/{file}` (mirror inbox guard)." Rationale: mirror repos should
+   not track session-scoped inbox entries; only the README bootstrap
+   stays. This guard protects the edge case where wrap-up runs from a
+   mirror's working tree and the mirror's `.gitignore _inbox/*` rule
+   is missing.
 
    Then `git commit` and `git push` in sequence. If no session changes exist, skip the commit.
    After committing, delete `.claude/session-baseline.txt` (consumed).
-9.4. **Resolve the git host, then assert the branch is fully pushed (per BL-600 and BL-516; rules in DSM_0.2.A §27 and DSM_0.2 §20.4, not restated here):**
-
-   Resolve the host first. Steps 9.5 and 10 use `GIT_HOST`, `GH_REPO` and `ORIGIN_URL`
-   (DSM_0.2.A §27.1 is authoritative if this copy diverges):
-
-   ```bash
-   ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-   ORIGIN_URL=$(git remote get-url origin 2>/dev/null)
-   ORIGIN_HOST=$(printf '%s' "$ORIGIN_URL" | sed -E 's#^[a-z+]+://##; s#^[^@/]*@##; s#[:/].*##')
-   ORIGIN_REPO=$(printf '%s' "$ORIGIN_URL" | sed -E 's#\.git$##; s#^[a-z+]+://[^/]+/##; s#^[^@/]*@[^:/]+:##')
-   GH_REPO="$ORIGIN_HOST/$ORIGIN_REPO"
-   GIT_HOST=$(sed -nE 's/^\*\*Git host:\*\*[[:space:]]*(github|gitlab|other|none)([^a-z].*)?$/\1/p' "$ROOT/.claude/CLAUDE.md" 2>/dev/null | head -1)
-   if [ -z "$GIT_HOST" ]; then
-     if [ -z "$ORIGIN_URL" ]; then GIT_HOST=none
-     elif [ -n "$ORIGIN_HOST" ] && gh repo view "$GH_REPO" --json name >/dev/null 2>&1; then GIT_HOST=github
-     elif [ -n "$ORIGIN_HOST" ] && glab repo view "$ORIGIN_URL" >/dev/null 2>&1; then GIT_HOST=gitlab
-     else GIT_HOST=other; fi
-   fi
-   echo "GIT_HOST=$GIT_HOST GH_REPO=$GH_REPO"
-   ```
-
-   Then, when Step 10 will open a pull or merge request (`GIT_HOST` is `github` or
-   `gitlab`):
+9.4. **Fully-pushed assertion before any PR is created or merged (per BL-516; rule and rationale in DSM_0.2 §20.4, not restated here):**
 
    ```bash
    git fetch -q origin
    UNPUSHED=$(git rev-list @{u}..HEAD --count)
    ```
 
-   `UNPUSHED` must be `0` before Step 10 opens or merges a request. If it is not, **halt**
+   `UNPUSHED` must be `0` before Step 10 opens or merges a PR. If it is not, **halt**
    and report the count with `git log @{u}..HEAD --oneline`; do not push silently to
    clear it, because an unpushed commit at this point usually means the branch is not
    in the state the session believes. Read the count from the assignment, never from a
-   pipeline's exit status (§19.2). The request's head is checked against local `HEAD`
-   by the merge itself (`--match-head-commit` on GitHub, `--sha` on GitLab, Step 10).
+   pipeline's exit status (§19.2).
 
-   **Skip the assertion silently if:** `GIT_AVAILABLE` is false, `GIT_HOST` is `other` or
-   `none` (the local merge merges the local branch itself), or no upstream is configured
-   (`@{u}` fails , set one or push with `-u` first).
+   When a PR already exists, also assert its head matches local `HEAD`:
+   `gh pr view "$PR" --json headRefOid --jq .headRefOid` equals `git rev-parse HEAD`.
 
-9.5. **Open-PR CI status check (per BL-441):** After the session push (Step 9) and BEFORE the merge-to-main (Step 10), if the session pushed commits to a branch with an open PR, verify CI is not silently red. If `GIT_HOST` is `github` (Step 9.4); `--repo` is required, because in a GitHub fork `gh`'s default repository is the upstream one:
+   **Skip silently if:** `GIT_AVAILABLE` is false, no upstream is configured (`@{u}`
+   fails , set one or push with `-u` first), or Step 10 will not open a PR.
+
+9.5. **Open-PR CI status check (per BL-441):** After the session push (Step 9) and BEFORE the merge-to-main (Step 10), if the session pushed commits to a branch with an open PR, verify CI is not silently red. If `GIT_AVAILABLE` is true AND `origin` points at GitHub AND `gh` is installed:
    ```bash
-   PR_NUMBER=$(gh pr list --repo "${GH_REPO:?run the §27 host snippet first}" --head "$(git branch --show-current)" --json number --jq '.[0].number' 2>/dev/null)
-   [ -n "$PR_NUMBER" ] && gh pr checks "$PR_NUMBER" --repo "${GH_REPO:?run the §27 host snippet first}" 2>/dev/null
+   PR_NUMBER=$(gh pr list --head "$(git branch --show-current)" --json number --jq '.[0].number' 2>/dev/null)
+   [ -n "$PR_NUMBER" ] && gh pr checks "$PR_NUMBER" 2>/dev/null
    ```
-   If any check has `conclusion=failure`, **warn in conversation text** (not just the persistent report): "Wrap-up note: PR #{N} has K failing CI check(s): [names]. The session is ending with red CI on the working branch's PR." This is a **warn, not a block** , the user's redirect window between the warning and the actual session end is the enforcement mechanism; the wrap-up proceeds. **Anti-pattern guard:** a session must not end with the working branch's PR in a red CI state without the user being explicitly informed; the warning is the discharge of that obligation. **Skip silently if:** `GIT_HOST` is not `github` (GitLab is deferred to BACKLOG-602), no open PR for the branch, or no commits pushed this session. `pending` checks are silent; only `conclusion=failure` warns. One `gh` call per wrap-up (rate-limit guard). Origin: S14 ("wrap-up is too late to verify because this skill is running to finalize the session; we should have caught failed checks before ending the session"). Placed before Step 10 so red CI surfaces before the merge-to-main publication.
-10. **Merge session branch to main, by git host (DSM_0.2.A §27.2):** If already on main (no session branch), skip this step. Otherwise merge the session branch by the path for `GIT_HOST` (Step 9.4). Report each outcome line exactly as printed: every line comes from its own command's exit status (DSM_0.2 §19.2), and a `STOP:` line ends this step with the branches left as the line describes. Never force-push. Shell variables do not survive between Bash calls (DSM_0.2.A §27.1): begin each block's call with the Step 9.4 resolution snippet and `B="{session-branch}"`.
-   a. **Push the session branch** (every host except `none`; it may already be pushed from Step 9):
-      ```bash
-      B="{session-branch}"
-      if [ "$GIT_HOST" != none ]; then
-        if git push -q -u origin "$B"; then echo "PUSHED: $B"
-        else echo "STOP: push of $B to origin failed (exit $?); nothing was merged and $B exists only on this machine"; fi
-      fi
-      ```
-   b. **`github`: pull request on the project's own repository.** `--repo` is required (a fork's `gh` default is the upstream repository); `--match-head-commit` merges only what is on this machine. On `MERGED`, continue with (e).
-      ```bash
-      if PR_URL=$(gh pr create --repo "${GH_REPO:?run the §27 host snippet first}" --base main --head "$B" --title "Session N: [brief summary]" --body "Session wrap-up merge."); then
-        if gh pr merge "$PR_URL" --merge --delete-branch --match-head-commit "$(git rev-parse HEAD)"; then echo "MERGED: $PR_URL"
-        else echo "STOP: $PR_URL was created but not merged (exit $?); merge it on GitHub"; fi
-      else echo "STOP: no pull request could be created on $GH_REPO (exit $?); $B is pushed; open and merge a pull request on GitHub"; fi
-      ```
-   c. **`gitlab`: merge request through `glab`.** `--auto-merge=false` merges now (by default `glab` waits for a running pipeline); `--sha` merges only what is on this machine. On `MERGED`, continue with (e). On `FALLBACK`, run (d). Once the merge request exists, never run (d) for the same branch (one merge route per branch).
-      ```bash
-      if glab mr create -R "${ORIGIN_URL:?run the §27 host snippet first}" --source-branch "$B" --target-branch main --title "Session N: [brief summary]" --description "Session wrap-up merge." --yes; then
-        if glab mr merge "$B" -R "${ORIGIN_URL:?run the §27 host snippet first}" --auto-merge=false --remove-source-branch --sha "$(git rev-parse HEAD)" --yes; then echo "MERGED: merge request for $B"
-        else echo "STOP: the merge request for $B was created but not merged (exit $?); merge it on GitLab"; fi
-      else echo "FALLBACK: glab could not create a merge request (exit $?); using the local merge"; fi
-      ```
-   d. **`other`, `none`, or the GitLab fallback: local merge.** Pushes `main` unless `GIT_HOST` is `none`. If the host rejects the push (a protected branch), local `main` is put back where it was and the session branch stays pushed; the user merges it through the host's web interface. This push is the same publication as a pull-request merge to `main` (DSM_0.2.C §2), authorized by the user invoking `/dsm-wrap-up`.
-      ```bash
-      OUT=""
-      git checkout -q main || OUT="STOP: could not switch to main; nothing was merged"
-      if [ -z "$OUT" ] && [ "$GIT_HOST" != none ]; then
-        git fetch -q origin main && git merge -q --ff-only origin/main \
-          || OUT="STOP: local main does not fast-forward to origin/main; nothing was merged"
-      fi
-      PRE=$(git rev-parse HEAD)
-      if [ -z "$OUT" ]; then
-        git merge -q --no-ff -m "Merge $B (session wrap-up)" "$B" \
-          || { git merge --abort 2>/dev/null; OUT="STOP: merging $B into main failed (conflict); main is unchanged"; }
-      fi
-      if [ -z "$OUT" ] && [ "$GIT_HOST" != none ]; then
-        if git push -q origin main; then
-          git push -q origin --delete "$B" 2>/dev/null
-          OUT="MERGED: $B into main and pushed main to origin"
-        else
-          git checkout -q "$B" && git update-ref refs/heads/main "$PRE"
-          OUT="STOP: origin rejected the push of main; local main is back at $(git rev-parse --short "$PRE") and $B stays pushed. Merge $B through your host's web interface. Do not force-push."
-        fi
-      elif [ -z "$OUT" ]; then
-        OUT="MERGED: $B into main (local only, no remote)"
-      fi
-      case "$OUT" in MERGED*) git branch -q -d "$B" ;; *) git checkout -q "$B" 2>/dev/null ;; esac
-      echo "$OUT"
-      ```
-   e. **Update local after a pull or merge request** (the local merge in (d) already leaves you on the updated `main`):
-      ```bash
-      git checkout -q main && git pull -q --ff-only && echo "LOCAL MAIN: $(git log --oneline -1)"
-      git branch -q -d "$B" 2>/dev/null
-      ```
+   If any check has `conclusion=failure`, **warn in conversation text** (not just the persistent report): "Wrap-up note: PR #{N} has K failing CI check(s): [names]. The session is ending with red CI on the working branch's PR." This is a **warn, not a block** , the user's redirect window between the warning and the actual session end is the enforcement mechanism; the wrap-up proceeds. **Anti-pattern guard:** a session must not end with the working branch's PR in a red CI state without the user being explicitly informed; the warning is the discharge of that obligation. **Skip silently if:** no `gh`, no GitHub remote, no open PR for the branch, or no commits pushed this session. `pending` checks are silent; only `conclusion=failure` warns. One `gh` call per wrap-up (rate-limit guard). Origin: S14 ("wrap-up is too late to verify because this skill is running to finalize the session; we should have caught failed checks before ending the session"). Placed before Step 10 so red CI surfaces before the merge-to-main publication.
+10. **Merge session branch to main via PR:** If the current branch is a session branch (not main/master), merge it to main using a pull request. This is required because branch protection prevents direct pushes to main.
+   a. Ensure the session branch is pushed: `git push -u origin {session-branch}` (may already be pushed from step 8)
+   b. Create PR: `gh pr create --title "Session N: [brief summary]" --body "Session wrap-up merge." --base main --head {session-branch}`
+   c. Merge PR: `gh pr merge --merge --delete-branch`
+   d. Update local: `git checkout main && git pull`
+   e. If `gh` is not available or the PR fails, warn: "Branch protection is active. Cannot merge to main without a PR. The session branch `{session-branch}` has been pushed to remote. Merge manually via GitHub." and stop.
+   f. If already on main (no session branch), skip this step.
 11. **Mirror sync PR safety net:** Check the Ecosystem Path Registry for entries with `mirror: true`. For each mirror repo, check for open PRs created by mirror sync:
 
    a. **List open sync PRs. `--head` is an EXACT branch match, never a prefix (BL-535).**
@@ -409,7 +306,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
       exclusion list is the mechanism that produced BL-535, and it fails the moment someone
       forgets an entry. A mirror may legitimately hold long-lived retained sync PRs; take-ai-bite
       holds `#92` and `#93` deliberately, and a working filter matches them on its first run.
-   c. For each PR that passes (b): attempt `gh pr merge {number} --repo {mirror-repo} --merge --delete-branch`. The `--repo` is required: run from Central, an unqualified `gh pr merge {number}` would act on Central's own pull request with that number (found by the BL-600 sweep).
+   c. For each PR that passes (b): attempt `gh pr merge {number} --merge --delete-branch`.
    d. If merge succeeds: report "Merged mirror sync PR #{number} on {repo}".
    e. If merge fails or `gh` unavailable: warn "Open mirror sync PR on {repo}: #{number} ({title}). Merge manually."
    f. **Report the three outcomes distinguishably**, so inertness can never again read as an
@@ -464,7 +361,7 @@ At the start, run `git rev-parse --is-inside-work-tree 2>/dev/null`. Cache the r
 
 ## Notes
 
-- Do NOT clear or overwrite `.claude/worklog.md`; `/dsm-go` handles the reset at next session start
+- Do NOT clear or overwrite `.claude/session-transcript.md`; `/dsm-go` handles the reset at next session start
 - No co-author lines in commits
 - If $ARGUMENTS is provided, use it as the session description in MEMORY.md
 - All steps run autonomously; do not pause for confirmation between steps

@@ -36,7 +36,7 @@ Minimal troubleshooting boot for DSM projects. Zero dependencies on other skills
    - If the file does not exist: report "No ecosystem registry found."
 
 5. **Transcript best-effort:**
-   - If `.claude/worklog.md` exists:
+   - If `.claude/session-transcript.md` exists:
      - Attempt to append a single plan block summarizing the safe-go results
      - If the append fails for any reason (permission, hook error, file locked), skip silently and continue
    - If the file does not exist: skip silently

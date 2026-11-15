@@ -10,4 +10,4 @@ Re-read MEMORY.md to refresh session context. Use when MEMORY.md was updated ext
 - This skill is strictly read-only; it reloads context without creating or modifying files
 - Use `/dsm-refresh-all` for a full context reload (CLAUDE.md, DSM_0.2, inbox, artifacts)
 - Follow .claude/CLAUDE.md conventions for this project
-- Follow the Worklog Protocol from DSM_0.2 (append the plan entry to .claude/worklog.md)
+- Follow the Session Transcript Protocol from DSM_0.2 (append reasoning to .claude/session-transcript.md)

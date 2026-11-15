@@ -44,7 +44,7 @@ where that understanding lives.
 
 ### What stays in DSM_0-6
 
-- Pre-Generation Brief protocol (§8), worklog discipline (§7),
+- Pre-Generation Brief protocol (§8), session transcript discipline (§7),
   inclusive language (§13), heading parsability (§14), and other rules
   whose semantics are platform-agnostic
 - Principles: Take a Bite, Earn Your Assertions, Know Your Context, etc.
@@ -168,12 +168,10 @@ Y = native and stable; P = partial or plan-gated; N = not supported.
 The densest subsection, because most DSM protocols depend on
 Claude-specific mechanisms. Grouped by protocol.
 
-**Worklog and the UserPromptSubmit hook.**
+**Session transcript and the UserPromptSubmit hook.**
 `.claude/hooks/transcript-reminder.sh` (UserPromptSubmit) injects a
 per-turn reminder that the agent must append the plan entry to
-`.claude/worklog.md` before work (per TAB/DSM patterns audit P-01); it is
-silent on a `/dsm-go` turn, whose first entry follows the Step 6 reset
-(DSM_0.2.G, Boot-turn ordering). A second
+`.claude/session-transcript.md` before work (per TAB/DSM patterns audit P-01). A second
 hook, `.claude/hooks/validate-transcript-edit.sh` (PreToolUse on
 Edit), enforces append-only shape with three checks: anchor is the
 last non-empty line of the file, new content is strictly appended,
@@ -208,14 +206,11 @@ write to their own per-PID files). Commit booking via
 mirror repos arrive with `.claude/*.template` files instead of live
 runtime files. `/dsm-go` Step 0.8 detects the un-kicked-off state
 (no `.claude/kickoff-done.txt`, no self-as-central registry row) and
-runs the 15-step Kick-off sequence: copy templates to runtime paths,
+runs the 14-step Kick-off sequence: copy templates to runtime paths,
 substitute `{REPO_ROOT}` / `{project_name}` / `{ISO_DATE}`,
 self-register the clone as `dsm-central`, deploy commands, chmod
 hooks, write the done marker (DSM_0.2.A §25). This is the mechanism
-that turns a cloned mirror into a functional DSM hub. A
-Kick-off'd clone MAY then maintain its own fork-local backlog
-line, numbered from `BACKLOG-001` independent of Central's
-numbering (DSM_0.2 §21.5).
+that turns a cloned mirror into a functional DSM hub.
 
 **Three-Level Branching Strategy.** DSM's L1 (main) / L2 (session) /
 L3 (task) branch model runs on Claude's sessions-are-per-directory
@@ -234,9 +229,9 @@ without this rule.
   Destructive Command Protocol).
 - Do NOT skip the `PreToolUse` hook on transcript edits by
   appending via Bash heredoc. The `Edit` tool path is preferred; if
-  Bash is needed, match the heredoc quoting to the body: unquoted
-  expands `$(date ...)` but also executes backticks in prose,
-  single-quoted keeps both literal (DSM_0.2.G, Appending with Bash).
+  Bash is used, the heredoc must be unquoted (`<< EOF`, not
+  `<< 'EOF'`) to allow `$(date ...)` expansion (DSM_0.2 §7
+  heredoc anti-pattern).
 - Do NOT skip `/dsm-align` at session start. `/dsm-go` Step 1.8
   runs it unconditionally; the failure mode that justifies
   unconditional run (F-094, S180) is described in §5 and
@@ -342,7 +337,7 @@ where full `/dsm-go` context is not needed.
 **Protected paths.** `.claude/` is protected by default EXCEPT for
 `.claude/commands/`, `.claude/agents/`, `.claude/skills/`, and
 `.claude/worktrees/` (per Claude Code docs §4). DSM writes to
-`.claude/worklog.md`, `.claude/last-align-report.md`,
+`.claude/session-transcript.md`, `.claude/last-align-report.md`,
 `.claude/last-align.txt`, and `.claude/session-baseline.txt` under
 the per-project auto-approved allowlist (set by `/dsm-align` via
 the settings.json template).
@@ -363,7 +358,7 @@ cross-document catalog lives in §5; this subsection curates the
 - **F-094 , per-turn transcript hook silently broken (2026-01 to
   2026-04-07).** Hook script at index-mode 100644; WSL with
   `core.fileMode = false` hid the missing +x. Resolution: `/dsm-align`
-  Step 10b sub-step (b) re-applies chmod every run (worklog hook requirement). See §5.
+  Step 10b sub-step (b) re-applies chmod every run (session-transcript hook requirement). See §5.
 - **S180 +x bug (2026-04-07).** Same class, smaller scale. Same
   resolution.
 - **Parallel-session turn-1 hook collision (2026-04-18).**
@@ -379,11 +374,9 @@ cross-document catalog lives in §5; this subsection curates the
   alignment via Platform Alignment Protocol.
 - **Heredoc quoting anti-pattern (S69).** Single-quoted
   heredoc (`<< 'EOF'`) suppresses `$(date ...)` expansion, writing
-  literal strings into the transcript. The opposite form fails too:
-  an unquoted heredoc executes backticks in prose (S249, S258).
-  Resolution: Edit-tool append path is preferred; for Bash, printf
-  the delimiter with a fresh clock read and write the body through a
-  single-quoted heredoc. Documented in DSM_0.2.G (Appending with Bash).
+  literal strings into the transcript. Resolution: Edit-tool append
+  path is preferred; Bash heredoc must be unquoted. Documented in
+  DSM_0.2 §7 anti-patterns.
 
 Failure modes inherent to Claude Code that DSM should watch:
 
@@ -409,7 +402,7 @@ not a replacement for official docs.
 | Resume DSM session                  | `/dsm-go` (runs `/dsm-align` unconditionally)         |
 | Deploy DSM commands to user scope   | `scripts/sync-commands.sh --deploy`                   |
 | List installed skills (user)        | `ls ~/.claude/commands/`                              |
-| Worklog (live log)       | `.claude/worklog.md`                       |
+| Session transcript (live log)       | `.claude/session-transcript.md`                       |
 | Archived transcripts                | `.claude/transcripts/{YYYY-MM-DDTHH:MM}-ST.md`        |
 | Project agent config                | `.claude/CLAUDE.md`                                   |
 | Settings (permissions, hooks)       | `.claude/settings.json`                               |
@@ -537,7 +530,7 @@ platform mechanism, give the one-line mapping, and reference any BL
 or research file where the mapping is documented. Typical protocols
 covered:
 
-- Worklog discipline (DSM_0.2 §7)
+- Session transcript discipline (DSM_0.2 §7)
 - Pre-Generation Brief gates, especially Gate 2 (DSM_0.2 §8)
 - Parallel session coordination (DSM_0.2.A §7)
 - Cloned-Mirror Kick-off (DSM_0.2.A §25)
@@ -670,7 +663,7 @@ semantic-also. Phase 1 inventory only; Phase 5 (template generalization) applies
 
 | Location | Platform-specific content | Classification | Candidate resolution |
 |----------|--------------------------|----------------|----------------------|
-| DSM_0.2 §7 Worklog Protocol | `.claude/worklog.md` path; `UserPromptSubmit` hook name; PreToolUse validator | Naming-only (protocol shape is platform-agnostic) | Keep in §7 with a cross-reference footer pointing to DSM_7.0 §2.1 for the Claude execution layer |
+| DSM_0.2 §7 Session Transcript Protocol | `.claude/session-transcript.md` path; `UserPromptSubmit` hook name; PreToolUse validator | Naming-only (protocol shape is platform-agnostic) | Keep in §7 with a cross-reference footer pointing to DSM_7.0 §2.1 for the Claude execution layer |
 | DSM_0.2 §17 CLAUDE.md Configuration | Entire section is Claude's agent-config system (filename `CLAUDE.md`, `@` import syntax, `.claude/` directory) | Semantic-also (the section describes Claude's config system) | Option 1 (recommended for now): leave §17 in place; add a cross-reference to DSM_7.0 §2.1. Option 3 (Phase 5 revisit): extract Claude-specific parts into DSM_7.0 §2.1; keep only the platform-agnostic "agents need a config file" spec in DSM_0.2 |
 | DSM_0.2 §23 Third-Party Skill Governance | `~/.claude/skills/`, SKILL.md frontmatter, skill event matchers | Naming-only (registry pattern is platform-agnostic) + semantic-also (SKILL.md format) | Keep general registry concept in §23; move SKILL.md specifics to DSM_7.0 §2.1 |
 | DSM_0.2.B Infrastructure File Collaboration | Skills, hooks, settings.json, command files | Naming-only with semantic-also leanings | Cross-reference to DSM_7.0 §2.1 |
@@ -693,7 +686,7 @@ applies edits.
 
 1. DSM_0.0 §7 Document Map , add DSM_7.0 entry (this scaffold already does
    it)
-2. DSM_0.2 §7 Worklog , footer cross-reference to §2.1
+2. DSM_0.2 §7 Session Transcript , footer cross-reference to §2.1
 3. DSM_0.2 §8 Pre-Generation Brief (Gate 2 permission window) ,
    cross-reference
 4. DSM_0.2 §17 CLAUDE.md Configuration , cross-reference at section top

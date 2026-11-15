@@ -121,14 +121,3 @@ contributions-docs/
 .claude/last-align-report.md
 .claude/last-wrap-up.txt
 .claude/*.code-workspace
-
-# Hub knowledge stays private (BACKLOG-606; DSM_0.2.A §8.3 "Lesson files are never public")
-dsm-docs/reasoning-lessons-ecosystem.md
-_inbox/*
-!_inbox/README.md
-.claude/worklog.md
-.claude/reasoning-lessons-compact.md
-.claude/memory/
-.claude/last-staa.txt
-.claude/lessons-shared.txt
-.claude/leak-scan-patterns.txt

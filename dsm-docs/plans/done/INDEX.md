@@ -106,7 +106,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-104 | Add Next-Steps Summary to Sprint Boundary Checklist | — | 2026-02-10 | — (needs review) |
 | BACKLOG-105 | Blog Workflow Three-Document Pipeline | v1.3.34 | 2026-02-13 | — (needs review) |
 | BACKLOG-106 | Standardize done/ Subfolder Convention Across docs/ | — | 2026-02-11 | — (needs review) |
-| BACKLOG-107 | Worklog as Primary Reasoning Channel | — | 2026-02-11 | — (needs review) |
+| BACKLOG-107 | Session Transcript as Primary Reasoning Channel | — | 2026-02-11 | — (needs review) |
 | BACKLOG-108 | Canonical Spoke Folder Names and Scaffolding Pre-Check | — | 2026-02-11 | — (implementation-only) |
 | BACKLOG-109 | /dsm-initiate Scaffolding Skill | v1.3.33 | 2026-02-13 | — (implementation-only) |
 | BACKLOG-110 | /dsm-refresh-memory and /dsm-refresh-all Skills | v1.3.34 | 2026-02-13 | — (needs review) |
@@ -226,7 +226,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-237 | Transcript-Based Wrap-Up Recovery Protocol | — | 2026-03-20 | — (needs review) |
 | BACKLOG-238 | Public Feature Inventory and Distribution Pipeline | — | 2026-03-20 | — (needs review) |
 | BACKLOG-239 | DSM Vocabulary Comprehensive Update and Spoke Propagation | v1.6.3 | 2026-04-20 | — (needs review) |
-| BACKLOG-240 | Worklog Append-Only Enforcement | — | 2026-03-20 | — (needs review) |
+| BACKLOG-240 | Session Transcript Append-Only Enforcement | — | 2026-03-20 | — (needs review) |
 | BACKLOG-241 | Fix Global dsm-go Command Bandwidth Step Drift | — | 2026-03-20 | — (needs review) |
 | BACKLOG-242 | Protocol Violation Triage | — | 2026-03-21 | — (needs review) |
 | BACKLOG-243 | Parallel Session Conflict Prevention | — | 2026-03-21 | — (needs review) |
@@ -275,7 +275,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-289 | Preserve Mandatory Thinking Step in Lightweight Session Mode | — | 2026-04-01 | — (needs review) |
 | BACKLOG-290 | Scaffold-First Flow for /dsm-go on New Projects | v1.4.3 | 2026-04-05 | §17 |
 | BACKLOG-291 | Enforce Transcript Append-Only Rule via Claude Code Hook | — | 2026-04-01 | DSM_0.2 §7 |
-| BACKLOG-292 | Universal Typed Delimiters for Worklog Protocol | v1.4.1 | 2026-04-01 | DSM_0.2 §7 |
+| BACKLOG-292 | Universal Typed Delimiters for Session Transcript Protocol | v1.4.1 | 2026-04-01 | DSM_0.2 §7 |
 | BACKLOG-293 | Stale Branch Cleanup at Session Start | v1.4.1 | 2026-04-01 | — (implementation-only) |
 | BACKLOG-294 | CLAUDE.md Validation Lifecycle for Project Content Drift Detection | v1.4.1 | 2026-04-01 | DSM_0.2 §1 |
 | BACKLOG-296 | CHANGELOG Spoke Action Annotations for Broadcast Notifications | v1.4.1 | 2026-04-01 | DSM_0.2 §2 |
@@ -298,16 +298,16 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-315 | Add Cross-Repo Write Safety and Read-Before-Answering to §17.1 Template | v1.4.5 | 2026-04-06 | §17.1 |
 | BACKLOG-316 | Planning Pipeline Gate — Only `dsm-docs/plans/` Items Are Actionable | v1.4.6 | 2026-04-07 | §17.1 |
 | BACKLOG-317 | Feature Trail Index for Blog Reconstruction | — | 2026-04-07 | — (needs review) |
-| BACKLOG-318 | Per-Turn Enforcement of Worklog Append | v1.4.9 | 2026-04-07 | DSM_0.2 §7 |
+| BACKLOG-318 | Per-Turn Enforcement of Session Transcript Append | v1.4.9 | 2026-04-07 | DSM_0.2 §7 |
 | BACKLOG-319 | Scaffold Delivery for Per-Turn Transcript Hook | v1.4.13 | 2026-04-09 | DSM_0.2 §7 |
 | BACKLOG-320 | Audit §7-Style Protocols for Require/Validate Gaps | v1.4.12 | 2026-04-19 | DSM_0.2 §7 |
-| BACKLOG-324 | Parallel Sessions Contaminating Main Worklog | S174 (branch `bl-324/parallel-session-hook-detection`) | 2026-04-08 | DSM_0.2 §17 |
+| BACKLOG-324 | Parallel Sessions Contaminating Main Session Transcript | S174 (branch `bl-324/parallel-session-hook-detection`) | 2026-04-08 | DSM_0.2 §17 |
 | BACKLOG-325 | Promote What/Why/How Rule to CLAUDE.md Alignment Template | v1.4.10 | 2026-04-09 | DSM_0.2 §8.5 |
 | BACKLOG-326 | Make /dsm-light-wrap-up Merge-to-Main Mandatory | v1.4.10 | 2026-04-08 | DSM_0.2 §20 |
 | BACKLOG-327 | Add Skill Self-Reference Read-Before-Claim Rule | v1.4.10 | 2026-04-09 | §17.1 |
 | BACKLOG-328 | /dsm-align Scaffolds .claude/reasoning-lessons.md on Project Setup | v1.4.10 | 2026-04-09 | — (implementation-only) |
 | BACKLOG-329 | /dsm-align Produces a Persistent Informative Alignment Report | v1.4.10 | 2026-04-09 | — (needs review) |
-| BACKLOG-330 | Tighten Worklog Protocol Self-Check for Pure-Reasoning Turns | v1.4.10 | 2026-04-08 | DSM_0.2 §7 |
+| BACKLOG-330 | Tighten Session Transcript Protocol Self-Check for Pure-Reasoning Turns | v1.4.10 | 2026-04-08 | DSM_0.2 §7 |
 | BACKLOG-331 | Light-go Switch-Flow Recovery and DSM_0.2 §7 Hardening | v1.4.17 | 2026-04-09 | DSM_0.2 §7 |
 | BACKLOG-332 | Post-Merge Branch Recreation Rule for DSM_0.2 §20 | v1.4.11 | 2026-04-09 | DSM_0.2 §20 |
 | BACKLOG-335 | Pre-Mirror-Sync Personal Content Scanner | v1.4.13 | 2026-04-09 | DSM_0.2 §13 |
@@ -356,7 +356,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-407 | Prevent Central from committing notification files into mirror _inbox/ | v1.7.0 | 2026-04-21 | /dsm-wrap-up Step 8d/9 (mirror inbox guard) |
 | BACKLOG-408 | Hello-world welcome inbox entry for fresh mirror clones | v1.7.0 | 2026-04-21 | DSM_0.2.A §25.2 |
 | BACKLOG-409 | Gate 1 Parallel Offload Analysis — user-approved subagent delegation plan | v1.7.0 | 2026-04-21 | DSM_0.2 §8.8 |
-| BACKLOG-410 | Register agent + model identity in worklog header | v1.7.0 | 2026-04-21 | DSM_6.0 §2.3 |
+| BACKLOG-410 | Register agent + model identity in session-transcript header | v1.7.0 | 2026-04-21 | DSM_6.0 §2.3 |
 | BACKLOG-413 | /dsm-go Context Efficiency Improvements (Inbox Lazy-Load + Conditional Align + Hook Chmod) | v1.7.0 | 2026-04-22 | §22 |
 | BACKLOG-414 | Checkpoint Step Missing from /dsm-wrap-up | v1.7.0 | 2026-04-23 | — (needs review) |
 | BACKLOG-418 | Scrub BL References from Mirrored Methodology | v1.8.0 | 2026-04-24 | — (implementation-only) |
@@ -383,7 +383,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-444 | /dsm-go Step 3.5 Spec Fix, Add Post-Rename Restage | v1.10.0 | 2026-05-29 | scripts/commands/dsm-go.md (Step 3.5) |
 | BACKLOG-447 | Reconcile Compact-Mirror Regenerator Drift Between /dsm-staa and /dsm-wrap-up | v1.10.0 | 2026-05-29 | DSM_0.2.A §8.1 |
 | BACKLOG-448 | Cross-Repo Writes Must Be Write-Only, Never Run git in the Target Repo | v1.11.0 | 2026-05-31 | DSM_0.2.C §2 |
-| BACKLOG-449 | Forbid replace_all on Worklog Edits + Hook Anomaly Detection | v1.11.0 | 2026-05-31 | DSM_0.2 §7 |
+| BACKLOG-449 | Forbid replace_all on Session-Transcript Edits + Hook Anomaly Detection | v1.11.0 | 2026-05-31 | DSM_0.2 §7 |
 | BACKLOG-450 | /dsm-wrap-up Step 0.5 Pre-Confirm Known Cross-Repo Targets | v1.11.0 | 2026-05-31 | scripts/commands/dsm-wrap-up.md (Step 0.5) |
 | BACKLOG-451 | Inbox-Done Lifecycle, Collision-Safe Dated Filenames | v1.11.0 | 2026-05-31 | DSM_0.2 §17.1 |
 | BACKLOG-452 | Adopt Smoke Tests as a Named DSM Artifact | v1.12.0 | 2026-05-31 | DSM_4.0.A §7 |
@@ -416,9 +416,7 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-489 | The closed-session-leftover remedy strands the leftover branch's commits | v1.20.0 | 2026-08-05 | — (needs review) |
 | BACKLOG-491 | Both stated byte caps on the reasoning-lessons compact mirror are unenforceable | v1.22.0 | 2026-08-20 | DSM_0.2.A §8.1 Size bound + /dsm-go Step 1.5 |
 | BACKLOG-493 | /dsm-go Step 5.8's incomplete-wrap-up detection fires on every fresh session | v1.21.0 | 2026-08-05 | /dsm-go Step 5.8 |
-| BACKLOG-495 | Reasoning-lessons intake outpaces pruning, so no size target holds without a rate control | v1.26.5 | 2026-10-01 | DSM_0.2.A §8 Maintenance (per-entry size ceiling) + §8.2 (R2 ecosystem-split retention) |
 | BACKLOG-498 | The done/INDEX.md currency audit is Central-only but lives inside a skill Central almost never runs | — | 2026-09-12 | /dsm-align Step 11b both-tree audit + BL-547 reachability |
-| BACKLOG-500 | §7's sanctioned transcript-append paths are under-specified: anchor collision and heredoc quoting | v1.35.0 | 2026-10-15 | DSM_0.2.G Appending with Bash (anchor-collision precondition) |
 | BACKLOG-501 | Research-file status labels may not exceed their verification pass | v1.21.0 | 2026-08-12 | DSM_0.2 §10.1 |
 | BACKLOG-502 | The roadmap covers 26% of the backlog it claims to map, and work selection is routed through it | v1.21.0 | 2026-08-12 | plan/roadmap.md curation criterion |
 | BACKLOG-503 | /dsm-align hook merge keys idempotency on command alone, so multi-matcher hooks never reach spokes | v1.21.0 | 2026-08-12 | /dsm-align sub-step 10e |
@@ -447,9 +445,8 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-533 | /dsm-review-feedback reads two feedback filenames that exist on zero projects, and four methodology sites still describe them as current | v1.25.0 | 2026-08-25 | scripts/commands/dsm-review-feedback.md Steps 1-4, DSM_0.2.A §4 BL-472 carve-out |
 | BACKLOG-534 | `/dsm-go` and `/dsm-light-go` count nine scaffold folders where the specification and the scaffolder both say eight, so a correct project can never report a complete count | v1.26.0 | 2026-08-25 | /dsm-go Step 0.5 + /dsm-light-go Scaffold Pre-Check (folder census, DSM_0.1 §10 named as authority) |
 | BACKLOG-535 | /dsm-wrap-up Step 11's mirror-sync PR filter is an exact branch match, so the safety net never fires | v1.25.0 | 2026-08-25 | /dsm-wrap-up Step 11 (client-side prefix filter + session-created positive guard) |
-| BACKLOG-543 | A wording pattern in the always-loaded Worklog reinforcement block correlates with a model-side session-start refusal on newer models | v1.26.0 | 2026-09-03 | DSM_0.2 §17.1 alignment template + `.claude/CLAUDE.md` reinforcement block (rewording); localized by manual ablation |
-| BACKLOG-544 | Generational memory tiering: decommission + archive skills to keep auto-loaded MEMORY.md bounded | v1.26.5 | 2026-10-01 | `/dsm-memory-decommission` + `/dsm-memory-archive` skills + `/dsm-wrap-up` Step 2.4 / `/dsm-quick-wrap-up` Step 1.4 triggers (sessions-zone 4 KB, long-term 10 KB) |
-| BACKLOG-545 | Reframe the Worklog Protocol delimiter from "thinking" to a plan entry ecosystem-wide | v1.26.0 | 2026-09-04 | DSM_0.2 §6 delimiter label (`Start Plan`), §7, DSM_0.2.G, the §17.1 template, and `transcript-reminder.sh` |
+| BACKLOG-543 | A wording pattern in the always-loaded Session Transcript reinforcement block correlates with a model-side session-start refusal on newer models | v1.26.0 | 2026-09-03 | DSM_0.2 §17.1 alignment template + `.claude/CLAUDE.md` reinforcement block (rewording); localized by manual ablation |
+| BACKLOG-545 | Reframe the Session Transcript Protocol delimiter from "thinking" to a plan entry ecosystem-wide | v1.26.0 | 2026-09-04 | DSM_0.2 §6 delimiter label (`Start Plan`), §7, DSM_0.2.G, the §17.1 template, and `transcript-reminder.sh` |
 | BACKLOG-546 | The document-metrics script writes to the folder renamed away in S138, creates it on the way, and reports success either way | v1.26.3 | 2026-09-04 | `scripts/document_structure_metrics.py` (REFERENCE_FILE path + assert-never-create) |
 | BACKLOG-547 | The Central align exception is a procedure that exists only inside the markers it writes, and the template it reads has moved | — | 2026-09-12 | `/dsm-go` Step 1.8 (no-Central-exception + measured cost) and `/dsm-align` Step 1 Hub fast-path + Step 13 marker `note:` rule |
 | BACKLOG-521 | Two Sprint Boundary Checklist items name paths no scaffold creates | — | 2026-08-21 | DSM_2.0.C Template 8, /dsm-align Step 3 |
@@ -458,42 +455,9 @@ updated when `/dsm-backlog-done` moves a BL.
 | BACKLOG-517 | Transcript delimiter timestamps are never checked against the wall clock | — | 2026-08-21 | validate-transcript-edit.sh check 4/4, DSM_0.2 §7 |
 | BACKLOG-536 | `/dsm-wrap-up` Step 6a's per-session feedback scan is suffix-specific, so topically-named feedback is never pushed | v1.26.2 | 2026-08-31 | /dsm-wrap-up Step 6a, /dsm-align Step 6a (scope widened in-flight), DSM_0.2.A §4 |
 | BACKLOG-537 | Central's six leftover project-level command copies are inert residue the deploy warning flags every run | v1.26.2 | 2026-08-31 | scripts/sync-commands.sh (delete + Central-only --check guard) |
-| BACKLOG-554 | The transcript heredoc rule names one command-substitution syntax out of two, and one of the two defects its own remedy fixes | v1.35.0 | 2026-10-15 | DSM_0.2.G Appending with Bash (two-direction table, clock-read default form) |
-| BACKLOG-557 | The active backlog index has no currency audit, so a filed item can sit open and invisible indefinitely | v1.27.2 | 2026-10-08 | /dsm-align Step 11d (active-index currency audit, both directions; absorbs BL-498 active-README dead-link criterion) |
-| BACKLOG-558 | Design an envelope/payload split so redistributed lessons and feedback never carry client identity by default | — | 2026-09-24 | 2026-09-24 envelope/payload operational design (B-mirror boundary; Q1–Q5 resolved, no methodology edit / no impl BL needed; enforcement = BL-560/561); closed S274 |
 | BACKLOG-559 | Retroactively reword redistributed reasoning-lesson and feedback entries to remove project/client identity, count-preserving | — | 2026-09-24 | superseded: moot under the B-mirror boundary (2026-09-24 envelope/payload operational design) |
 | BACKLOG-560 | De-identify the public TAB provenance corpus — reword every specific project name to a project-agnostic form | v1.26.4 | 2026-09-30 | DSM_0.2.C §5.7 Public Mirror Project-Name Exclusion (public corpus de-identified; scanner BL-561/564 enforces; §21.4 sweep clean) |
 | BACKLOG-561 | Extend the mirror-sync content scanner to block client and project names, not only operator identity | — | 2026-09-24 | scripts/check-mirror-sync-content.sh (two-tier project-name detection; primary confidentiality gate under BL-558 B-mirror boundary) |
-| BACKLOG-564 | Extend the mirror-sync scanner to catch project-name variants and reclassify dual-use slugs | — | 2026-09-30 | scripts/check-mirror-sync-content.sh (boundary-robust Tier-1b + dual-use Tier-2 + discovered names; sibling to BL-561) |
-| BACKLOG-565 | Correct the git branch -d merge-criterion wording (§20.4) and fix the dsm-go stale-cleanup silent-skip of main-merged branches | v1.26.8 | 2026-10-05 | DSM_0.2 §20.4 (upstream/HEAD wording) + /dsm-go Step 0d item 3 (surface-on-rejection) |
-| BACKLOG-566 | Fix the wrap-up mirror self-detection inbox guard that classifies every spoke as a mirror | v1.26.8 | 2026-10-05 | /dsm-wrap-up Step 9 + /dsm-quick-wrap-up Step 7 (role-signal predicate, DSM_0.2.A §25.1) |
-| BACKLOG-567 | Ecosystem reasoning-lessons aggregation file: review-cost bound + STAA prune | v1.28.0 | 2026-10-09 | DSM_0.2.A §8.3 + /dsm-staa Step 7b (bound/owner/action-set/ceiling; ~120 KB long-term target) |
-| BACKLOG-568 | The MEMORY.md evergreen zone is the larger half of the always-loaded boot cost | v1.26.6 | 2026-10-02 | /dsm-wrap-up Step 2.4a (evergreen review flag) |
-| BACKLOG-569 | Assert FEATURES Current count equals actual F-entry count at wrap-up/release | v1.26.7 | 2026-10-05 | /dsm-go Step 2f (count-equality boot assertion, sibling to Step 2e; placed at boot not wrap-up) |
-| BACKLOG-571 | Egress leak-scan must report generically, never echo matched PII | v1.27.0 | 2026-10-06 | DSM_0.2.C §5.8 (Egress Leak-Scan Generic Reporting Rule) + core §7 pointer |
-| BACKLOG-572 | Give /dsm-staa an explicit PII/egress safeguard | v1.27.0 | 2026-10-06 | /dsm-staa IMPORTANT PII block + Step 5/6 edits + core §7 exception-clause pointer |
-| BACKLOG-573 | Cloned-Mirror Kick-off should offer the .git/info/exclude blanket rule | v1.27.0 | 2026-10-06 | DSM_0.2.A §25.2 step 12 + §25.5 (detect + print the line, no auto-edit) + /dsm-go Step 0.8c |
-| BACKLOG-574 | Correct the tracked mode of validate-cross-repo-write.sh to 755 | v1.27.0 | 2026-10-07 | Mirror committed mode 644→755 (confirmed on take-ai-bite main at the v1.27.0 sync, afcff19); Central source already 755 |
-| BACKLOG-575 | Make sync-commands.sh --check orphan wording mirror-aware | v1.27.0 | 2026-10-06 | scripts/sync-commands.sh report_orphans() (IS_CENTRAL-aware header + non-central branch) |
-| BACKLOG-576 | Prune/prompt ecosystem-template placeholder rows for a standalone fork | v1.27.0 | 2026-10-06 | — already resolved in corpus (DSM_0.2.A §25.2 step 5); no change made |
-| BACKLOG-577 | Emit a fork-init readiness checklist at the end of Cloned-Mirror Kick-off | v1.27.0 | 2026-10-06 | DSM_0.2.A §25.2 step 15 + /dsm-go Step 0.8d |
-| BACKLOG-578 | First-class new-spoke bootstrap path for an uninitialized directory | v1.29.0 | 2026-10-09 | DSM_0.2.A §25.7 + /dsm-new-spoke + /dsm-go Step 0.8c guard |
-| BACKLOG-579 | Fix GNU-only `date +%:z` in the §8.1 compact-mirror transform (macOS/BSD portability) | v1.27.1 | 2026-10-08 | DSM_0.2.A §8.1 canonical transform (`%:z` → portable `%z`); take-ai-bite #121/#122 |
-| BACKLOG-580 | A completed design can sit in a decision record while its parent BL stays active, and nothing cross-references the two | v1.27.2 | 2026-10-08 | /dsm-align Step 11e (decision-record completion marker vs active-BL status, best-effort) |
-| BACKLOG-581 | Sanctioned independent fork-local backlog line for public-mirror forks | v1.30.0 | 2026-10-09 | DSM_0.2 §21.5 (fork-local backlog line) + DSM_7.0 §2.1 cross-ref |
-| BACKLOG-582 | By-design data-protection / compliance briefing for projects handling personal data | v1.31.0 | 2026-10-10 | DSM_0.2.C §5.9 (DP/compliance briefing by design); take-ai-bite #127/#128 |
-| BACKLOG-583 | Wire the §5.9 DP/compliance briefing surfacing check into session-start | v1.32.0 | 2026-10-11 | /dsm-go Step 2g (DP/compliance surfacing) + DSM_0.2.C §5.9 reconcile + DSM_0.2.A §23 cross-ref |
-| BACKLOG-585 | Propagate the BL-584 boot-safeguard fix across the DSM ecosystem (spokes, TAB mirror, forks) | v1.33.0/v1.33.1 (rollout) | 2026-10-19 | — (rollout: TAB sync, fork migration guide, first spoke migrated; remaining spokes split to BACKLOG-593) |
-| BACKLOG-586 | Give /dsm-staa a read-only concurrent-session check on entry | v1.34.0 | 2026-10-14 | /dsm-staa Step 0 (read-only lock check) + Notes write scope + DSM_0.2.A §26.2 row; take-ai-bite #135/#136 |
-| BACKLOG-587 | Require a clean staged index before creating a Level 3 task branch | v1.35.0 | 2026-10-15 | DSM_0.2 §20.9 (clean staged index before a Level 3 branch); take-ai-bite #137/#138 |
-| BACKLOG-588 | Keep fork-local backlog on main and document the fork BL workflow | v1.35.0 | 2026-10-15 | DSM_0.2 §21.5 (visible-from-every-session rule + fork-local BL workflow); take-ai-bite #139/#140 |
-| BACKLOG-589 | Add a fork non-contradiction and free-contribution principle | v1.35.0 | 2026-10-15 | DSM_0.2 §21.5 (extend-not-contradict rule) + fork migration guide pointer; take-ai-bite #139/#140 |
-| BACKLOG-590 | Stop the /dsm-go boot-turn plan from landing in the previous session's archive | v1.35.0 | 2026-10-15 | DSM_0.2.G Boot-turn ordering + transcript-reminder.sh silent on /dsm-go |
-| BACKLOG-591 | Define when a fork-local BL is done and where it is archived | v1.35.0 | 2026-10-15 | DSM_0.2 §21.5 (done-and-archive rule, done/fork-INDEX.md); take-ai-bite #144 |
-| BACKLOG-592 | Make the Worklog Protocol readable on strict models (trim §7 by priority; remove Module G's two flagged blocks) | v1.34.0 | 2026-10-15 | DSM_0.2 §7 (trimmed) + DSM_0.2.G (Worklog Protocol Detail) |
-| BACKLOG-609 | Make the boot and wrap-up snippets work on macOS and zsh (BSD stat, full-path process name, zsh's path variable) | v1.37.1 | 2026-10-22 | macOS/zsh portability of `/dsm-go` Steps 0.7a + 6, `/dsm-staa` Step 0, `/dsm-parallel-session-go`, `/dsm-wrap-up` Step 0.5, DSM_0.2.A §26, transcript-reminder.sh |
-| BACKLOG-610 | Make /dsm-align's done-index check use a fork's own done/fork-INDEX.md instead of Central's INDEX.md | v1.37.1 | 2026-10-22 | `/dsm-align` Step 11b (done/fork-INDEX.md switch; row IDs as BACKLOG-NNN or bare NNN) |
-| BACKLOG-611 | Correct the mirror-sync manifest, which lists the content scanner as mirrored although take-ai-bite does not carry it | v1.37.1 | 2026-10-22 | dsm-docs/guides/mirror-sync-manifest.md (category 7, section 3: scanner Central-only) |
 
 ---
 
@@ -508,6 +472,6 @@ updated when `/dsm-backlog-done` moves a BL.
 - Version filled from CHANGELOG: 220
 - Version from BL header only: 1
 - Version unresolved: 108
-- Resolver with section ref (§): 72
+- Resolver with section ref (§): 71
 - Resolver — (implementation-only): 36
 - Resolver — (needs review): 222

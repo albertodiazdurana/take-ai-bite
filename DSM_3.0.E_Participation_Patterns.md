@@ -157,7 +157,7 @@ adoption checklist before the standard initialization (Section 6.7 checklist).
    - Agent-created memory files (e.g., `memody.md`) → extract key user
      preferences into CLAUDE.md, then archive the source file in place
 3. Preserve all originals; they are the user's pre-DSM work record
-4. Document the migration in the worklog
+4. Document the migration in the session transcript
 
 **Hierarchical project guidance:**
 
@@ -272,7 +272,7 @@ Project type: Private Documentation. DSM private project pattern
 
 | Protocol | Applies? | Override |
 |----------|:--------:|---------|
-| Worklog Protocol | Yes | Standard |
+| Session Transcript Protocol | Yes | Standard |
 | Pre-Generation Brief Protocol | Yes | Standard |
 | Destructive Action Protocol | Yes | Standard |
 | Inbox, inbound | Yes | Receive only; DSM Central writes to `_inbox/` |
@@ -297,12 +297,12 @@ DSM Central --writes--> _inbox/               (methodology updates only)
 {project}   --writes--> DSM Central/_inbox/    (minimal: "feedback available")
 DSM Central <--reads--- dsm-docs/feedback-to-dsm/         (sanitized by user, read-only)
 
-### Worklog Protocol (reinforces inherited protocol)
+### Session Transcript Protocol (reinforces inherited protocol)
 
-- Append the plan entry to `.claude/worklog.md` BEFORE acting
+- Append the plan entry to `.claude/session-transcript.md` BEFORE acting
 - Output summary AFTER completing work
 - Conversation text = results only
-- Use Worklog Delimiter Format for every block:
+- Use Session Transcript Delimiter Format for every block:
   `<------------Start Plan / HH:MM------------>`
   `<------------Start Output / HH:MM------------>`
   `<------------Start User / HH:MM------------>`
@@ -319,7 +319,7 @@ Extend the Agent Constraints with project-specific sensitive data types
   README.md                (local status dashboard)
   .claude/
     CLAUDE.md              (@ reference + privacy overrides)
-    worklog.md
+    session-transcript.md
     session-baseline.txt
     reasoning-lessons.md   (optional)
   _inbox/                  (receives from DSM Central only)
@@ -503,7 +503,7 @@ Standard spoke pattern (see DSM_3 Section 6.9).
 
 | Protocol | Applies? | Override |
 |----------|:--------:|---------|
-| Worklog Protocol | Yes | Standard |
+| Session Transcript Protocol | Yes | Standard |
 | Pre-Generation Brief Protocol | Yes | Standard |
 | Destructive Action Protocol | Yes | Standard |
 | Inbox, inbound | Yes | Bidirectional |
@@ -512,12 +512,12 @@ Standard spoke pattern (see DSM_3 Section 6.9).
 | Cross-repo writes | Yes | Standard |
 | DSM_3 Section 7 registration | Yes | Standard |
 
-## Worklog Protocol (reinforces inherited protocol)
+## Session Transcript Protocol (reinforces inherited protocol)
 
-- Append the plan entry to `.claude/worklog.md` BEFORE acting
+- Append the plan entry to `.claude/session-transcript.md` BEFORE acting
 - Output summary AFTER completing work
 - Conversation text = results only
-- Use Worklog Delimiter Format for every block:
+- Use Session Transcript Delimiter Format for every block:
   `<------------Start Plan / HH:MM------------>`
   `<------------Start Output / HH:MM------------>`
   `<------------Start User / HH:MM------------>`
@@ -531,7 +531,7 @@ Standard spoke pattern (see DSM_3 Section 6.9).
   README.md                (project description for external audiences)
   .claude/
     CLAUDE.md              (@ reference + project-specific instructions)
-    worklog.md
+    session-transcript.md
     session-baseline.txt
     reasoning-lessons.md   (optional)
     dsm-ecosystem.md       (gitignored: cross-repo paths)
