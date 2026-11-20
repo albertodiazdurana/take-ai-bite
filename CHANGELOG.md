@@ -5,6 +5,12 @@ All notable changes to the Deliberate Systematic Methodology (DSM) will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.38.0] - 2026-11-20
+
+### Added
+
+- `.gitignore` rules that keep a hub's own records (spoke messages, lessons, memory, worklogs) out of commits.
+
 ## [1.26.4] - 2026-09-30
 
 Patch: the public mirror's provenance corpus is de-identified — no specific project, client, or spoke name reaches it — and the standing rule that keeps it that way is codified as methodology.

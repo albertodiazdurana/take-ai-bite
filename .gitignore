@@ -121,3 +121,34 @@ contributions-docs/
 .claude/last-align-report.md
 .claude/last-wrap-up.txt
 .claude/*.code-workspace
+
+# ------------------------------------------------------------------
+# Keep your hub's own records out of commits (added in 1.38.0)
+#
+# After Kick-off, a clone of this repository works as your DSM hub.
+# Your sessions then write lessons, memory, worklogs and messages from
+# your spoke projects into it. Those records describe your work, not
+# the methodology, and a fork of a public repository on GitHub is
+# public as well, so they are never committed.
+#
+# Claude Code normally hides .claude/ through .git/info/exclude. The
+# .claude/ lines below still apply when that exclude is missing.
+# ------------------------------------------------------------------
+
+# Messages from your spoke projects stay local; the README that
+# explains the folder is kept.
+_inbox/*
+!_inbox/README.md
+
+# Lessons the hub collects from its spokes.
+dsm-docs/reasoning-lessons-ecosystem.md
+
+# Working records of your agent sessions.
+.claude/worklog.md
+.claude/memory/
+.claude/reasoning-lessons-compact.md
+.claude/last-staa.txt
+
+# Lesson-sharing record and private scan terms.
+.claude/lessons-shared.txt
+.claude/leak-scan-patterns.txt
